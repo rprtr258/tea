@@ -1,11 +1,12 @@
 package lipgloss
 
 import (
+	"fmt"
 	"io"
-	"reflect"
 	"testing"
 
 	"github.com/muesli/termenv"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStyleRender(t *testing.T) {
@@ -13,7 +14,7 @@ func TestStyleRender(t *testing.T) {
 	renderer.SetHasDarkBackground(true)
 	t.Parallel()
 
-	tt := []struct {
+	for i, tc := range []struct {
 		style    Style
 		expected string
 	}{
@@ -45,16 +46,12 @@ func TestStyleRender(t *testing.T) {
 			NewStyle().Faint(true),
 			"\x1b[2mhello\x1b[0m",
 		},
-	}
-
-	for i, tc := range tt {
-		s := tc.style.Copy().SetString("hello")
-		res := s.Render()
-		if res != tc.expected {
-			t.Errorf("Test %d, expected:\n\n`%s`\n`%s`\n\nActual output:\n\n`%s`\n`%s`\n\n",
-				i, tc.expected, formatEscapes(tc.expected),
-				res, formatEscapes(res))
-		}
+	} {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			s := tc.style.Copy().SetString("hello")
+			res := s.Render()
+			assert.Equal(t, tc.expected, res)
+		})
 	}
 }
 
@@ -62,7 +59,7 @@ func TestStyleCustomRender(t *testing.T) {
 	r := NewRenderer(io.Discard)
 	r.SetHasDarkBackground(false)
 	r.SetColorProfile(termenv.TrueColor)
-	tt := []struct {
+	for i, tc := range []struct {
 		style    Style
 		expected string
 	}{
@@ -98,16 +95,12 @@ func TestStyleCustomRender(t *testing.T) {
 			NewStyle().Faint(true).Renderer(r),
 			"\x1b[2mhello\x1b[0m",
 		},
-	}
-
-	for i, tc := range tt {
-		s := tc.style.Copy().SetString("hello")
-		res := s.Render()
-		if res != tc.expected {
-			t.Errorf("Test %d, expected:\n\n`%s`\n`%s`\n\nActual output:\n\n`%s`\n`%s`\n\n",
-				i, tc.expected, formatEscapes(tc.expected),
-				res, formatEscapes(res))
-		}
+	} {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			s := tc.style.Copy().SetString("hello")
+			res := s.Render()
+			assert.Equal(t, tc.expected, res)
+		})
 	}
 }
 
@@ -115,9 +108,7 @@ func TestStyleRenderer(t *testing.T) {
 	r := NewRenderer(io.Discard)
 	s1 := NewStyle().Bold(true)
 	s2 := s1.Renderer(r)
-	if s1.r == s2.r {
-		t.Fatalf("expected different renderers")
-	}
+	assert.NotEqual(t, s1.r, s2.r)
 }
 
 func TestValueCopy(t *testing.T) {
@@ -129,7 +120,7 @@ func TestValueCopy(t *testing.T) {
 	i := s
 	i.Bold(false)
 
-	requireEqual(t, s.GetBold(), i.GetBold())
+	assert.Equal(t, s.GetBold(), i.GetBold())
 }
 
 func TestStyleInherit(t *testing.T) {
@@ -149,23 +140,23 @@ func TestStyleInherit(t *testing.T) {
 
 	i := NewStyle().Inherit(s)
 
-	requireEqual(t, s.GetBold(), i.GetBold())
-	requireEqual(t, s.GetItalic(), i.GetItalic())
-	requireEqual(t, s.GetUnderline(), i.GetUnderline())
-	requireEqual(t, s.GetStrikethrough(), i.GetStrikethrough())
-	requireEqual(t, s.GetBlink(), i.GetBlink())
-	requireEqual(t, s.GetFaint(), i.GetFaint())
-	requireEqual(t, s.GetForeground(), i.GetForeground())
-	requireEqual(t, s.GetBackground(), i.GetBackground())
+	assert.Equal(t, s.GetBold(), i.GetBold())
+	assert.Equal(t, s.GetItalic(), i.GetItalic())
+	assert.Equal(t, s.GetUnderline(), i.GetUnderline())
+	assert.Equal(t, s.GetStrikethrough(), i.GetStrikethrough())
+	assert.Equal(t, s.GetBlink(), i.GetBlink())
+	assert.Equal(t, s.GetFaint(), i.GetFaint())
+	assert.Equal(t, s.GetForeground(), i.GetForeground())
+	assert.Equal(t, s.GetBackground(), i.GetBackground())
 
-	requireNotEqual(t, s.GetMarginLeft(), i.GetMarginLeft())
-	requireNotEqual(t, s.GetMarginRight(), i.GetMarginRight())
-	requireNotEqual(t, s.GetMarginTop(), i.GetMarginTop())
-	requireNotEqual(t, s.GetMarginBottom(), i.GetMarginBottom())
-	requireNotEqual(t, s.GetPaddingLeft(), i.GetPaddingLeft())
-	requireNotEqual(t, s.GetPaddingRight(), i.GetPaddingRight())
-	requireNotEqual(t, s.GetPaddingTop(), i.GetPaddingTop())
-	requireNotEqual(t, s.GetPaddingBottom(), i.GetPaddingBottom())
+	assert.NotEqual(t, s.GetMarginLeft(), i.GetMarginLeft())
+	assert.NotEqual(t, s.GetMarginRight(), i.GetMarginRight())
+	assert.NotEqual(t, s.GetMarginTop(), i.GetMarginTop())
+	assert.NotEqual(t, s.GetMarginBottom(), i.GetMarginBottom())
+	assert.NotEqual(t, s.GetPaddingLeft(), i.GetPaddingLeft())
+	assert.NotEqual(t, s.GetPaddingRight(), i.GetPaddingRight())
+	assert.NotEqual(t, s.GetPaddingTop(), i.GetPaddingTop())
+	assert.NotEqual(t, s.GetPaddingBottom(), i.GetPaddingBottom())
 }
 
 func TestStyleCopy(t *testing.T) {
@@ -185,172 +176,164 @@ func TestStyleCopy(t *testing.T) {
 
 	i := s.Copy()
 
-	requireEqual(t, s.GetBold(), i.GetBold())
-	requireEqual(t, s.GetItalic(), i.GetItalic())
-	requireEqual(t, s.GetUnderline(), i.GetUnderline())
-	requireEqual(t, s.GetStrikethrough(), i.GetStrikethrough())
-	requireEqual(t, s.GetBlink(), i.GetBlink())
-	requireEqual(t, s.GetFaint(), i.GetFaint())
-	requireEqual(t, s.GetForeground(), i.GetForeground())
-	requireEqual(t, s.GetBackground(), i.GetBackground())
+	assert.Equal(t, s.GetBold(), i.GetBold())
+	assert.Equal(t, s.GetItalic(), i.GetItalic())
+	assert.Equal(t, s.GetUnderline(), i.GetUnderline())
+	assert.Equal(t, s.GetStrikethrough(), i.GetStrikethrough())
+	assert.Equal(t, s.GetBlink(), i.GetBlink())
+	assert.Equal(t, s.GetFaint(), i.GetFaint())
+	assert.Equal(t, s.GetForeground(), i.GetForeground())
+	assert.Equal(t, s.GetBackground(), i.GetBackground())
 
-	requireEqual(t, s.GetMarginLeft(), i.GetMarginLeft())
-	requireEqual(t, s.GetMarginRight(), i.GetMarginRight())
-	requireEqual(t, s.GetMarginTop(), i.GetMarginTop())
-	requireEqual(t, s.GetMarginBottom(), i.GetMarginBottom())
-	requireEqual(t, s.GetPaddingLeft(), i.GetPaddingLeft())
-	requireEqual(t, s.GetPaddingRight(), i.GetPaddingRight())
-	requireEqual(t, s.GetPaddingTop(), i.GetPaddingTop())
-	requireEqual(t, s.GetPaddingBottom(), i.GetPaddingBottom())
+	assert.Equal(t, s.GetMarginLeft(), i.GetMarginLeft())
+	assert.Equal(t, s.GetMarginRight(), i.GetMarginRight())
+	assert.Equal(t, s.GetMarginTop(), i.GetMarginTop())
+	assert.Equal(t, s.GetMarginBottom(), i.GetMarginBottom())
+	assert.Equal(t, s.GetPaddingLeft(), i.GetPaddingLeft())
+	assert.Equal(t, s.GetPaddingRight(), i.GetPaddingRight())
+	assert.Equal(t, s.GetPaddingTop(), i.GetPaddingTop())
+	assert.Equal(t, s.GetPaddingBottom(), i.GetPaddingBottom())
 }
 
 func TestStyleUnset(t *testing.T) {
 	t.Parallel()
 
 	s := NewStyle().Bold(true)
-	requireTrue(t, s.GetBold())
+	assert.True(t, s.GetBold())
 	s.UnsetBold()
-	requireFalse(t, s.GetBold())
+	assert.False(t, s.GetBold())
 
 	s = NewStyle().Italic(true)
-	requireTrue(t, s.GetItalic())
+	assert.True(t, s.GetItalic())
 	s.UnsetItalic()
-	requireFalse(t, s.GetItalic())
+	assert.False(t, s.GetItalic())
 
 	s = NewStyle().Underline(true)
-	requireTrue(t, s.GetUnderline())
+	assert.True(t, s.GetUnderline())
 	s.UnsetUnderline()
-	requireFalse(t, s.GetUnderline())
+	assert.False(t, s.GetUnderline())
 
 	s = NewStyle().Strikethrough(true)
-	requireTrue(t, s.GetStrikethrough())
+	assert.True(t, s.GetStrikethrough())
 	s.UnsetStrikethrough()
-	requireFalse(t, s.GetStrikethrough())
+	assert.False(t, s.GetStrikethrough())
 
 	s = NewStyle().Reverse(true)
-	requireTrue(t, s.GetReverse())
+	assert.True(t, s.GetReverse())
 	s.UnsetReverse()
-	requireFalse(t, s.GetReverse())
+	assert.False(t, s.GetReverse())
 
 	s = NewStyle().Blink(true)
-	requireTrue(t, s.GetBlink())
+	assert.True(t, s.GetBlink())
 	s.UnsetBlink()
-	requireFalse(t, s.GetBlink())
+	assert.False(t, s.GetBlink())
 
 	s = NewStyle().Faint(true)
-	requireTrue(t, s.GetFaint())
+	assert.True(t, s.GetFaint())
 	s.UnsetFaint()
-	requireFalse(t, s.GetFaint())
+	assert.False(t, s.GetFaint())
 
 	s = NewStyle().Inline(true)
-	requireTrue(t, s.GetInline())
+	assert.True(t, s.GetInline())
 	s.UnsetInline()
-	requireFalse(t, s.GetInline())
+	assert.False(t, s.GetInline())
 
 	// colors
 	col := Color("#ffffff")
 	s = NewStyle().Foreground(col)
-	requireEqual(t, col, s.GetForeground())
+	assert.Equal(t, col, s.GetForeground())
 	s.UnsetForeground()
-	requireNotEqual(t, col, s.GetForeground())
+	assert.NotEqual(t, col, s.GetForeground())
 
 	s = NewStyle().Background(col)
-	requireEqual(t, col, s.GetBackground())
+	assert.Equal(t, col, s.GetBackground())
 	s.UnsetBackground()
-	requireNotEqual(t, col, s.GetBackground())
+	assert.NotEqual(t, col, s.GetBackground())
 
 	// margins
 	s = NewStyle().Margin(1, 2, 3, 4)
-	requireEqual(t, 1, s.GetMarginTop())
+	assert.Equal(t, 1, s.GetMarginTop())
 	s.UnsetMarginTop()
-	requireEqual(t, 0, s.GetMarginTop())
+	assert.Equal(t, 0, s.GetMarginTop())
 
-	requireEqual(t, 2, s.GetMarginRight())
+	assert.Equal(t, 2, s.GetMarginRight())
 	s.UnsetMarginRight()
-	requireEqual(t, 0, s.GetMarginRight())
+	assert.Equal(t, 0, s.GetMarginRight())
 
-	requireEqual(t, 3, s.GetMarginBottom())
+	assert.Equal(t, 3, s.GetMarginBottom())
 	s.UnsetMarginBottom()
-	requireEqual(t, 0, s.GetMarginBottom())
+	assert.Equal(t, 0, s.GetMarginBottom())
 
-	requireEqual(t, 4, s.GetMarginLeft())
+	assert.Equal(t, 4, s.GetMarginLeft())
 	s.UnsetMarginLeft()
-	requireEqual(t, 0, s.GetMarginLeft())
+	assert.Equal(t, 0, s.GetMarginLeft())
 
 	// padding
 	s = NewStyle().Padding(1, 2, 3, 4)
-	requireEqual(t, 1, s.GetPaddingTop())
+	assert.Equal(t, 1, s.GetPaddingTop())
 	s.UnsetPaddingTop()
-	requireEqual(t, 0, s.GetPaddingTop())
+	assert.Equal(t, 0, s.GetPaddingTop())
 
-	requireEqual(t, 2, s.GetPaddingRight())
+	assert.Equal(t, 2, s.GetPaddingRight())
 	s.UnsetPaddingRight()
-	requireEqual(t, 0, s.GetPaddingRight())
+	assert.Equal(t, 0, s.GetPaddingRight())
 
-	requireEqual(t, 3, s.GetPaddingBottom())
+	assert.Equal(t, 3, s.GetPaddingBottom())
 	s.UnsetPaddingBottom()
-	requireEqual(t, 0, s.GetPaddingBottom())
+	assert.Equal(t, 0, s.GetPaddingBottom())
 
-	requireEqual(t, 4, s.GetPaddingLeft())
+	assert.Equal(t, 4, s.GetPaddingLeft())
 	s.UnsetPaddingLeft()
-	requireEqual(t, 0, s.GetPaddingLeft())
+	assert.Equal(t, 0, s.GetPaddingLeft())
 
 	// border
 	s = NewStyle().Border(normalBorder, true, true, true, true)
-	requireTrue(t, s.GetBorderTop())
+	assert.True(t, s.GetBorderTop())
 	s.UnsetBorderTop()
-	requireFalse(t, s.GetBorderTop())
+	assert.False(t, s.GetBorderTop())
 
-	requireTrue(t, s.GetBorderRight())
+	assert.True(t, s.GetBorderRight())
 	s.UnsetBorderRight()
-	requireFalse(t, s.GetBorderRight())
+	assert.False(t, s.GetBorderRight())
 
-	requireTrue(t, s.GetBorderBottom())
+	assert.True(t, s.GetBorderBottom())
 	s.UnsetBorderBottom()
-	requireFalse(t, s.GetBorderBottom())
+	assert.False(t, s.GetBorderBottom())
 
-	requireTrue(t, s.GetBorderLeft())
+	assert.True(t, s.GetBorderLeft())
 	s.UnsetBorderLeft()
-	requireFalse(t, s.GetBorderLeft())
+	assert.False(t, s.GetBorderLeft())
 }
 
 func TestStyleValue(t *testing.T) {
 	t.Parallel()
 
-	tt := []struct {
+	for name, test := range map[string]struct {
 		name     string
 		style    Style
 		expected string
 	}{
-		{
-			name:     "empty",
+		"empty": {
 			style:    NewStyle(),
 			expected: "foo",
 		},
-		{
-			name:     "set string",
+		"set string": {
 			style:    NewStyle().SetString("bar"),
 			expected: "bar foo",
 		},
-		{
-			name:     "set string with bold",
+		"set string with bold": {
 			style:    NewStyle().SetString("bar").Bold(true),
 			expected: "\x1b[1mbar foo\x1b[0m",
 		},
-		{
-			name:     "new style with string",
+		"new style with string": {
 			style:    NewStyle().SetString("bar", "foobar"),
 			expected: "bar foobar foo",
 		},
-	}
-
-	for i, tc := range tt {
-		res := tc.style.Render("foo")
-		if res != tc.expected {
-			t.Errorf("Test %d, expected:\n\n`%s`\n`%s`\n\nActual output:\n\n`%s`\n`%s`\n\n",
-				i, tc.expected, formatEscapes(tc.expected),
-				res, formatEscapes(res))
-		}
+	} {
+		t.Run(name, func(t *testing.T) {
+			res := test.style.Render("foo")
+			assert.Equal(t, test.expected, res)
+		})
 	}
 }
 
@@ -361,29 +344,5 @@ func BenchmarkStyleRender(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		s.Render("Hello world")
-	}
-}
-
-func requireTrue(tb testing.TB, b bool) {
-	requireEqual(tb, true, b)
-}
-
-func requireFalse(tb testing.TB, b bool) {
-	requireEqual(tb, false, b)
-}
-
-func requireEqual(tb testing.TB, a, b interface{}) {
-	tb.Helper()
-	if !reflect.DeepEqual(a, b) {
-		tb.Errorf("%v != %v", a, b)
-		tb.FailNow()
-	}
-}
-
-func requireNotEqual(tb testing.TB, a, b interface{}) {
-	tb.Helper()
-	if reflect.DeepEqual(a, b) {
-		tb.Errorf("%v == %v", a, b)
-		tb.FailNow()
 	}
 }

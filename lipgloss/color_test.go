@@ -1,54 +1,45 @@
 package lipgloss
 
 import (
+	"fmt"
 	"image/color"
 	"testing"
 
 	"github.com/muesli/termenv"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSetColorProfile(t *testing.T) {
 	r := renderer
 	input := "hello"
 
-	tt := []struct {
-		name     string
+	for name, test := range map[string]struct {
 		profile  termenv.Profile
 		expected string
 	}{
-		{
-			"ascii",
+		"ascii": {
 			termenv.Ascii,
 			"hello",
 		},
-		{
-			"ansi",
+		"ansi": {
 			termenv.ANSI,
 			"\x1b[94mhello\x1b[0m",
 		},
-		{
-			"ansi256",
+		"ansi256": {
 			termenv.ANSI256,
 			"\x1b[38;5;62mhello\x1b[0m",
 		},
-		{
-			"truecolor",
+		"truecolor": {
 			termenv.TrueColor,
 			"\x1b[38;2;89;86;224mhello\x1b[0m",
 		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			r.SetColorProfile(tc.profile)
+	} {
+		t.Run(name, func(t *testing.T) {
+			r.SetColorProfile(test.profile)
 			style := NewStyle().Foreground(Color("#5A56E0"))
 			res := style.Render(input)
 
-			if res != tc.expected {
-				t.Errorf("Expected:\n\n`%s`\n`%s`\n\nActual output:\n\n`%s`\n`%s`\n\n",
-					tc.expected, formatEscapes(tc.expected),
-					res, formatEscapes(res))
-			}
+			assert.Equal(t, test.expected, res)
 		})
 	}
 }
@@ -56,39 +47,23 @@ func TestSetColorProfile(t *testing.T) {
 func TestHexToColor(t *testing.T) {
 	t.Parallel()
 
-	tt := []struct {
-		input    string
-		expected uint
-	}{
-		{
-			"#FF0000",
-			0xFF0000,
-		},
-		{
-			"#00F",
-			0x0000FF,
-		},
-		{
-			"#6B50FF",
-			0x6B50FF,
-		},
-		{
-			"invalid color",
-			0x0,
-		},
-	}
-
-	for i, tc := range tt {
-		h := hexToColor(tc.input)
-		o := uint(h.R)<<16 + uint(h.G)<<8 + uint(h.B)
-		if o != tc.expected {
-			t.Errorf("expected %X, got %X (test #%d)", tc.expected, o, i+1)
-		}
+	for input, expected := range map[string]uint{
+		"#FF0000":       0xFF0000,
+		"#00F":          0x0000FF,
+		"#6B50FF":       0x6B50FF,
+		"invalid color": 0x0,
+	} {
+		t.Run(input, func(t *testing.T) {
+			h := hexToColor(input)
+			o := uint(h.R)<<16 + uint(h.G)<<8 + uint(h.B)
+			assert.Equal(t, expected, o)
+		})
 	}
 }
 
 func TestRGBA(t *testing.T) {
-	tt := []struct {
+	r := DefaultRenderer()
+	for i, test := range []struct {
 		profile  termenv.Profile
 		darkBg   bool
 		input    TerminalColor
@@ -220,19 +195,15 @@ func TestRGBA(t *testing.T) {
 			},
 			0xFF0000,
 		},
-	}
+	} {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			r.SetColorProfile(test.profile)
+			r.SetHasDarkBackground(test.darkBg)
 
-	r := DefaultRenderer()
-	for i, tc := range tt {
-		r.SetColorProfile(tc.profile)
-		r.SetHasDarkBackground(tc.darkBg)
-
-		r, g, b, _ := tc.input.RGBA()
-		o := uint(r/256)<<16 + uint(g/256)<<8 + uint(b/256)
-
-		if o != tc.expected {
-			t.Errorf("expected %X, got %X (test #%d)", tc.expected, o, i+1)
-		}
+			r, g, b, _ := test.input.RGBA()
+			o := uint(r/256)<<16 + uint(g/256)<<8 + uint(b/256)
+			assert.Equal(t, test.expected, o)
+		})
 	}
 }
 
@@ -276,7 +247,7 @@ func hexToByte(b byte) byte {
 		return b - 'a' + offset
 	case b >= 'A' && b <= 'F':
 		return b - 'A' + offset
+	default: // Invalid, but just return 0.
+		return 0
 	}
-	// Invalid, but just return 0.
-	return 0
 }

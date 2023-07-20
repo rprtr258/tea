@@ -5,31 +5,26 @@ import (
 	"testing"
 
 	"github.com/muesli/termenv"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRendererHasDarkBackground(t *testing.T) {
 	r1 := NewRenderer(os.Stdout)
 	r1.SetHasDarkBackground(false)
-	if r1.HasDarkBackground() {
-		t.Error("Expected renderer to have light background")
-	}
+	assert.False(t, r1.HasDarkBackground(), "Expected renderer to have light background")
+
 	r2 := NewRenderer(os.Stdout)
 	r2.SetHasDarkBackground(true)
-	if !r2.HasDarkBackground() {
-		t.Error("Expected renderer to have dark background")
-	}
+	assert.True(t, r2.HasDarkBackground(), "Expected renderer to have dark background")
 }
 
 func TestRendererWithOutput(t *testing.T) {
 	f, err := os.Create(t.Name())
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	defer f.Close()
 	defer os.Remove(f.Name())
+
 	r := NewRenderer(f)
 	r.SetColorProfile(termenv.TrueColor)
-	if r.output.Profile != termenv.TrueColor {
-		t.Error("Expected renderer to use true color")
-	}
+	assert.Equal(t, termenv.TrueColor, r.output.Profile)
 }

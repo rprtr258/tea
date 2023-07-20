@@ -1,9 +1,14 @@
 package lipgloss
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestAlignTextVertical(t *testing.T) {
-	tests := []struct {
+	for _, test := range []struct {
 		str    string
 		pos    Position
 		height int
@@ -30,12 +35,9 @@ func TestAlignTextVertical(t *testing.T) {
 
 		{str: "Foo\nBar\nBaz", pos: Center, height: 9, want: "\n\n\nFoo\nBar\nBaz\n\n\n"},
 		{str: "Foo\nBar\nBaz", pos: Center, height: 10, want: "\n\n\nFoo\nBar\nBaz\n\n\n\n"},
-	}
-
-	for _, test := range tests {
-		got := alignTextVertical(test.str, test.pos, test.height, nil)
-		if got != test.want {
-			t.Errorf("alignTextVertical(%q, %v, %d) = %q, want %q", test.str, test.pos, test.height, got, test.want)
-		}
+	} {
+		t.Run(fmt.Sprintf("str=%q pos=%v height=%d", test.str, test.pos, test.height), func(t *testing.T) {
+			assert.Equal(t, test.want, alignTextVertical(test.str, test.pos, test.height, nil))
+		})
 	}
 }

@@ -6,6 +6,8 @@ import (
 	"testing"
 	"testing/iotest"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRequireEqualOutputUpdate(t *testing.T) {
@@ -17,24 +19,14 @@ func TestWaitForErrorReader(t *testing.T) {
 	err := doWaitFor(iotest.ErrReader(fmt.Errorf("fake")), func(bts []byte) bool {
 		return true
 	}, WithDuration(time.Millisecond), WithCheckInterval(10*time.Microsecond))
-	if err == nil {
-		t.Fatal("expected an error, got nil")
-	}
-	if err.Error() != "WaitFor: fake" {
-		t.Fatalf("unexpected error: %s", err.Error())
-	}
+	assert.EqualError(t, err, "WaitFor: fake")
 }
 
 func TestWaitForTimeout(t *testing.T) {
 	err := doWaitFor(strings.NewReader("nope"), func(bts []byte) bool {
 		return false
 	}, WithDuration(time.Millisecond), WithCheckInterval(10*time.Microsecond))
-	if err == nil {
-		t.Fatal("expected an error, got nil")
-	}
-	if err.Error() != "WaitFor: condition not met after 1ms" {
-		t.Fatalf("unexpected error: %s", err.Error())
-	}
+	assert.EqualError(t, err, "WaitFor: condition not met after 1ms")
 }
 
 func enableUpdate(tb testing.TB) {

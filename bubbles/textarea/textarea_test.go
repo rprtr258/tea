@@ -5,21 +5,15 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
 	textarea := newTextArea()
 	view := textarea.View()
 
-	if !strings.Contains(view, ">") {
-		t.Log(view)
-		t.Error("Text area did not render the prompt")
-	}
-
-	if !strings.Contains(view, "World!") {
-		t.Log(view)
-		t.Error("Text area did not render the placeholder")
-	}
+	assert.Contains(t, view, ">", "Text area did not render the prompt")
+	assert.Contains(t, view, "World!", "Text area did not render the placeholder")
 }
 
 func TestInput(t *testing.T) {
@@ -33,15 +27,8 @@ func TestInput(t *testing.T) {
 
 	view := textarea.View()
 
-	if !strings.Contains(view, input) {
-		t.Log(view)
-		t.Error("Text area did not render the input")
-	}
-
-	if textarea.col != len(input) {
-		t.Log(view)
-		t.Error("Text area did not move the cursor to the correct position")
-	}
+	assert.Contains(t, view, input, "Text area did not render the input")
+	assert.Len(t, input, textarea.col, "Text area did not move the cursor to the correct position")
 }
 
 func TestSoftWrap(t *testing.T) {
@@ -63,10 +50,7 @@ func TestSoftWrap(t *testing.T) {
 	view := textarea.View()
 
 	for _, word := range strings.Split(input, " ") {
-		if !strings.Contains(view, word) {
-			t.Log(view)
-			t.Error("Text area did not render the input")
-		}
+		assert.Contains(t, view, word, "Text area did not render the input")
 	}
 
 	// Due to the word wrapping, each word will be on a new line and the
@@ -77,10 +61,8 @@ func TestSoftWrap(t *testing.T) {
 	// > baz█
 	//
 	// However, due to soft-wrapping the column will still be at the end of the line.
-	if textarea.row != 0 || textarea.col != len(input) {
-		t.Log(view)
-		t.Error("Text area did not move the cursor to the correct position")
-	}
+	assert.Equal(t, 0, textarea.row)
+	assert.Len(t, input, textarea.col, "Text area did not move the cursor to the correct position")
 }
 
 func TestCharLimit(t *testing.T) {
@@ -96,10 +78,7 @@ func TestCharLimit(t *testing.T) {
 	}
 
 	view := textarea.View()
-	if strings.Contains(view, input[1]) {
-		t.Log(view)
-		t.Error("Text area should not include input past the character limit")
-	}
+	assert.NotContains(t, view, input[1], "Text area should not include input past the character limit")
 }
 
 func TestVerticalScrolling(t *testing.T) {
@@ -112,34 +91,25 @@ func TestVerticalScrolling(t *testing.T) {
 
 	textarea, _ = textarea.Update(nil)
 
-	input := "This is a really long line that should wrap around the text area."
-
-	for _, k := range []rune(input) {
+	for _, k := range []rune("This is a really long line that should wrap around the text area.") {
 		textarea, _ = textarea.Update(keyPress(k))
 	}
 
 	view := textarea.View()
 
 	// The view should contain the first "line" of the input.
-	if !strings.Contains(view, "This is a really") {
-		t.Log(view)
-		t.Error("Text area did not render the input")
-	}
+	assert.Contains(t, view, "This is a really", "Text area did not render the input")
 
 	// But we should be able to scroll to see the next line.
 	// Let's scroll down for each line to view the full input.
-	lines := []string{
+	for _, line := range []string{
 		"long line that",
 		"should wrap around",
 		"the text area.",
-	}
-	for _, line := range lines {
+	} {
 		textarea.viewport.LineDown(1)
 		view = textarea.View()
-		if !strings.Contains(view, line) {
-			t.Log(view)
-			t.Error("Text area did not render the correct scrolled input")
-		}
+		assert.Contains(t, view, line, "Text area did not render the correct scrolled input")
 	}
 }
 
@@ -178,11 +148,7 @@ func TestWordWrapOverflowing(t *testing.T) {
 	}
 
 	lastLineWidth := textarea.LineInfo().Width
-	if lastLineWidth > 20 {
-		t.Log(lastLineWidth)
-		t.Log(textarea.View())
-		t.Fail()
-	}
+	assert.Greater(t, lastLineWidth, 20)
 }
 
 func TestValueSoftWrap(t *testing.T) {
@@ -201,43 +167,30 @@ func TestValueSoftWrap(t *testing.T) {
 	}
 
 	value := textarea.Value()
-	if value != input {
-		t.Log(value)
-		t.Log(input)
-		t.Fatal("The text area does not have the correct value")
-	}
+	assert.Equal(t, input, value)
 }
 
 func TestSetValue(t *testing.T) {
 	textarea := newTextArea()
 	textarea.SetValue(strings.Join([]string{"Foo", "Bar", "Baz"}, "\n"))
 
-	if textarea.row != 2 && textarea.col != 3 {
-		t.Log(textarea.row, textarea.col)
-		t.Fatal("Cursor Should be on row 2 column 3 after inserting 2 new lines")
-	}
+	assert.Equal(t, 2, textarea.row, "Cursor Should be on row 2 column 3 after inserting 2 new lines")
+	assert.Equal(t, 3, textarea.col, "Cursor Should be on row 2 column 3 after inserting 2 new lines")
 
 	value := textarea.Value()
-	if value != "Foo\nBar\nBaz" {
-		t.Fatal("Value should be Foo\nBar\nBaz")
-	}
+	assert.Equal(t, "Foo\nBar\nBaz", value)
 
 	// SetValue should reset text area
 	textarea.SetValue("Test")
 	value = textarea.Value()
-	if value != "Test" {
-		t.Log(value)
-		t.Fatal("Text area was not reset when SetValue() was called")
-	}
+	assert.Equal(t, "Test", value, "Text area was not reset when SetValue() was called")
 }
 
 func TestInsertString(t *testing.T) {
 	textarea := newTextArea()
 
 	// Insert some text
-	input := "foo baz"
-
-	for _, k := range []rune(input) {
+	for _, k := range "foo baz" {
 		textarea, _ = textarea.Update(keyPress(k))
 	}
 
@@ -247,10 +200,7 @@ func TestInsertString(t *testing.T) {
 	textarea.InsertString("bar ")
 
 	value := textarea.Value()
-	if value != "foo bar baz" {
-		t.Log(value)
-		t.Fatal("Expected insert string to insert bar between foo and baz")
-	}
+	assert.Equal(t, "foo bar baz", value, "Expected insert string to insert bar between foo and baz")
 }
 
 func TestCanHandleEmoji(t *testing.T) {
@@ -262,30 +212,19 @@ func TestCanHandleEmoji(t *testing.T) {
 	}
 
 	value := textarea.Value()
-	if value != input {
-		t.Log(value)
-		t.Fatal("Expected emoji to be inserted")
-	}
+	assert.Equal(t, input, value, "Expected emoji to be inserted")
 
 	input = "🧋🧋🧋"
 
 	textarea.SetValue(input)
 
 	value = textarea.Value()
-	if value != input {
-		t.Log(value)
-		t.Fatal("Expected emoji to be inserted")
-	}
+	assert.Equal(t, input, value, "Expected emoji to be inserted")
 
-	if textarea.col != 3 {
-		t.Log(textarea.col)
-		t.Fatal("Expected cursor to be on the third character")
-	}
+	assert.Equal(t, 3, textarea.col, "Expected cursor to be on the third character")
 
-	if charOffset := textarea.LineInfo().CharOffset; charOffset != 6 {
-		t.Log(charOffset)
-		t.Fatal("Expected cursor to be on the sixth character")
-	}
+	charOffset := textarea.LineInfo().CharOffset
+	assert.Equal(t, 6, charOffset, "Expected cursor to be on the sixth character")
 }
 
 func TestVerticalNavigationKeepsCursorHorizontalPosition(t *testing.T) {
@@ -319,21 +258,15 @@ func TestVerticalNavigationKeepsCursorHorizontalPosition(t *testing.T) {
 	// ensuring that the column offset goes from 2 -> 4.
 
 	lineInfo := textarea.LineInfo()
-	if lineInfo.CharOffset != 4 || lineInfo.ColumnOffset != 2 {
-		t.Log(lineInfo.CharOffset)
-		t.Log(lineInfo.ColumnOffset)
-		t.Fatal("Expected cursor to be on the fourth character because there are two double width runes on the first line.")
-	}
+	assert.Equal(t, 4, lineInfo.CharOffset, "Expected cursor to be on the fourth character because there are two double width runes on the first line.")
+	assert.Equal(t, 2, lineInfo.ColumnOffset)
 
 	downMsg := tea.MsgKey{Type: tea.KeyDown, Alt: false, Runes: []rune{}}
 	textarea, _ = textarea.Update(downMsg)
 
 	lineInfo = textarea.LineInfo()
-	if lineInfo.CharOffset != 4 || lineInfo.ColumnOffset != 4 {
-		t.Log(lineInfo.CharOffset)
-		t.Log(lineInfo.ColumnOffset)
-		t.Fatal("Expected cursor to be on the fourth character because we came down from the first line.")
-	}
+	assert.Equal(t, 4, lineInfo.CharOffset, "Expected cursor to be on the fourth character because we came down from the first line.")
+	assert.Equal(t, 4, lineInfo.ColumnOffset)
 }
 
 func TestVerticalNavigationShouldRememberPositionWhileTraversing(t *testing.T) {
@@ -358,29 +291,23 @@ func TestVerticalNavigationShouldRememberPositionWhileTraversing(t *testing.T) {
 	textarea.SetValue(strings.Join([]string{"Hello", "World", "This is a long line."}, "\n"))
 
 	// We are at the end of the last line.
-	if textarea.col != 20 || textarea.row != 2 {
-		t.Log(textarea.col)
-		t.Fatal("Expected cursor to be on the 20th character of the last line")
-	}
+	assert.Equal(t, 20, textarea.col, "Expected cursor to be on the 20th character of the last line")
+	assert.Equal(t, 2, textarea.row)
 
 	// Let's go up.
 	upMsg := tea.MsgKey{Type: tea.KeyUp, Alt: false, Runes: []rune{}}
 	textarea, _ = textarea.Update(upMsg)
 
 	// We should be at the end of the second line.
-	if textarea.col != 5 || textarea.row != 1 {
-		t.Log(textarea.col)
-		t.Fatal("Expected cursor to be on the 5th character of the second line")
-	}
+	assert.Equal(t, 5, textarea.col, "Expected cursor to be on the 5th character of the second line")
+	assert.Equal(t, 1, textarea.row)
 
 	// And, again.
 	textarea, _ = textarea.Update(upMsg)
 
 	// We should be at the end of the first line.
-	if textarea.col != 5 || textarea.row != 0 {
-		t.Log(textarea.col)
-		t.Fatal("Expected cursor to be on the 5th character of the first line")
-	}
+	assert.Equal(t, 5, textarea.col, "Expected cursor to be on the 5th character of the first line")
+	assert.Equal(t, 0, textarea.row)
 
 	// Let's go down, twice.
 	downMsg := tea.MsgKey{Type: tea.KeyDown, Alt: false, Runes: []rune{}}
@@ -388,10 +315,8 @@ func TestVerticalNavigationShouldRememberPositionWhileTraversing(t *testing.T) {
 	textarea, _ = textarea.Update(downMsg)
 
 	// We should be at the end of the last line.
-	if textarea.col != 20 || textarea.row != 2 {
-		t.Log(textarea.col)
-		t.Fatal("Expected cursor to be on the 20th character of the last line")
-	}
+	assert.Equal(t, 20, textarea.col, "Expected cursor to be on the 20th character of the last line")
+	assert.Equal(t, 2, textarea.row)
 
 	// Now, for correct behavior, if we move right or left, we should forget
 	// (reset) the saved horizontal position. Since we assume the user wants to
@@ -402,18 +327,14 @@ func TestVerticalNavigationShouldRememberPositionWhileTraversing(t *testing.T) {
 	leftMsg := tea.MsgKey{Type: tea.KeyLeft, Alt: false, Runes: []rune{}}
 	textarea, _ = textarea.Update(leftMsg)
 
-	if textarea.col != 4 || textarea.row != 1 {
-		t.Log(textarea.col)
-		t.Fatal("Expected cursor to be on the 5th character of the second line")
-	}
+	assert.Equal(t, 4, textarea.col, "Expected cursor to be on the 5th character of the second line")
+	assert.Equal(t, 1, textarea.row)
 
 	// Going down now should keep us at the 4th column since we moved left and
 	// reset the horizontal position saved state.
 	textarea, _ = textarea.Update(downMsg)
-	if textarea.col != 4 || textarea.row != 2 {
-		t.Log(textarea.col)
-		t.Fatal("Expected cursor to be on the 4th character of the last line")
-	}
+	assert.Equal(t, 4, textarea.col, "Expected cursor to be on the 4th character of the last line")
+	assert.Equal(t, 2, textarea.row)
 }
 
 func TestRendersEndOfLineBuffer(t *testing.T) {
@@ -422,10 +343,7 @@ func TestRendersEndOfLineBuffer(t *testing.T) {
 	textarea.SetWidth(20)
 
 	view := textarea.View()
-	if !strings.Contains(view, "~") {
-		t.Log(view)
-		t.Fatal("Expected to see a tilde at the end of the line")
-	}
+	assert.Contains(t, view, "~", "Expected to see a tilde at the end of the line")
 }
 
 func newTextArea() Model {
@@ -442,5 +360,9 @@ func newTextArea() Model {
 }
 
 func keyPress(key rune) tea.Msg {
-	return tea.MsgKey{Type: tea.KeyRunes, Runes: []rune{key}, Alt: false}
+	return tea.MsgKey{
+		Type:  tea.KeyRunes,
+		Runes: []rune{key},
+		Alt:   false,
+	}
 }

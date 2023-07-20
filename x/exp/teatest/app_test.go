@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"regexp"
 	"testing"
 	"time"
 
@@ -20,9 +19,7 @@ func TestApp(t *testing.T) {
 		teatest.WithInitialTermSize(70, 30),
 	)
 	t.Cleanup(func() {
-		if err := tm.Quit(); err != nil {
-			t.Fatal(err)
-		}
+		assert.NoError(t, tm.Quit())
 	})
 
 	time.Sleep(time.Second + time.Millisecond*200)
@@ -32,14 +29,10 @@ func TestApp(t *testing.T) {
 		Type: tea.KeyEnter,
 	})
 
-	if err := tm.Quit(); err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, tm.Quit())
 
 	out := readBts(t, tm.FinalOutput(t, teatest.WithFinalTimeout(time.Second)))
-	if !regexp.MustCompile(`This program will exit in \d+ seconds`).Match(out) {
-		t.Fatalf("output does not match the given regular expression: %s", string(out))
-	}
+	assert.Regexp(t, `This program will exit in \d+ seconds`, out)
 	teatest.RequireEqualOutput(t, out)
 
 	assert.Equal(t, 9, tm.FinalModel(t))
@@ -47,17 +40,13 @@ func TestApp(t *testing.T) {
 
 func TestAppInteractive(t *testing.T) {
 	m := model(10)
-	tm := teatest.NewTestModel(
-		t, m,
-		teatest.WithInitialTermSize(70, 30),
-	)
+	tm := teatest.NewTestModel(t, m, teatest.WithInitialTermSize(70, 30))
 
 	time.Sleep(time.Second + time.Millisecond*200)
 	tm.Send("ignored msg")
 
-	if bts := readBts(t, tm.Output()); !bytes.Contains(bts, []byte("This program will exit in 9 seconds")) {
-		t.Fatalf("output does not match: expected %q", string(bts))
-	}
+	bts := readBts(t, tm.Output())
+	assert.Contains(t, bts, []byte("This program will exit in 9 seconds"))
 
 	teatest.WaitFor(t, tm.Output(), func(out []byte) bool {
 		return bytes.Contains(out, []byte("This program will exit in 7 seconds"))
@@ -67,9 +56,7 @@ func TestAppInteractive(t *testing.T) {
 		Type: tea.KeyEnter,
 	})
 
-	if err := tm.Quit(); err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, tm.Quit())
 
 	assert.Equal(t, 7, tm.FinalModel(t))
 }
