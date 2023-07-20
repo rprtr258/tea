@@ -68,7 +68,7 @@ func alignTextVertical(str string, pos Position, height int, _ *termenv.Style) s
 	case Top:
 		return str + strings.Repeat("\n", height-strHeight)
 	case Center:
-		var topPadding, bottomPadding = (height - strHeight) / 2, (height - strHeight) / 2
+		topPadding, bottomPadding := (height-strHeight)/2, (height-strHeight)/2
 		if strHeight+topPadding+bottomPadding > height {
 			topPadding--
 		} else if strHeight+topPadding+bottomPadding < height {

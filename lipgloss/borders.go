@@ -381,7 +381,7 @@ func (s Style) styleBorder(border string, fg, bg TerminalColor) string {
 		return border
 	}
 
-	var style = termenv.Style{}
+	style := termenv.Style{}
 
 	if fg != noColor {
 		style = style.Foreground(fg.color(s.r))

@@ -13,7 +13,6 @@ const (
 )
 
 func TestGradient(t *testing.T) {
-
 	colA := "#FF0000"
 	colB := "#00FF00"
 
@@ -58,5 +57,4 @@ func TestGradient(t *testing.T) {
 			}
 		})
 	}
-
 }

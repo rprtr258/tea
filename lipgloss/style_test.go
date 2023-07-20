@@ -352,7 +352,6 @@ func TestStyleValue(t *testing.T) {
 				res, formatEscapes(res))
 		}
 	}
-
 }
 
 func BenchmarkStyleRender(b *testing.B) {
