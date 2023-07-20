@@ -10,8 +10,6 @@ import (
 
 type stringMsg string
 
-func (stringMsg) IsBubbleteaMsg() {}
-
 func TestEvery(t *testing.T) {
 	expected := stringMsg("every ms")
 	msg := Every(time.Millisecond, func(t time.Time) Msg {
@@ -29,11 +27,8 @@ func TestTick(t *testing.T) {
 }
 
 type errorMsg struct {
-	MsgImplementation
 	error
 }
-
-func (errorMsg) IsBubbleteaMsg() {}
 
 func TestSequentially(t *testing.T) {
 	expectedErrMsg := errorMsg{error: errors.New("some err")}

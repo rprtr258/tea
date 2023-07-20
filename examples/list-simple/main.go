@@ -1,4 +1,4 @@
-package main
+package listsimple
 
 import (
 	"fmt"
@@ -59,7 +59,7 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
@@ -85,17 +85,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	if m.choice != "" {
-		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+		r.Write(quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice)))
+		return
 	}
+
 	if m.quitting {
-		return quitTextStyle.Render("Not hungry? That’s cool.")
+		r.Write(quitTextStyle.Render("Not hungry? That’s cool."))
+		return
 	}
-	return "\n" + m.list.View()
+
+	r.Write("\n" + m.list.View())
+	return
 }
 
-func main() {
+func Main() {
 	items := []list.Item{
 		item("Ramen"),
 		item("Tomato Soup"),

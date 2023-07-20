@@ -1,4 +1,4 @@
-package main
+package table
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ type model struct {
 
 func (m model) Init() tea.Cmd { return nil }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -42,11 +42,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) View() string {
-	return baseStyle.Render(m.table.View()) + "\n"
+func (m model) View(r tea.Renderer) {
+	r.Write(baseStyle.Render(m.table.View()) + "\n")
 }
 
-func main() {
+func Main() {
 	columns := []table.Column{
 		{Title: "Rank", Width: 4},
 		{Title: "City", Width: 10},

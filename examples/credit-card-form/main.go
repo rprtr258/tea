@@ -1,4 +1,4 @@
-package main
+package creditcardform
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func main() {
+func Main() {
 	p := tea.NewProgram(initialModel())
 
 	if _, err := p.Run(); err != nil {
@@ -130,7 +130,7 @@ func (m model) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmds []tea.Cmd = make([]tea.Cmd, len(m.inputs))
 
 	switch msg := msg.(type) {
@@ -165,8 +165,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m model) View() string {
-	return fmt.Sprintf(
+func (m model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf(
 		` Total: $21.50:
 
  %s
@@ -184,7 +184,7 @@ func (m model) View() string {
 		m.inputs[exp].View(),
 		m.inputs[cvv].View(),
 		continueStyle.Render("Continue ->"),
-	) + "\n"
+	) + "\n")
 }
 
 // nextInput focuses the next input field

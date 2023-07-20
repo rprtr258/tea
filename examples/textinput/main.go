@@ -1,4 +1,4 @@
-package main
+package textinput
 
 // A simple program demonstrating the text input component from the Bubbles
 // component library.
@@ -11,7 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func main() {
+func Main() {
 	p := tea.NewProgram(initialModel())
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
@@ -44,7 +44,7 @@ func (m model) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -64,10 +64,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) View() string {
-	return fmt.Sprintf(
+func (m model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf(
 		"What’s your favorite Pokémon?\n\n%s\n\n%s",
 		m.textInput.View(),
 		"(esc to quit)",
-	) + "\n"
+	) + "\n")
+	return
 }

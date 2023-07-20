@@ -1,4 +1,4 @@
-package main
+package spinner
 
 // A simple program demonstrating the spinner component from the Bubbles
 // component library.
@@ -31,7 +31,7 @@ func (m model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -53,18 +53,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	if m.err != nil {
-		return m.err.Error()
+		r.Write(m.err.Error())
+		return
 	}
+
 	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
 	if m.quitting {
-		return str + "\n"
+		str += "\n"
 	}
-	return str
+
+	r.Write(str)
 }
 
-func main() {
+func Main() {
 	p := tea.NewProgram(initialModel())
 	if _, err := p.Run(); err != nil {
 		fmt.Println(err)

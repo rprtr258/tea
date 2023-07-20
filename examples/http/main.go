@@ -1,4 +1,4 @@
-package main
+package http
 
 // A simple program that makes a GET request and prints the response status.
 
@@ -24,7 +24,7 @@ type errMsg struct{ error }
 
 func (e errMsg) Error() string { return e.error.Error() }
 
-func main() {
+func Main() {
 	p := tea.NewProgram(model{})
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
@@ -35,7 +35,7 @@ func (m model) Init() tea.Cmd {
 	return checkServer
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -58,14 +58,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	s := fmt.Sprintf("Checking %s...", url)
 	if m.err != nil {
 		s += fmt.Sprintf("something went wrong: %s", m.err)
 	} else if m.status != 0 {
 		s += fmt.Sprintf("%d %s", m.status, http.StatusText(m.status))
 	}
-	return s + "\n"
+	r.Write(s + "\n")
+	return
 }
 
 func checkServer() tea.Msg {

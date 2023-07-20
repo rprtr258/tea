@@ -1,4 +1,4 @@
-package main
+package help
 
 import (
 	"fmt"
@@ -84,7 +84,7 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		// If we set a width on the help menu it can gracefully truncate
@@ -112,9 +112,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	if m.quitting {
-		return "Bye!\n"
+		r.Write("Bye!\n")
+		return
 	}
 
 	var status string
@@ -127,10 +128,11 @@ func (m model) View() string {
 	helpView := m.help.View(m.keys)
 	height := 8 - strings.Count(status, "\n") - strings.Count(helpView, "\n")
 
-	return "\n" + status + strings.Repeat("\n", height) + helpView
+	r.Write("\n" + status + strings.Repeat("\n", height) + helpView)
+	return
 }
 
-func main() {
+func Main() {
 	if os.Getenv("HELP_DEBUG") != "" {
 		f, err := tea.LogToFile("debug.log", "help")
 		if err != nil {

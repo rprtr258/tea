@@ -1,4 +1,4 @@
-package main
+package simple
 
 // A simple program that counts down from 5 and then exits.
 
@@ -11,7 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func main() {
+func Main() {
 	// Log to a file. Useful in debugging since you can't really log to stdout.
 	// Not required.
 	logfilePath := os.Getenv("BUBBLETEA_LOG")
@@ -65,8 +65,6 @@ func (m model) View(r tea.Renderer) {
 // Messages are events that we respond to in our Update function. This
 // particular one indicates that the timer has ticked.
 type tickMsg time.Time
-
-func (tickMsg) IsBubbleteaMsg() {}
 
 func tick() tea.Msg {
 	time.Sleep(time.Second)

@@ -1,4 +1,4 @@
-package main
+package packagemanager
 
 import (
 	"fmt"
@@ -48,7 +48,7 @@ func (m model) Init() tea.Cmd {
 	return tea.Batch(downloadAndInstall(m.packages[m.index]), m.spinner.Tick)
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
@@ -78,21 +78,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.spinner, cmd = m.spinner.Update(msg)
 		return m, cmd
 	case progress.FrameMsg:
-		newModel, cmd := m.progress.Update(msg)
-		if newModel, ok := newModel.(progress.Model); ok {
-			m.progress = newModel
-		}
+		var cmd tea.Cmd
+		m.progress, cmd = m.progress.Update(msg)
 		return m, cmd
 	}
 	return m, nil
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	n := len(m.packages)
 	w := lipgloss.Width(fmt.Sprintf("%d", n))
 
 	if m.done {
-		return doneStyle.Render(fmt.Sprintf("Done! Installed %d packages.\n", n))
+		r.Write(doneStyle.Render(fmt.Sprintf("Done! Installed %d packages.\n", n)))
+		return
 	}
 
 	pkgCount := fmt.Sprintf(" %*d/%*d", w, m.index, w, n-1)
@@ -107,7 +106,7 @@ func (m model) View() string {
 	cellsRemaining := max(0, m.width-lipgloss.Width(spin+info+prog+pkgCount))
 	gap := strings.Repeat(" ", cellsRemaining)
 
-	return spin + info + gap + prog + pkgCount
+	r.Write(spin + info + gap + prog + pkgCount)
 }
 
 type installedPkgMsg string
@@ -128,7 +127,7 @@ func max(a, b int) int {
 	return b
 }
 
-func main() {
+func Main() {
 	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)

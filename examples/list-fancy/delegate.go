@@ -1,4 +1,4 @@
-package main
+package listfancy
 
 import (
 	"github.com/charmbracelet/bubbles/key"

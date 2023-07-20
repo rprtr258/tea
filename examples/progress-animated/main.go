@@ -1,4 +1,4 @@
-package main
+package progressanimated
 
 // A simple example that shows how to render an animated progress bar. In this
 // example we bump the progress by 25% every two seconds, animating our
@@ -25,7 +25,7 @@ const (
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
 
-func main() {
+func Main() {
 	m := model{
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
@@ -46,7 +46,7 @@ func (m model) Init() tea.Cmd {
 	return tickCmd()
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		return m, tea.Quit
@@ -70,8 +70,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// FrameMsg is sent when the progress bar wants to animate itself
 	case progress.FrameMsg:
-		progressModel, cmd := m.progress.Update(msg)
-		m.progress = progressModel.(progress.Model)
+		var cmd tea.Cmd
+		m.progress, cmd = m.progress.Update(msg)
 		return m, cmd
 
 	default:
@@ -79,11 +79,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	pad := strings.Repeat(" ", padding)
-	return "\n" +
+	r.Write("\n" +
 		pad + m.progress.View() + "\n\n" +
-		pad + helpStyle("Press any key to quit")
+		pad + helpStyle("Press any key to quit"))
 }
 
 func tickCmd() tea.Cmd {

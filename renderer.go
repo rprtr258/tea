@@ -55,4 +55,4 @@ type Renderer interface {
 }
 
 // repaintMsg forces a full repaint.
-type repaintMsg struct{ MsgImplementation }
+type repaintMsg struct{}

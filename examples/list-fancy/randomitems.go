@@ -1,4 +1,4 @@
-package main
+package listfancy
 
 import (
 	"math/rand"

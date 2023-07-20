@@ -1,4 +1,4 @@
-package main
+package textarea
 
 // A simple program demonstrating the textarea component from the Bubbles
 // component library.
@@ -11,7 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func main() {
+func Main() {
 	p := tea.NewProgram(initialModel())
 
 	if _, err := p.Run(); err != nil {
@@ -41,7 +41,7 @@ func (m model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
 
@@ -72,10 +72,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m model) View() string {
-	return fmt.Sprintf(
+func (m model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf(
 		"Tell me a story.\n\n%s\n\n%s",
 		m.textarea.View(),
 		"(ctrl+c to quit)",
-	) + "\n\n"
+	) + "\n\n")
+	return
 }

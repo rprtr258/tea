@@ -1,4 +1,4 @@
-package main
+package sequence
 
 // A simple example illustrating how to run a series of commands in order.
 
@@ -23,7 +23,7 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg.(type) {
 	case tea.KeyMsg:
 		return m, tea.Quit
@@ -31,11 +31,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
-	return ""
+func (m model) View(r tea.Renderer) {
 }
 
-func main() {
+func Main() {
 	if _, err := tea.NewProgram(model{}).Run(); err != nil {
 		fmt.Println("Uh oh:", err)
 		os.Exit(1)

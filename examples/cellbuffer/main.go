@@ -1,4 +1,4 @@
-package main
+package cellbuffer
 
 // A simple example demonstrating how to draw and animate on a cellular grid.
 // Note that the cellbuffer implementation in this example does not support
@@ -146,7 +146,7 @@ func (m model) Init() tea.Cmd {
 	return animate()
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		return m, tea.Quit
@@ -178,16 +178,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
-	return m.cells.String()
+func (m model) View(r tea.Renderer) {
+	r.Write(m.cells.String())
 }
 
-func main() {
+func Main() {
 	m := model{
 		spring: harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
 	}
 
-	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
+	p := tea.NewProgram(m).WithAltScreen().WithMouseCellMotion()
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Uh oh:", err)
 		os.Exit(1)

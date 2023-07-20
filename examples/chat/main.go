@@ -1,4 +1,4 @@
-package main
+package chat
 
 // A simple program demonstrating the text area component from the Bubbles
 // component library.
@@ -14,7 +14,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func main() {
+func Main() {
 	p := tea.NewProgram(initialModel())
 
 	if _, err := p.Run(); err != nil {
@@ -69,7 +69,7 @@ func (m model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var (
 		tiCmd tea.Cmd
 		vpCmd tea.Cmd
@@ -100,10 +100,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(tiCmd, vpCmd)
 }
 
-func (m model) View() string {
-	return fmt.Sprintf(
+func (m model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf(
 		"%s\n\n%s",
 		m.viewport.View(),
 		m.textarea.View(),
-	) + "\n\n"
+	) + "\n\n")
 }

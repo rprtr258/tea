@@ -553,7 +553,6 @@ func (r *standardRenderer) handleMessages(msg Msg) {
 // HIGH-PERFORMANCE RENDERING STUFF
 
 type syncScrollAreaMsg struct {
-	MsgImplementation
 	lines          []string
 	topBoundary    int
 	bottomBoundary int
@@ -574,7 +573,7 @@ func SyncScrollArea(lines []string, topBoundary int, bottomBoundary int) Cmd {
 	}
 }
 
-type clearScrollAreaMsg struct{ MsgImplementation }
+type clearScrollAreaMsg struct{}
 
 // ClearScrollArea deallocates the scrollable region and returns the control of
 // those lines to the main rendering routine.
@@ -585,7 +584,6 @@ func ClearScrollArea() Msg {
 }
 
 type scrollUpMsg struct {
-	MsgImplementation
 	lines          []string
 	topBoundary    int
 	bottomBoundary int
@@ -607,7 +605,6 @@ func ScrollUp(newLines []string, topBoundary, bottomBoundary int) Cmd {
 }
 
 type scrollDownMsg struct {
-	MsgImplementation
 	lines          []string
 	topBoundary    int
 	bottomBoundary int
@@ -629,7 +626,6 @@ func ScrollDown(newLines []string, topBoundary, bottomBoundary int) Cmd {
 }
 
 type printLineMessage struct {
-	MsgImplementation
 	messageBody string
 }
 

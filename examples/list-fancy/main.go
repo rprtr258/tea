@@ -1,4 +1,4 @@
-package main
+package listfancy
 
 import (
 	"fmt"
@@ -121,7 +121,7 @@ func (m model) Init() tea.Cmd {
 	return tea.EnterAltScreen
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
@@ -180,7 +180,7 @@ func (m model) View(r tea.Renderer) {
 	r.Write(appStyle.Render(m.list.View()))
 }
 
-func main() {
+func Main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	if _, err := tea.NewProgram(newModel()).Run(); err != nil {

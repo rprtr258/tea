@@ -1,4 +1,4 @@
-package main
+package debounce
 
 // This example illustrates how to debounce commands.
 //
@@ -30,7 +30,7 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// Increment the tag on the model...
@@ -53,12 +53,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
-	return fmt.Sprintf("Key presses: %d", m.tag) +
-		"\nTo exit press any key, then wait for one second without pressing anything."
+func (m model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf("Key presses: %d", m.tag) +
+		"\nTo exit press any key, then wait for one second without pressing anything.")
 }
 
-func main() {
+func Main() {
 	if _, err := tea.NewProgram(model{}).Run(); err != nil {
 		fmt.Println("uh oh:", err)
 		os.Exit(1)

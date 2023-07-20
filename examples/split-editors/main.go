@@ -1,4 +1,4 @@
-package main
+package spliteditors
 
 import (
 	"fmt"
@@ -114,7 +114,7 @@ func (m model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
@@ -179,7 +179,7 @@ func (m *model) updateKeybindings() {
 	m.keymap.remove.SetEnabled(len(m.inputs) > minInputs)
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	help := m.help.ShortHelpView([]key.Binding{
 		m.keymap.next,
 		m.keymap.prev,
@@ -193,11 +193,11 @@ func (m model) View() string {
 		views = append(views, m.inputs[i].View())
 	}
 
-	return lipgloss.JoinHorizontal(lipgloss.Top, views...) + "\n\n" + help
+	r.Write(lipgloss.JoinHorizontal(lipgloss.Top, views...) + "\n\n" + help)
 }
 
-func main() {
-	if _, err := tea.NewProgram(newModel(), tea.WithAltScreen()).Run(); err != nil {
+func Main() {
+	if _, err := tea.NewProgram(newModel()).WithAltScreen().Run(); err != nil {
 		fmt.Println("Error while running program:", err)
 		os.Exit(1)
 	}

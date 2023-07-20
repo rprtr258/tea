@@ -1,4 +1,4 @@
-package main
+package tuidaemoncombo
 
 import (
 	"flag"
@@ -18,11 +18,10 @@ import (
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
 
-func main() {
+func Main() {
 	var (
 		daemonMode bool
 		showHelp   bool
-		opts       []tea.ProgramOption
 	)
 
 	flag.BoolVar(&daemonMode, "d", false, "run as a daemon")
@@ -34,15 +33,15 @@ func main() {
 		os.Exit(0)
 	}
 
+	p := tea.NewProgram(newModel())
 	if daemonMode || !isatty.IsTerminal(os.Stdout.Fd()) {
 		// If we're in daemon mode don't render the TUI
-		opts = []tea.ProgramOption{tea.WithoutRenderer()}
+		p = p.WithoutRenderer()
 	} else {
 		// If we're in TUI mode, discard log output
 		log.SetOutput(io.Discard)
 	}
 
-	p := tea.NewProgram(newModel(), opts...)
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Error starting Bubble Tea program:", err)
 		os.Exit(1)
@@ -80,7 +79,7 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		m.quitting = true
@@ -100,7 +99,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	s := "\n" +
 		m.spinner.View() + " Doing some work...\n\n"
 
@@ -118,7 +117,8 @@ func (m model) View() string {
 		s += "\n"
 	}
 
-	return indent.String(s, 1)
+	r.Write(indent.String(s, 1))
+	return
 }
 
 // processFinishedMsg is sent when a pretend process completes.

@@ -1,4 +1,4 @@
-package main
+package composableviews
 
 import (
 	"fmt"
@@ -77,7 +77,7 @@ func (m mainModel) Init() tea.Cmd {
 	return tea.Batch(m.timer.Init(), m.spinner.Tick)
 }
 
-func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m mainModel) Update(msg tea.Msg) (mainModel, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
@@ -120,7 +120,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m mainModel) View() string {
+func (m mainModel) View(r tea.Renderer) {
 	var s string
 	model := m.currentFocusedModel()
 	if m.state == timerView {
@@ -129,7 +129,7 @@ func (m mainModel) View() string {
 		s += lipgloss.JoinHorizontal(lipgloss.Top, modelStyle.Render(fmt.Sprintf("%4s", m.timer.View())), focusedModelStyle.Render(m.spinner.View()))
 	}
 	s += helpStyle.Render(fmt.Sprintf("\ntab: focus next • n: new %s • q: exit\n", model))
-	return s
+	r.Write(s)
 }
 
 func (m mainModel) currentFocusedModel() string {
@@ -153,7 +153,7 @@ func (m *mainModel) resetSpinner() {
 	m.spinner.Spinner = spinners[m.index]
 }
 
-func main() {
+func Main() {
 	p := tea.NewProgram(newModel(defaultTime))
 
 	if _, err := p.Run(); err != nil {

@@ -6,9 +6,6 @@ import "time"
 // no ordering guarantees. You can send a BatchMsg with Batch.
 type BatchMsg []Cmd
 
-// IsBubbleteaMsg implements BubbleteaMsg
-func (BatchMsg) IsBubbleteaMsg() {}
-
 // Batch performs a bunch of commands concurrently with no ordering guarantees
 // about the results. Use a Batch to return several commands.
 func Batch(cmds ...Cmd) Cmd {
@@ -29,8 +26,6 @@ func Batch(cmds ...Cmd) Cmd {
 
 // sequenceMsg is used internally to run the given commands in order.
 type sequenceMsg []Cmd
-
-func (sequenceMsg) IsBubbleteaMsg() {}
 
 // Sequence runs the given commands one at a time, in order. Contrast this with
 // Batch, which runs commands concurrently.

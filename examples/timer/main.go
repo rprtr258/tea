@@ -1,4 +1,4 @@
-package main
+package timer
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func (m model) Init() tea.Cmd {
 	return m.timer.Init()
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case timer.TickMsg:
 		var cmd tea.Cmd
@@ -73,7 +73,7 @@ func (m model) helpView() string {
 	})
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	// For a more detailed timer view you could read m.timer.Timeout to get
 	// the remaining time as a time.Duration and skip calling m.timer.View()
 	// entirely.
@@ -87,10 +87,10 @@ func (m model) View() string {
 		s = "Exiting in " + s
 		s += m.helpView()
 	}
-	return s
+	r.Write(s)
 }
 
-func main() {
+func Main() {
 	m := model{
 		timer: timer.NewWithInterval(timeout, time.Millisecond),
 		keymap: keymap{

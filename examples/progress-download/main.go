@@ -1,4 +1,4 @@
-package main
+package progressdownload
 
 import (
 	"flag"
@@ -13,7 +13,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-var p *tea.Program
+var p *tea.Program[model]
 
 type progressWriter struct {
 	total      int
@@ -50,7 +50,7 @@ func getResponse(url string) (*http.Response, error) {
 	return resp, nil
 }
 
-func main() {
+func Main() {
 	url := flag.String("url", "", "url for the file to download")
 	flag.Parse()
 

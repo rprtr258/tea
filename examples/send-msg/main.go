@@ -1,4 +1,4 @@
-package main
+package sendmsg
 
 // A simple example that shows how to send messages to a Bubble Tea program
 // from outside the program using Program.Send(Msg).
@@ -56,7 +56,7 @@ func (m model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		m.quitting = true
@@ -73,7 +73,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	var s string
 
 	if m.quitting {
@@ -96,10 +96,10 @@ func (m model) View() string {
 		s += "\n"
 	}
 
-	return appStyle.Render(s)
+	r.Write(appStyle.Render(s))
 }
 
-func main() {
+func Main() {
 	p := tea.NewProgram(newModel())
 
 	// Simulate activity

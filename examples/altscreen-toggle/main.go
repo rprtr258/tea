@@ -1,8 +1,8 @@
-package main
+package altscreentoggle
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/muesli/termenv"
@@ -23,7 +23,7 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -44,9 +44,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	if m.quitting {
-		return "Bye!\n"
+		r.Write("Bye!\n")
+		return
 	}
 
 	const (
@@ -61,13 +62,11 @@ func (m model) View() string {
 		mode = inlineMode
 	}
 
-	return fmt.Sprintf("\n\n  You're in %s\n\n\n", keyword(mode)) +
-		help("  space: switch modes • q: exit\n")
+	r.Write(fmt.Sprintf("\n\n  You're in %s\n\n\n%s", keyword(mode), help("  space: switch modes • q: exit\n")))
 }
 
-func main() {
+func Main() {
 	if _, err := tea.NewProgram(model{}).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatal("Error running program: ", err.Error())
 	}
 }

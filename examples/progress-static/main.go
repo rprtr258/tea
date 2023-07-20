@@ -1,4 +1,4 @@
-package main
+package progressstatic
 
 // A simple example that shows how to render a progress bar in a "pure"
 // fashion. In this example we bump the progress by 25% every second,
@@ -34,7 +34,7 @@ const (
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
 
-func main() {
+func Main() {
 	prog := progress.New(progress.WithScaledGradient("#FF7CCB", "#FDFF8C"))
 
 	if _, err := tea.NewProgram(model{progress: prog}).Run(); err != nil {
@@ -54,7 +54,7 @@ func (m model) Init() tea.Cmd {
 	return tickCmd()
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		return m, tea.Quit
@@ -79,11 +79,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	pad := strings.Repeat(" ", padding)
-	return "\n" +
+	r.Write("\n" +
 		pad + m.progress.ViewAs(m.percent) + "\n\n" +
-		pad + helpStyle("Press any key to quit")
+		pad + helpStyle("Press any key to quit"))
+	return
 }
 
 func tickCmd() tea.Cmd {

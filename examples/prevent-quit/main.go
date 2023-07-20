@@ -1,4 +1,4 @@
-package main
+package preventquit
 
 // A program demonstrating how to use the WithFilter option to intercept events.
 
@@ -19,20 +19,19 @@ var (
 	quitViewStyle = lipgloss.NewStyle().Padding(1).Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("170"))
 )
 
-func main() {
-	p := tea.NewProgram(initialModel(), tea.WithFilter(filter))
+func Main() {
+	p := tea.NewProgram(initialModel()).WithFilter(filter)
 
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func filter(teaModel tea.Model, msg tea.Msg) tea.Msg {
+func filter(m model, msg tea.Msg) tea.Msg {
 	if _, ok := msg.(tea.QuitMsg); !ok {
 		return msg
 	}
 
-	m := teaModel.(model)
 	if m.hasChanges {
 		return nil
 	}
@@ -79,7 +78,7 @@ func (m model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	if m.quitting {
 		return m.updatePromptView(msg)
 	}
@@ -87,7 +86,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m.updateTextView(msg)
 }
 
-func (m model) updateTextView(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) updateTextView(msg tea.Msg) (model, tea.Cmd) {
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
 
@@ -117,7 +116,7 @@ func (m model) updateTextView(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m model) updatePromptView(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) updatePromptView(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// For simplicity's sake, we'll treat any key besides "y" as "no"
@@ -131,13 +130,16 @@ func (m model) updatePromptView(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	if m.quitting {
 		if m.hasChanges {
 			text := lipgloss.JoinHorizontal(lipgloss.Top, "You have unsaved changes. Quit without saving?", choiceStyle.Render("[yn]"))
-			return quitViewStyle.Render(text)
+			r.Write(quitViewStyle.Render(text))
+			return
 		}
-		return "Very important, thank you\n"
+
+		r.Write("Very important, thank you\n")
+		return
 	}
 
 	helpView := m.help.ShortHelpView([]key.Binding{
@@ -145,10 +147,10 @@ func (m model) View() string {
 		m.keymap.quit,
 	})
 
-	return fmt.Sprintf(
+	r.Write(fmt.Sprintf(
 		"\nType some important things.\n\n%s\n\n %s\n %s",
 		m.textarea.View(),
 		saveTextStyle.Render(m.saveText),
 		helpView,
-	) + "\n\n"
+	) + "\n\n")
 }

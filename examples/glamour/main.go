@@ -1,4 +1,4 @@
-package main
+package glamour
 
 import (
 	"log"
@@ -55,7 +55,7 @@ type model struct {
 	viewport viewport.Model
 }
 
-func newExample() (*model, error) {
+func newExample() (model, error) {
 	const width = 78
 
 	vp := viewport.New(width, 20)
@@ -69,17 +69,17 @@ func newExample() (*model, error) {
 		glamour.WithWordWrap(width),
 	)
 	if err != nil {
-		return nil, err
+		return model{}, err
 	}
 
 	str, err := renderer.Render(content)
 	if err != nil {
-		return nil, err
+		return model{}, err
 	}
 
 	vp.SetContent(str)
 
-	return &model{
+	return model{
 		viewport: vp,
 	}, nil
 }
@@ -88,7 +88,7 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -112,7 +112,7 @@ func (e model) helpView() string {
 	return helpStyle("\n  ↑/↓: Navigate • q: Quit\n")
 }
 
-func main() {
+func Main() {
 	model, err := newExample()
 	if err != nil {
 		log.Fatal("Could not initialize Bubble Tea model: ", err.Error())

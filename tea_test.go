@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type incrementMsg struct{ MsgImplementation }
+type incrementMsg struct{}
 
 type testModel struct {
 	executed atomic.Value

@@ -1,4 +1,4 @@
-package main
+package stopwatch
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ func (m model) Init() tea.Cmd {
 	return m.stopwatch.Init()
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	// Note: you could further customize the time output by getting the
 	// duration from m.stopwatch.Elapsed(), which returns a time.Duration, and
 	// skip m.stopwatch.View() altogether.
@@ -38,7 +38,7 @@ func (m model) View() string {
 		s = "Elapsed: " + s
 		s += m.helpView()
 	}
-	return s
+	r.Write(s)
 }
 
 func (m model) helpView() string {
@@ -50,7 +50,7 @@ func (m model) helpView() string {
 	})
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -70,7 +70,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func main() {
+func Main() {
 	m := model{
 		stopwatch: stopwatch.NewWithInterval(time.Millisecond),
 		keymap: keymap{

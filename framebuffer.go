@@ -36,14 +36,6 @@ func NewFramebuffer(height, width int) FrameBuffer {
 	}
 }
 
-// WriteString writes a string to the framebuffer
-func (fb FrameBuffer) WriteString(s string) {
-	offset := 0 // TODO: store last drawn offset in fb field
-	for i, c := range s {
-		fb.B[i+offset] = c
-	}
-}
-
 // Set writes a rune to the framebuffer to the given position
 func (fb FrameBuffer) Set(y, x int, c rune) {
 	// TODO: bounds check?

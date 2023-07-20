@@ -140,7 +140,7 @@ For now, we'll just deal with `tea.KeyMsg` messages, which are automatically
 sent to the update function when keys are pressed.
 
 ```go
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
     switch msg := msg.(type) {
 
     // Is it a key press?
@@ -198,7 +198,7 @@ worry about redrawing logic and stuff like that. Bubble Tea takes care of it
 for you.
 
 ```go
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
     // The header
     s := "What should we buy at the market?\n\n"
 

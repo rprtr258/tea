@@ -1,4 +1,4 @@
-package main
+package realtime
 
 // A simple example that shows how to send activity to Bubble Tea in real-time
 // through a channel.
@@ -52,7 +52,7 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg.(type) {
 	case tea.KeyMsg:
 		m.quitting = true
@@ -69,15 +69,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	s := fmt.Sprintf("\n %s Events received: %d\n\n Press any key to exit\n", m.spinner.View(), m.responses)
 	if m.quitting {
 		s += "\n"
 	}
-	return s
+	r.Write(s)
+	return
 }
 
-func main() {
+func Main() {
 	p := tea.NewProgram(model{
 		sub:     make(chan struct{}),
 		spinner: spinner.New(),

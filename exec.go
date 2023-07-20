@@ -8,7 +8,6 @@ import (
 
 // execMsg is used internally to run an ExecCommand sent with Exec.
 type execMsg struct {
-	MsgImplementation
 	cmd ExecCommand
 	fn  ExecCallback
 }

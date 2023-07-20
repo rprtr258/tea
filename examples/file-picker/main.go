@@ -1,4 +1,4 @@
-package main
+package filepicker
 
 import (
 	"errors"
@@ -30,7 +30,7 @@ func (m model) Init() tea.Cmd {
 	return m.filepicker.Init()
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -63,10 +63,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
 	if m.quitting {
-		return ""
+		return
 	}
+
 	var s strings.Builder
 	s.WriteString("\n  ")
 	if m.err != nil {
@@ -77,10 +78,11 @@ func (m model) View() string {
 		s.WriteString("Selected file: " + m.filepicker.Styles.Selected.Render(m.selectedFile))
 	}
 	s.WriteString("\n\n" + m.filepicker.View() + "\n")
-	return s.String()
+	r.Write(s.String())
+	return
 }
 
-func main() {
+func Main() {
 	fp := filepicker.New()
 	fp.AllowedTypes = []string{".mod", ".sum", ".go", ".txt", ".md"}
 	fp.CurrentDirectory, _ = os.UserHomeDir()
@@ -88,7 +90,6 @@ func main() {
 	m := model{
 		filepicker: fp,
 	}
-	tm, _ := tea.NewProgram(&m, tea.WithOutput(os.Stderr)).Run()
-	mm := tm.(model)
+	mm, _ := tea.NewProgram(m).WithOutput(os.Stderr).Run()
 	fmt.Println("\n  You selected: " + m.filepicker.Styles.Selected.Render(mm.selectedFile) + "\n")
 }

@@ -105,7 +105,7 @@ types we made earlier when we were making the `checkServer` command? We handle
 them here. This makes dealing with many asynchronous operations very easy.
 
 ```go
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
     switch msg := msg.(type) {
 
     case statusMsg:
@@ -142,7 +142,7 @@ Our view is very straightforward. We look at the current model and build a
 string accordingly:
 
 ```go
-func (m model) View() string {
+func (m model) View(r tea.Renderer) {
     // If there's an error, print it out and don't do anything else.
     if m.err != nil {
         return fmt.Sprintf("\nWe had some trouble: %v\n\n", m.err)
