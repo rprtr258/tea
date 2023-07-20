@@ -66,6 +66,8 @@ func (m model) View() string {
 // particular one indicates that the timer has ticked.
 type tickMsg time.Time
 
+func (tickMsg) IsBubbleteaMsg() {}
+
 func tick() tea.Msg {
 	time.Sleep(time.Second)
 	return tickMsg{}

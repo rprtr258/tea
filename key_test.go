@@ -8,55 +8,58 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"reflect"
 	"runtime"
 	"sort"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestKeyString(t *testing.T) {
-	t.Run("alt+space", func(t *testing.T) {
-		if got := KeyMsg(Key{
-			Type: KeySpace,
-			Alt:  true,
-		}).String(); got != "alt+ " {
-			t.Fatalf(`expected a "alt+ ", got %q`, got)
-		}
-	})
-
-	t.Run("runes", func(t *testing.T) {
-		if got := KeyMsg(Key{
-			Type:  KeyRunes,
-			Runes: []rune{'a'},
-		}).String(); got != "a" {
-			t.Fatalf(`expected an "a", got %q`, got)
-		}
-	})
-
-	t.Run("invalid", func(t *testing.T) {
-		if got := KeyMsg(Key{
-			Type: KeyType(99999),
-		}).String(); got != "" {
-			t.Fatalf(`expected a "", got %q`, got)
-		}
-	})
+	for name, test := range map[string]struct {
+		key      Key
+		expected string
+	}{
+		"alt+space": {
+			key:      Key{Type: KeySpace, Alt: true},
+			expected: "alt+ ",
+		},
+		"runes": {
+			key:      Key{Type: KeyRunes, Runes: []rune{'a'}},
+			expected: "a",
+		},
+		"invalid": {
+			key:      Key{Type: KeyType(99999)},
+			expected: "",
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.expected, KeyMsg(test.key).String())
+		})
+	}
 }
 
 func TestKeyTypeString(t *testing.T) {
-	t.Run("space", func(t *testing.T) {
-		if got := KeySpace.String(); got != " " {
-			t.Fatalf(`expected a " ", got %q`, got)
-		}
-	})
-
-	t.Run("invalid", func(t *testing.T) {
-		if got := KeyType(99999).String(); got != "" {
-			t.Fatalf(`expected a "", got %q`, got)
-		}
-	})
+	for name, test := range map[string]struct {
+		keyType  KeyType
+		expected string
+	}{
+		"space": {
+			keyType:  KeySpace,
+			expected: " ",
+		},
+		"invalid": {
+			keyType:  KeyType(99999),
+			expected: "",
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.expected, test.keyType.String())
+		})
+	}
 }
 
 type seqTest struct {
@@ -83,8 +86,10 @@ func buildBaseSeqTests() []seqTest {
 			// suite.
 			continue
 		}
-		td = append(td, seqTest{[]byte{byte(i)}, KeyMsg{Type: i}})
-		td = append(td, seqTest{[]byte{'\x1b', byte(i)}, KeyMsg{Type: i, Alt: true}})
+		td = append(td,
+			seqTest{[]byte{byte(i)}, KeyMsg{Type: i}},
+			seqTest{[]byte{'\x1b', byte(i)}, KeyMsg{Type: i, Alt: true}},
+		)
 		if i == keyUS {
 			i = keyDEL - 1
 		}
@@ -112,19 +117,12 @@ func buildBaseSeqTests() []seqTest {
 }
 
 func TestDetectSequence(t *testing.T) {
-	td := buildBaseSeqTests()
-	for _, tc := range td {
+	for _, tc := range buildBaseSeqTests() {
 		t.Run(fmt.Sprintf("%q", string(tc.seq)), func(t *testing.T) {
 			hasSeq, width, msg := detectSequence(tc.seq)
-			if !hasSeq {
-				t.Fatalf("no sequence found")
-			}
-			if width != len(tc.seq) {
-				t.Errorf("parser did not consume the entire input: got %d, expected %d", width, len(tc.seq))
-			}
-			if !reflect.DeepEqual(tc.msg, msg) {
-				t.Errorf("expected event %#v (%T), got %#v (%T)", tc.msg, tc.msg, msg, msg)
-			}
+			assert.True(t, hasSeq, "no sequence found")
+			assert.Len(t, tc.seq, width, "parser did not consume the entire input")
+			assert.Equal(t, tc.msg, msg)
 		})
 	}
 }
@@ -201,12 +199,8 @@ func TestDetectOneMsg(t *testing.T) {
 	for _, tc := range td {
 		t.Run(fmt.Sprintf("%q", string(tc.seq)), func(t *testing.T) {
 			width, msg := detectOneMsg(tc.seq)
-			if width != len(tc.seq) {
-				t.Errorf("parser did not consume the entire input: got %d, expected %d", width, len(tc.seq))
-			}
-			if !reflect.DeepEqual(tc.msg, msg) {
-				t.Errorf("expected event %#v (%T), got %#v (%T)", tc.msg, tc.msg, msg, msg)
-			}
+			assert.Len(t, tc.seq, width)
+			assert.Equal(t, tc.msg, msg)
 		})
 	}
 }
@@ -459,18 +453,8 @@ func TestReadInput(t *testing.T) {
 				}
 			}
 
-			title := buf.String()
-			if title != td.keyname {
-				t.Errorf("expected message titles:\n  %s\ngot:\n  %s", td.keyname, title)
-			}
-
-			if len(msgs) != len(td.out) {
-				t.Fatalf("unexpected message list length: got %d, expected %d\n%#v", len(msgs), len(td.out), msgs)
-			}
-
-			if !reflect.DeepEqual(td.out, msgs) {
-				t.Fatalf("expected:\n%#v\ngot:\n%#v", td.out, msgs)
-			}
+			assert.Equal(t, td.keyname, buf.String())
+			assert.Equal(t, td.out, msgs)
 		})
 	}
 }
@@ -610,7 +594,8 @@ func TestDetectRandomSequencesLex(t *testing.T) {
 }
 
 func runTestDetectSequence(
-	t *testing.T, detectSequence func(input []byte) (hasSeq bool, width int, msg Msg),
+	t *testing.T,
+	detectSequence func(input []byte) (hasSeq bool, width int, msg Msg),
 ) {
 	for i := 0; i < 10; i++ {
 		t.Run("", func(t *testing.T) {
@@ -623,22 +608,11 @@ func runTestDetectSequence(
 			// w is the length of the last sequence detected.
 			for tn, i, w := 0, 0, 0; i < len(td.data); tn, i = tn+1, i+w {
 				hasSequence, width, msg := detectSequence(td.data[i:])
-				if !hasSequence {
-					t.Fatalf("at %d (ev %d): failed to find sequence", i, tn)
-				}
-				if width != td.lengths[tn] {
-					t.Errorf("at %d (ev %d): expected width %d, got %d", i, tn, td.lengths[tn], width)
-				}
+				assert.True(t, hasSequence, "at %d (ev %d): failed to find sequence", i, tn)
+				assert.Equal(t, td.lengths[tn], width)
 				w = width
 
-				s, ok := msg.(fmt.Stringer)
-				if !ok {
-					t.Errorf("at %d (ev %d): expected stringer event, got %T", i, tn, msg)
-				} else {
-					if td.names[tn] != s.String() {
-						t.Errorf("at %d (ev %d): expected event %q, got %q", i, tn, td.names[tn], s.String())
-					}
-				}
+				assert.Equal(t, td.names[tn], msg.(fmt.Stringer).String(), "at %d (ev %d)", i, tn)
 			}
 		})
 	}

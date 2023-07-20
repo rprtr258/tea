@@ -10,7 +10,7 @@ import (
 
 type stringMsg string
 
-func (stringMsg) isBubbleteaMsg() {}
+func (stringMsg) IsBubbleteaMsg() {}
 
 func TestEvery(t *testing.T) {
 	expected := stringMsg("every ms")
@@ -33,7 +33,7 @@ type errorMsg struct {
 	error
 }
 
-func (errorMsg) isBubbleteaMsg() {}
+func (errorMsg) IsBubbleteaMsg() {}
 
 func TestSequentially(t *testing.T) {
 	expectedErrMsg := errorMsg{error: errors.New("some err")}
@@ -83,16 +83,33 @@ func TestSequentially(t *testing.T) {
 }
 
 func TestBatch(t *testing.T) {
-	t.Run("nil cmd", func(t *testing.T) {
-		assert.Nil(t, Batch(nil))
-	})
-	t.Run("empty cmd", func(t *testing.T) {
-		assert.Nil(t, Batch())
-	})
-	t.Run("single cmd", func(t *testing.T) {
-		assert.Len(t, Batch(Quit)(), 1)
-	})
-	t.Run("mixed nil cmds", func(t *testing.T) {
-		assert.Len(t, Batch(nil, Quit, nil, Quit, nil, nil)(), 2)
-	})
+	for name, test := range map[string]struct {
+		cmds        []Cmd
+		expectedLen int
+	}{
+		"nil cmd": {
+			cmds:        []Cmd{nil},
+			expectedLen: 0,
+		},
+		"empty cmd": {
+			cmds:        nil,
+			expectedLen: 0,
+		},
+		"single cmd": {
+			cmds:        []Cmd{Quit},
+			expectedLen: 1,
+		},
+		"mixed nil cmds": {
+			cmds:        []Cmd{nil, Quit, nil, Quit, nil, nil},
+			expectedLen: 2,
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			if test.expectedLen == 0 {
+				assert.Nil(t, Batch(test.cmds...))
+			} else {
+				assert.Len(t, Batch(test.cmds...)(), test.expectedLen)
+			}
+		})
+	}
 }

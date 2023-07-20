@@ -5,7 +5,7 @@ package tea
 // be enabled in order for the mouse events to be received.
 type MouseMsg MouseEvent
 
-func (MouseMsg) isBubbleteaMsg() {}
+func (MouseMsg) IsBubbleteaMsg() {}
 
 // String returns a string representation of a mouse event.
 func (m MouseMsg) String() string {

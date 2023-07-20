@@ -33,14 +33,15 @@ var ErrProgramKilled = errors.New("program was killed")
 // Msg contain data from the result of a IO operation. Msgs trigger the update
 // function and, henceforth, the UI.
 type Msg interface {
-	isBubbleteaMsg()
+	IsBubbleteaMsg()
 }
 
 // MsgImplementation is an implementation of Msg interface. Usefule to just embed
 // instead of implementing Msg.
 type MsgImplementation struct{}
 
-func (m MsgImplementation) isBubbleteaMsg() {}
+// IsBubbleteaMsg implements the Msg interface.
+func (m MsgImplementation) IsBubbleteaMsg() {}
 
 // Model contains the program's state as well as its core functions.
 type Model interface {
