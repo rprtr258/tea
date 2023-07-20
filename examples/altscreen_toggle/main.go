@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	tea "github.com/rprtr258/bubbletea"
 	"github.com/muesli/termenv"
+	tea "github.com/rprtr258/bubbletea"
 )
 
 var (
