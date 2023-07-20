@@ -53,6 +53,10 @@ type Model interface {
 	// and, in response, update the model and/or send a command.
 	Update(Msg) (Model, Cmd)
 
+	// FrameSize returns the current frame size. If changed, framebuffer will be
+	// reallocated.
+	FrameSize() (int, int)
+
 	// View renders the program's UI, which is just a string. The view is
 	// rendered after every Update.
 	View(FrameBuffer)
@@ -404,9 +408,9 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 			}
 
 			var cmd Cmd
-			model, cmd = model.Update(msg)          // run update
-			cmds <- cmd                             // process command (if any)
-			framebuffer := NewFramebuffer(100, 100) // TODO: add actual height, width, cache framebuffer
+			model, cmd = model.Update(msg)                   // run update
+			cmds <- cmd                                      // process command (if any)
+			framebuffer := NewFramebuffer(model.FrameSize()) // TODO: cache framebuffer
 			model.View(framebuffer)
 			p.renderer.write(framebuffer.Render()) // send view to renderer
 		}
@@ -520,7 +524,7 @@ func (p *Program) Run() (Model, error) {
 	p.renderer.start()
 
 	// Render the initial view.
-	framebuffer := NewFramebuffer(100, 100) // TODO: add actual height, width, cache framebuffer
+	framebuffer := NewFramebuffer(model.FrameSize()) // TODO: cache framebuffer
 	model.View(framebuffer)
 	p.renderer.write(framebuffer.Render())
 
@@ -544,7 +548,7 @@ func (p *Program) Run() (Model, error) {
 		err = ErrProgramKilled
 	} else {
 		// Ensure we rendered the final state of the model.
-		framebuffer := NewFramebuffer(100, 100) // TODO: add actual height, width, cache framebuffer
+		framebuffer := NewFramebuffer(model.FrameSize()) // TODO: cache framebuffer
 		model.View(framebuffer)
 		p.renderer.write(framebuffer.Render())
 	}

@@ -38,6 +38,10 @@ func (m *testModel) Update(msg Msg) (Model, Cmd) {
 	return m, nil
 }
 
+func (m *testModel) FrameSize() (int, int) {
+	return 100, 100
+}
+
 func (m *testModel) View(fb FrameBuffer) {
 	m.executed.Store(true)
 	fb.WriteString("success\n")
