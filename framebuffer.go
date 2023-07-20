@@ -95,3 +95,48 @@ func (fb FrameBuffer) Render() string {
 	}
 	return strings.Join(rows, "\n")
 }
+
+type Viewbox struct {
+	FB     FrameBuffer
+	Y      int
+	X      int
+	Height int
+	Width  int
+}
+
+type PaddingOptions struct {
+	Top, Bottom, Left, Right int
+}
+
+func (vb Viewbox) Row(y int) Viewbox {
+	return Viewbox{
+		Y:      y + vb.Y,
+		X:      vb.X,
+		Height: 1,
+		Width:  vb.Width,
+		FB:     vb.FB,
+	}
+}
+
+func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
+	return Viewbox{
+		Y:      vb.Y + opt.Top,
+		X:      vb.X + opt.Left,
+		Height: vb.Height - opt.Top - opt.Bottom,
+		Width:  vb.Width - opt.Left - opt.Right,
+		FB:     vb.FB,
+	}
+}
+
+func (vb Viewbox) Set(y, x int, c rune) {
+	// TODO: bounds check?
+	vb.FB.Set(vb.Y+y, vb.X+x, c)
+}
+
+func (vb Viewbox) Background(y, x1, x2 int, background termenv.Color) {
+	vb.FB.Background(y+vb.Y, x1+vb.X, x2+vb.X, background)
+}
+
+func (vb Viewbox) Foreground(y, x1, x2 int, foreground termenv.Color) {
+	vb.FB.Foreground(y+vb.Y, x1+vb.X, x2+vb.X, foreground)
+}
