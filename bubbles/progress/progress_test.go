@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/muesli/termenv"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -52,13 +53,8 @@ func TestGradient(t *testing.T) {
 				// discard the last color, because it is empty (no new color comes after the last char of the bar)
 				colors = colors[0 : len(colors)-1]
 
-				if expFirst != colors[0] {
-					t.Errorf("expected first color of bar to be first gradient color %q, instead got %q", expFirst, colors[0])
-				}
-
-				if expLast != colors[len(colors)-1] {
-					t.Errorf("expected last color of bar to be second gradient color %q, instead got %q", expLast, colors[len(colors)-1])
-				}
+				assert.Equal(t, expFirst, colors[0])
+				assert.Equal(t, expLast, colors[len(colors)-1])
 			}
 		})
 	}

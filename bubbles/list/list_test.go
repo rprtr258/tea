@@ -3,10 +3,10 @@ package list
 import (
 	"fmt"
 	"io"
-	"strings"
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/stretchr/testify/assert"
 )
 
 type item string
@@ -24,51 +24,30 @@ func (d itemDelegate) Render(w io.Writer, m Model, index int, listItem Item) {
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s", index+1, i)
-	fmt.Fprint(w, m.Styles.TitleBar.Render(str))
+	fmt.Fprint(w, m.Styles.TitleBar.Render(fmt.Sprintf("%d. %s", index+1, i)))
 }
 
 func TestStatusBarItemName(t *testing.T) {
 	list := New([]Item{item("foo"), item("bar")}, itemDelegate{}, 10, 10)
-	expected := "2 items"
-	if !strings.Contains(list.statusView(), expected) {
-		t.Fatalf("Error: expected view to contain %s", expected)
-	}
+	assert.Contains(t, list.statusView(), "2 items")
 
 	list.SetItems([]Item{item("foo")})
-	expected = "1 item"
-	if !strings.Contains(list.statusView(), expected) {
-		t.Fatalf("Error: expected view to contain %s", expected)
-	}
+	assert.NotContains(t, list.statusView(), "1 item")
 }
 
 func TestStatusBarWithoutItems(t *testing.T) {
 	list := New([]Item{}, itemDelegate{}, 10, 10)
-
-	expected := "No items"
-	if !strings.Contains(list.statusView(), expected) {
-		t.Fatalf("Error: expected view to contain %s", expected)
-	}
+	assert.Contains(t, list.statusView(), "No items")
 }
 
 func TestCustomStatusBarItemName(t *testing.T) {
 	list := New([]Item{item("foo"), item("bar")}, itemDelegate{}, 10, 10)
 	list.SetStatusBarItemName("connection", "connections")
-
-	expected := "2 connections"
-	if !strings.Contains(list.statusView(), expected) {
-		t.Fatalf("Error: expected view to contain %s", expected)
-	}
+	assert.Contains(t, list.statusView(), "2 connections")
 
 	list.SetItems([]Item{item("foo")})
-	expected = "1 connection"
-	if !strings.Contains(list.statusView(), expected) {
-		t.Fatalf("Error: expected view to contain %s", expected)
-	}
+	assert.Contains(t, list.statusView(), "1 connection")
 
 	list.SetItems([]Item{})
-	expected = "No connections"
-	if !strings.Contains(list.statusView(), expected) {
-		t.Fatalf("Error: expected view to contain %s", expected)
-	}
+	assert.Contains(t, list.statusView(), "No connections")
 }

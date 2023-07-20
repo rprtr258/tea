@@ -2,6 +2,8 @@ package key
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBinding_Enabled(t *testing.T) {
@@ -9,18 +11,12 @@ func TestBinding_Enabled(t *testing.T) {
 		WithKeys("k", "up"),
 		WithHelp("↑/k", "move up"),
 	)
-	if !binding.Enabled() {
-		t.Errorf("expected key to be Enabled")
-	}
+	assert.True(t, binding.Enabled(), "expected key to be Enabled")
 
 	binding.SetEnabled(false)
-	if binding.Enabled() {
-		t.Errorf("expected key not to be Enabled")
-	}
+	assert.False(t, binding.Enabled(), "expected key not to be Enabled")
 
 	binding.SetEnabled(true)
 	binding.Unbind()
-	if binding.Enabled() {
-		t.Errorf("expected key not to be Enabled")
-	}
+	assert.False(t, binding.Enabled(), "expected key not to be Enabled")
 }
