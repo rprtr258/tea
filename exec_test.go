@@ -35,11 +35,7 @@ func (m *testExecModel) Update(msg Msg) (Model, Cmd) {
 	return m, nil
 }
 
-func (m *testExecModel) FrameSize() (int, int) {
-	return 0, 0
-}
-
-func (m *testExecModel) View(fb FrameBuffer) {}
+func (m *testExecModel) View(Renderer) {}
 
 func TestTeaExec(t *testing.T) {
 	tests := []struct {

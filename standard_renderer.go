@@ -55,7 +55,7 @@ type standardRenderer struct {
 
 // newRenderer creates a new renderer. Normally you'll want to initialize it
 // with os.Stdout as the first argument.
-func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) renderer {
+func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) Renderer {
 	if fps < 1 {
 		fps = defaultFPS
 	} else if fps > maxFPS {
@@ -262,7 +262,7 @@ func (r *standardRenderer) flush() {
 
 // write writes to the internal buffer. The buffer will be outputted via the
 // ticker which calls flush().
-func (r *standardRenderer) write(s string) {
+func (r *standardRenderer) Write(s string) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	r.buf.Reset()

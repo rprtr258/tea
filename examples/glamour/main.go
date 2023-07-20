@@ -104,13 +104,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) FrameSize() (int, int) {
-	return 200, 100
-}
-
-func (m model) View(fb tea.FrameBuffer) {
-	fb.WriteString(m.viewport.View())
-	fb.WriteString(m.helpView())
+func (m model) View(r tea.Renderer) {
+	r.Write(m.viewport.View() + m.helpView()) // TODO: do not concat strings
 }
 
 func (e model) helpView() string {

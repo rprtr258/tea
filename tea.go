@@ -53,13 +53,9 @@ type Model interface {
 	// and, in response, update the model and/or send a command.
 	Update(Msg) (Model, Cmd)
 
-	// FrameSize returns the current frame size (height, width).
-	// If changed, framebuffer will be reallocated.
-	FrameSize() (int, int)
-
 	// View renders the program's UI, which is just a string. The view is
 	// rendered after every Update.
-	View(FrameBuffer)
+	View(Renderer)
 }
 
 // Cmd is an IO operation that returns a message when it's complete. If it's
@@ -156,7 +152,7 @@ type Program struct {
 	// where to send output, this will usually be os.Stdout.
 	output        *termenv.Output
 	restoreOutput func() error
-	renderer      renderer
+	renderer      Renderer
 
 	// where to read inputs from, this will usually be os.Stdin.
 	input        io.Reader
@@ -408,11 +404,9 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 			}
 
 			var cmd Cmd
-			model, cmd = model.Update(msg)                   // run update
-			cmds <- cmd                                      // process command (if any)
-			framebuffer := NewFramebuffer(model.FrameSize()) // TODO: cache framebuffer
-			model.View(framebuffer)
-			p.renderer.write(framebuffer.Render()) // send view to renderer
+			model, cmd = model.Update(msg) // run update
+			cmds <- cmd                    // process command (if any)
+			model.View(p.renderer)         // TODO: do not retain renderer, give it back to user
 		}
 	}
 }
@@ -524,9 +518,7 @@ func (p *Program) Run() (Model, error) {
 	p.renderer.start()
 
 	// Render the initial view.
-	framebuffer := NewFramebuffer(model.FrameSize()) // TODO: cache framebuffer
-	model.View(framebuffer)
-	p.renderer.write(framebuffer.Render())
+	model.View(p.renderer)
 
 	// Subscribe to user input.
 	if p.input != nil {
@@ -548,9 +540,7 @@ func (p *Program) Run() (Model, error) {
 		err = ErrProgramKilled
 	} else {
 		// Ensure we rendered the final state of the model.
-		framebuffer := NewFramebuffer(model.FrameSize()) // TODO: cache framebuffer
-		model.View(framebuffer)
-		p.renderer.write(framebuffer.Render())
+		model.View(p.renderer)
 	}
 
 	// Tear down.

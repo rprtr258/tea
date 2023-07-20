@@ -38,13 +38,9 @@ func (m *testModel) Update(msg Msg) (Model, Cmd) {
 	return m, nil
 }
 
-func (m *testModel) FrameSize() (int, int) {
-	return 1, 8
-}
-
-func (m *testModel) View(fb FrameBuffer) {
+func (m *testModel) View(r Renderer) {
 	m.executed.Store(true)
-	fb.WriteString("success\n")
+	r.Write("success\n")
 }
 
 func TestTeaModel(t *testing.T) {
