@@ -64,7 +64,7 @@ func TestTeaExec(t *testing.T) {
 			m := &testExecModel{cmd: test.cmd}
 			_, err := NewProgram(m, WithInput(&in), WithOutput(&buf)).Run()
 			assert.NoError(t, err)
-			assert.IsType(t, m.err, test.expectErr)
+			assert.IsType(t, test.expectErr, m.err)
 		})
 	}
 }

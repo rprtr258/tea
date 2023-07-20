@@ -3,58 +3,43 @@ package tea
 import (
 	"bytes"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestOptions(t *testing.T) {
 	t.Run("output", func(t *testing.T) {
 		var b bytes.Buffer
 		p := NewProgram(nil, WithOutput(&b))
-		if p.output.TTY() != nil {
-			t.Errorf("expected output to custom, got %v", p.output.TTY().Fd())
-		}
+		assert.Nil(t, p.output.TTY())
 	})
 
 	t.Run("custom input", func(t *testing.T) {
 		var b bytes.Buffer
 		p := NewProgram(nil, WithInput(&b))
-		if p.input != &b {
-			t.Errorf("expected input to custom, got %v", p.input)
-		}
-		if p.inputType != customInput {
-			t.Errorf("expected startup options to have custom input set, got %v", p.input)
-		}
+		assert.Equal(t, &b, p.input)
+		assert.Equal(t, customInput, p.inputType)
 	})
 
 	t.Run("renderer", func(t *testing.T) {
 		p := NewProgram(nil, WithoutRenderer())
-		switch p.renderer.(type) {
-		case *nilRenderer:
-			return
-		default:
-			t.Errorf("expected renderer to be a nilRenderer, got %v", p.renderer)
-		}
+		assert.IsType(t, (*nilRenderer)(nil), p.renderer)
 	})
 
 	t.Run("without signals", func(t *testing.T) {
 		p := NewProgram(nil, WithoutSignals())
-		if !p.ignoreSignals {
-			t.Errorf("ignore signals should have been set")
-		}
+		assert.True(t, p.ignoreSignals)
 	})
 
 	t.Run("filter", func(t *testing.T) {
 		p := NewProgram(nil, WithFilter(func(_ Model, msg Msg) Msg { return msg }))
-		if p.filter == nil {
-			t.Errorf("expected filter to be set")
-		}
+		assert.NotNil(t, p.filter)
 	})
 
 	t.Run("input options", func(t *testing.T) {
 		exercise := func(t *testing.T, opt ProgramOption, expect inputType) {
 			p := NewProgram(nil, opt)
-			if p.inputType != expect {
-				t.Errorf("expected input type %s, got %s", expect, p.inputType)
-			}
+			assert.Equal(t, expect, p.inputType)
 		}
 
 		t.Run("tty input", func(t *testing.T) {
@@ -70,9 +55,7 @@ func TestOptions(t *testing.T) {
 	t.Run("startup options", func(t *testing.T) {
 		exercise := func(t *testing.T, opt ProgramOption, expect startupOptions) {
 			p := NewProgram(nil, opt)
-			if !p.startupOptions.has(expect) {
-				t.Errorf("expected startup options have %v, got %v", expect, p.startupOptions)
-			}
+			assert.True(t, p.startupOptions.has(expect))
 		}
 
 		t.Run("alt screen", func(t *testing.T) {
@@ -93,34 +76,22 @@ func TestOptions(t *testing.T) {
 
 		t.Run("mouse cell motion", func(t *testing.T) {
 			p := NewProgram(nil, WithMouseAllMotion(), WithMouseCellMotion())
-			if !p.startupOptions.has(withMouseCellMotion) {
-				t.Errorf("expected startup options have %v, got %v", withMouseCellMotion, p.startupOptions)
-			}
-			if p.startupOptions.has(withMouseAllMotion) {
-				t.Errorf("expected startup options not have %v, got %v", withMouseAllMotion, p.startupOptions)
-			}
+			assert.True(t, p.startupOptions.has(withMouseCellMotion))
+			assert.False(t, p.startupOptions.has(withMouseAllMotion))
 		})
 
 		t.Run("mouse all motion", func(t *testing.T) {
 			p := NewProgram(nil, WithMouseCellMotion(), WithMouseAllMotion())
-			if !p.startupOptions.has(withMouseAllMotion) {
-				t.Errorf("expected startup options have %v, got %v", withMouseAllMotion, p.startupOptions)
-			}
-			if p.startupOptions.has(withMouseCellMotion) {
-				t.Errorf("expected startup options not have %v, got %v", withMouseCellMotion, p.startupOptions)
-			}
+			assert.True(t, p.startupOptions.has(withMouseAllMotion))
+			assert.False(t, p.startupOptions.has(withMouseCellMotion))
 		})
 	})
 
 	t.Run("multiple", func(t *testing.T) {
 		p := NewProgram(nil, WithMouseAllMotion(), WithAltScreen(), WithInputTTY())
 		for _, opt := range []startupOptions{withMouseAllMotion, withAltScreen} {
-			if !p.startupOptions.has(opt) {
-				t.Errorf("expected startup options have %v, got %v", opt, p.startupOptions)
-			}
-			if p.inputType != ttyInput {
-				t.Errorf("expected input to be %v, got %v", opt, p.startupOptions)
-			}
+			assert.True(t, p.startupOptions.has(opt))
+			assert.Equal(t, ttyInput, p.inputType)
 		}
 	})
 }
