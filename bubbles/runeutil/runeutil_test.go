@@ -3,6 +3,8 @@ package runeutil
 import (
 	"testing"
 	"unicode/utf8"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSanitize(t *testing.T) {
@@ -37,8 +39,6 @@ func TestSanitize(t *testing.T) {
 		s := NewSanitizer(ReplaceNewlines("XX"), ReplaceTabs(""))
 		result := s.Sanitize(runes)
 		rs := string(result)
-		if tc.output != rs {
-			t.Errorf("%q: expected %q, got %q (%+v)", tc.input, tc.output, rs, result)
-		}
+		assert.Equal(t, tc.output, rs, "input: %q, result: %v", tc.input, result)
 	}
 }
