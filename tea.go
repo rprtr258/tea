@@ -53,8 +53,8 @@ type Model interface {
 	// and, in response, update the model and/or send a command.
 	Update(Msg) (Model, Cmd)
 
-	// FrameSize returns the current frame size. If changed, framebuffer will be
-	// reallocated.
+	// FrameSize returns the current frame size (height, width).
+	// If changed, framebuffer will be reallocated.
 	FrameSize() (int, int)
 
 	// View renders the program's UI, which is just a string. The view is

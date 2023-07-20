@@ -91,8 +91,7 @@ func (fb FrameBuffer) Render() string {
 			newRow += coloring + string([]rune{fullRow[x]})
 		}
 
-		// TODO: is it needed? colors are already resetting for each pixel
-		rows[y] = newRow + ctrlSeq(termenv.ResetSeq)
+		rows[y] = newRow
 	}
 	return strings.Join(rows, "\n")
 }

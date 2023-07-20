@@ -39,7 +39,7 @@ func (m *testModel) Update(msg Msg) (Model, Cmd) {
 }
 
 func (m *testModel) FrameSize() (int, int) {
-	return 100, 100
+	return 1, 8
 }
 
 func (m *testModel) View(fb FrameBuffer) {
