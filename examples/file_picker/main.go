@@ -65,6 +65,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 
 func (m model) View(r tea.Renderer) {
 	if m.quitting {
+		r.Write("")
 		return
 	}
 

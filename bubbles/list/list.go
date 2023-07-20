@@ -347,10 +347,10 @@ func (m Model) Items() []Item {
 }
 
 // SetItems sets the items available in the list. This returns a command.
-func (m *Model) SetItems(i []Item) tea.Cmd {
-	var cmd tea.Cmd
-	m.items = i
+func (m *Model) SetItems(items []Item) tea.Cmd {
+	m.items = items
 
+	var cmd tea.Cmd
 	if m.filterState != Unfiltered {
 		m.filteredItems = nil
 		cmd = filterItems(*m)
@@ -1096,9 +1096,6 @@ func (m Model) titleView() string {
 }
 
 func (m Model) statusView() string {
-	var status string
-
-	totalItems := len(m.items)
 	visibleItems := len(m.VisibleItems())
 
 	var itemName string
@@ -1110,6 +1107,7 @@ func (m Model) statusView() string {
 
 	itemsDisplay := fmt.Sprintf("%d %s", visibleItems, itemName)
 
+	var status string
 	if m.filterState == Filtering {
 		// Filter results
 		if visibleItems == 0 {
@@ -1133,6 +1131,7 @@ func (m Model) statusView() string {
 		status += itemsDisplay
 	}
 
+	totalItems := len(m.items)
 	numFiltered := totalItems - visibleItems
 	if numFiltered > 0 {
 		status += m.Styles.DividerDot.String()
