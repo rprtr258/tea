@@ -7,9 +7,10 @@ import (
 	"testing"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/charmbracelet/x/exp/teatest"
 	"github.com/stretchr/testify/assert"
+
+	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/bubbletea/x/exp/teatest"
 )
 
 func TestApp(t *testing.T) {

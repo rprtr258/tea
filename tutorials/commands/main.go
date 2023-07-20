@@ -69,7 +69,6 @@ func (m model) View(r tea.Renderer) {
 		s += fmt.Sprintf("%d %s!", m.status, http.StatusText(m.status))
 	}
 	r.Write("\n" + s + "\n\n")
-	return
 }
 
 func main() {

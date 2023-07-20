@@ -6,9 +6,7 @@ use (
 	./glamour
 	./lipgloss
 	./lipgloss/examples
-	./tutorials
 	./x/exp/higherorder
 	./x/exp/ordered
 	./x/exp/slice
-	./x/exp/teatest
 )

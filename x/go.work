@@ -4,5 +4,4 @@ use (
 	./exp/higherorder
 	./exp/ordered
 	./exp/slice
-	./exp/teatest
 )
