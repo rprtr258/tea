@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -52,11 +51,11 @@ Bon appétit!
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
 
-type example struct {
+type model struct {
 	viewport viewport.Model
 }
 
-func newExample() (*example, error) {
+func newExample() (*model, error) {
 	const width = 78
 
 	vp := viewport.New(width, 20)
@@ -80,48 +79,51 @@ func newExample() (*example, error) {
 
 	vp.SetContent(str)
 
-	return &example{
+	return &model{
 		viewport: vp,
 	}, nil
 }
 
-func (e example) Init() tea.Cmd {
+func (m model) Init() tea.Cmd {
 	return nil
 }
 
-func (e example) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return e, tea.Quit
+			return m, tea.Quit
 		default:
 			var cmd tea.Cmd
-			e.viewport, cmd = e.viewport.Update(msg)
-			return e, cmd
+			m.viewport, cmd = m.viewport.Update(msg)
+			return m, cmd
 		}
 	default:
-		return e, nil
+		return m, nil
 	}
 }
 
-func (e example) View() string {
-	return e.viewport.View() + e.helpView()
+func (m model) FrameSize() (int, int) {
+	return 200, 100
 }
 
-func (e example) helpView() string {
+func (m model) View(fb tea.FrameBuffer) {
+	fb.WriteString(m.viewport.View())
+	fb.WriteString(m.helpView())
+}
+
+func (e model) helpView() string {
 	return helpStyle("\n  ↑/↓: Navigate • q: Quit\n")
 }
 
 func main() {
 	model, err := newExample()
 	if err != nil {
-		fmt.Println("Could not initialize Bubble Tea model:", err)
-		os.Exit(1)
+		log.Fatal("Could not initialize Bubble Tea model: ", err.Error())
 	}
 
 	if _, err := tea.NewProgram(model).Run(); err != nil {
-		fmt.Println("Bummer, there's been an error:", err)
-		os.Exit(1)
+		log.Fatal("Bummer, there's been an error: ", err.Error())
 	}
 }
