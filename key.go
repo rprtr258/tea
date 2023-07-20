@@ -43,6 +43,8 @@ import (
 // IMEs) can input multiple runes at once.
 type KeyMsg Key
 
+func (KeyMsg) isBubbleteaMsg() {}
+
 // String returns a string representation for a key message. It's safe (and
 // encouraged) for use in key comparison.
 func (k KeyMsg) String() (str string) {
@@ -522,6 +524,8 @@ var sequences = map[string]Key{
 // to troubleshoot invalid inputs.
 type unknownInputByteMsg byte
 
+func (unknownInputByteMsg) isBubbleteaMsg() {}
+
 func (u unknownInputByteMsg) String() string {
 	return fmt.Sprintf("?%#02x?", int(u))
 }
@@ -531,6 +535,8 @@ func (u unknownInputByteMsg) String() string {
 // is not handled further by bubbletea. However, having this event
 // makes it possible to troubleshoot invalid inputs.
 type unknownCSISequenceMsg []byte
+
+func (unknownCSISequenceMsg) isBubbleteaMsg() {}
 
 func (u unknownCSISequenceMsg) String() string {
 	return fmt.Sprintf("?CSI%+v?", []byte(u)[2:])

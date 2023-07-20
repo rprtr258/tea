@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type incrementMsg struct{}
+type incrementMsg struct{ MsgImplementation }
 
 type testModel struct {
 	executed atomic.Value

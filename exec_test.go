@@ -6,7 +6,10 @@ import (
 	"testing"
 )
 
-type execFinishedMsg struct{ err error }
+type execFinishedMsg struct {
+	MsgImplementation
+	err error
+}
 
 type testExecModel struct {
 	cmd string
@@ -16,7 +19,7 @@ type testExecModel struct {
 func (m testExecModel) Init() Cmd {
 	c := exec.Command(m.cmd) //nolint:gosec
 	return ExecProcess(c, func(err error) Msg {
-		return execFinishedMsg{err}
+		return execFinishedMsg{err: err}
 	})
 }
 

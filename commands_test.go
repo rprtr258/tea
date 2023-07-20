@@ -1,13 +1,17 @@
 package tea
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 )
 
+type stringMsg string
+
+func (stringMsg) isBubbleteaMsg() {}
+
 func TestEvery(t *testing.T) {
-	expected := "every ms"
+	expected := stringMsg("every ms")
 	msg := Every(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
@@ -17,7 +21,7 @@ func TestEvery(t *testing.T) {
 }
 
 func TestTick(t *testing.T) {
-	expected := "tick"
+	expected := stringMsg("tick")
 	msg := Tick(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
@@ -26,9 +30,16 @@ func TestTick(t *testing.T) {
 	}
 }
 
+type errorMsg struct {
+	MsgImplementation
+	error
+}
+
+func (errorMsg) isBubbleteaMsg() {}
+
 func TestSequentially(t *testing.T) {
-	expectedErrMsg := fmt.Errorf("some err")
-	expectedStrMsg := "some msg"
+	expectedErrMsg := errorMsg{error: errors.New("some err")}
+	expectedStrMsg := stringMsg("some msg")
 
 	nilReturnCmd := func() Msg {
 		return nil

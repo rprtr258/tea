@@ -32,7 +32,15 @@ var ErrProgramKilled = errors.New("program was killed")
 
 // Msg contain data from the result of a IO operation. Msgs trigger the update
 // function and, henceforth, the UI.
-type Msg interface{}
+type Msg interface {
+	isBubbleteaMsg()
+}
+
+// MsgImplementation is an implementation of Msg interface. Usefule to just embed
+// instead of implementing Msg.
+type MsgImplementation struct{}
+
+func (m MsgImplementation) isBubbleteaMsg() {}
 
 // Model contains the program's state as well as its core functions.
 type Model interface {
@@ -171,14 +179,14 @@ type Program struct {
 	fps int
 }
 
+// QuitMsg signals that the program should quit. You can send a QuitMsg with
+// Quit.
+type QuitMsg struct{ MsgImplementation }
+
 // Quit is a special command that tells the Bubble Tea program to exit.
 func Quit() Msg {
 	return QuitMsg{}
 }
-
-// QuitMsg signals that the program should quit. You can send a QuitMsg with
-// Quit.
-type QuitMsg struct{}
 
 // NewProgram creates a new Program.
 func NewProgram(model Model, opts ...ProgramOption) *Program {
