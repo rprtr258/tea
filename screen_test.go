@@ -46,18 +46,18 @@ func TestClearMsg(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			var buf bytes.Buffer
-			var in bytes.Buffer
-
-			m := &testModel{}
-			p := NewProgram(m, WithInput(&in), WithOutput(&buf))
+			var (
+				in  bytes.Buffer
+				out bytes.Buffer
+			)
+			p := NewProgram(&testModel{}, WithInput(&in), WithOutput(&out))
 
 			go p.Send(append(test.cmds, Quit))
 
 			_, err := p.Run()
 			assert.NoError(t, err)
 
-			assert.Equal(t, test.expected, buf.String())
+			assert.Equal(t, test.expected, out.String())
 		})
 	}
 }

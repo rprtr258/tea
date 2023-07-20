@@ -35,9 +35,7 @@ func (m *testExecModel) Update(msg Msg) (Model, Cmd) {
 	return m, nil
 }
 
-func (m *testExecModel) View() string {
-	return "\n"
-}
+func (m *testExecModel) View(fb FrameBuffer) {}
 
 func TestTeaExec(t *testing.T) {
 	tests := []struct {

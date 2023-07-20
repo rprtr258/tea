@@ -13,7 +13,7 @@ type renderer interface {
 
 	// Write a frame to the renderer. The renderer can write this data to
 	// output at its discretion.
-	write(string)
+	write(string) // TODO: accept framebuffer
 
 	// Request a full re-render. Note that this will not trigger a render
 	// immediately. Rather, this method causes the next render to be a full

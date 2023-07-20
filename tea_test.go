@@ -38,9 +38,9 @@ func (m *testModel) Update(msg Msg) (Model, Cmd) {
 	return m, nil
 }
 
-func (m *testModel) View() string {
+func (m *testModel) View(fb FrameBuffer) {
 	m.executed.Store(true)
-	return "success\n"
+	fb.WriteString("success\n")
 }
 
 func TestTeaModel(t *testing.T) {

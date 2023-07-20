@@ -55,7 +55,7 @@ type Model interface {
 
 	// View renders the program's UI, which is just a string. The view is
 	// rendered after every Update.
-	View() string
+	View(FrameBuffer)
 }
 
 // Cmd is an IO operation that returns a message when it's complete. If it's
@@ -404,9 +404,11 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 			}
 
 			var cmd Cmd
-			model, cmd = model.Update(msg) // run update
-			cmds <- cmd                    // process command (if any)
-			p.renderer.write(model.View()) // send view to renderer
+			model, cmd = model.Update(msg)          // run update
+			cmds <- cmd                             // process command (if any)
+			framebuffer := NewFramebuffer(100, 100) // TODO: add actual height, width, cache framebuffer
+			model.View(framebuffer)
+			p.renderer.write(framebuffer.Render()) // send view to renderer
 		}
 	}
 }
@@ -518,7 +520,9 @@ func (p *Program) Run() (Model, error) {
 	p.renderer.start()
 
 	// Render the initial view.
-	p.renderer.write(model.View())
+	framebuffer := NewFramebuffer(100, 100) // TODO: add actual height, width, cache framebuffer
+	model.View(framebuffer)
+	p.renderer.write(framebuffer.Render())
 
 	// Subscribe to user input.
 	if p.input != nil {
@@ -540,7 +544,9 @@ func (p *Program) Run() (Model, error) {
 		err = ErrProgramKilled
 	} else {
 		// Ensure we rendered the final state of the model.
-		p.renderer.write(model.View())
+		framebuffer := NewFramebuffer(100, 100) // TODO: add actual height, width, cache framebuffer
+		model.View(framebuffer)
+		p.renderer.write(framebuffer.Render())
 	}
 
 	// Tear down.
