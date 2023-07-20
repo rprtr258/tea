@@ -182,9 +182,7 @@ func (s Style) Render(strs ...string) string {
 	var (
 		str = joinString(strs...)
 
-		te           = s.r.ColorProfile().String()
-		teSpace      = s.r.ColorProfile().String()
-		teWhitespace = s.r.ColorProfile().String()
+		teSpace = s.r.ColorProfile().String()
 
 		bold          = s.getAsBool(boldKey, false)
 		italic        = s.getAsBool(italicKey, false)
@@ -231,6 +229,8 @@ func (s Style) Render(strs ...string) string {
 	// no-op on non-Windows systems and on Windows runs only once.
 	enableLegacyWindowsANSI()
 
+	teWhitespace := s.r.ColorProfile().String()
+	te := s.r.ColorProfile().String()
 	if bold {
 		te = te.Bold()
 	}
@@ -241,9 +241,7 @@ func (s Style) Render(strs ...string) string {
 		te = te.Underline()
 	}
 	if reverse {
-		if reverse {
-			teWhitespace = teWhitespace.Reverse()
-		}
+		teWhitespace = teWhitespace.Reverse()
 		te = te.Reverse()
 	}
 	if blink {
