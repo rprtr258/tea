@@ -24,18 +24,9 @@ func TestKeyString(t *testing.T) {
 		key      Key
 		expected string
 	}{
-		"alt+space": {
-			key:      Key{Type: KeySpace, Alt: true},
-			expected: "alt+ ",
-		},
-		"runes": {
-			key:      Key{Type: KeyRunes, Runes: []rune{'a'}},
-			expected: "a",
-		},
-		"invalid": {
-			key:      Key{Type: KeyType(99999)},
-			expected: "",
-		},
+		"alt+space": {key: Key{Type: KeySpace, Alt: true}, expected: "alt+ "},
+		"runes":     {key: Key{Type: KeyRunes, Runes: []rune{'a'}}, expected: "a"},
+		"invalid":   {key: Key{Type: KeyType(99999)}, expected: ""},
 	} {
 		t.Run(name, func(t *testing.T) {
 			assert.Equal(t, test.expected, KeyMsg(test.key).String())
@@ -71,13 +62,13 @@ type seqTest struct {
 // buildBaseSeqTests returns sequence tests that are valid for the
 // detectSequence() function.
 func buildBaseSeqTests() []seqTest {
-	td := []seqTest{}
+	tests := []seqTest{}
 	for seq, key := range sequences {
 		key := key
-		td = append(td, seqTest{[]byte(seq), KeyMsg(key)})
+		tests = append(tests, seqTest{[]byte(seq), KeyMsg(key)})
 		if !key.Alt {
 			key.Alt = true
-			td = append(td, seqTest{[]byte("\x1b" + seq), KeyMsg(key)})
+			tests = append(tests, seqTest{[]byte("\x1b" + seq), KeyMsg(key)})
 		}
 	}
 	// Add all the control characters.
@@ -87,7 +78,7 @@ func buildBaseSeqTests() []seqTest {
 			// suite.
 			continue
 		}
-		td = append(td,
+		tests = append(tests,
 			seqTest{[]byte{byte(i)}, KeyMsg{Type: i}},
 			seqTest{[]byte{'\x1b', byte(i)}, KeyMsg{Type: i, Alt: true}},
 		)
@@ -97,7 +88,7 @@ func buildBaseSeqTests() []seqTest {
 	}
 
 	// Additional special cases.
-	td = append(td,
+	tests = append(tests,
 		// Unrecognized CSI sequence.
 		seqTest{
 			[]byte{'\x1b', '[', '-', '-', '-', '-', 'X'},
@@ -114,25 +105,25 @@ func buildBaseSeqTests() []seqTest {
 			KeyMsg{Type: KeySpace, Runes: []rune(" "), Alt: true},
 		},
 	)
-	return td
+	return tests
 }
 
 func TestDetectSequence(t *testing.T) {
-	for _, tc := range buildBaseSeqTests() {
-		t.Run(fmt.Sprintf("%q", string(tc.seq)), func(t *testing.T) {
-			hasSeq, width, msg := detectSequence(tc.seq)
+	for _, test := range buildBaseSeqTests() {
+		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
+			hasSeq, width, msg := detectSequence(test.seq)
 			assert.True(t, hasSeq, "no sequence found")
-			assert.Len(t, tc.seq, width, "parser did not consume the entire input")
-			assert.Equal(t, tc.msg, msg)
+			assert.Len(t, test.seq, width, "parser did not consume the entire input")
+			assert.Equal(t, test.msg, msg)
 		})
 	}
 }
 
 func TestDetectOneMsg(t *testing.T) {
-	td := buildBaseSeqTests()
+	tests := buildBaseSeqTests()
 	// Add tests for the inputs that detectOneMsg() can parse, but
 	// detectSequence() cannot.
-	td = append(td,
+	tests = append(tests,
 		// Mouse event.
 		seqTest{
 			[]byte{'\x1b', '[', 'M', byte(32) + 0b0100_0000, byte(65), byte(49)},
@@ -158,13 +149,13 @@ func TestDetectOneMsg(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		// Sadly, utf8.DecodeRune([]byte(0xfe)) returns a valid rune on windows.
 		// This is incorrect, but it makes our test fail if we try it out.
-		td = append(td, seqTest{
+		tests = append(tests, seqTest{
 			[]byte{'\xfe'},
 			unknownInputByteMsg(0xfe),
 		})
 	}
 
-	for _, test := range td {
+	for _, test := range tests {
 		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
 			width, msg := detectOneMsg(test.seq)
 			assert.Len(t, test.seq, width)
@@ -459,8 +450,7 @@ func TestReadInput(t *testing.T) {
 }
 
 func testReadInputs(t *testing.T, input io.Reader) []Msg {
-	// We'll check that the input reader finishes at the end
-	// without error.
+	// We'll check that the input reader finishes at the end without error.
 	var wg sync.WaitGroup
 	var inputErr error
 	ctx, cancel := context.WithCancel(context.Background())
