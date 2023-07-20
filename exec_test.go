@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"os/exec"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type execFinishedMsg struct {
@@ -38,45 +40,31 @@ func (m *testExecModel) Update(msg Msg) (Model, Cmd) {
 func (m *testExecModel) View(Renderer) {}
 
 func TestTeaExec(t *testing.T) {
-	tests := []struct {
-		name      string
+	for name, test := range map[string]struct {
 		cmd       string
-		expectErr bool
+		expectErr error
 	}{
-		{
-			name:      "true",
+		"true": {
 			cmd:       "true",
-			expectErr: false,
+			expectErr: nil,
 		},
-		{
-			name:      "false",
+		"false": {
 			cmd:       "false",
-			expectErr: true,
+			expectErr: &exec.ExitError{},
 		},
-		{
-			name:      "invalid command",
+		"invalid command": {
 			cmd:       "invalid",
-			expectErr: true,
+			expectErr: &exec.Error{},
 		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	} {
+		t.Run(name, func(t *testing.T) {
 			var buf bytes.Buffer
 			var in bytes.Buffer
 
 			m := &testExecModel{cmd: test.cmd}
-			p := NewProgram(m, WithInput(&in), WithOutput(&buf))
-			if _, err := p.Run(); err != nil {
-				t.Error(err)
-			}
-
-			if m.err != nil && !test.expectErr {
-				t.Errorf("expected no error, got %v", m.err)
-			}
-			if m.err == nil && test.expectErr {
-				t.Error("expected error, got nil")
-			}
+			_, err := NewProgram(m, WithInput(&in), WithOutput(&buf)).Run()
+			assert.NoError(t, err)
+			assert.IsType(t, m.err, test.expectErr)
 		})
 	}
 }
