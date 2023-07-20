@@ -84,14 +84,6 @@ func WithoutSignals() ProgramOption {
 // (i.e. the program starts in full window mode). Note that the altscreen will
 // be automatically exited when the program quits.
 //
-// Example:
-//
-//	p := tea.NewProgram(Model{}, tea.WithAltScreen())
-//	if _, err := p.Run(); err != nil {
-//	    fmt.Println("Error running program:", err)
-//	    os.Exit(1)
-//	}
-//
 // To enter the altscreen once the program has already started running use the
 // EnterAltScreen command.
 func WithAltScreen() ProgramOption {
@@ -176,7 +168,9 @@ func WithANSICompressor() ProgramOption {
 //
 // Example:
 //
-//	func filter(m tea.Model, msg tea.Msg) tea.Msg {
+//	tea.NewProgram(
+//		Model{},
+//		tea.WithFilter(func (m tea.Model, msg tea.Msg) tea.Msg {
 //		if _, ok := msg.(tea.QuitMsg); !ok {
 //			return msg
 //		}
@@ -187,14 +181,7 @@ func WithANSICompressor() ProgramOption {
 //		}
 //
 //		return msg
-//	}
-//
-//	p := tea.NewProgram(Model{}, tea.WithFilter(filter));
-//
-//	if _,err := p.Run(); err != nil {
-//		fmt.Println("Error running program:", err)
-//		os.Exit(1)
-//	}
+//	}));
 func WithFilter(filter func(Model, Msg) Msg) ProgramOption {
 	return func(p *Program) {
 		p.filter = filter

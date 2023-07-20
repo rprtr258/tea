@@ -11,12 +11,6 @@ func (BatchMsg) IsBubbleteaMsg() {}
 
 // Batch performs a bunch of commands concurrently with no ordering guarantees
 // about the results. Use a Batch to return several commands.
-//
-// Example:
-//
-//	    func (m model) Init() Cmd {
-//		       return tea.Batch(someCommand, someOtherCommand)
-//	    }
 func Batch(cmds ...Cmd) Cmd {
 	var validCmds []Cmd //nolint:prealloc
 	for _, c := range cmds {
