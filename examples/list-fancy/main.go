@@ -176,8 +176,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m model) View() string {
-	return appStyle.Render(m.list.View())
+func (m model) View(r tea.Renderer) {
+	r.Write(appStyle.Render(m.list.View()))
 }
 
 func main() {
