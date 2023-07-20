@@ -468,7 +468,7 @@ For a more document-centric rendering solution with support for things like
 lists, tables, and syntax-highlighted code have a look at [Glamour][glamour],
 the stylesheet-based Markdown renderer.
 
-[glamour]: https://github.com/charmbracelet/glamour
+[glamour]: https://github.com/rprtr258/bubbletea/glamour
 
 
 ## Feedback

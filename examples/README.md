@@ -64,7 +64,7 @@ The `fullscreen` example shows how to make a Bubble Tea application fullscreen.
 
 ### Glamour
 
-The `glamour` example shows how to use [Glamour](https://github.com/charmbracelet/glamour) inside a viewport bubble.
+The `glamour` example shows how to use [Glamour](https://github.com/rprtr258/bubbletea/glamour) inside a viewport bubble.
 
 <a href="./glamour/main.go">
   <img width="750" src="./glamour/glamour.gif" />
