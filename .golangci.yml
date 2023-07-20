@@ -1,5 +1,4 @@
-run:
-  tests: false
+run: {}
 
 issues:
   include:
