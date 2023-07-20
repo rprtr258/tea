@@ -4,38 +4,38 @@ import (
 	"log"
 	"os"
 
-	altscreentoggle "examples/altscreen-toggle"
+	"examples/altscreen_toggle"
 	"examples/cellbuffer"
 	"examples/chat"
-	composableviews "examples/composable-views"
-	creditcardform "examples/credit-card-form"
+	"examples/composable_views"
+	"examples/credit_card_form"
 	"examples/debounce"
 	"examples/exec"
-	filepicker "examples/file-picker"
+	"examples/file_picker"
 	"examples/fullscreen"
 	"examples/glamour"
 	"examples/help"
 	"examples/http"
-	listdefault "examples/list-default"
-	listfancy "examples/list-fancy"
-	listsimple "examples/list-simple"
+	"examples/list_default"
+	"examples/list_fancy"
+	"examples/list_simple"
 	"examples/mouse"
-	packagemanager "examples/package-manager"
+	"examples/package_manager"
 	"examples/pager"
 	"examples/paginator"
 	"examples/pipe"
-	preventquit "examples/prevent-quit"
-	progressanimated "examples/progress-animated"
-	progressdownload "examples/progress-download"
-	progressstatic "examples/progress-static"
+	"examples/prevent_quit"
+	"examples/progress_animated"
+	"examples/progress_download"
+	"examples/progress_static"
 	"examples/realtime"
 	"examples/result"
-	sendmsg "examples/send-msg"
+	"examples/send_msg"
 	"examples/sequence"
 	"examples/simple"
 	"examples/spinner"
 	"examples/spinners"
-	spliteditors "examples/split-editors"
+	"examples/split_editors"
 	"examples/stopwatch"
 	"examples/table"
 	"examples/tabs"
@@ -43,7 +43,7 @@ import (
 	"examples/textinput"
 	"examples/textinputs"
 	"examples/timer"
-	tuidaemoncombo "examples/tui-daemon-combo"
+	"examples/tui_daemon_combo"
 	"examples/views"
 )
 
@@ -56,21 +56,21 @@ func main() {
 	case "--help":
 		log.Println("TODO: print examples list")
 	case "altscreen-toggle":
-		altscreentoggle.Main()
+		altscreen_toggle.Main()
 	case "cellbuffer":
 		cellbuffer.Main()
 	case "chat":
 		chat.Main()
 	case "composable-views":
-		composableviews.Main()
+		composable_views.Main()
 	case "credit-card-form":
-		creditcardform.Main()
+		credit_card_form.Main()
 	case "debounce":
 		debounce.Main()
 	case "exec":
 		exec.Main()
 	case "file-picker":
-		filepicker.Main()
+		file_picker.Main()
 	case "fullscreen":
 		fullscreen.Main()
 	case "glamour":
@@ -80,15 +80,15 @@ func main() {
 	case "http":
 		http.Main()
 	case "list-default":
-		listdefault.Main()
+		list_default.Main()
 	case "list-fancy":
-		listfancy.Main()
+		list_fancy.Main()
 	case "list-simple":
-		listsimple.Main()
+		list_simple.Main()
 	case "mouse":
 		mouse.Main()
 	case "package-manager":
-		packagemanager.Main()
+		package_manager.Main()
 	case "pager":
 		pager.Main()
 	case "paginator":
@@ -96,19 +96,19 @@ func main() {
 	case "pipe":
 		pipe.Main()
 	case "prevent-quit":
-		preventquit.Main()
+		prevent_quit.Main()
 	case "progress-animated":
-		progressanimated.Main()
+		progress_animated.Main()
 	case "progress-download":
-		progressdownload.Main()
+		progress_download.Main()
 	case "progress-static":
-		progressstatic.Main()
+		progress_static.Main()
 	case "realtime":
 		realtime.Main()
 	case "result":
 		result.Main()
 	case "send-msg":
-		sendmsg.Main()
+		send_msg.Main()
 	case "sequence":
 		sequence.Main()
 	case "simple":
@@ -118,7 +118,7 @@ func main() {
 	case "spinners":
 		spinners.Main()
 	case "split-editors":
-		spliteditors.Main()
+		split_editors.Main()
 	case "stopwatch":
 		stopwatch.Main()
 	case "table":
@@ -134,7 +134,7 @@ func main() {
 	case "timer":
 		timer.Main()
 	case "tui-daemon-combo":
-		tuidaemoncombo.Main()
+		tui_daemon_combo.Main()
 	case "views":
 		views.Main()
 	default:
