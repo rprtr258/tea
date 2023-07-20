@@ -292,7 +292,7 @@ func (m Model) updateAsModel(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.KeyMap.PageDown):
 			lines := m.ViewDown()

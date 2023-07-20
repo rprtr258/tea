@@ -215,7 +215,7 @@ func (p *Program[M]) handleSignals() chan struct{} {
 	//
 	// In most cases ^C will not send an interrupt because the terminal will be
 	// in raw mode and ^C will be captured as a keystroke and sent along to
-	// Program.Update as a KeyMsg. When input is not a TTY, however, ^C will be
+	// Program.Update as a MsgKey. When input is not a TTY, however, ^C will be
 	// caught here.
 	//
 	// SIGTERM is sent by unix utilities (like kill) to terminate a process.

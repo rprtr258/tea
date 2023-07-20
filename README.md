@@ -136,35 +136,29 @@ tick, or a response from a server.
 We usually figure out which type of `Msg` we received with a type switch, but
 you could also use a type assertion.
 
-For now, we'll just deal with `tea.KeyMsg` messages, which are automatically
+For now, we'll just deal with `tea.MsgKey` messages, which are automatically
 sent to the update function when keys are pressed.
 
 ```go
 func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
     switch msg := msg.(type) {
-
     // Is it a key press?
-    case tea.KeyMsg:
-
+    case tea.MsgKey:
         // Cool, what was the actual key pressed?
         switch msg.String() {
-
         // These keys should exit the program.
         case "ctrl+c", "q":
             return m, tea.Quit
-
         // The "up" and "k" keys move the cursor up
         case "up", "k":
             if m.cursor > 0 {
                 m.cursor--
             }
-
         // The "down" and "j" keys move the cursor down
         case "down", "j":
             if m.cursor < len(m.choices)-1 {
                 m.cursor++
             }
-
         // The "enter" key and the spacebar (a literal space) toggle
         // the selected state for the item that the cursor is pointing at.
         case "enter", " ":

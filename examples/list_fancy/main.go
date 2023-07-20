@@ -129,7 +129,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		h, v := appStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		// Don't match any of the keys below if we're actively filtering.
 		if m.list.FilterState() == list.Filtering {
 			break

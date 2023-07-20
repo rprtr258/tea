@@ -20,7 +20,7 @@
 //
 //	func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 //	    switch msg := msg.(type) {
-//	    case tea.KeyMsg:
+//	    case tea.MsgKey:
 //	        switch {
 //	        case key.Matches(msg, DefaultKeyMap.Up):
 //	            // The user pressed up
@@ -128,8 +128,8 @@ type Help struct {
 	Desc string
 }
 
-// Matches checks if the given KeyMsg matches the given bindings.
-func Matches(k tea.KeyMsg, b ...Binding) bool {
+// Matches checks if the given MsgKey matches the given bindings.
+func Matches(k tea.MsgKey, b ...Binding) bool {
 	keys := k.String()
 	for _, binding := range b {
 		for _, v := range binding.keys {

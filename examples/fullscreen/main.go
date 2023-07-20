@@ -28,7 +28,7 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(message tea.Msg) (model, tea.Cmd) {
 	switch msg := message.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
 			return m, tea.Quit

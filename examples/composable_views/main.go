@@ -81,7 +81,7 @@ func (m mainModel) Update(msg tea.Msg) (mainModel, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit

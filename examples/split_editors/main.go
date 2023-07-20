@@ -118,7 +118,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
 			for i := range m.inputs {

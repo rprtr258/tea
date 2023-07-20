@@ -99,7 +99,7 @@ tick, or a response from a server.
 We usually figure out which type of `Msg` we received with a type switch, but
 you could also use a type assertion.
 
-For now, we'll just deal with `tea.KeyMsg` messages, which are automatically
+For now, we'll just deal with `tea.MsgKey` messages, which are automatically
 sent to the update function when keys are pressed.
 
 ```go
@@ -107,7 +107,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
     switch msg := msg.(type) {
 
     // Is it a key press?
-    case tea.KeyMsg:
+    case tea.MsgKey:
 
         // Cool, what was the actual key pressed?
         switch msg.String() {

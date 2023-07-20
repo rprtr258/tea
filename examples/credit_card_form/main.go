@@ -134,7 +134,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	var cmds []tea.Cmd = make([]tea.Cmd, len(m.inputs))
 
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.focused == len(m.inputs)-1 {

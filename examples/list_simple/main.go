@@ -65,7 +65,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		m.list.SetWidth(msg.Width)
 		return m, nil
 
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch keypress := msg.String(); keypress {
 		case "ctrl+c":
 			m.quitting = true

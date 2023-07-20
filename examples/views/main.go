@@ -80,7 +80,7 @@ func (m model) Init() tea.Cmd {
 // Main update function.
 func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	// Make sure these keys always quit
-	if msg, ok := msg.(tea.KeyMsg); ok {
+	if msg, ok := msg.(tea.MsgKey); ok {
 		k := msg.String()
 		if k == "q" || k == "esc" || k == "ctrl+c" {
 			m.Quitting = true
@@ -118,7 +118,7 @@ func (m model) View(r tea.Renderer) {
 // Update loop for the first view where you're choosing a task.
 func updateChoices(msg tea.Msg, m model) (model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch msg.String() {
 		case "j", "down":
 			m.Choice++

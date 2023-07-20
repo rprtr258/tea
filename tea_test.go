@@ -31,7 +31,7 @@ func (m *testModel) Update(msg Msg) (*testModel, Cmd) {
 			m.counter.Store(i.(int) + 1)
 		}
 
-	case KeyMsg:
+	case MsgKey:
 		return m, Quit
 	}
 

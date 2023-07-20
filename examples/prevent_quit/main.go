@@ -91,7 +91,7 @@ func (m model) updateTextView(msg tea.Msg) (model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		m.saveText = ""
 		switch {
 		case key.Matches(msg, m.keymap.save):
@@ -118,7 +118,7 @@ func (m model) updateTextView(msg tea.Msg) (model, tea.Cmd) {
 
 func (m model) updatePromptView(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		// For simplicity's sake, we'll treat any key besides "y" as "no"
 		if key.Matches(msg, m.keymap.quit) || msg.String() == "y" {
 			m.hasChanges = false

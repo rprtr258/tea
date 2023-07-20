@@ -91,7 +91,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		// its view as needed.
 		m.help.Width = msg.Width
 
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keys.Up):
 			m.lastKey = "↑"

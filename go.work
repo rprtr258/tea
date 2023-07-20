@@ -1,9 +1,15 @@
 go 1.19
 
 use (
-    ./examples
-    ./lipgloss
-    ./bubbles
-    ./glamour
-    ./
+	.
+	./bubbles
+	./examples
+	./glamour
+	./lipgloss
+	./lipgloss/examples
+	./tutorials
+	./x/exp/higherorder
+	./x/exp/ordered
+	./x/exp/slice
+	./x/exp/teatest
 )

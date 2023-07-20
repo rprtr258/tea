@@ -44,7 +44,7 @@ func (m model) Init() tea.Cmd {
 // a command, which is a function that performs I/O and returns a message.
 func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		return m, tea.Quit
 	case tickMsg:
 		m--

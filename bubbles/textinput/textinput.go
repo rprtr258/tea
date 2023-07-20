@@ -534,7 +534,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	oldPos := m.pos //nolint
 
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.KeyMap.DeleteWordBackward):
 			m.Err = nil

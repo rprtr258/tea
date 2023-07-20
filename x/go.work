@@ -1,0 +1,8 @@
+go 1.20
+
+use (
+	./exp/higherorder
+	./exp/ordered
+	./exp/slice
+	./exp/teatest
+)

@@ -49,7 +49,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		m.err = msg
 		return m, tea.Quit
 
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		if msg.Type == tea.KeyCtrlC {
 			return m, tea.Quit
 		}
@@ -60,14 +60,16 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 
 func (m model) View(r tea.Renderer) {
 	if m.err != nil {
-		return fmt.Sprintf("\nWe had some trouble: %v\n\n", m.err)
+		r.Write(fmt.Sprintf("\nWe had some trouble: %v\n\n", m.err))
+		return
 	}
 
 	s := fmt.Sprintf("Checking %s ... ", url)
 	if m.status > 0 {
 		s += fmt.Sprintf("%d %s!", m.status, http.StatusText(m.status))
 	}
-	return "\n" + s + "\n\n"
+	r.Write("\n" + s + "\n\n")
+	return
 }
 
 func main() {
