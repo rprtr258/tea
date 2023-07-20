@@ -1,13 +1,14 @@
 package slice
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_Take(t *testing.T) {
-	for _, tc := range []struct {
+	for _, test := range []struct {
 		input    []int
 		take     int
 		expected []int
@@ -35,9 +36,11 @@ func Test_Take(t *testing.T) {
 		{
 			input:    nil,
 			take:     2,
-			expected: []int{},
+			expected: nil,
 		},
 	} {
-		assert.Equal(t, tc.expected, Take(tc.input, tc.take))
+		t.Run(fmt.Sprint(test.input, test.take), func(t *testing.T) {
+			assert.Equal(t, test.expected, Take(test.input, test.take))
+		})
 	}
 }
