@@ -65,7 +65,6 @@ func TestOptions(t *testing.T) {
 			var b bytes.Buffer
 			exercise(t, WithInput(&b), customInput)
 		})
-
 	})
 
 	t.Run("startup options", func(t *testing.T) {
