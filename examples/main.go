@@ -20,16 +20,14 @@ import (
 	listfancy "examples/list-fancy"
 	listsimple "examples/list-simple"
 	"examples/mouse"
-
 	packagemanager "examples/package-manager"
 	"examples/pager"
 	"examples/paginator"
 	"examples/pipe"
 	preventquit "examples/prevent-quit"
-
-	// progressanimated "examples/progress-animated"
-	// progressdownload "examples/progress-download"
-	// progressstatic "examples/progress-static"
+	progressanimated "examples/progress-animated"
+	progressdownload "examples/progress-download"
+	progressstatic "examples/progress-static"
 	"examples/realtime"
 	"examples/result"
 	sendmsg "examples/send-msg"
@@ -99,12 +97,12 @@ func main() {
 		pipe.Main()
 	case "prevent-quit":
 		preventquit.Main()
-	// case "progress-animated":
-	// 	progressanimated.Main()
-	// case "progress-download":
-	// 	progressdownload.Main()
-	// case "progress-static":
-	// 	progressstatic.Main()
+	case "progress-animated":
+		progressanimated.Main()
+	case "progress-download":
+		progressdownload.Main()
+	case "progress-static":
+		progressstatic.Main()
 	case "realtime":
 		realtime.Main()
 	case "result":
