@@ -8,10 +8,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/paginator"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/rprtr258/bubbletea/bubbles/paginator"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/rprtr258/bubbletea"
 )
 
 func newModel() model {

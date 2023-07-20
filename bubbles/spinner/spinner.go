@@ -4,8 +4,9 @@ import (
 	"sync"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+
+	tea "github.com/rprtr258/bubbletea"
 )
 
 // Internal ID management. Used during animating to ensure that frame messages

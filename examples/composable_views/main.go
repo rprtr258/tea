@@ -5,10 +5,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/charmbracelet/bubbles/spinner"
-	"github.com/charmbracelet/bubbles/timer"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/bubbletea/bubbles/spinner"
+	"github.com/rprtr258/bubbletea/bubbles/timer"
 )
 
 /*
@@ -17,8 +17,8 @@ haven't already read our tutorials on the basics of Bubble Tea and working
 with commands, we recommend reading those first.
 
 Find them at:
-https://github.com/charmbracelet/bubbletea/tree/master/tutorials/commands
-https://github.com/charmbracelet/bubbletea/tree/master/tutorials/basics
+https://github.com/rprtr258/bubbletea/tree/master/tutorials/commands
+https://github.com/rprtr258/bubbletea/tree/master/tutorials/basics
 */
 
 // sessionState is used to track which model is focused

@@ -11,7 +11,7 @@ import (
 	"github.com/muesli/termenv"
 	"github.com/stretchr/testify/assert"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/rprtr258/bubbletea"
 )
 
 func init() {

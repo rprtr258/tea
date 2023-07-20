@@ -2,9 +2,9 @@
 
 <p>
     <img src="https://stuff.charm.sh/bubbletea/bubbletea-github-header-simple.png" width="313" alt="Bubble Tea Title Treatment"><br>
-    <a href="https://github.com/charmbracelet/bubbletea/releases"><img src="https://img.shields.io/github/release/charmbracelet/bubbletea.svg" alt="Latest Release"></a>
-    <a href="https://pkg.go.dev/github.com/charmbracelet/bubbletea?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
-    <a href="https://github.com/charmbracelet/bubbletea/actions"><img src="https://github.com/charmbracelet/bubbletea/workflows/build/badge.svg" alt="Build Status"></a>
+    <a href="https://github.com/rprtr258/bubbletea/releases"><img src="https://img.shields.io/github/release/charmbracelet/bubbletea.svg" alt="Latest Release"></a>
+    <a href="https://pkg.go.dev/github.com/rprtr258/bubbletea?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
+    <a href="https://github.com/rprtr258/bubbletea/actions"><img src="https://github.com/rprtr258/bubbletea/workflows/build/badge.svg" alt="Build Status"></a>
 </p>
 
 The fun, functional and stateful way to build terminal apps. A Go framework
@@ -30,8 +30,8 @@ To get started, see the tutorial below, the [examples][examples], the
 Be sure to check out [Bubbles][bubbles], a library of common UI components for Bubble Tea.
 
 <p>
-    <a href="https://github.com/charmbracelet/bubbles"><img src="https://stuff.charm.sh/bubbles/bubbles-badge.png" width="174" alt="Bubbles Badge"></a>&nbsp;&nbsp;
-    <a href="https://github.com/charmbracelet/bubbles"><img src="https://stuff.charm.sh/bubbles-examples/textinput.gif" width="400" alt="Text Input Example from Bubbles"></a>
+    <a href="https://github.com/rprtr258/bubbletea/bubbles"><img src="https://stuff.charm.sh/bubbles/bubbles-badge.png" width="174" alt="Bubbles Badge"></a>&nbsp;&nbsp;
+    <a href="https://github.com/rprtr258/bubbletea/bubbles"><img src="https://stuff.charm.sh/bubbles-examples/textinput.gif" width="400" alt="Text Input Example from Bubbles"></a>
 </p>
 
 ***
@@ -48,7 +48,7 @@ By the way, the non-annotated source code for this program is available
 [on GitHub][tut-source].
 
 [elm]: https://guide.elm-lang.org/architecture/
-[tut-source]:https://github.com/charmbracelet/bubbletea/tree/master/tutorials/basics
+[tut-source]:https://github.com/rprtr258/bubbletea/tree/master/tutorials/basics
 
 ### Enough! Let's get to it.
 
@@ -64,7 +64,7 @@ import (
     "fmt"
     "os"
 
-    tea "github.com/charmbracelet/bubbletea"
+    tea "github.com/rprtr258/bubbletea"
 )
 ```
 
@@ -247,9 +247,9 @@ look at the [Command Tutorial][cmd]. It's pretty simple.
 There are also several [Bubble Tea examples][examples] available and, of course,
 there are [Go Docs][docs].
 
-[cmd]: http://github.com/charmbracelet/bubbletea/tree/master/tutorials/commands/
-[examples]: http://github.com/charmbracelet/bubbletea/tree/master/examples
-[docs]: https://pkg.go.dev/github.com/charmbracelet/bubbletea?tab=doc
+[cmd]: http://github.com/rprtr258/bubbletea/tree/master/tutorials/commands/
+[examples]: http://github.com/rprtr258/bubbletea/tree/master/examples
+[docs]: https://pkg.go.dev/github.com/rprtr258/bubbletea?tab=doc
 
 ## Debugging
 
@@ -299,7 +299,7 @@ your program in another window.
 * [Termenv][termenv]: Advanced ANSI styling for terminal applications
 * [Reflow][reflow]: Advanced ANSI-aware methods for working with text
 
-[bubbles]: https://github.com/charmbracelet/bubbles
+[bubbles]: https://github.com/rprtr258/bubbletea/bubbles
 [lipgloss]: https://github.com/charmbracelet/lipgloss
 [harmonica]: https://github.com/charmbracelet/harmonica
 [bubblezone]: https://github.com/lrstanley/bubblezone
@@ -389,7 +389,7 @@ of days past.
 
 ## License
 
-[MIT](https://github.com/charmbracelet/bubbletea/raw/master/LICENSE)
+[MIT](https://github.com/rprtr258/bubbletea/raw/master/LICENSE)
 
 ***
 

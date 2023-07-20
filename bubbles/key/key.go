@@ -37,7 +37,7 @@
 package key
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/rprtr258/bubbletea"
 )
 
 // Binding describes a set of keybindings and, optionally, their associated

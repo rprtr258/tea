@@ -7,12 +7,13 @@ import (
 	"sync"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/harmonica"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/termenv"
+
+	tea "github.com/rprtr258/bubbletea"
 )
 
 // Internal ID management. Used during animating to assure that frame messages

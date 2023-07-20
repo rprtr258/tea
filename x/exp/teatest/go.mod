@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/aymanbagabas/go-udiff v0.1.0
-	github.com/charmbracelet/bubbletea v0.24.2
+	github.com/rprtr258/bubbletea v0.24.2
 	github.com/stretchr/testify v1.8.4
 )
 

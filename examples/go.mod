@@ -3,8 +3,8 @@ module examples
 go 1.18
 
 require (
-	github.com/charmbracelet/bubbles v0.16.1
-	github.com/charmbracelet/bubbletea v0.24.1
+	github.com/rprtr258/bubbletea/bubbles v0.16.1
+	github.com/rprtr258/bubbletea v0.24.1
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/charmbracelet/harmonica v0.2.0
 	github.com/charmbracelet/lipgloss v0.7.1
@@ -18,9 +18,9 @@ require (
 )
 
 replace (
-	github.com/charmbracelet/bubbletea => ../
+	github.com/rprtr258/bubbletea => ../
 	github.com/charmbracelet/glamour => ../glamour
-	github.com/charmbracelet/bubbles => ../bubbles
+	github.com/rprtr258/bubbletea/bubbles => ../bubbles
 )
 
 require (

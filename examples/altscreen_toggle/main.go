@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/rprtr258/bubbletea"
 	"github.com/muesli/termenv"
 )
 

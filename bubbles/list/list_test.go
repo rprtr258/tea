@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/rprtr258/bubbletea"
 	"github.com/stretchr/testify/assert"
 )
 

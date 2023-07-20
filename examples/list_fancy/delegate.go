@@ -1,9 +1,9 @@
 package list_fancy
 
 import (
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/list"
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/bubbletea/bubbles/key"
+	"github.com/rprtr258/bubbletea/bubbles/list"
 )
 
 func newItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {

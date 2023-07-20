@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/rprtr258/bubbletea"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ func TestInput(t *testing.T) {
 
 	input := "foo"
 
-	for _, k := range []rune(input) {
+	for _, k := range input {
 		textarea, _ = textarea.Update(keyPress(k))
 	}
 
@@ -43,7 +43,7 @@ func TestSoftWrap(t *testing.T) {
 
 	input := "foo bar baz"
 
-	for _, k := range []rune(input) {
+	for _, k := range input {
 		textarea, _ = textarea.Update(keyPress(k))
 	}
 
@@ -73,7 +73,7 @@ func TestCharLimit(t *testing.T) {
 	input := []string{"foo bar", "baz"}
 	textarea.CharLimit = len(input[0])
 
-	for _, k := range []rune(strings.Join(input, " ")) {
+	for _, k := range strings.Join(input, " ") {
 		textarea, _ = textarea.Update(keyPress(k))
 	}
 
@@ -91,7 +91,7 @@ func TestVerticalScrolling(t *testing.T) {
 
 	textarea, _ = textarea.Update(nil)
 
-	for _, k := range []rune("This is a really long line that should wrap around the text area.") {
+	for _, k := range "This is a really long line that should wrap around the text area." {
 		textarea, _ = textarea.Update(keyPress(k))
 	}
 
@@ -130,7 +130,7 @@ func TestWordWrapOverflowing(t *testing.T) {
 
 	input := "Testing Testing Testing Testing Testing Testing Testing Testing"
 
-	for _, k := range []rune(input) {
+	for _, k := range input {
 		textarea, _ = textarea.Update(keyPress(k))
 		textarea.View()
 	}
@@ -142,7 +142,7 @@ func TestWordWrapOverflowing(t *testing.T) {
 
 	input = "Testing"
 
-	for _, k := range []rune(input) {
+	for _, k := range input {
 		textarea, _ = textarea.Update(keyPress(k))
 		textarea.View()
 	}
@@ -161,7 +161,7 @@ func TestValueSoftWrap(t *testing.T) {
 
 	input := "Testing Testing Testing Testing Testing Testing Testing Testing"
 
-	for _, k := range []rune(input) {
+	for _, k := range input {
 		textarea, _ = textarea.Update(keyPress(k))
 		textarea.View()
 	}
@@ -207,7 +207,7 @@ func TestCanHandleEmoji(t *testing.T) {
 	textarea := newTextArea()
 	input := "🧋"
 
-	for _, k := range []rune(input) {
+	for _, k := range input {
 		textarea, _ = textarea.Update(keyPress(k))
 	}
 
