@@ -399,7 +399,7 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 			}
 
 			// Process internal messages for the renderer.
-			if r, ok := p.renderer.(*standardRenderer); ok {
+			if r, ok := p.renderer.(*standardRenderer); ok { // TODO: remove assertion
 				r.handleMessages(msg)
 			}
 
