@@ -29,7 +29,7 @@ func (p *Program[M]) WithOutput(output io.Writer) *Program[M] {
 // WithInput sets the input which, by default, is stdin. In most cases you
 // won't need to use this. To disable input entirely pass nil.
 //
-//	p := NewProgram(model, WithInput(nil))
+//	p := NewProgram(model).WithInput(nil)
 func (p *Program[M]) WithInput(input io.Reader) *Program[M] {
 	p.input = input
 	p.inputType = customInput
@@ -148,20 +148,19 @@ func (p *Program[M]) WithANSICompressor() *Program[M] {
 //
 // Example:
 //
-//	tea.NewProgram(
-//		Model{},
-//		tea.WithFilter(func (m tea.Model, msg tea.Msg) tea.Msg {
-//		if _, ok := msg.(tea.QuitMsg); !ok {
+//	tea.NewProgram(Model{}).
+//		.WithFilter(func (m tea.Model, msg tea.Msg) tea.Msg {
+//			if _, ok := msg.(tea.QuitMsg); !ok {
+//				return msg
+//			}
+//
+//			model := m.(myModel)
+//			if model.hasChanges {
+//				return nil
+//			}
+//
 //			return msg
-//		}
-//
-//		model := m.(myModel)
-//		if model.hasChanges {
-//			return nil
-//		}
-//
-//		return msg
-//	}));
+//		});
 func (p *Program[M]) WithFilter(filter func(M, Msg) Msg) *Program[M] {
 	p.filter = filter
 	return p
