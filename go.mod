@@ -13,7 +13,7 @@ require (
 	github.com/samber/lo v1.38.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sync v0.1.0
-	golang.org/x/term v0.6.0
+	golang.org/x/term v0.10.0
 )
 
 require (
@@ -23,8 +23,8 @@ require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/exp v0.0.0-20230510235704-dd950f8aeaea // indirect
+	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/text v0.11.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

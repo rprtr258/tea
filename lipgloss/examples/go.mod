@@ -1,6 +1,6 @@
 module examples
 
-go 1.17
+go 1.18
 
 replace github.com/charmbracelet/lipgloss => ../
 
@@ -11,7 +11,7 @@ require (
 	github.com/kr/pty v1.1.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/muesli/termenv v0.15.2
-	golang.org/x/term v0.0.0-20210422114643-f5beecf764ed
+	golang.org/x/term v0.10.0
 )
 
 require (
@@ -24,6 +24,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	github.com/stretchr/testify v1.8.4 // indirect
+	golang.org/x/crypto v0.11.0 // indirect
+	golang.org/x/sys v0.10.0 // indirect
 )
