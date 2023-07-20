@@ -43,6 +43,7 @@ import (
 // IMEs) can input multiple runes at once.
 type KeyMsg Key
 
+// IsBubbleteaMsg implements BubbleteaMsg
 func (KeyMsg) IsBubbleteaMsg() {}
 
 // String returns a string representation for a key message. It's safe (and
