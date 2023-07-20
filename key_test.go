@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -138,53 +139,20 @@ func TestDetectOneMsg(t *testing.T) {
 			MouseMsg{X: 32, Y: 16, Type: MouseWheelUp},
 		},
 		// Runes.
-		seqTest{
-			[]byte{'a'},
-			KeyMsg{Type: KeyRunes, Runes: []rune("a")},
-		},
-		seqTest{
-			[]byte{'\x1b', 'a'},
-			KeyMsg{Type: KeyRunes, Runes: []rune("a"), Alt: true},
-		},
-		seqTest{
-			[]byte{'a', 'a', 'a'},
-			KeyMsg{Type: KeyRunes, Runes: []rune("aaa")},
-		},
+		seqTest{[]byte{'a'}, KeyMsg{Type: KeyRunes, Runes: []rune("a")}},
+		seqTest{[]byte{'\x1b', 'a'}, KeyMsg{Type: KeyRunes, Runes: []rune("a"), Alt: true}},
+		seqTest{[]byte{'a', 'a', 'a'}, KeyMsg{Type: KeyRunes, Runes: []rune("aaa")}},
 		// Multi-byte rune.
-		seqTest{
-			[]byte("☃"),
-			KeyMsg{Type: KeyRunes, Runes: []rune("☃")},
-		},
-		seqTest{
-			[]byte("\x1b☃"),
-			KeyMsg{Type: KeyRunes, Runes: []rune("☃"), Alt: true},
-		},
+		seqTest{[]byte("☃"), KeyMsg{Type: KeyRunes, Runes: []rune("☃")}},
+		seqTest{[]byte("\x1b☃"), KeyMsg{Type: KeyRunes, Runes: []rune("☃"), Alt: true}},
 		// Standalone control chacters.
-		seqTest{
-			[]byte{'\x1b'},
-			KeyMsg{Type: KeyEscape},
-		},
-		seqTest{
-			[]byte{byte(keySOH)},
-			KeyMsg{Type: KeyCtrlA},
-		},
-		seqTest{
-			[]byte{'\x1b', byte(keySOH)},
-			KeyMsg{Type: KeyCtrlA, Alt: true},
-		},
-		seqTest{
-			[]byte{byte(keyNUL)},
-			KeyMsg{Type: KeyCtrlAt},
-		},
-		seqTest{
-			[]byte{'\x1b', byte(keyNUL)},
-			KeyMsg{Type: KeyCtrlAt, Alt: true},
-		},
+		seqTest{[]byte{'\x1b'}, KeyMsg{Type: KeyEscape}},
+		seqTest{[]byte{byte(keySOH)}, KeyMsg{Type: KeyCtrlA}},
+		seqTest{[]byte{'\x1b', byte(keySOH)}, KeyMsg{Type: KeyCtrlA, Alt: true}},
+		seqTest{[]byte{byte(keyNUL)}, KeyMsg{Type: KeyCtrlAt}},
+		seqTest{[]byte{'\x1b', byte(keyNUL)}, KeyMsg{Type: KeyCtrlAt, Alt: true}},
 		// Invalid characters.
-		seqTest{
-			[]byte{'\x80'},
-			unknownInputByteMsg(0x80),
-		},
+		seqTest{[]byte{'\x80'}, unknownInputByteMsg(0x80)},
 	)
 
 	if runtime.GOOS != "windows" {
@@ -196,11 +164,11 @@ func TestDetectOneMsg(t *testing.T) {
 		})
 	}
 
-	for _, tc := range td {
-		t.Run(fmt.Sprintf("%q", string(tc.seq)), func(t *testing.T) {
-			width, msg := detectOneMsg(tc.seq)
-			assert.Len(t, tc.seq, width)
-			assert.Equal(t, tc.msg, msg)
+	for _, test := range td {
+		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
+			width, msg := detectOneMsg(test.seq)
+			assert.Len(t, test.seq, width)
+			assert.Equal(t, test.msg, msg)
 		})
 	}
 }
@@ -211,7 +179,7 @@ func TestReadInput(t *testing.T) {
 		in      []byte
 		out     []Msg
 	}
-	testData := []test{
+	tests := []test{
 		{
 			"a",
 			[]byte{'a'},
@@ -450,7 +418,7 @@ func TestReadInput(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		// Sadly, utf8.DecodeRune([]byte(0xfe)) returns a valid rune on windows.
 		// This is incorrect, but it makes our test fail if we try it out.
-		testData = append(testData,
+		tests = append(tests,
 			test{
 				"?0xfe?",
 				[]byte{'\xfe'},
@@ -469,9 +437,9 @@ func TestReadInput(t *testing.T) {
 		)
 	}
 
-	for i, td := range testData {
-		t.Run(fmt.Sprintf("%d: %s", i, td.keyname), func(t *testing.T) {
-			msgs := testReadInputs(t, bytes.NewReader(td.in))
+	for i, test := range tests {
+		t.Run(fmt.Sprintf("%d: %s", i, test.keyname), func(t *testing.T) {
+			msgs := testReadInputs(t, bytes.NewReader(test.in))
 			var buf strings.Builder
 			for i, msg := range msgs {
 				if i > 0 {
@@ -484,8 +452,8 @@ func TestReadInput(t *testing.T) {
 				}
 			}
 
-			assert.Equal(t, td.keyname, buf.String())
-			assert.Equal(t, td.out, msgs)
+			assert.Equal(t, test.keyname, buf.String())
+			assert.Equal(t, test.out, msgs)
 		})
 	}
 }
@@ -561,8 +529,7 @@ func genRandomData(logfn func(int64), length int) randTest {
 
 // genRandomDataWithSeed generates a randomized test with a fixed seed.
 func genRandomDataWithSeed(s int64, length int) randTest {
-	src := rand.NewSource(s)
-	r := rand.New(src)
+	r := rand.New(rand.NewSource(s))
 
 	// allseqs contains all the sequences, in sorted order. We sort
 	// to make the test deterministic (when the seed is also fixed).
@@ -570,15 +537,15 @@ func genRandomDataWithSeed(s int64, length int) randTest {
 		seq  string
 		name string
 	}
-	var allseqs []seqpair
-	for seq, key := range sequences {
-		allseqs = append(allseqs, seqpair{seq, key.String()})
-	}
-	sort.Slice(allseqs, func(i, j int) bool { return allseqs[i].seq < allseqs[j].seq })
+	allseqs := lo.MapToSlice(sequences, func(seq string, key Key) seqpair {
+		return seqpair{seq, key.String()}
+	})
+	sort.Slice(allseqs, func(i, j int) bool {
+		return allseqs[i].seq < allseqs[j].seq
+	})
 
 	// res contains the computed test.
 	var res randTest
-
 	for len(res.data) < length {
 		alt := r.Intn(2)
 		prefix := ""
@@ -594,10 +561,11 @@ func genRandomDataWithSeed(s int64, length int) randTest {
 			if alt == 1 {
 				res.data = append(res.data, '\x1b')
 			}
-			res.data = append(res.data, 1)
-			res.names = append(res.names, prefix+"ctrl+a")
-			res.lengths = append(res.lengths, 1+esclen)
-
+			res = randTest{
+				data:    append(res.data, 1),
+				names:   append(res.names, prefix+"ctrl+a"),
+				lengths: append(res.lengths, 1+esclen),
+			}
 		case 1, 2:
 			// A sequence.
 			seqi := r.Intn(len(allseqs))
@@ -610,9 +578,11 @@ func genRandomDataWithSeed(s int64, length int) randTest {
 			if alt == 1 {
 				res.data = append(res.data, '\x1b')
 			}
-			res.data = append(res.data, s.seq...)
-			res.names = append(res.names, prefix+s.name)
-			res.lengths = append(res.lengths, len(s.seq)+esclen)
+			res = randTest{
+				data:    append(res.data, s.seq...),
+				names:   append(res.names, prefix+s.name),
+				lengths: append(res.lengths, len(s.seq)+esclen),
+			}
 		}
 	}
 	return res
