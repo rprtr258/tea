@@ -51,7 +51,7 @@ type Model[M any] interface {
 
 	// Update is called when a message is received. Use it to inspect messages
 	// and, in response, update the model and/or send a command.
-	Update(Msg) (M, Cmd)
+	Update(Msg) (M, Cmd) // TODO: remove M from return
 
 	// View renders the program's UI, which is just a string. The view is
 	// rendered after every Update.
