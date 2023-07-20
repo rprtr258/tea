@@ -96,6 +96,8 @@ func (fb FrameBuffer) Render() string {
 	return strings.Join(rows, "\n")
 }
 
+// TODO: is it needed? may be it is enough to use FrameBuffer as viewbox?
+// Viewbox is rectangular view to terminal frame part
 type Viewbox struct {
 	FB     FrameBuffer
 	Y      int
@@ -104,10 +106,7 @@ type Viewbox struct {
 	Width  int
 }
 
-type PaddingOptions struct {
-	Top, Bottom, Left, Right int
-}
-
+// Row returns view to current viewbox's row
 func (vb Viewbox) Row(y int) Viewbox {
 	return Viewbox{
 		Y:      y + vb.Y,
@@ -118,7 +117,14 @@ func (vb Viewbox) Row(y int) Viewbox {
 	}
 }
 
+// PaddingOptions is padding options
+type PaddingOptions struct {
+	Top, Bottom, Left, Right int
+}
+
+// Padding returns view to current viewbox inner with given paddings and size
 func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
+	// TODO: check bounds
 	return Viewbox{
 		Y:      vb.Y + opt.Top,
 		X:      vb.X + opt.Left,
@@ -128,15 +134,20 @@ func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
 	}
 }
 
+// Set writes a rune to the framebuffer in position relative to viewbox
 func (vb Viewbox) Set(y, x int, c rune) {
 	// TODO: bounds check?
 	vb.FB.Set(vb.Y+y, vb.X+x, c)
 }
 
+// Background colors y'th row bacground to given color from x1 to x2 with
+// coordinates relative to viewbox
 func (vb Viewbox) Background(y, x1, x2 int, background termenv.Color) {
 	vb.FB.Background(y+vb.Y, x1+vb.X, x2+vb.X, background)
 }
 
+// Background colors y'th row foreground to given color from x1 to x2 with
+// coordinates relative to viewbox
 func (vb Viewbox) Foreground(y, x1, x2 int, foreground termenv.Color) {
 	vb.FB.Foreground(y+vb.Y, x1+vb.X, x2+vb.X, foreground)
 }
