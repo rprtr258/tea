@@ -50,7 +50,7 @@ func TestClearMsg(t *testing.T) {
 				in  bytes.Buffer
 				out bytes.Buffer
 			)
-			p := NewProgram(&testModel{}, WithInput(&in), WithOutput(&out))
+			p := NewProgram(&testModel{}).WithInput(&in).WithOutput(&out)
 
 			go p.Send(append(test.cmds, Quit))
 

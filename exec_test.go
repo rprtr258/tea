@@ -25,7 +25,7 @@ func (m testExecModel) Init() Cmd {
 	})
 }
 
-func (m *testExecModel) Update(msg Msg) (Model, Cmd) {
+func (m *testExecModel) Update(msg Msg) (*testExecModel, Cmd) {
 	switch msg := msg.(type) {
 	case execFinishedMsg:
 		if msg.err != nil {
@@ -62,7 +62,7 @@ func TestTeaExec(t *testing.T) {
 			var in bytes.Buffer
 
 			m := &testExecModel{cmd: test.cmd}
-			_, err := NewProgram(m, WithInput(&in), WithOutput(&buf)).Run()
+			_, err := NewProgram(m).WithInput(&in).WithOutput(&buf).Run()
 			assert.NoError(t, err)
 			assert.IsType(t, test.expectErr, m.err)
 		})

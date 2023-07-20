@@ -121,7 +121,7 @@ func ShowCursor() Msg {
 // terminal window. ExitAltScreen will return the terminal to its former state.
 //
 // Deprecated: Use the WithAltScreen ProgramOption instead.
-func (p *Program) EnterAltScreen() {
+func (p *Program[M]) EnterAltScreen() {
 	if p.renderer != nil {
 		p.renderer.enterAltScreen()
 	}
@@ -130,7 +130,7 @@ func (p *Program) EnterAltScreen() {
 // ExitAltScreen exits the alternate screen buffer.
 //
 // Deprecated: The altscreen will exited automatically when the program exits.
-func (p *Program) ExitAltScreen() {
+func (p *Program[M]) ExitAltScreen() {
 	if p.renderer != nil {
 		p.renderer.exitAltScreen()
 	}
@@ -140,7 +140,7 @@ func (p *Program) ExitAltScreen() {
 // if a mouse button is pressed (i.e., drag events).
 //
 // Deprecated: Use the WithMouseCellMotion ProgramOption instead.
-func (p *Program) EnableMouseCellMotion() {
+func (p *Program[M]) EnableMouseCellMotion() {
 	p.renderer.enableMouseCellMotion()
 }
 
@@ -148,7 +148,7 @@ func (p *Program) EnableMouseCellMotion() {
 // called automatically when exiting a Bubble Tea program.
 //
 // Deprecated: The mouse will automatically be disabled when the program exits.
-func (p *Program) DisableMouseCellMotion() {
+func (p *Program[M]) DisableMouseCellMotion() {
 	p.renderer.disableMouseCellMotion()
 }
 
@@ -157,7 +157,7 @@ func (p *Program) DisableMouseCellMotion() {
 // support this, but not all.
 //
 // Deprecated: Use the WithMouseAllMotion ProgramOption instead.
-func (p *Program) EnableMouseAllMotion() {
+func (p *Program[M]) EnableMouseAllMotion() {
 	p.renderer.enableMouseAllMotion()
 }
 
@@ -165,6 +165,6 @@ func (p *Program) EnableMouseAllMotion() {
 // called automatically when exiting a Bubble Tea program.
 //
 // Deprecated: The mouse will automatically be disabled when the program exits.
-func (p *Program) DisableMouseAllMotion() {
+func (p *Program[M]) DisableMouseAllMotion() {
 	p.renderer.disableMouseAllMotion()
 }

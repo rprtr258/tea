@@ -44,14 +44,14 @@ type MsgImplementation struct{}
 func (m MsgImplementation) IsBubbleteaMsg() {}
 
 // Model contains the program's state as well as its core functions.
-type Model interface {
+type Model[M any] interface {
 	// Init is the first function that will be called. It returns an optional
 	// initial command. To not perform an initial command return nil.
 	Init() Cmd
 
 	// Update is called when a message is received. Use it to inspect messages
 	// and, in response, update the model and/or send a command.
-	Update(Msg) (Model, Cmd)
+	Update(Msg) (M, Cmd)
 
 	// View renders the program's UI, which is just a string. The view is
 	// rendered after every Update.
@@ -133,8 +133,8 @@ func (h handlers) shutdown() {
 }
 
 // Program is a terminal user interface.
-type Program struct {
-	initialModel Model
+type Program[M Model[M]] struct {
+	initialModel M
 
 	// Configuration options that will set as the program is initializing,
 	// treated as bits. These options can be set via various ProgramOptions.
@@ -173,7 +173,7 @@ type Program struct {
 	// below.
 	windowsStdin *os.File //nolint:golint,structcheck,unused
 
-	filter func(Model, Msg) Msg
+	filter func(M, Msg) Msg
 
 	// fps is the frames per second we should set on the renderer, if
 	// applicable,
@@ -190,15 +190,10 @@ func Quit() Msg {
 }
 
 // NewProgram creates a new Program.
-func NewProgram(model Model, opts ...ProgramOption) *Program {
-	p := &Program{
+func NewProgram[M Model[M]](model M) *Program[M] {
+	p := &Program[M]{
 		initialModel: model,
 		msgs:         make(chan Msg),
-	}
-
-	// Apply all options to the program.
-	for _, opt := range opts {
-		opt(p)
 	}
 
 	// A context can be provided with a ProgramOption, but if none was provided
@@ -222,7 +217,7 @@ func NewProgram(model Model, opts ...ProgramOption) *Program {
 	return p
 }
 
-func (p *Program) handleSignals() chan struct{} {
+func (p *Program[M]) handleSignals() chan struct{} {
 	ch := make(chan struct{})
 
 	// Listen for SIGINT and SIGTERM.
@@ -259,7 +254,7 @@ func (p *Program) handleSignals() chan struct{} {
 }
 
 // handleResize handles terminal resize events.
-func (p *Program) handleResize() chan struct{} {
+func (p *Program[M]) handleResize() chan struct{} {
 	ch := make(chan struct{})
 
 	if f, ok := p.output.TTY().(*os.File); ok && isatty.IsTerminal(f.Fd()) {
@@ -277,7 +272,7 @@ func (p *Program) handleResize() chan struct{} {
 
 // handleCommands runs commands in a goroutine and sends the result to the
 // program's message channel.
-func (p *Program) handleCommands(cmds chan Cmd) chan struct{} {
+func (p *Program[M]) handleCommands(cmds chan Cmd) chan struct{} {
 	ch := make(chan struct{})
 
 	go func() {
@@ -311,7 +306,7 @@ func (p *Program) handleCommands(cmds chan Cmd) chan struct{} {
 
 // eventLoop is the central message loop. It receives and handles the default
 // Bubble Tea messages, update the model and triggers redraws.
-func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
+func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 	for {
 		select {
 		case <-p.ctx.Done():
@@ -411,7 +406,7 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 // Run initializes the program and runs its event loops, blocking until it gets
 // terminated by either [Program.Quit], [Program.Kill], or its signal handler.
 // Returns the final model.
-func (p *Program) Run() (Model, error) {
+func (p *Program[M]) Run() (M, error) {
 	handlers := handlers{}
 	cmds := make(chan Cmd)
 	p.errs = make(chan error)
@@ -566,7 +561,7 @@ func (p *Program) Run() (Model, error) {
 // or its signal handler. Returns the final model.
 //
 // Deprecated: please use [Program.Run] instead.
-func (p *Program) StartReturningModel() (Model, error) {
+func (p *Program[M]) StartReturningModel() (M, error) {
 	return p.Run()
 }
 
@@ -575,7 +570,7 @@ func (p *Program) StartReturningModel() (Model, error) {
 // handler.
 //
 // Deprecated: please use [Program.Run] instead.
-func (p *Program) Start() error {
+func (p *Program[M]) Start() error {
 	_, err := p.Run()
 	return err
 }
@@ -587,7 +582,7 @@ func (p *Program) Start() error {
 // If the program hasn't started yet this will be a blocking operation.
 // If the program has already been terminated this will be a no-op, so it's safe
 // to send messages after the program has exited.
-func (p *Program) Send(msg Msg) {
+func (p *Program[M]) Send(msg Msg) {
 	select {
 	case <-p.ctx.Done():
 	case p.msgs <- msg:
@@ -601,25 +596,25 @@ func (p *Program) Send(msg Msg) {
 //
 // If the program is not running this will be a no-op, so it's safe to call
 // if the program is unstarted or has already exited.
-func (p *Program) Quit() {
+func (p *Program[M]) Quit() {
 	p.Send(Quit())
 }
 
 // Kill stops the program immediately and restores the former terminal state.
 // The final render that you would normally see when quitting will be skipped.
 // [program.Run] returns a [ErrProgramKilled] error.
-func (p *Program) Kill() {
+func (p *Program[M]) Kill() {
 	p.cancel()
 }
 
 // Wait waits/blocks until the underlying Program finished shutting down.
-func (p *Program) Wait() {
+func (p *Program[M]) Wait() {
 	<-p.finished
 }
 
 // shutdown performs operations to free up resources and restore the terminal
 // to its original state.
-func (p *Program) shutdown(kill bool) {
+func (p *Program[M]) shutdown(kill bool) {
 	if p.renderer != nil {
 		if kill {
 			p.renderer.kill()
@@ -637,7 +632,7 @@ func (p *Program) shutdown(kill bool) {
 
 // ReleaseTerminal restores the original terminal state and cancels the input
 // reader. You can return control to the Program with RestoreTerminal.
-func (p *Program) ReleaseTerminal() error {
+func (p *Program[M]) ReleaseTerminal() error {
 	p.ignoreSignals = true
 	p.cancelReader.Cancel()
 	p.waitForReadLoop()
@@ -653,7 +648,7 @@ func (p *Program) ReleaseTerminal() error {
 // RestoreTerminal reinitializes the Program's input reader, restores the
 // terminal to the former state when the program was running, and repaints.
 // Use it to reinitialize a Program after running ReleaseTerminal.
-func (p *Program) RestoreTerminal() error {
+func (p *Program[M]) RestoreTerminal() error {
 	p.ignoreSignals = false
 
 	if err := p.initTerminal(); err != nil {
@@ -686,7 +681,7 @@ func (p *Program) RestoreTerminal() error {
 // and will persist across renders by the Program.
 //
 // If the altscreen is active no output will be printed.
-func (p *Program) Println(args ...any) {
+func (p *Program[M]) Println(args ...any) {
 	p.msgs <- printLineMessage{
 		messageBody: fmt.Sprint(args...),
 	}
@@ -700,7 +695,7 @@ func (p *Program) Println(args ...any) {
 // its own line.
 //
 // If the altscreen is active no output will be printed.
-func (p *Program) Printf(format string, args ...any) {
+func (p *Program[M]) Printf(format string, args ...any) {
 	p.msgs <- printLineMessage{
 		messageBody: fmt.Sprintf(format, args...),
 	}
