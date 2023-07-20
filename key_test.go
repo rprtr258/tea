@@ -628,8 +628,8 @@ func runTestDetectSequence(
 	t *testing.T,
 	detectSequence func(input []byte) (hasSeq bool, width int, msg Msg),
 ) {
-	for i := 0; i < 10; i++ {
-		t.Run("", func(t *testing.T) {
+	for wtf := 0; wtf < 10; wtf++ {
+		t.Run(fmt.Sprintf("#%d", wtf), func(t *testing.T) {
 			td := genRandomData(func(s int64) { t.Logf("using random seed: %d", s) }, 1000)
 
 			t.Logf("%#v", td)
