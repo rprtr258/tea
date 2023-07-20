@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/charmbracelet/harmonica"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/termenv"
+	"github.com/rprtr258/bubbletea/lipgloss"
 
 	tea "github.com/rprtr258/bubbletea"
 )

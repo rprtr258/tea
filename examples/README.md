@@ -268,7 +268,7 @@ data.
 
 ### Tabs
 
-The `tabs` example demonstrates tabbed navigation styled with [Lip Gloss](https://github.com/charmbracelet/lipgloss).
+The `tabs` example demonstrates tabbed navigation styled with [Lip Gloss](https://github.com/rprtr258/bubbletea/lipgloss).
 
 <a href="./tabs/main.go">
   <img width="750" src="./tabs/tabs.gif" />

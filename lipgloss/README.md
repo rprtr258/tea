@@ -3,9 +3,9 @@ Lip Gloss
 
 <p>
     <img src="https://stuff.charm.sh/lipgloss/lipgloss-header-github.png" width="340" alt="Lip Gloss Title Treatment"><br>
-    <a href="https://github.com/charmbracelet/lipgloss/releases"><img src="https://img.shields.io/github/release/charmbracelet/lipgloss.svg" alt="Latest Release"></a>
-    <a href="https://pkg.go.dev/github.com/charmbracelet/lipgloss?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
-    <a href="https://github.com/charmbracelet/lipgloss/actions"><img src="https://github.com/charmbracelet/lipgloss/workflows/build/badge.svg" alt="Build Status"></a>
+    <a href="https://github.com/rprtr258/bubbletea/lipgloss/releases"><img src="https://img.shields.io/github/release/rprtr258/bubbletea/lipgloss.svg" alt="Latest Release"></a>
+    <a href="https://pkg.go.dev/github.com/rprtr258/bubbletea/lipgloss?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
+    <a href="https://github.com/rprtr258/bubbletea/lipgloss/actions"><img src="https://github.com/rprtr258/bubbletea/lipgloss/workflows/build/badge.svg" alt="Build Status"></a>
 </p>
 
 Style definitions for nice terminal layouts. Built with TUIs in mind.
@@ -17,7 +17,7 @@ Users familiar with CSS will feel at home with Lip Gloss.
 
 ```go
 
-import "github.com/charmbracelet/lipgloss"
+import "github.com/rprtr258/bubbletea/lipgloss"
 
 var style = lipgloss.NewStyle().
     Bold(true).
@@ -411,7 +411,7 @@ regard to Chinese, Japanese, and Korean (for example, <code>zh_CN.UTF-8</code>
 or <code>ja_JP.UTF-8</code>). The most direct way to fix this is to set
 <code>RUNEWIDTH_EASTASIAN=0</code> in your environment.</p>
 
-<p>For details see <a href="https://github.com/charmbracelet/lipgloss/issues/40">https://github.com/charmbracelet/lipgloss/issues/40.</a></p>
+<p>For details see <a href="https://github.com/rprtr258/bubbletea/lipgloss/issues/40">https://github.com/rprtr258/bubbletea/lipgloss/issues/40.</a></p>
 </details>
 
 <details>
@@ -423,11 +423,11 @@ given terminal, and if output's not a TTY it will remove color output entirely.
 This is common when running tests, CI, or when piping output elsewhere.</p>
 
 <p>If necessary, you can force a color profile in your tests with
-<a href="https://pkg.go.dev/github.com/charmbracelet/lipgloss#SetColorProfile"><code>SetColorProfile</code></a>.</p>
+<a href="https://pkg.go.dev/github.com/rprtr258/bubbletea/lipgloss#SetColorProfile"><code>SetColorProfile</code></a>.</p>
 
 ```go
 import (
-    "github.com/charmbracelet/lipgloss"
+    "github.com/rprtr258/bubbletea/lipgloss"
     "github.com/muesli/termenv"
 )
 
@@ -481,7 +481,7 @@ We’d love to hear your thoughts on this project. Feel free to drop us a note!
 
 ## License
 
-[MIT](https://github.com/charmbracelet/lipgloss/raw/master/LICENSE)
+[MIT](https://github.com/rprtr258/bubbletea/lipgloss/raw/master/LICENSE)
 
 ***
 
@@ -492,6 +492,6 @@ Part of [Charm](https://charm.sh).
 Charm热爱开源 • Charm loves open source
 
 
-[docs]: https://pkg.go.dev/github.com/charmbracelet/lipgloss?tab=doc
+[docs]: https://pkg.go.dev/github.com/rprtr258/bubbletea/lipgloss?tab=doc
 [wish]: https://github.com/charmbracelet/wish
 [ssh-example]: examples/ssh

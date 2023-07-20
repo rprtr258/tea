@@ -8,10 +8,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/cursor"
 	"github.com/rprtr258/bubbletea/bubbles/textinput"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 var (

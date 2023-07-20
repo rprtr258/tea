@@ -9,11 +9,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-isatty"
 	"github.com/muesli/reflow/indent"
+
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/spinner"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render

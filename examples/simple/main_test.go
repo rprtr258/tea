@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
+	"github.com/rprtr258/bubbletea/lipgloss"
 	"github.com/stretchr/testify/assert"
 
 	tea "github.com/rprtr258/bubbletea"

@@ -8,10 +8,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/dustin/go-humanize"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/key"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 var (

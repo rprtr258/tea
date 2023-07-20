@@ -6,12 +6,12 @@ import (
 	"unicode"
 
 	"github.com/atotto/clipboard"
-	"github.com/charmbracelet/lipgloss"
 	rw "github.com/mattn/go-runewidth"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/cursor"
 	"github.com/rprtr258/bubbletea/bubbles/key"
 	"github.com/rprtr258/bubbletea/bubbles/runeutil"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 // Internal messages for clipboard operations.
@@ -93,7 +93,7 @@ type Model struct {
 	// Styles. These will be applied as inline styles.
 	//
 	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/charmbracelet/lipgloss
+	// https://github.com/rprtr258/bubbletea/lipgloss
 	PromptStyle      lipgloss.Style
 	TextStyle        lipgloss.Style
 	PlaceholderStyle lipgloss.Style

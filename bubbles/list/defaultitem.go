@@ -5,10 +5,10 @@ import (
 	"io"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/truncate"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/key"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 // DefaultItemStyles defines styling for a default list item.

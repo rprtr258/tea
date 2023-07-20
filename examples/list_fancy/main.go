@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/key"
 	"github.com/rprtr258/bubbletea/bubbles/list"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 var (

@@ -1,7 +1,7 @@
 package list
 
 import (
-	"github.com/charmbracelet/lipgloss"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 const (

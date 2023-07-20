@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
+	"github.com/rprtr258/bubbletea/lipgloss"
 
 	tea "github.com/rprtr258/bubbletea"
 )
@@ -100,7 +100,7 @@ type Model struct {
 	// want foreground and background coloring, and potentially some padding.
 	//
 	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/charmbracelet/lipgloss
+	// https://github.com/rprtr258/bubbletea/lipgloss
 	Style lipgloss.Style
 
 	frame int

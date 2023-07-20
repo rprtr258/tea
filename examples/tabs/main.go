@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	tea "github.com/rprtr258/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 type model struct {

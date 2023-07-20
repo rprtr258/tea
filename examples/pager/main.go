@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/viewport"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 // You generally won't need this unless you're processing stuff with

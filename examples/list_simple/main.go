@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/list"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 const listHeight = 14

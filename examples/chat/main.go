@@ -8,10 +8,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/textarea"
 	"github.com/rprtr258/bubbletea/bubbles/viewport"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 func Main() {

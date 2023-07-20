@@ -300,7 +300,7 @@ your program in another window.
 * [Reflow][reflow]: Advanced ANSI-aware methods for working with text
 
 [bubbles]: https://github.com/rprtr258/bubbletea/bubbles
-[lipgloss]: https://github.com/charmbracelet/lipgloss
+[lipgloss]: https://github.com/rprtr258/bubbletea/lipgloss
 [harmonica]: https://github.com/charmbracelet/harmonica
 [bubblezone]: https://github.com/lrstanley/bubblezone
 [termenv]: https://github.com/muesli/termenv

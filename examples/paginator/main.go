@@ -8,8 +8,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/rprtr258/bubbletea/bubbles/paginator"
+	"github.com/rprtr258/bubbletea/lipgloss"
 
 	tea "github.com/rprtr258/bubbletea"
 )

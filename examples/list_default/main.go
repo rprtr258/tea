@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/list"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 var docStyle = lipgloss.NewStyle().Margin(1, 2)

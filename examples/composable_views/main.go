@@ -5,10 +5,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/rprtr258/bubbletea"
 	"github.com/rprtr258/bubbletea/bubbles/spinner"
 	"github.com/rprtr258/bubbletea/bubbles/timer"
+	"github.com/rprtr258/bubbletea/lipgloss"
 )
 
 /*

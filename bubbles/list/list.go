@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/reflow/truncate"
 	tea "github.com/rprtr258/bubbletea"
@@ -19,6 +18,7 @@ import (
 	"github.com/rprtr258/bubbletea/bubbles/paginator"
 	"github.com/rprtr258/bubbletea/bubbles/spinner"
 	"github.com/rprtr258/bubbletea/bubbles/textinput"
+	"github.com/rprtr258/bubbletea/lipgloss"
 	"github.com/sahilm/fuzzy"
 )
 
