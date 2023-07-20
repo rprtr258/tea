@@ -680,7 +680,7 @@ func (p *Program) RestoreTerminal() error {
 // and will persist across renders by the Program.
 //
 // If the altscreen is active no output will be printed.
-func (p *Program) Println(args ...interface{}) {
+func (p *Program) Println(args ...any) {
 	p.msgs <- printLineMessage{
 		messageBody: fmt.Sprint(args...),
 	}
@@ -694,8 +694,8 @@ func (p *Program) Println(args ...interface{}) {
 // its own line.
 //
 // If the altscreen is active no output will be printed.
-func (p *Program) Printf(template string, args ...interface{}) {
+func (p *Program) Printf(format string, args ...any) {
 	p.msgs <- printLineMessage{
-		messageBody: fmt.Sprintf(template, args...),
+		messageBody: fmt.Sprintf(format, args...),
 	}
 }
