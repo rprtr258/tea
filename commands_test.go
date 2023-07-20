@@ -4,6 +4,8 @@ import (
 	"errors"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type stringMsg string
@@ -15,9 +17,7 @@ func TestEvery(t *testing.T) {
 	msg := Every(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
-	if expected != msg {
-		t.Fatalf("expected a msg %v but got %v", expected, msg)
-	}
+	assert.Equal(t, expected, msg)
 }
 
 func TestTick(t *testing.T) {
@@ -25,9 +25,7 @@ func TestTick(t *testing.T) {
 	msg := Tick(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
-	if expected != msg {
-		t.Fatalf("expected a msg %v but got %v", expected, msg)
-	}
+	assert.Equal(t, expected, msg)
 }
 
 type errorMsg struct {
@@ -45,23 +43,19 @@ func TestSequentially(t *testing.T) {
 		return nil
 	}
 
-	tests := []struct {
-		name     string
+	for name, test := range map[string]struct {
 		cmds     []Cmd
 		expected Msg
 	}{
-		{
-			name:     "all nil",
+		"all nil": {
 			cmds:     []Cmd{nilReturnCmd, nilReturnCmd},
 			expected: nil,
 		},
-		{
-			name:     "null cmds",
+		"null cmds": {
 			cmds:     []Cmd{nil, nil},
 			expected: nil,
 		},
-		{
-			name: "one error",
+		"one error": {
 			cmds: []Cmd{
 				nilReturnCmd,
 				func() Msg {
@@ -71,8 +65,7 @@ func TestSequentially(t *testing.T) {
 			},
 			expected: expectedErrMsg,
 		},
-		{
-			name: "some msg",
+		"some msg": {
 			cmds: []Cmd{
 				nilReturnCmd,
 				func() Msg {
@@ -82,37 +75,24 @@ func TestSequentially(t *testing.T) {
 			},
 			expected: expectedStrMsg,
 		},
-	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if msg := Sequentially(test.cmds...)(); msg != test.expected {
-				t.Fatalf("expected a msg %v but got %v", test.expected, msg)
-			}
+	} {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.expected, Sequentially(test.cmds...)())
 		})
 	}
 }
 
 func TestBatch(t *testing.T) {
 	t.Run("nil cmd", func(t *testing.T) {
-		if b := Batch(nil); b != nil {
-			t.Fatalf("expected nil, got %+v", b)
-		}
+		assert.Nil(t, Batch(nil))
 	})
 	t.Run("empty cmd", func(t *testing.T) {
-		if b := Batch(); b != nil {
-			t.Fatalf("expected nil, got %+v", b)
-		}
+		assert.Nil(t, Batch())
 	})
 	t.Run("single cmd", func(t *testing.T) {
-		b := Batch(Quit)()
-		if l := len(b.(BatchMsg)); l != 1 {
-			t.Fatalf("expected a []Cmd with len 1, got %d", l)
-		}
+		assert.Len(t, Batch(Quit)(), 1)
 	})
 	t.Run("mixed nil cmds", func(t *testing.T) {
-		b := Batch(nil, Quit, nil, Quit, nil, nil)()
-		if l := len(b.(BatchMsg)); l != 2 {
-			t.Fatalf("expected a []Cmd with len 2, got %d", l)
-		}
+		assert.Len(t, Batch(nil, Quit, nil, Quit, nil, nil)(), 2)
 	})
 }
