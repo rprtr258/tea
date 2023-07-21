@@ -18,21 +18,21 @@ type model struct {
 	choice string
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			return m, tea.Quit
+			return tea.Quit
 
 		case "enter":
 			// Send the choice on the channel and exit.
 			m.choice = choices[m.cursor]
-			return m, tea.Quit
+			return tea.Quit
 
 		case "down", "j":
 			m.cursor++
@@ -48,10 +48,10 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := strings.Builder{}
 	s.WriteString("What kind of Bubble Tea would you like to order?\n\n")
 
@@ -70,7 +70,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(model{})
+	p := tea.NewProgram(&model{})
 
 	// Run returns the model as a tea.Model.
 	m, err := p.Run()

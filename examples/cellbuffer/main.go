@@ -142,52 +142,50 @@ type model struct {
 	xVelocity, yVelocity float64
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return animate()
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return m, tea.Quit
+		return tea.Quit
 	case tea.WindowSizeMsg:
 		if !m.cells.ready() {
 			m.targetX, m.targetY = float64(msg.Width)/2, float64(msg.Height)/2
 		}
 		m.cells.init(msg.Width, msg.Height)
-		return m, nil
+		return nil
 	case tea.MouseMsg:
 		if !m.cells.ready() {
-			return m, nil
+			return nil
 		}
 		m.targetX, m.targetY = float64(msg.X), float64(msg.Y)
-		return m, nil
+		return nil
 
 	case frameMsg:
 		if !m.cells.ready() {
-			return m, nil
+			return nil
 		}
 
 		m.cells.wipe()
 		m.x, m.xVelocity = m.spring.Update(m.x, m.xVelocity, m.targetX)
 		m.y, m.yVelocity = m.spring.Update(m.y, m.yVelocity, m.targetY)
 		drawEllipse(&m.cells, m.x, m.y, 16, 8)
-		return m, animate()
+		return animate()
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(m.cells.String())
 }
 
 func Main() {
-	m := model{
+	p := tea.NewProgram(&model{
 		spring: harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
-	}
-
-	p := tea.NewProgram(m).WithAltScreen().WithMouseCellMotion()
+	}).WithAltScreen().WithMouseCellMotion()
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Uh oh:", err)
 		os.Exit(1)

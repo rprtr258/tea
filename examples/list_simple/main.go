@@ -3,7 +3,7 @@ package list_simple
 import (
 	"fmt"
 	"io"
-	"os"
+	"log"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -31,7 +31,7 @@ type itemDelegate struct{}
 func (d itemDelegate) Height() int                             { return 1 }
 func (d itemDelegate) Spacing() int                            { return 0 }
 func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+func (d itemDelegate) Render(w io.Writer, m *list.Model, index int, listItem list.Item) {
 	i, ok := listItem.(item)
 	if !ok {
 		return
@@ -55,37 +55,35 @@ type model struct {
 	quitting bool
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
-		return m, nil
+		return nil
 
 	case tea.MsgKey:
 		switch keypress := msg.String(); keypress {
 		case "ctrl+c":
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				m.choice = string(i)
 			}
-			return m, tea.Quit
+			return tea.Quit
 		}
 	}
 
-	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
-	return m, cmd
+	return m.list.Update(msg)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.choice != "" {
 		r.Write(quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice)))
 		return
@@ -124,10 +122,7 @@ func Main() {
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpStyle
 
-	m := model{list: l}
-
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(&model{list: l}).Run(); err != nil {
+		log.Fatal("Error running program: ", err.Error())
 	}
 }

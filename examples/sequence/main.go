@@ -11,7 +11,7 @@ import (
 
 type model struct{}
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.Sequence(
 		tea.Batch(
 			tea.Println("A"),
@@ -23,19 +23,19 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
-		return m, tea.Quit
+		return tea.Quit
 	}
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(model{}).Run(); err != nil {
+	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
 		fmt.Println("Uh oh:", err)
 		os.Exit(1)
 	}

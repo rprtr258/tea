@@ -20,23 +20,22 @@ var (
 )
 
 func Main() {
-	p := tea.NewProgram(initialModel()).WithFilter(filter)
+	if _, err := tea.
+		NewProgram(initialModel()).
+		WithFilter(func(m *model, msg tea.Msg) tea.Msg {
+			if _, ok := msg.(tea.QuitMsg); !ok {
+				return msg
+			}
 
-	if _, err := p.Run(); err != nil {
+			if !m.hasChanges {
+				return msg
+			}
+
+			return nil
+		}).
+		Run(); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func filter(m model, msg tea.Msg) tea.Msg {
-	if _, ok := msg.(tea.QuitMsg); !ok {
-		return msg
-	}
-
-	if m.hasChanges {
-		return nil
-	}
-
-	return msg
 }
 
 type model struct {
@@ -53,12 +52,12 @@ type keymap struct {
 	quit key.Binding
 }
 
-func initialModel() model {
+func initialModel() *model {
 	ti := textarea.New()
 	ti.Placeholder = "Only the best words"
 	ti.Focus()
 
-	return model{
+	return &model{
 		textarea: ti,
 		help:     help.New(),
 		keymap: keymap{
@@ -74,11 +73,11 @@ func initialModel() model {
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	if m.quitting {
 		return m.updatePromptView(msg)
 	}
@@ -86,7 +85,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	return m.updateTextView(msg)
 }
 
-func (m model) updateTextView(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) updateTextView(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
 
@@ -99,7 +98,7 @@ func (m model) updateTextView(msg tea.Msg) (model, tea.Cmd) {
 			m.hasChanges = false
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		case msg.Type == tea.KeyRunes:
 			m.saveText = ""
 			m.hasChanges = true
@@ -111,26 +110,25 @@ func (m model) updateTextView(msg tea.Msg) (model, tea.Cmd) {
 			}
 		}
 	}
-	m.textarea, cmd = m.textarea.Update(msg)
-	cmds = append(cmds, cmd)
-	return m, tea.Batch(cmds...)
+	cmds = append(cmds, m.textarea.Update(msg))
+	return tea.Batch(cmds...)
 }
 
-func (m model) updatePromptView(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) updatePromptView(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		// For simplicity's sake, we'll treat any key besides "y" as "no"
 		if key.Matches(msg, m.keymap.quit) || msg.String() == "y" {
 			m.hasChanges = false
-			return m, tea.Quit
+			return tea.Quit
 		}
 		m.quitting = false
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.quitting {
 		if m.hasChanges {
 			text := lipgloss.JoinHorizontal(lipgloss.Top, "You have unsaved changes. Quit without saving?", choiceStyle.Render("[yn]"))

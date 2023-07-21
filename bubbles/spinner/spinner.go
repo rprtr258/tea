@@ -109,7 +109,7 @@ type Model struct {
 }
 
 // ID returns the spinner's unique ID.
-func (m Model) ID() int {
+func (m *Model) ID() int {
 	return m.id
 }
 
@@ -140,20 +140,20 @@ type TickMsg struct {
 }
 
 // Update is the Tea update function.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case TickMsg:
 		// If an ID is set, and the ID doesn't belong to this spinner, reject
 		// the message.
 		if msg.ID > 0 && msg.ID != m.id {
-			return m, nil
+			return nil
 		}
 
 		// If a tag is set, and it's not the one we expect, reject the message.
 		// This prevents the spinner from receiving too many messages and
 		// thus spinning too fast.
 		if msg.tag > 0 && msg.tag != m.tag {
-			return m, nil
+			return nil
 		}
 
 		m.frame++
@@ -162,14 +162,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 
 		m.tag++
-		return m, m.tick(m.id, m.tag)
+		return m.tick(m.id, m.tag)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
 // View renders the model's view.
-func (m Model) View() string {
+func (m *Model) View() string {
 	if m.frame >= len(m.Spinner.Frames) {
 		return "(error)"
 	}
@@ -179,7 +179,7 @@ func (m Model) View() string {
 
 // Tick is the command used to advance the spinner one frame. Use this command
 // to effectively start the spinner.
-func (m Model) Tick() tea.Msg {
+func (m *Model) Tick() tea.Msg {
 	return TickMsg{
 		// The time at which the tick occurred.
 		Time: time.Now(),
@@ -193,7 +193,7 @@ func (m Model) Tick() tea.Msg {
 	}
 }
 
-func (m Model) tick(id, tag int) tea.Cmd {
+func (m *Model) tick(id, tag int) tea.Cmd {
 	return tea.Tick(m.Spinner.FPS, func(t time.Time) tea.Msg {
 		return TickMsg{
 			Time: t,

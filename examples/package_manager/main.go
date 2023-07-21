@@ -2,8 +2,8 @@ package package_manager
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 
@@ -29,63 +29,58 @@ var (
 	checkMark           = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
 )
 
-func newModel() model {
-	p := progress.New(
-		progress.WithDefaultGradient(),
-		progress.WithWidth(40),
-		progress.WithoutPercentage(),
-	)
+func newModel() *model {
 	s := spinner.New()
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
-	return model{
+	return &model{
 		packages: getPackages(),
 		spinner:  s,
-		progress: p,
+		progress: progress.New(
+			progress.WithDefaultGradient(),
+			progress.WithWidth(40),
+			progress.WithoutPercentage(),
+		),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.Batch(downloadAndInstall(m.packages[m.index]), m.spinner.Tick)
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
-			return m, tea.Quit
+			return tea.Quit
 		}
 	case installedPkgMsg:
 		if m.index >= len(m.packages)-1 {
 			// Everything's been installed. We're done!
 			m.done = true
-			return m, tea.Quit
+			return tea.Quit
 		}
 
 		// Update progress bar
 		progressCmd := m.progress.SetPercent(float64(m.index) / float64(len(m.packages)-1))
 
 		m.index++
-		return m, tea.Batch(
+		return tea.Batch(
 			progressCmd,
 			tea.Printf("%s %s", checkMark, m.packages[m.index]), // print success message above our program
 			downloadAndInstall(m.packages[m.index]),             // download the next package
 		)
 	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return m.spinner.Update(msg)
 	case progress.FrameMsg:
-		var cmd tea.Cmd
-		m.progress, cmd = m.progress.Update(msg)
-		return m, cmd
+		return m.progress.Update(msg)
 	}
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	n := len(m.packages)
 	w := lipgloss.Width(fmt.Sprintf("%d", n))
 
@@ -129,7 +124,6 @@ func max(a, b int) int {
 
 func Main() {
 	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatal("Error running program: ", err.Error())
 	}
 }

@@ -106,7 +106,7 @@ func doWaitFor(r io.Reader, condition func(bts []byte) bool, options ...WaitForO
 }
 
 // TestModel is a model that is being tested.
-type TestModel[M tea.Model[M]] struct {
+type TestModel[M tea.Model] struct {
 	program *tea.Program[M]
 
 	in  *bytes.Buffer
@@ -120,7 +120,7 @@ type TestModel[M tea.Model[M]] struct {
 }
 
 // NewTestModel makes a new TestModel which can be used for tests.
-func NewTestModel[M tea.Model[M]](t *testing.T, m M, options ...TestOption) *TestModel[M] {
+func NewTestModel[M tea.Model](t *testing.T, m M, options ...TestOption) *TestModel[M] {
 	tm := &TestModel[M]{
 		in:      bytes.NewBuffer(nil),
 		out:     safe(bytes.NewBuffer(nil)),
@@ -203,7 +203,7 @@ func (tm *TestModel[M]) WaitFinished(tb testing.TB, opts ...FinalOpt) {
 // FinalModel returns the resulting model, resulting from program.Run().
 // This method only returns once the program has finished running or when it
 // times out.
-func (tm *TestModel[M]) FinalModel(tb testing.TB, opts ...FinalOpt) tea.Model[M] {
+func (tm *TestModel[M]) FinalModel(tb testing.TB, opts ...FinalOpt) M {
 	tm.waitDone(tb, opts)
 	select {
 	case m := <-tm.modelCh:

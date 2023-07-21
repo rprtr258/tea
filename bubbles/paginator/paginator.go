@@ -83,7 +83,7 @@ func (m *Model) SetTotalPages(items int) int {
 
 // ItemsOnPage is a helper function for returning the number of items on the
 // current page given the total number of items passed as an argument.
-func (m Model) ItemsOnPage(totalItems int) int {
+func (m *Model) ItemsOnPage(totalItems int) int {
 	if totalItems < 1 {
 		return 0
 	}
@@ -121,7 +121,7 @@ func (m *Model) NextPage() {
 }
 
 // OnLastPage returns whether or not we're on the last page.
-func (m Model) OnLastPage() bool {
+func (m *Model) OnLastPage() bool {
 	return m.Page == m.TotalPages-1
 }
 
@@ -145,7 +145,7 @@ func New() Model {
 var NewModel = New
 
 // Update is the Tea update function which binds keystrokes to pagination.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {
@@ -156,11 +156,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
 // View renders the pagination to a string.
-func (m Model) View() string {
+func (m *Model) View() string {
 	switch m.Type {
 	case Dots:
 		return m.dotsView()
@@ -169,7 +169,7 @@ func (m Model) View() string {
 	}
 }
 
-func (m Model) dotsView() string {
+func (m *Model) dotsView() string {
 	var s string
 	for i := 0; i < m.TotalPages; i++ {
 		if i == m.Page {
@@ -181,7 +181,7 @@ func (m Model) dotsView() string {
 	return s
 }
 
-func (m Model) arabicView() string {
+func (m *Model) arabicView() string {
 	return fmt.Sprintf(m.ArabicFormat, m.Page+1, m.TotalPages)
 }
 

@@ -25,40 +25,40 @@ type errMsg struct{ error }
 func (e errMsg) Error() string { return e.error.Error() }
 
 func Main() {
-	p := tea.NewProgram(model{})
+	p := tea.NewProgram(&model{})
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return checkServer
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return m, tea.Quit
+			return tea.Quit
 		default:
-			return m, nil
+			return nil
 		}
 
 	case statusMsg:
 		m.status = int(msg)
-		return m, tea.Quit
+		return tea.Quit
 
 	case errMsg:
 		m.err = msg
-		return m, nil
+		return nil
 
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := fmt.Sprintf("Checking %s...", url)
 	if m.err != nil {
 		s += fmt.Sprintf("something went wrong: %s", m.err)

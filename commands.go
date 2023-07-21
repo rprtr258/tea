@@ -76,12 +76,12 @@ func Sequence(cmds ...Cmd) Cmd {
 //	    })
 //	}
 //
-//	func (m model) Init() Cmd {
+//	func (m *model) Init() Cmd {
 //	    // Start ticking.
 //	    return tickEvery()
 //	}
 //
-//	func (m model) Update(msg Msg) (Model, Cmd) {
+//	func (m *model) Update(msg Msg) (Model, Cmd) {
 //	    switch msg.(type) {
 //	    case TickMsg:
 //	        // Return your Every command again to loop.
@@ -125,12 +125,12 @@ func Every(duration time.Duration, fn func(time.Time) Msg) Cmd {
 //	    })
 //	}
 //
-//	func (m model) Init() Cmd {
+//	func (m *model) Init() Cmd {
 //	    // Start ticking.
 //	    return doTick()
 //	}
 //
-//	func (m model) Update(msg Msg) (Model, Cmd) {
+//	func (m *model) Update(msg Msg) (Model, Cmd) {
 //	    switch msg.(type) {
 //	    case TickMsg:
 //	        // Return your Tick command again to loop.

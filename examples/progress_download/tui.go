@@ -32,25 +32,25 @@ type model struct {
 	err      error
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return m, tea.Quit
+		return tea.Quit
 
 	case tea.WindowSizeMsg:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
-		return m, nil
+		return nil
 
 	case progressErrMsg:
 		m.err = msg.err
-		return m, tea.Quit
+		return tea.Quit
 
 	case progressMsg:
 		var cmds []tea.Cmd
@@ -60,20 +60,18 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		}
 
 		cmds = append(cmds, m.progress.SetPercent(float64(msg)))
-		return m, tea.Batch(cmds...)
+		return tea.Batch(cmds...)
 
 	// FrameMsg is sent when the progress bar wants to animate itself
 	case progress.FrameMsg:
-		var cmd tea.Cmd
-		m.progress, cmd = m.progress.Update(msg)
-		return m, cmd
+		return m.progress.Update(msg)
 
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.err != nil {
 		r.Write("Error downloading: " + m.err.Error() + "\n")
 		return

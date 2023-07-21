@@ -27,44 +27,41 @@ type keymap struct {
 	quit  key.Binding
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.timer.Init()
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case timer.TickMsg:
-		var cmd tea.Cmd
-		m.timer, cmd = m.timer.Update(msg)
-		return m, cmd
+		return m.timer.Update(msg)
 
 	case timer.StartStopMsg:
-		var cmd tea.Cmd
-		m.timer, cmd = m.timer.Update(msg)
+		cmd := m.timer.Update(msg)
 		m.keymap.stop.SetEnabled(m.timer.Running())
 		m.keymap.start.SetEnabled(!m.timer.Running())
-		return m, cmd
+		return cmd
 
 	case timer.TimeoutMsg:
 		m.quitting = true
-		return m, tea.Quit
+		return tea.Quit
 
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		case key.Matches(msg, m.keymap.reset):
 			m.timer.Timeout = timeout
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
-			return m, m.timer.Toggle()
+			return m.timer.Toggle()
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) helpView() string {
+func (m *model) helpView() string {
 	return "\n" + m.help.ShortHelpView([]key.Binding{
 		m.keymap.start,
 		m.keymap.stop,
@@ -73,7 +70,7 @@ func (m model) helpView() string {
 	})
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	// For a more detailed timer view you could read m.timer.Timeout to get
 	// the remaining time as a time.Duration and skip calling m.timer.View()
 	// entirely.
@@ -91,7 +88,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	m := model{
+	m := &model{
 		timer: timer.NewWithInterval(timeout, time.Millisecond),
 		keymap: keymap{
 			start: key.NewBinding(

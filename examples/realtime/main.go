@@ -44,7 +44,7 @@ type model struct {
 	quitting  bool
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		m.spinner.Tick,
 		listenForActivity(m.sub), // generate activity
@@ -52,24 +52,22 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return m, tea.Quit
+		return tea.Quit
 	case responseMsg:
-		m.responses++                    // record external activity
-		return m, waitForActivity(m.sub) // wait for next event
+		m.responses++                 // record external activity
+		return waitForActivity(m.sub) // wait for next event
 	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return m.spinner.Update(msg)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := fmt.Sprintf("\n %s Events received: %d\n\n Press any key to exit\n", m.spinner.View(), m.responses)
 	if m.quitting {
 		s += "\n"
@@ -79,7 +77,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(model{
+	p := tea.NewProgram(&model{
 		sub:     make(chan struct{}),
 		spinner: spinner.New(),
 	})

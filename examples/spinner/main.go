@@ -20,40 +20,38 @@ type model struct {
 	err      error
 }
 
-func initialModel() model {
+func initialModel() *model {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-	return model{spinner: s}
+	return &model{spinner: s}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		default:
-			return m, nil
+			return nil
 		}
 
 	case errMsg:
 		m.err = msg
-		return m, nil
+		return nil
 
 	default:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return m.spinner.Update(msg)
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.err != nil {
 		r.Write(m.err.Error())
 		return

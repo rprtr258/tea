@@ -24,16 +24,16 @@ func (m testExecModel) Init() Cmd {
 	})
 }
 
-func (m *testExecModel) Update(msg Msg) (*testExecModel, Cmd) {
+func (m *testExecModel) Update(msg Msg) Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case execFinishedMsg:
 		if msg.err != nil {
 			m.err = msg.err
 		}
-		return m, Quit
+		return Quit
 	}
 
-	return m, nil
+	return nil
 }
 
 func (m *testExecModel) View(Renderer) {}

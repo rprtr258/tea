@@ -26,22 +26,22 @@ type model struct {
 	err      error
 }
 
-func initialModel() model {
+func initialModel() *model {
 	ti := textarea.New()
 	ti.Placeholder = "Once upon a time..."
 	ti.Focus()
 
-	return model{
+	return &model{
 		textarea: ti,
 		err:      nil,
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
 
@@ -53,7 +53,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 				m.textarea.Blur()
 			}
 		case tea.KeyCtrlC:
-			return m, tea.Quit
+			return tea.Quit
 		default:
 			if !m.textarea.Focused() {
 				cmd = m.textarea.Focus()
@@ -64,15 +64,14 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	// We handle errors just like any other message
 	case errMsg:
 		m.err = msg
-		return m, nil
+		return nil
 	}
 
-	m.textarea, cmd = m.textarea.Update(msg)
-	cmds = append(cmds, cmd)
-	return m, tea.Batch(cmds...)
+	cmds = append(cmds, m.textarea.Update(msg))
+	return tea.Batch(cmds...)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(fmt.Sprintf(
 		"Tell me a story.\n\n%s\n\n%s",
 		m.textarea.View(),

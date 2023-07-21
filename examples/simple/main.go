@@ -22,7 +22,8 @@ func Main() {
 	}
 
 	// Initialize our program
-	p := tea.NewProgram(model(5))
+	m := model(5)
+	p := tea.NewProgram(&m)
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -35,31 +36,31 @@ type model int
 
 // Init optionally returns an initial command we should run. In this case we
 // want to start the timer.
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tick
 }
 
 // Update is called when messages are received. The idea is that you inspect the
 // message and send back an updated model accordingly. You can also return
 // a command, which is a function that performs I/O and returns a message.
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
-		return m, tea.Quit
+		return tea.Quit
 	case tickMsg:
-		m--
-		if m <= 0 {
-			return m, tea.Quit
+		*m--
+		if *m <= 0 {
+			return tea.Quit
 		}
-		return m, tick
+		return tick
 	}
-	return m, nil
+	return nil
 }
 
 // View returns a string based on data in the model. That string which will be
 // rendered to the terminal.
-func (m model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf("Hi. This program will exit in %d seconds. To quit sooner press any key.\n", m))
+func (m *model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf("Hi. This program will exit in %d seconds. To quit sooner press any key.\n", *m))
 }
 
 // Messages are events that we respond to in our Update function. This

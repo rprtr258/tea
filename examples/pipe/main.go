@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -16,6 +17,46 @@ import (
 	"github.com/rprtr258/tea/bubbles/textinput"
 	"github.com/rprtr258/tea/lipgloss"
 )
+
+type model struct {
+	userInput textinput.Model
+}
+
+func newModel(initialValue string) *model {
+	i := textinput.New()
+	i.Prompt = ""
+	i.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
+	i.Width = 48
+	i.SetValue(initialValue)
+	i.CursorEnd()
+	i.Focus()
+
+	return &model{
+		userInput: i,
+	}
+}
+
+func (m *model) Init() tea.Cmd {
+	return textinput.Blink
+}
+
+func (m *model) Update(msg tea.Msg) tea.Cmd {
+	if key, ok := msg.(tea.MsgKey); ok {
+		switch key.Type {
+		case tea.KeyCtrlC, tea.KeyEscape, tea.KeyEnter:
+			return tea.Quit
+		}
+	}
+
+	return m.userInput.Update(msg)
+}
+
+func (m *model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf(
+		"\nYou piped in: %s\n\nPress ^C to exit",
+		m.userInput.View(),
+	))
+}
 
 func Main() {
 	stat, err := os.Stdin.Stat()
@@ -29,65 +70,22 @@ func Main() {
 	}
 
 	reader := bufio.NewReader(os.Stdin)
-	var b strings.Builder
 
+	var sb strings.Builder
 	for {
 		r, _, err := reader.ReadRune()
 		if err != nil && err == io.EOF {
 			break
 		}
-		_, err = b.WriteRune(r)
+		_, err = sb.WriteRune(r)
 		if err != nil {
-			fmt.Println("Error getting input:", err)
-			os.Exit(1)
+			log.Fatal("Error getting input: ", err.Error())
 		}
 	}
 
-	model := newModel(strings.TrimSpace(b.String()))
+	model := newModel(strings.TrimSpace(sb.String()))
 
 	if _, err := tea.NewProgram(model).Run(); err != nil {
-		fmt.Println("Couldn't start program:", err)
-		os.Exit(1)
+		log.Fatal("Couldn't start program: ", err.Error())
 	}
-}
-
-type model struct {
-	userInput textinput.Model
-}
-
-func newModel(initialValue string) (m model) {
-	i := textinput.New()
-	i.Prompt = ""
-	i.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
-	i.Width = 48
-	i.SetValue(initialValue)
-	i.CursorEnd()
-	i.Focus()
-
-	m.userInput = i
-	return
-}
-
-func (m model) Init() tea.Cmd {
-	return textinput.Blink
-}
-
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
-	if key, ok := msg.(tea.MsgKey); ok {
-		switch key.Type {
-		case tea.KeyCtrlC, tea.KeyEscape, tea.KeyEnter:
-			return m, tea.Quit
-		}
-	}
-
-	var cmd tea.Cmd
-	m.userInput, cmd = m.userInput.Update(msg)
-	return m, cmd
-}
-
-func (m model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf(
-		"\nYou piped in: %s\n\nPress ^C to exit",
-		m.userInput.View(),
-	))
 }

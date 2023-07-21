@@ -13,8 +13,8 @@ type model struct {
 	selected map[int]struct{}
 }
 
-func initialModel() model {
-	return model{
+func initialModel() *model {
+	return &model{
 		choices: []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
 
 		// A map which indicates which choices are selected. We're using
@@ -24,16 +24,16 @@ func initialModel() model {
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			return m, tea.Quit
+			return tea.Quit
 		case "up", "k":
 			if m.cursor > 0 {
 				m.cursor--
@@ -52,10 +52,10 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := "What should we buy at the market?\n\n"
 
 	for i, choice := range m.choices {

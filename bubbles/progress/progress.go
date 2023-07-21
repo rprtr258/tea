@@ -196,7 +196,7 @@ func New(opts ...Option) Model {
 var NewModel = New
 
 // Init exists to satisfy the tea.Model interface.
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return nil
 }
 
@@ -204,23 +204,23 @@ func (m Model) Init() tea.Cmd {
 // SetPercent to create the command you'll need to trigger the animation.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case FrameMsg:
 		if msg.id != m.id || msg.tag != m.tag {
-			return m, nil
+			return nil
 		}
 
 		// If we've more or less reached equilibrium, stop updating.
 		if !m.IsAnimating() {
-			return m, nil
+			return nil
 		}
 
 		m.percentShown, m.velocity = m.spring.Update(m.percentShown, m.velocity, m.targetPercent)
-		return m, m.nextFrame()
+		return m.nextFrame()
 
 	default:
-		return m, nil
+		return nil
 	}
 }
 
@@ -236,7 +236,7 @@ func (m *Model) SetSpringOptions(frequency, damping float64) {
 // relevant when you're animating the progress bar.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m Model) Percent() float64 {
+func (m *Model) Percent() float64 {
 	return m.targetPercent
 }
 
@@ -268,12 +268,12 @@ func (m *Model) DecrPercent(v float64) tea.Cmd {
 
 // View renders an animated progress bar in its current state. To render
 // a static progress bar based on your own calculations use ViewAs instead.
-func (m Model) View() string {
+func (m *Model) View() string {
 	return m.ViewAs(m.percentShown)
 }
 
 // ViewAs renders the progress bar with a given percentage.
-func (m Model) ViewAs(percent float64) string {
+func (m *Model) ViewAs(percent float64) string {
 	b := strings.Builder{}
 	percentView := m.percentageView(percent)
 	m.barView(&b, percent, ansi.PrintableRuneWidth(percentView))
@@ -287,7 +287,7 @@ func (m *Model) nextFrame() tea.Cmd {
 	})
 }
 
-func (m Model) barView(b *strings.Builder, percent float64, textWidth int) {
+func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
 	var (
 		tw = max(0, m.Width-textWidth)                // total width
 		fw = int(math.Round((float64(tw) * percent))) // filled width
@@ -329,7 +329,7 @@ func (m Model) barView(b *strings.Builder, percent float64, textWidth int) {
 	b.WriteString(strings.Repeat(e, n))
 }
 
-func (m Model) percentageView(percent float64) string {
+func (m *Model) percentageView(percent float64) string {
 	if !m.ShowPercentage {
 		return ""
 	}
@@ -352,7 +352,7 @@ func (m *Model) setRamp(colorA, colorB string, scaled bool) {
 	m.rampColorB = b
 }
 
-func (m Model) color(c string) termenv.Color {
+func (m *Model) color(c string) termenv.Color {
 	return m.colorProfile.Color(c)
 }
 

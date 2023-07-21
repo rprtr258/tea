@@ -17,11 +17,11 @@ type testModel struct {
 	counter  atomic.Value
 }
 
-func (m testModel) Init() Cmd {
+func (m *testModel) Init() Cmd {
 	return nil
 }
 
-func (m *testModel) Update(msg Msg) (*testModel, Cmd) {
+func (m *testModel) Update(msg Msg) Cmd {
 	switch msg.(type) {
 	case incrementMsg:
 		i := m.counter.Load()
@@ -32,10 +32,10 @@ func (m *testModel) Update(msg Msg) (*testModel, Cmd) {
 		}
 
 	case MsgKey:
-		return m, Quit
+		return Quit
 	}
 
-	return m, nil
+	return nil
 }
 
 func (m *testModel) View(r Renderer) {

@@ -95,7 +95,7 @@ func cvvValidator(s string) error {
 	return err
 }
 
-func initialModel() model {
+func initialModel() *model {
 	var inputs []textinput.Model = make([]textinput.Model, 3)
 	inputs[ccn] = textinput.New()
 	inputs[ccn].Placeholder = "4505 **** **** 1234"
@@ -119,18 +119,18 @@ func initialModel() model {
 	inputs[cvv].Prompt = ""
 	inputs[cvv].Validate = cvvValidator
 
-	return model{
+	return &model{
 		inputs:  inputs,
 		focused: 0,
 		err:     nil,
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd = make([]tea.Cmd, len(m.inputs))
 
 	switch msg := msg.(type) {
@@ -138,11 +138,11 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.focused == len(m.inputs)-1 {
-				return m, tea.Quit
+				return tea.Quit
 			}
 			m.nextInput()
 		case tea.KeyCtrlC, tea.KeyEsc:
-			return m, tea.Quit
+			return tea.Quit
 		case tea.KeyShiftTab, tea.KeyCtrlP:
 			m.prevInput()
 		case tea.KeyTab, tea.KeyCtrlN:
@@ -156,16 +156,16 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	// We handle errors just like any other message
 	case errMsg:
 		m.err = msg
-		return m, nil
+		return nil
 	}
 
 	for i := range m.inputs {
-		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
+		cmds[i] = m.inputs[i].Update(msg)
 	}
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(fmt.Sprintf(
 		` Total: $21.50:
 

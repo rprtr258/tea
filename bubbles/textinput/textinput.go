@@ -190,12 +190,12 @@ func (m *Model) setValueInternal(runes []rune) {
 }
 
 // Value returns the value of the text input.
-func (m Model) Value() string {
+func (m *Model) Value() string {
 	return string(m.value)
 }
 
 // Position returns the cursor position.
-func (m Model) Position() int {
+func (m *Model) Position() int {
 	return m.pos
 }
 
@@ -217,7 +217,7 @@ func (m *Model) CursorEnd() {
 }
 
 // Focused returns the focus state on the model.
-func (m Model) Focused() bool {
+func (m *Model) Focused() bool {
 	return m.focus
 }
 
@@ -511,7 +511,7 @@ func (m *Model) wordForward() {
 	}
 }
 
-func (m Model) echoTransform(v string) string {
+func (m *Model) echoTransform(v string) string {
 	switch m.EchoMode {
 	case EchoPassword:
 		return strings.Repeat(string(m.EchoCharacter), rw.StringWidth(v))
@@ -525,9 +525,9 @@ func (m Model) echoTransform(v string) string {
 }
 
 // Update is the Bubble Tea update loop.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	if !m.focus {
-		return m, nil
+		return nil
 	}
 
 	// Let's remember where the position of the cursor currently is so that if
@@ -573,7 +573,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case key.Matches(msg, m.KeyMap.DeleteBeforeCursor):
 			m.deleteBeforeCursor()
 		case key.Matches(msg, m.KeyMap.Paste):
-			return m, Paste
+			return Paste
 		case key.Matches(msg, m.KeyMap.DeleteWordForward):
 			m.deleteWordForward()
 		default:
@@ -588,23 +588,18 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.Err = msg
 	}
 
-	var cmds []tea.Cmd
-	var cmd tea.Cmd
-
-	m.Cursor, cmd = m.Cursor.Update(msg)
-	cmds = append(cmds, cmd)
-
+	cmds := []tea.Cmd{m.Cursor.Update(msg)}
 	if oldPos != m.pos && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
 		cmds = append(cmds, m.Cursor.BlinkCmd())
 	}
 
 	m.handleOverflow()
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
 // View renders the textinput in its current state.
-func (m Model) View() string {
+func (m *Model) View() string {
 	// Placeholder text
 	if len(m.value) == 0 && m.Placeholder != "" {
 		return m.placeholderView()
@@ -641,7 +636,7 @@ func (m Model) View() string {
 }
 
 // placeholderView returns the prompt and placeholder view, if any.
-func (m Model) placeholderView() string {
+func (m *Model) placeholderView() string {
 	var (
 		v     string
 		p     = m.Placeholder
@@ -712,7 +707,7 @@ func (c CursorMode) String() string {
 }
 
 // Deprecated: use cursor.Mode().
-func (m Model) CursorMode() CursorMode {
+func (m *Model) CursorMode() CursorMode {
 	return CursorMode(m.Cursor.Mode())
 }
 

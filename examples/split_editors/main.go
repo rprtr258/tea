@@ -75,8 +75,8 @@ type model struct {
 	focus  int
 }
 
-func newModel() model {
-	m := model{
+func newModel() *model {
+	m := &model{
 		inputs: make([]textarea.Model, initialInputs),
 		help:   help.New(),
 		keymap: keymap{
@@ -110,11 +110,11 @@ func newModel() model {
 	return m
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
@@ -124,7 +124,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 			for i := range m.inputs {
 				m.inputs[i].Blur()
 			}
-			return m, tea.Quit
+			return tea.Quit
 		case key.Matches(msg, m.keymap.next):
 			m.inputs[m.focus].Blur()
 			m.focus++
@@ -159,12 +159,10 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 
 	// Update all textareas
 	for i := range m.inputs {
-		newModel, cmd := m.inputs[i].Update(msg)
-		m.inputs[i] = newModel
-		cmds = append(cmds, cmd)
+		cmds = append(cmds, m.inputs[i].Update(msg))
 	}
 
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
 func (m *model) sizeInputs() {
@@ -179,7 +177,7 @@ func (m *model) updateKeybindings() {
 	m.keymap.remove.SetEnabled(len(m.inputs) > minInputs)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	help := m.help.ShortHelpView([]key.Binding{
 		m.keymap.next,
 		m.keymap.prev,

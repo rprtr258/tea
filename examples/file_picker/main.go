@@ -26,24 +26,23 @@ func clearErrorAfter(t time.Duration) tea.Cmd {
 	})
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.filepicker.Init()
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		}
 	case clearErrorMsg:
 		m.err = nil
 	}
 
-	var cmd tea.Cmd
-	m.filepicker, cmd = m.filepicker.Update(msg)
+	cmd := m.filepicker.Update(msg)
 
 	// Did the user select a file?
 	if didSelect, path := m.filepicker.DidSelectFile(msg); didSelect {
@@ -57,13 +56,13 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		// Let's clear the selectedFile and display an error.
 		m.err = errors.New(path + " is not valid.")
 		m.selectedFile = ""
-		return m, tea.Batch(cmd, clearErrorAfter(2*time.Second))
+		return tea.Batch(cmd, clearErrorAfter(2*time.Second))
 	}
 
-	return m, cmd
+	return cmd
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.quitting {
 		r.Write("")
 		return
@@ -88,7 +87,7 @@ func Main() {
 	fp.AllowedTypes = []string{".mod", ".sum", ".go", ".txt", ".md"}
 	fp.CurrentDirectory, _ = os.UserHomeDir()
 
-	m := model{
+	m := &model{
 		filepicker: fp,
 	}
 	mm, _ := tea.NewProgram(m).WithOutput(os.Stderr).Run()

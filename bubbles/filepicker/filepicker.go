@@ -193,17 +193,17 @@ func newStack() stack {
 	}
 }
 
-func (m Model) pushView() {
+func (m *Model) pushView() {
 	m.minStack.Push(m.min)
 	m.maxStack.Push(m.max)
 	m.selectedStack.Push(m.selected)
 }
 
-func (m Model) popView() (int, int, int) {
+func (m *Model) popView() (int, int, int) {
 	return m.selectedStack.Pop(), m.minStack.Pop(), m.maxStack.Pop()
 }
 
-func (m Model) readDir(path string, showHidden bool) tea.Cmd {
+func (m *Model) readDir(path string, showHidden bool) tea.Cmd {
 	return func() tea.Msg {
 		dirEntries, err := os.ReadDir(path)
 		if err != nil {
@@ -234,12 +234,12 @@ func (m Model) readDir(path string, showHidden bool) tea.Cmd {
 }
 
 // Init initializes the file picker model.
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return m.readDir(m.CurrentDirectory, m.ShowHidden)
 }
 
 // Update handles user interactions within the file picker model.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case readDirMsg:
 		if msg.id != m.id {
@@ -313,7 +313,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				m.min = 0
 				m.max = m.Height - 1
 			}
-			return m, m.readDir(m.CurrentDirectory, m.ShowHidden)
+			return m.readDir(m.CurrentDirectory, m.ShowHidden)
 		case key.Matches(msg, m.KeyMap.Open):
 			if len(m.files) == 0 {
 				break
@@ -354,14 +354,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.selected = 0
 			m.min = 0
 			m.max = m.Height - 1
-			return m, m.readDir(m.CurrentDirectory, m.ShowHidden)
+			return m.readDir(m.CurrentDirectory, m.ShowHidden)
 		}
 	}
-	return m, nil
+	return nil
 }
 
 // View returns the view of the file picker.
-func (m Model) View() string {
+func (m *Model) View() string {
 	if len(m.files) == 0 {
 		return m.Styles.EmptyDirectory.String()
 	}
@@ -425,7 +425,7 @@ func (m Model) View() string {
 }
 
 // DidSelectFile returns whether a user has selected a file (on this msg).
-func (m Model) DidSelectFile(msg tea.Msg) (bool, string) {
+func (m *Model) DidSelectFile(msg tea.Msg) (bool, string) {
 	didSelect, path := m.didSelectFile(msg)
 	return didSelect && m.canSelect(path), path
 }
@@ -433,7 +433,7 @@ func (m Model) DidSelectFile(msg tea.Msg) (bool, string) {
 // DidSelectDisabledFile returns whether a user tried to select a disabled file
 // (on this msg). This is necessary only if you would like to warn the user that
 // they tried to select a disabled file.
-func (m Model) DidSelectDisabledFile(msg tea.Msg) (bool, string) {
+func (m *Model) DidSelectDisabledFile(msg tea.Msg) (bool, string) {
 	didSelect, path := m.didSelectFile(msg)
 	if didSelect && !m.canSelect(path) {
 		return true, path
@@ -441,7 +441,7 @@ func (m Model) DidSelectDisabledFile(msg tea.Msg) (bool, string) {
 	return false, ""
 }
 
-func (m Model) didSelectFile(msg tea.Msg) (bool, string) {
+func (m *Model) didSelectFile(msg tea.Msg) (bool, string) {
 	if len(m.files) == 0 {
 		return false, ""
 	}
@@ -486,7 +486,7 @@ func (m Model) didSelectFile(msg tea.Msg) (bool, string) {
 	return false, ""
 }
 
-func (m Model) canSelect(file string) bool {
+func (m *Model) canSelect(file string) bool {
 	if len(m.AllowedTypes) == 0 {
 		return true
 	}

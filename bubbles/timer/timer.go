@@ -106,13 +106,13 @@ func New(timeout time.Duration) Model {
 
 // ID returns the model's identifier. This can be used to determine if messages
 // belong to this timer instance when there are multiple timers.
-func (m Model) ID() int {
+func (m *Model) ID() int {
 	return m.id
 }
 
 // Running returns whether or not the timer is running. If the timer has timed
 // out this will always return false.
-func (m Model) Running() bool {
+func (m *Model) Running() bool {
 	if m.Timedout() || !m.running {
 		return false
 	}
@@ -120,38 +120,38 @@ func (m Model) Running() bool {
 }
 
 // Timedout returns whether or not the timer has timed out.
-func (m Model) Timedout() bool {
+func (m *Model) Timedout() bool {
 	return m.Timeout <= 0
 }
 
 // Init starts the timer.
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return m.tick()
 }
 
 // Update handles the timer tick.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case StartStopMsg:
 		if msg.ID != 0 && msg.ID != m.id {
-			return m, nil
+			return nil
 		}
 		m.running = msg.running
-		return m, m.tick()
+		return m.tick()
 	case TickMsg:
 		if !m.Running() || (msg.ID != 0 && msg.ID != m.id) {
 			break
 		}
 
 		m.Timeout -= m.Interval
-		return m, tea.Batch(m.tick(), m.timedout())
+		return tea.Batch(m.tick(), m.timedout())
 	}
 
-	return m, nil
+	return nil
 }
 
 // View of the timer component.
-func (m Model) View() string {
+func (m *Model) View() string {
 	return m.Timeout.String()
 }
 
@@ -170,13 +170,13 @@ func (m *Model) Toggle() tea.Cmd {
 	return m.startStop(!m.Running())
 }
 
-func (m Model) tick() tea.Cmd {
+func (m *Model) tick() tea.Cmd {
 	return tea.Tick(m.Interval, func(_ time.Time) tea.Msg {
 		return TickMsg{ID: m.id, Timeout: m.Timedout()}
 	})
 }
 
-func (m Model) timedout() tea.Cmd {
+func (m *Model) timedout() tea.Cmd {
 	if !m.Timedout() {
 		return nil
 	}
@@ -185,7 +185,7 @@ func (m Model) timedout() tea.Cmd {
 	}
 }
 
-func (m Model) startStop(v bool) tea.Cmd {
+func (m *Model) startStop(v bool) tea.Cmd {
 	return func() tea.Msg {
 		return StartStopMsg{ID: m.id, running: v}
 	}

@@ -29,7 +29,7 @@ var (
 )
 
 func Main() {
-	m := model{}
+	m := &model{}
 	m.resetSpinner()
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
@@ -43,39 +43,37 @@ type model struct {
 	spinner spinner.Model
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			return m, tea.Quit
+			return tea.Quit
 		case "h", "left":
 			m.index--
 			if m.index < 0 {
 				m.index = len(spinners) - 1
 			}
 			m.resetSpinner()
-			return m, m.spinner.Tick
+			return m.spinner.Tick
 		case "l", "right":
 			m.index++
 			if m.index >= len(spinners) {
 				m.index = 0
 			}
 			m.resetSpinner()
-			return m, m.spinner.Tick
+			return m.spinner.Tick
 		default:
-			return m, nil
+			return nil
 		}
 	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return m.spinner.Update(msg)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
@@ -85,7 +83,7 @@ func (m *model) resetSpinner() {
 	m.spinner.Spinner = spinners[m.index]
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	var gap string
 	switch m.index {
 	case 1:

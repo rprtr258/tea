@@ -42,38 +42,36 @@ type model struct {
 	quitting bool
 }
 
-func newModel() model {
+func newModel() *model {
 	const numLastResults = 5
 	s := spinner.New()
 	s.Style = spinnerStyle
-	return model{
+	return &model{
 		spinner: s,
 		results: make([]resultMsg, numLastResults),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return m, tea.Quit
+		return tea.Quit
 	case resultMsg:
 		m.results = append(m.results[1:], msg)
-		return m, nil
+		return nil
 	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return m.spinner.Update(msg)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	var s string
 
 	if m.quitting {

@@ -26,11 +26,11 @@ type model struct {
 	err             error
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -40,22 +40,22 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 			if !m.altscreenActive {
 				cmd = tea.ExitAltScreen
 			}
-			return m, cmd
+			return cmd
 		case "e":
-			return m, openEditor()
+			return openEditor()
 		case "ctrl+c", "q":
-			return m, tea.Quit
+			return tea.Quit
 		}
 	case editorFinishedMsg:
 		if msg.err != nil {
 			m.err = msg.err
-			return m, tea.Quit
+			return tea.Quit
 		}
 	}
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.err != nil {
 		r.Write("Error: " + m.err.Error() + "\n")
 		return
@@ -66,8 +66,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	m := model{}
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}

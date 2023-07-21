@@ -13,7 +13,7 @@ import (
 	"github.com/rprtr258/tea/bubbles/progress"
 )
 
-var p *tea.Program[model]
+var p *tea.Program[*model]
 
 type progressWriter struct {
 	total      int
@@ -90,7 +90,7 @@ func Main() {
 		},
 	}
 
-	m := model{
+	m := &model{
 		pw:       pw,
 		progress: progress.New(progress.WithDefaultGradient()),
 	}

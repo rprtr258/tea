@@ -26,16 +26,16 @@ type model struct {
 	tag int
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		// Increment the tag on the model...
 		m.tag++
-		return m, tea.Tick(debounceDuration, func(_ time.Time) tea.Msg {
+		return tea.Tick(debounceDuration, func(_ time.Time) tea.Msg {
 			// ...and include a copy of that tag value in the message.
 			return exitMsg(m.tag)
 		})
@@ -46,20 +46,20 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		// Otherwise, the debounce timeout has passed and this message is a
 		// valid debounced one.
 		if int(msg) == m.tag {
-			return m, tea.Quit
+			return tea.Quit
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(fmt.Sprintf("Key presses: %d", m.tag) +
 		"\nTo exit press any key, then wait for one second without pressing anything.")
 }
 
 func Main() {
-	if _, err := tea.NewProgram(model{}).Run(); err != nil {
+	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
 		fmt.Println("uh oh:", err)
 		os.Exit(1)
 	}

@@ -39,8 +39,7 @@ var (
 )
 
 func Main() {
-	initialModel := model{0, false, 10, 0, 0, false, false}
-	p := tea.NewProgram(initialModel)
+	p := tea.NewProgram(&model{0, false, 10, 0, 0, false, false})
 	if _, err := p.Run(); err != nil {
 		fmt.Println("could not start program:", err)
 	}
@@ -73,18 +72,18 @@ type model struct {
 	Quitting bool
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tick()
 }
 
 // Main update function.
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	// Make sure these keys always quit
 	if msg, ok := msg.(tea.MsgKey); ok {
 		k := msg.String()
 		if k == "q" || k == "esc" || k == "ctrl+c" {
 			m.Quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		}
 	}
 
@@ -97,7 +96,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 }
 
 // The main view, which just calls the appropriate sub-view
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.Quitting {
 		r.Write("\n  See you later!\n\n")
 		return
@@ -116,7 +115,7 @@ func (m model) View(r tea.Renderer) {
 // Sub-update functions
 
 // Update loop for the first view where you're choosing a task.
-func updateChoices(msg tea.Msg, m model) (model, tea.Cmd) {
+func updateChoices(msg tea.Msg, m *model) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -132,23 +131,23 @@ func updateChoices(msg tea.Msg, m model) (model, tea.Cmd) {
 			}
 		case "enter":
 			m.Chosen = true
-			return m, frame()
+			return frame()
 		}
 
 	case tickMsg:
 		if m.Ticks == 0 {
 			m.Quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		}
 		m.Ticks--
-		return m, tick()
+		return tick()
 	}
 
-	return m, nil
+	return nil
 }
 
 // Update loop for the second view after a choice has been made
-func updateChosen(msg tea.Msg, m model) (model, tea.Cmd) {
+func updateChosen(msg tea.Msg, m *model) tea.Cmd {
 	switch msg.(type) {
 	case frameMsg:
 		if !m.Loaded {
@@ -158,29 +157,29 @@ func updateChosen(msg tea.Msg, m model) (model, tea.Cmd) {
 				m.Progress = 1
 				m.Loaded = true
 				m.Ticks = 3
-				return m, tick()
+				return tick()
 			}
-			return m, frame()
+			return frame()
 		}
 
 	case tickMsg:
 		if m.Loaded {
 			if m.Ticks == 0 {
 				m.Quitting = true
-				return m, tea.Quit
+				return tea.Quit
 			}
 			m.Ticks--
-			return m, tick()
+			return tick()
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
 // Sub-views
 
 // The first view, where you're choosing a task
-func choicesView(m model) string {
+func choicesView(m *model) string {
 	c := m.Choice
 
 	tpl := "What to do today?\n\n"
@@ -200,7 +199,7 @@ func choicesView(m model) string {
 }
 
 // The second view, after a task has been chosen
-func chosenView(m model) string {
+func chosenView(m *model) string {
 	var msg string
 
 	switch m.Choice {

@@ -15,26 +15,26 @@ type model struct {
 	activeTab  int
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch keypress := msg.String(); keypress {
 		case "ctrl+c", "q":
-			return m, tea.Quit
+			return tea.Quit
 		case "right", "l", "n", "tab":
 			m.activeTab = min(m.activeTab+1, len(m.Tabs)-1)
-			return m, nil
+			return nil
 		case "left", "h", "p", "shift+tab":
 			m.activeTab = max(m.activeTab-1, 0)
-			return m, nil
+			return nil
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
 func tabBorderWithBottom(left, middle, right string) lipgloss.Border {
@@ -55,7 +55,7 @@ var (
 	windowStyle       = lipgloss.NewStyle().BorderForeground(highlightColor).Padding(2, 0).Align(lipgloss.Center).Border(lipgloss.NormalBorder()).UnsetBorderTop()
 )
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	doc := strings.Builder{}
 
 	var renderedTabs []string
@@ -92,7 +92,7 @@ func (m model) View(r tea.Renderer) {
 func Main() {
 	tabs := []string{"Lip Gloss", "Blush", "Eye Shadow", "Mascara", "Foundation"}
 	tabContent := []string{"Lip Gloss Tab", "Blush Tab", "Eye Shadow Tab", "Mascara Tab", "Foundation Tab"}
-	m := model{Tabs: tabs, TabContent: tabContent}
+	m := &model{Tabs: tabs, TabContent: tabContent}
 	if _, err := tea.NewProgram(m).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
