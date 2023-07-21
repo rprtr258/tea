@@ -1108,17 +1108,18 @@ func (m Model) statusView() string {
 	itemsDisplay := fmt.Sprintf("%d %s", visibleItems, itemName)
 
 	var status string
-	if m.filterState == Filtering {
+	switch {
+	case m.filterState == Filtering:
 		// Filter results
 		if visibleItems == 0 {
 			status = m.Styles.StatusEmpty.Render("Nothing matched")
 		} else {
 			status = itemsDisplay
 		}
-	} else if len(m.items) == 0 {
+	case len(m.items) == 0:
 		// Not filtering: no items.
 		status = m.Styles.StatusEmpty.Render("No " + m.itemNamePlural)
-	} else {
+	default:
 		// Normal
 		filtered := m.FilterState() == FilterApplied
 

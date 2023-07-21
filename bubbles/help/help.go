@@ -163,16 +163,10 @@ func (m Model) FullHelpView(groups [][]key.Binding) string {
 		return ""
 	}
 
-	// Linter note: at this time we don't think it's worth the additional
-	// code complexity involved in preallocating this slice.
-	//nolint:prealloc
-	var (
-		out []string
-
-		totalWidth int
-		sep        = m.Styles.FullSeparator.Render(m.FullSeparator)
-		sepWidth   = lipgloss.Width(sep)
-	)
+	var totalWidth int
+	out := make([]string, 0, len(groups))
+	sep := m.Styles.FullSeparator.Render(m.FullSeparator)
+	sepWidth := lipgloss.Width(sep)
 
 	// Iterate over groups to build columns
 	for i, group := range groups {
@@ -222,7 +216,7 @@ func (m Model) FullHelpView(groups [][]key.Binding) string {
 	return lipgloss.JoinHorizontal(lipgloss.Top, out...)
 }
 
-func shouldRenderColumn(b []key.Binding) (ok bool) {
+func shouldRenderColumn(b []key.Binding) bool {
 	for _, v := range b {
 		if v.Enabled() {
 			return true

@@ -136,24 +136,20 @@ func (d DefaultDelegate) Update(msg tea.Msg, m *Model) tea.Cmd {
 
 // Render prints an item.
 func (d DefaultDelegate) Render(w io.Writer, m Model, index int, item Item) {
-	var (
-		title, desc  string
-		matchedRunes []int
-		s            = &d.Styles
-	)
-
-	if i, ok := item.(DefaultItem); ok {
-		title = i.Title()
-		desc = i.Description()
-	} else {
+	i, ok := item.(DefaultItem)
+	if !ok {
 		return
 	}
+
+	title := i.Title()
+	desc := i.Description()
 
 	if m.width <= 0 {
 		// short-circuit
 		return
 	}
 
+	s := &d.Styles
 	// Prevent text from exceeding list width
 	textwidth := uint(m.width - s.NormalTitle.GetPaddingLeft() - s.NormalTitle.GetPaddingRight())
 	title = truncate.StringWithTail(title, textwidth, ellipsis)
@@ -175,15 +171,17 @@ func (d DefaultDelegate) Render(w io.Writer, m Model, index int, item Item) {
 		isFiltered  = m.FilterState() == Filtering || m.FilterState() == FilterApplied
 	)
 
+	var matchedRunes []int
 	if isFiltered && index < len(m.filteredItems) {
 		// Get indices of matched characters
 		matchedRunes = m.MatchesForItem(index)
 	}
 
-	if emptyFilter {
+	switch {
+	case emptyFilter:
 		title = s.DimmedTitle.Render(title)
 		desc = s.DimmedDesc.Render(desc)
-	} else if isSelected && m.FilterState() != Filtering {
+	case isSelected && m.FilterState() != Filtering:
 		if isFiltered {
 			// Highlight matches
 			unmatched := s.SelectedTitle.Inline(true)
@@ -192,7 +190,7 @@ func (d DefaultDelegate) Render(w io.Writer, m Model, index int, item Item) {
 		}
 		title = s.SelectedTitle.Render(title)
 		desc = s.SelectedDesc.Render(desc)
-	} else {
+	default:
 		if isFiltered {
 			// Highlight matches
 			unmatched := s.NormalTitle.Inline(true)

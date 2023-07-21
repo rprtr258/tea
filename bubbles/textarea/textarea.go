@@ -669,11 +669,9 @@ func (m *Model) deleteWordRight() {
 func (m *Model) characterRight() {
 	if m.col < len(m.value[m.row]) {
 		m.SetCursor(m.col + 1)
-	} else {
-		if m.row < len(m.value)-1 {
-			m.row++
-			m.CursorStart()
-		}
+	} else if m.row < len(m.value)-1 {
+		m.row++
+		m.CursorStart()
 	}
 }
 
@@ -1222,7 +1220,7 @@ func (m *Model) mergeLineAbove(row int) {
 	}
 
 	m.col = len(m.value[row-1])
-	m.row = m.row - 1
+	m.row--
 
 	// To perform a merge, we will need to combine the two lines and then
 	m.value[row-1] = append(m.value[row-1], m.value[row]...)

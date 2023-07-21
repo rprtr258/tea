@@ -127,7 +127,10 @@ func DefaultStylesWithRenderer(r *lipgloss.Renderer) Styles {
 		Permission:       r.NewStyle().Foreground(lipgloss.Color("244")),
 		Selected:         r.NewStyle().Foreground(lipgloss.Color("212")).Bold(true),
 		FileSize:         r.NewStyle().Foreground(lipgloss.Color("240")).Width(fileSizeWidth).Align(lipgloss.Right),
-		EmptyDirectory:   r.NewStyle().Foreground(lipgloss.Color("240")).PaddingLeft(paddingLeft).SetString("Bummer. No Files Found."),
+		EmptyDirectory: r.NewStyle().
+			Foreground(lipgloss.Color("240")).
+			PaddingLeft(paddingLeft).
+			SetString("Bummer. No Files Found."),
 	}
 }
 
@@ -396,11 +399,12 @@ func (m Model) View() string {
 		}
 
 		style := m.Styles.File
-		if f.IsDir() {
+		switch {
+		case f.IsDir():
 			style = m.Styles.Directory
-		} else if isSymlink {
+		case isSymlink:
 			style = m.Styles.Symlink
-		} else if disabled {
+		case disabled:
 			style = m.Styles.DisabledFile
 		}
 
@@ -408,7 +412,12 @@ func (m Model) View() string {
 		if isSymlink {
 			fileName = fmt.Sprintf("%s → %s", fileName, symlinkPath)
 		}
-		s.WriteString(fmt.Sprintf("  %s %s %s", m.Styles.Permission.Render(info.Mode().String()), m.Styles.FileSize.Render(size), fileName))
+		s.WriteString(fmt.Sprintf(
+			"  %s %s %s",
+			m.Styles.Permission.Render(info.Mode().String()),
+			m.Styles.FileSize.Render(size),
+			fileName,
+		))
 		s.WriteRune('\n')
 	}
 
@@ -478,7 +487,7 @@ func (m Model) didSelectFile(msg tea.Msg) (bool, string) {
 }
 
 func (m Model) canSelect(file string) bool {
-	if len(m.AllowedTypes) <= 0 {
+	if len(m.AllowedTypes) == 0 {
 		return true
 	}
 

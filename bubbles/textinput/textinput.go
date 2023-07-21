@@ -561,8 +561,6 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			if m.pos < len(m.value) {
 				m.SetCursor(m.pos + 1)
 			}
-		case key.Matches(msg, m.KeyMap.DeleteWordBackward):
-			m.deleteWordBackward()
 		case key.Matches(msg, m.KeyMap.LineStart):
 			m.CursorStart()
 		case key.Matches(msg, m.KeyMap.DeleteCharacterForward):
