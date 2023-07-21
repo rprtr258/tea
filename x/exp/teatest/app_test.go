@@ -33,10 +33,10 @@ func TestApp(t *testing.T) {
 	assert.NoError(t, tm.Quit())
 
 	out := readBts(t, tm.FinalOutput(t, teatest.WithFinalTimeout(time.Second)))
-	assert.Regexp(t, `This program will exit in \d+ seconds`, out)
+	assert.Regexp(t, `This program will exit in \d+ seconds`, string(out))
 	teatest.RequireEqualOutput(t, out)
 
-	assert.Equal(t, 9, tm.FinalModel(t))
+	assert.Equal(t, model(9), tm.FinalModel(t))
 }
 
 func TestAppInteractive(t *testing.T) {
@@ -59,7 +59,7 @@ func TestAppInteractive(t *testing.T) {
 
 	assert.NoError(t, tm.Quit())
 
-	assert.Equal(t, 7, tm.FinalModel(t))
+	assert.Equal(t, model(7), tm.FinalModel(t))
 }
 
 func readBts(t *testing.T, r io.Reader) []byte {
