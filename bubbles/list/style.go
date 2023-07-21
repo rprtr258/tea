@@ -41,10 +41,11 @@ type Styles struct {
 
 // DefaultStyles returns a set of default style definitions for this list
 // component.
-func DefaultStyles() (s Styles) {
+func DefaultStyles() Styles {
 	verySubduedColor := lipgloss.AdaptiveColor{Light: "#DDDADA", Dark: "#3C3C3C"}
 	subduedColor := lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"}
 
+	var s Styles
 	s.TitleBar = lipgloss.NewStyle().Padding(0, 0, 1, 2)
 
 	s.Title = lipgloss.NewStyle().

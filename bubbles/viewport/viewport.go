@@ -11,9 +11,11 @@ import (
 
 // New returns a new model with the given width and height as well as default
 // key mappings.
-func New(width, height int) (m Model) {
-	m.Width = width
-	m.Height = height
+func New(width, height int) Model {
+	m := Model{
+		Width:  width,
+		Height: height,
+	}
 	m.setInitialValues()
 	return m
 }
@@ -116,13 +118,14 @@ func (m Model) maxYOffset() int {
 
 // visibleLines returns the lines that should currently be visible in the
 // viewport.
-func (m Model) visibleLines() (lines []string) {
-	if len(m.lines) > 0 {
-		top := max(0, m.YOffset)
-		bottom := clamp(m.YOffset+m.Height, top, len(m.lines))
-		lines = m.lines[top:bottom]
+func (m Model) visibleLines() []string {
+	if len(m.lines) == 0 {
+		return nil
 	}
-	return lines
+
+	top := max(0, m.YOffset)
+	bottom := clamp(m.YOffset+m.Height, top, len(m.lines))
+	return m.lines[top:bottom]
 }
 
 // scrollArea returns the scrollable boundaries for high performance rendering.
@@ -160,7 +163,7 @@ func (m *Model) ViewUp() []string {
 }
 
 // HalfViewDown moves the view down by half the height of the viewport.
-func (m *Model) HalfViewDown() (lines []string) {
+func (m *Model) HalfViewDown() []string {
 	if m.AtBottom() {
 		return nil
 	}
@@ -169,7 +172,7 @@ func (m *Model) HalfViewDown() (lines []string) {
 }
 
 // HalfViewUp moves the view up by half the height of the viewport.
-func (m *Model) HalfViewUp() (lines []string) {
+func (m *Model) HalfViewUp() []string {
 	if m.AtTop() {
 		return nil
 	}
@@ -178,7 +181,7 @@ func (m *Model) HalfViewUp() (lines []string) {
 }
 
 // LineDown moves the view down by the given number of lines.
-func (m *Model) LineDown(n int) (lines []string) {
+func (m *Model) LineDown(n int) []string {
 	if m.AtBottom() || n == 0 || len(m.lines) == 0 {
 		return nil
 	}
@@ -196,7 +199,7 @@ func (m *Model) LineDown(n int) (lines []string) {
 
 // LineUp moves the view down by the given number of lines. Returns the new
 // lines to show.
-func (m *Model) LineUp(n int) (lines []string) {
+func (m *Model) LineUp(n int) []string {
 	if m.AtTop() || n == 0 || len(m.lines) == 0 {
 		return nil
 	}
@@ -222,7 +225,7 @@ func (m Model) VisibleLineCount() int {
 }
 
 // GotoTop sets the viewport to the top position.
-func (m *Model) GotoTop() (lines []string) {
+func (m *Model) GotoTop() []string {
 	if m.AtTop() {
 		return nil
 	}
@@ -232,7 +235,7 @@ func (m *Model) GotoTop() (lines []string) {
 }
 
 // GotoBottom sets the viewport to the bottom position.
-func (m *Model) GotoBottom() (lines []string) {
+func (m *Model) GotoBottom() []string {
 	m.SetYOffset(m.maxYOffset())
 	return m.visibleLines()
 }

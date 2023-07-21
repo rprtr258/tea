@@ -1272,7 +1272,8 @@ func removeFilterMatchFromSlice(i []filteredItem, index int) []filteredItem {
 	return i[:len(i)-1]
 }
 
-func countEnabledBindings(groups [][]key.Binding) (agg int) {
+func countEnabledBindings(groups [][]key.Binding) int {
+	agg := 0
 	for _, group := range groups {
 		for _, kb := range group {
 			if kb.Enabled() {

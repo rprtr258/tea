@@ -1,6 +1,8 @@
 package tea
 
-import "time"
+import (
+	"time"
+)
 
 // BatchMsg is a message used to perform a bunch of commands concurrently with
 // no ordering guarantees. You can send a BatchMsg with Batch.
@@ -9,15 +11,23 @@ type BatchMsg []Cmd
 // Batch performs a bunch of commands concurrently with no ordering guarantees
 // about the results. Use a Batch to return several commands.
 func Batch(cmds ...Cmd) Cmd {
-	var validCmds []Cmd //nolint:prealloc
+	count := 0
+	for _, c := range cmds {
+		if c != nil {
+			count++
+		}
+	}
+
+	if count == 0 {
+		return nil
+	}
+
+	validCmds := make([]Cmd, 0, count)
 	for _, c := range cmds {
 		if c == nil {
 			continue
 		}
 		validCmds = append(validCmds, c)
-	}
-	if len(validCmds) == 0 {
-		return nil
 	}
 	return func() Msg {
 		return BatchMsg(validCmds)

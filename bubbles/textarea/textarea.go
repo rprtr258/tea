@@ -1122,12 +1122,12 @@ func (m Model) View() string {
 	return m.style.Base.Render(m.viewport.View())
 }
 
-func (m Model) getPromptString(displayLine int) (prompt string) {
-	prompt = m.Prompt
+func (m Model) getPromptString(displayLine int) string {
 	if m.promptFunc == nil {
-		return prompt
+		return m.Prompt
 	}
-	prompt = m.promptFunc(displayLine)
+
+	prompt := m.promptFunc(displayLine)
 	pl := rw.StringWidth(prompt)
 	if pl < m.promptWidth {
 		prompt = fmt.Sprintf("%*s%s", m.promptWidth-pl, "", prompt)

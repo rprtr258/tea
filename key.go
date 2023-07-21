@@ -45,7 +45,7 @@ type MsgKey Key
 
 // String returns a string representation for a key message. It's safe (and
 // encouraged) for use in key comparison.
-func (k MsgKey) String() (str string) {
+func (k MsgKey) String() string {
 	return Key(k).String()
 }
 
@@ -62,7 +62,8 @@ type Key struct {
 //	k := Key{Type: KeyEnter}
 //	fmt.Println(k)
 //	// Output: enter
-func (k Key) String() (str string) {
+func (k Key) String() string {
+	str := ""
 	if k.Alt {
 		str += "alt+"
 	}
@@ -92,11 +93,8 @@ func (k Key) String() (str string) {
 //	}
 type KeyType int
 
-func (k KeyType) String() (str string) {
-	if s, ok := keyNames[k]; ok {
-		return s
-	}
-	return ""
+func (k KeyType) String() string {
+	return keyNames[k]
 }
 
 // Control keys. We could do this with an iota, but the values are very

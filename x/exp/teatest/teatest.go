@@ -298,7 +298,7 @@ type safeReadWriter struct {
 }
 
 // Read implements io.ReadWriter.
-func (s *safeReadWriter) Read(p []byte) (n int, err error) {
+func (s *safeReadWriter) Read(p []byte) (int, error) {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	return s.rw.Read(p) //nolint: wrapcheck

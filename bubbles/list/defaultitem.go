@@ -32,7 +32,8 @@ type DefaultItemStyles struct {
 
 // NewDefaultItemStyles returns style definitions for a default item. See
 // DefaultItemView for when these come into play.
-func NewDefaultItemStyles() (s DefaultItemStyles) {
+func NewDefaultItemStyles() DefaultItemStyles {
+	var s DefaultItemStyles
 	s.NormalTitle = lipgloss.NewStyle().
 		Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}).
 		Padding(0, 0, 0, 2)

@@ -29,7 +29,7 @@ func checkServer() tea.Msg {
 
 type statusMsg int
 
-type errMsg struct{ err error }
+type errMsg struct{ err error } // TODO: rename all msgs to msgXxx
 
 // For messages that contain errors it's often handy to also implement the
 // error interface on the message.

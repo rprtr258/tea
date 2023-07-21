@@ -258,14 +258,20 @@ func TestVerticalNavigationKeepsCursorHorizontalPosition(t *testing.T) {
 	// ensuring that the column offset goes from 2 -> 4.
 
 	lineInfo := textarea.LineInfo()
-	assert.Equal(t, 4, lineInfo.CharOffset, "Expected cursor to be on the fourth character because there are two double width runes on the first line.")
+	assert.Equal(
+		t, 4, lineInfo.CharOffset,
+		"Expected cursor to be on the fourth character because there are two double width runes on the first line.",
+	)
 	assert.Equal(t, 2, lineInfo.ColumnOffset)
 
 	downMsg := tea.MsgKey{Type: tea.KeyDown, Alt: false, Runes: []rune{}}
 	textarea, _ = textarea.Update(downMsg)
 
 	lineInfo = textarea.LineInfo()
-	assert.Equal(t, 4, lineInfo.CharOffset, "Expected cursor to be on the fourth character because we came down from the first line.")
+	assert.Equal(
+		t, 4, lineInfo.CharOffset,
+		"Expected cursor to be on the fourth character because we came down from the first line.",
+	)
 	assert.Equal(t, 4, lineInfo.ColumnOffset)
 }
 

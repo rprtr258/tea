@@ -16,23 +16,20 @@ func TestGradient(t *testing.T) {
 	colA := "#FF0000"
 	colB := "#00FF00"
 
-	var p Model
-	var descr string
-
-	for _, scale := range []bool{false, true} {
-		opts := []Option{
-			WithColorProfile(termenv.TrueColor), WithoutPercentage(),
-		}
-		if scale {
-			descr = "progress bar with scaled gradient"
-			opts = append(opts, WithScaledGradient(colA, colB))
-		} else {
-			descr = "progress bar with gradient"
-			opts = append(opts, WithGradient(colA, colB))
-		}
-
-		t.Run(descr, func(t *testing.T) {
-			p = New(opts...)
+	for name, opts := range map[string][]Option{
+		"progress bar with gradient": {
+			WithColorProfile(termenv.TrueColor),
+			WithoutPercentage(),
+			WithGradient(colA, colB),
+		},
+		"progress bar with scaled gradient": {
+			WithColorProfile(termenv.TrueColor),
+			WithoutPercentage(),
+			WithScaledGradient(colA, colB),
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			p := New(opts...)
 
 			// build the expected colors by colorizing an empty string and then cutting off the following reset sequence
 			sb := strings.Builder{}

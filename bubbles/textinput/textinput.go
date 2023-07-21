@@ -533,7 +533,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 	// Let's remember where the position of the cursor currently is so that if
 	// the cursor position changes, we can reset the blink.
-	oldPos := m.pos //nolint
+	oldPos := m.pos
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:

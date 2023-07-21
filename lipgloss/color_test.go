@@ -210,7 +210,8 @@ func TestRGBA(t *testing.T) {
 // hexToColor translates a hex color string (#RRGGBB or #RGB) into a color.RGB,
 // which satisfies the color.Color interface. If an invalid string is passed
 // black with 100% opacity will be returned: or, in hex format, 0x000000FF.
-func hexToColor(hex string) (c color.RGBA) {
+func hexToColor(hex string) color.RGBA {
+	var c color.RGBA
 	c.A = 0xFF
 
 	if hex == "" || hex[0] != '#' {
