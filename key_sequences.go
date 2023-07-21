@@ -50,7 +50,7 @@ var seqLengths = func() []int {
 
 // detectSequence uses a longest prefix match over the input
 // sequence and a hash map.
-func detectSequence(input []byte) (hasSeq bool, width int, msg Msg) {
+func detectSequence(input []byte) (hasSeq bool, width int, msg Msg) { //nolint:nonamedreturns
 	seqs := extSequences
 	for _, sz := range seqLengths {
 		if sz > len(input) {

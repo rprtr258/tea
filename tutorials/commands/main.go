@@ -18,7 +18,7 @@ type model struct {
 
 func checkServer() tea.Msg {
 	c := &http.Client{Timeout: 10 * time.Second}
-	res, err := c.Get(url)
+	res, err := c.Get(url) //nolint:noctx
 	if err != nil {
 		return errMsg{err}
 	}

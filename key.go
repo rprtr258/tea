@@ -65,7 +65,7 @@ type Key struct {
 func (k Key) String() string {
 	str := ""
 	if k.Alt {
-		str += "alt+"
+		str += "alt+" //nolint:goconst
 	}
 	if k.Type == KeyRunes {
 		str += string(k.Runes)
@@ -568,7 +568,7 @@ func readInputs(ctx context.Context, msgs chan<- Msg, input io.Reader) error {
 
 var unknownCSIRe = regexp.MustCompile(`^\x1b\[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]`)
 
-func detectOneMsg(b []byte) (w int, msg Msg) {
+func detectOneMsg(b []byte) (int, Msg) {
 	// Detect mouse events.
 	const mouseEventLen = 6
 	if len(b) >= mouseEventLen && b[0] == '\x1b' && b[1] == '[' && b[2] == 'M' {
@@ -578,10 +578,9 @@ func detectOneMsg(b []byte) (w int, msg Msg) {
 	// Detect escape sequence and control characters other than NUL,
 	// possibly with an escape character in front to mark the Alt
 	// modifier.
-	var foundSeq bool
-	foundSeq, w, msg = detectSequence(b)
+	foundSeq, w, msg := detectSequence(b)
 	if foundSeq {
-		return
+		return w, msg
 	}
 
 	// No non-NUL control character or escape sequence.

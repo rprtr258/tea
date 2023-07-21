@@ -103,7 +103,7 @@ func (s Style) GetAlignVertical() Position {
 
 // GetPadding returns the style's top, right, bottom, and left padding values,
 // in that order. 0 is returned for unset values.
-func (s Style) GetPadding() (top, right, bottom, left int) {
+func (s Style) GetPadding() (top, right, bottom, left int) { //nolint:nonamedreturns
 	return s.getAsInt(paddingTopKey),
 		s.getAsInt(paddingRightKey),
 		s.getAsInt(paddingBottomKey),
@@ -154,7 +154,7 @@ func (s Style) GetColorWhitespace() bool {
 
 // GetMargin returns the style's top, right, bottom, and left margins, in that
 // order. 0 is returned for unset values.
-func (s Style) GetMargin() (top, right, bottom, left int) {
+func (s Style) GetMargin() (top, right, bottom, left int) { //nolint:nonamedreturns
 	return s.getAsInt(marginTopKey),
 		s.getAsInt(marginRightKey),
 		s.getAsInt(marginBottomKey),
@@ -201,7 +201,7 @@ func (s Style) GetVerticalMargins() int {
 // top, right, bottom, and left in that order. If no value is set for the
 // border style, Border{} is returned. For all other unset values false is
 // returned.
-func (s Style) GetBorder() (b Border, top, right, bottom, left bool) {
+func (s Style) GetBorder() (b Border, top, right, bottom, left bool) { //nolint:nonamedreturns
 	return s.getBorderStyle(),
 		s.getAsBool(borderTopKey, false),
 		s.getAsBool(borderRightKey, false),
@@ -400,7 +400,7 @@ func (s Style) GetVerticalFrameSize() int {
 
 // GetFrameSize returns the sum of the margins, padding and border width for
 // both the horizontal and vertical margins.
-func (s Style) GetFrameSize() (x, y int) {
+func (s Style) GetFrameSize() (x, y int) { //nolint:nonamedreturns
 	return s.GetHorizontalFrameSize(), s.GetVerticalFrameSize()
 }
 
@@ -467,7 +467,7 @@ func (s Style) getBorderStyle() Border {
 
 // Split a string into lines, additionally returning the size of the widest
 // line.
-func getLines(s string) (lines []string, widest int) {
+func getLines(s string) (lines []string, widest int) { //nolint:nonamedreturns
 	lines = strings.Split(s, "\n")
 
 	for _, l := range lines {

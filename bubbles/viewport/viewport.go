@@ -129,7 +129,7 @@ func (m Model) visibleLines() []string {
 }
 
 // scrollArea returns the scrollable boundaries for high performance rendering.
-func (m Model) scrollArea() (top, bottom int) {
+func (m Model) scrollArea() (top, bottom int) { //nolint:nonamedreturns
 	top = max(0, m.YPosition)
 	bottom = max(top, top+m.Height)
 	if top > 0 && bottom > top {

@@ -70,8 +70,18 @@ func (e *TableElement) Finish(w io.Writer, ctx RenderContext) error {
 	ctx.table.writer.Render()
 	ctx.table.writer = nil
 
-	renderText(ctx.table.styleWriter, ctx.options.ColorProfile, ctx.blockStack.With(rules.StylePrimitive), rules.Suffix)
-	renderText(ctx.table.styleWriter, ctx.options.ColorProfile, ctx.blockStack.Current().Style.StylePrimitive, rules.BlockSuffix)
+	renderText(
+		ctx.table.styleWriter,
+		ctx.options.ColorProfile,
+		ctx.blockStack.With(rules.StylePrimitive),
+		rules.Suffix,
+	)
+	renderText(
+		ctx.table.styleWriter,
+		ctx.options.ColorProfile,
+		ctx.blockStack.Current().Style.StylePrimitive,
+		rules.BlockSuffix,
+	)
 	return ctx.table.styleWriter.Close()
 }
 

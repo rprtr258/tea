@@ -1,7 +1,7 @@
 package tea
 
 // Renderer is the interface for Bubble Tea renderers.
-type Renderer interface {
+type Renderer interface { //nolint:interfacebloat
 	// Start the renderer.
 	start()
 

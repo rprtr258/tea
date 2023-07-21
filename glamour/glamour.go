@@ -19,7 +19,7 @@ import (
 
 // Default styles.
 const (
-	AsciiStyle   = "ascii"
+	ASCIIStyle   = "ascii"
 	AutoStyle    = "auto"
 	DarkStyle    = "dark"
 	DraculaStyle = "dracula"

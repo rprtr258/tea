@@ -806,7 +806,7 @@ func (m *Model) handleBrowsing(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 	numItems := len(m.VisibleItems())
 
-	switch msg := msg.(type) {
+	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {
 		// Note: we match clear filter before quit because, by default, they're

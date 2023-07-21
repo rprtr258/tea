@@ -69,7 +69,7 @@ var (
 		"SplitAfter":   strings.SplitAfter,
 		"SplitAfterN":  strings.SplitAfterN,
 		"SplitN":       strings.SplitN,
-		"Title":        strings.Title,
+		"Title":        strings.Title, //nolint:staticcheck
 		"ToLower":      strings.ToLower,
 		"ToTitle":      strings.ToTitle,
 		"ToUpper":      strings.ToUpper,

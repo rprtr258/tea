@@ -10,11 +10,12 @@ import (
 )
 
 func TestStyleRender(t *testing.T) {
-	renderer.SetColorProfile(termenv.TrueColor)
-	renderer.SetHasDarkBackground(true)
 	t.Parallel()
 
-	for i, tc := range []struct {
+	renderer.SetColorProfile(termenv.TrueColor)
+	renderer.SetHasDarkBackground(true)
+
+	for i, test := range []struct {
 		style    Style
 		expected string
 	}{
@@ -47,10 +48,13 @@ func TestStyleRender(t *testing.T) {
 			"\x1b[2mhello\x1b[0m",
 		},
 	} {
+		test := test
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			s := tc.style.Copy().SetString("hello")
+			t.Parallel()
+
+			s := test.style.Copy().SetString("hello")
 			res := s.Render()
-			assert.Equal(t, tc.expected, res)
+			assert.Equal(t, test.expected, res)
 		})
 	}
 }
@@ -309,7 +313,6 @@ func TestStyleValue(t *testing.T) {
 	t.Parallel()
 
 	for name, test := range map[string]struct {
-		name     string
 		style    Style
 		expected string
 	}{
@@ -330,7 +333,10 @@ func TestStyleValue(t *testing.T) {
 			expected: "bar foobar foo",
 		},
 	} {
+		test := test
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			res := test.style.Render("foo")
 			assert.Equal(t, test.expected, res)
 		})

@@ -26,7 +26,7 @@ type blinkCanceled struct{}
 
 // blinkCtx manages cursor blinking.
 type blinkCtx struct {
-	ctx    context.Context
+	ctx    context.Context //nolint:containedctx
 	cancel context.CancelFunc
 }
 

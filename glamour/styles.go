@@ -8,7 +8,7 @@ import (
 
 var (
 	// ASCIIStyleConfig uses only ASCII characters.
-	ASCIIStyleConfig = ansi.StyleConfig{
+	ASCIIStyleConfig = ansi.StyleConfig{ //nolint:dupl
 		Document: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix: "\n",
@@ -651,7 +651,7 @@ var (
 	}
 
 	// NoTTYStyleConfig is the default notty style.
-	NoTTYStyleConfig = ansi.StyleConfig{
+	NoTTYStyleConfig = ansi.StyleConfig{ //nolint:dupl
 		Document: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix: "\n",
@@ -759,7 +759,7 @@ var (
 
 	// DefaultStyles are the default styles.
 	DefaultStyles = map[string]*ansi.StyleConfig{
-		AsciiStyle:   &ASCIIStyleConfig,
+		ASCIIStyle:   &ASCIIStyleConfig,
 		DarkStyle:    &DarkStyleConfig,
 		DraculaStyle: &DraculaStyleConfig,
 		LightStyle:   &LightStyleConfig,

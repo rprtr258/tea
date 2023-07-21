@@ -12,14 +12,14 @@ import (
 //
 // You should use this instead of len(string) len([]rune(string) as neither
 // will give you accurate results.
-func Width(str string) (width int) {
+func Width(str string) int {
+	width := 0
 	for _, l := range strings.Split(str, "\n") {
 		w := ansi.PrintableRuneWidth(l)
 		if w > width {
 			width = w
 		}
 	}
-
 	return width
 }
 
@@ -34,7 +34,9 @@ func Height(str string) int {
 // Size returns the width and height of the string in cells. ANSI sequences are
 // ignored and characters wider than one cell (such as Chinese characters and
 // emojis) are appropriately measured.
-func Size(str string) (width, height int) {
+//
+// TODO: is it needed?
+func Size(str string) (width, height int) { //nolint:nonamedreturns
 	width = Width(str)
 	height = Height(str)
 	return width, height

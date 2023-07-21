@@ -75,14 +75,13 @@ func TestTeaQuit(t *testing.T) {
 
 func TestTeaWithFilter(t *testing.T) {
 	for preventCount := uint32(0); preventCount < 3; preventCount++ {
-		var buf bytes.Buffer
-		var in bytes.Buffer
+		preventCount := preventCount
 
 		m := &testModel{}
 		shutdowns := uint32(0)
 		p := NewProgram(m).
-			WithInput(&in).
-			WithOutput(&buf).
+			WithInput(&bytes.Buffer{}).
+			WithOutput(&bytes.Buffer{}).
 			WithFilter(func(_ *testModel, msg Msg) Msg {
 				if _, ok := msg.(QuitMsg); !ok {
 					return msg

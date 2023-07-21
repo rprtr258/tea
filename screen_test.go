@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:lll
 func TestClearMsg(t *testing.T) {
 	for name, test := range map[string]struct {
 		cmds     sequenceMsg

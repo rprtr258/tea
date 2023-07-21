@@ -188,7 +188,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		return m, nil
 	}
 
-	switch msg := msg.(type) {
+	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.KeyMap.LineUp):

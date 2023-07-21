@@ -295,8 +295,7 @@ func (m *Model) insertRunesFromUserInput(v []rune) {
 	}
 
 	// Put it all back together
-	value := append(head, tail...)
-	m.setValueInternal(value)
+	m.setValueInternal(append(head, tail...))
 
 	if m.Err != nil {
 		m.pos = oldPos

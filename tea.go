@@ -133,7 +133,7 @@ type Program[M Model[M]] struct {
 
 	inputType inputType
 
-	ctx    context.Context
+	ctx    context.Context //nolint:containedctx // TODO: is needed? check and remove nolint:containedctx if so
 	cancel context.CancelFunc
 
 	msgs     chan Msg
@@ -398,7 +398,7 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 // terminated by either [Program.Quit], [Program.Kill], or its signal handler.
 // Returns the final model.
 func (p *Program[M]) Run() (M, error) {
-	handlers := handlers{}
+	myHandlers := handlers{}
 	cmds := make(chan Cmd)
 	p.errs = make(chan error)
 	p.finished = make(chan struct{}, 1)
@@ -445,7 +445,7 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Handle signals.
 	if !p.startupOptions.has(withoutSignalHandler) {
-		handlers.add(p.handleSignals())
+		myHandlers.add(p.handleSignals())
 	}
 
 	// Recover from panics.
@@ -485,7 +485,7 @@ func (p *Program[M]) Run() (M, error) {
 	model := p.initialModel
 	if initCmd := model.Init(); initCmd != nil {
 		ch := make(chan struct{})
-		handlers.add(ch)
+		myHandlers.add(ch)
 
 		go func() {
 			defer close(ch)
@@ -511,10 +511,10 @@ func (p *Program[M]) Run() (M, error) {
 	}
 
 	// Handle resize events.
-	handlers.add(p.handleResize())
+	myHandlers.add(p.handleResize())
 
 	// Process commands.
-	handlers.add(p.handleCommands(cmds))
+	myHandlers.add(p.handleCommands(cmds))
 
 	// Run event loop, handle updates and draw.
 	model, err := p.eventLoop(model, cmds)
@@ -539,7 +539,7 @@ func (p *Program[M]) Run() (M, error) {
 	}
 
 	// Wait for all handlers to finish.
-	handlers.shutdown()
+	myHandlers.shutdown()
 
 	// Restore terminal state.
 	p.shutdown(killed)
@@ -573,7 +573,7 @@ func (p *Program[M]) Start() error {
 // If the program hasn't started yet this will be a blocking operation.
 // If the program has already been terminated this will be a no-op, so it's safe
 // to send messages after the program has exited.
-func (p *Program[M]) Send(msg Msg) { // TODO: remove
+func (p *Program[M]) Send(msg Msg) { // TODO: remove, give dispatch to user instead
 	select {
 	case <-p.ctx.Done():
 	case p.msgs <- msg:

@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -16,6 +16,7 @@ func writeStyleJSON(filename string, styleConfig *ansi.StyleConfig) error {
 		return err
 	}
 	defer f.Close()
+
 	e := json.NewEncoder(f)
 	e.SetIndent("", "  ")
 	return e.Encode(styleConfig)
@@ -23,7 +24,8 @@ func writeStyleJSON(filename string, styleConfig *ansi.StyleConfig) error {
 
 func run() error {
 	for style, styleConfig := range glamour.DefaultStyles {
-		if err := writeStyleJSON(filepath.Join("styles", style+".json"), styleConfig); err != nil {
+		filename := filepath.Join("styles", style+".json")
+		if err := writeStyleJSON(filename, styleConfig); err != nil {
 			return err
 		}
 	}
@@ -32,7 +34,6 @@ func run() error {
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 }

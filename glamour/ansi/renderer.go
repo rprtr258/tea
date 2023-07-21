@@ -22,20 +22,20 @@ type Options struct {
 	Styles           StyleConfig
 }
 
-// ANSIRenderer renders markdown content as ANSI escaped sequences.
-type ANSIRenderer struct {
+// Renderer renders markdown content as ANSI escaped sequences.
+type Renderer struct {
 	context RenderContext
 }
 
 // NewRenderer returns a new ANSIRenderer with style and options set.
-func NewRenderer(options Options) *ANSIRenderer {
-	return &ANSIRenderer{
+func NewRenderer(options Options) *Renderer {
+	return &Renderer{
 		context: NewRenderContext(options),
 	}
 }
 
 // RegisterFuncs implements NodeRenderer.RegisterFuncs.
-func (r *ANSIRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
+func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	// blocks
 	reg.Register(ast.KindDocument, r.renderNode)
 	reg.Register(ast.KindHeading, r.renderNode)
@@ -86,7 +86,7 @@ func (r *ANSIRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(east.KindEmoji, r.renderNode)
 }
 
-func (r *ANSIRenderer) renderNode(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) renderNode(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// _, _ = w.Write([]byte(node.Type.String()))
 	writeTo := io.Writer(w)
 	bs := r.context.blockStack

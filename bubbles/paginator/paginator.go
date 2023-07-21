@@ -98,7 +98,7 @@ func (m Model) ItemsOnPage(totalItems int) int {
 //	bunchOfStuff := []stuff{...}
 //	start, end := model.GetSliceBounds(len(bunchOfStuff))
 //	sliceToRender := bunchOfStuff[start:end]
-func (m *Model) GetSliceBounds(length int) (start int, end int) {
+func (m *Model) GetSliceBounds(length int) (start int, end int) { //nolint:nonamedreturns
 	start = m.Page * m.PerPage
 	end = min(m.Page*m.PerPage+m.PerPage, length)
 	return start, end
@@ -146,7 +146,7 @@ var NewModel = New
 
 // Update is the Tea update function which binds keystrokes to pagination.
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
-	switch msg := msg.(type) {
+	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.KeyMap.NextPage):

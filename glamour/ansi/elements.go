@@ -32,8 +32,8 @@ type Element struct {
 }
 
 // NewElement returns the appropriate render Element for a given node.
-func (tr *ANSIRenderer) NewElement(node ast.Node, source []byte) Element {
-	ctx := tr.context
+func (r *Renderer) NewElement(node ast.Node, source []byte) Element {
+	ctx := r.context
 	// fmt.Print(strings.Repeat("  ", ctx.blockStack.Len()), node.Type(), node.Kind())
 	// defer fmt.Println()
 
