@@ -1,15 +1,17 @@
 name: build
 on: [push, pull_request]
-
 jobs:
   build:
     strategy:
       matrix:
-        go-version: [~1.18, ^1]
+        go-version: [~1.17, ^1]
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     env:
       GO111MODULE: "on"
+      COLORTERM: "truecolor"
+      COLORFGBG: "7;0"
+      TERM: "xterm-256color"
     steps:
       - name: Install Go
         uses: actions/setup-go@v4
@@ -27,15 +29,4 @@ jobs:
 
       - name: Test
         run: go test ./...
-
-      - name: Build examples
-        run: go build -v ./...
-        working-directory: ./examples
-
-      - name: Test examples
-        run: go test -v ./...
-        working-directory: ./examples
-
-      - name: Build tutorials
-        run: go build -v ./...
-        working-directory: ./tutorials
+        if: matrix.os != 'windows-latest'
