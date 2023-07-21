@@ -84,9 +84,9 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	case tea.MsgKey:
 		m.quitting = true
 		return tea.Quit
-	case spinner.TickMsg:
+	case spinner.MsgTick:
 		return m.spinner.Update(msg)
-	case processFinishedMsg:
+	case msgProcessFinished:
 		d := time.Duration(msg)
 		res := result{emoji: randomEmoji(), duration: d}
 		log.Printf("%s Job finished in %s", res.emoji, res.duration)
@@ -118,14 +118,14 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(indent.String(s, 1))
 }
 
-// processFinishedMsg is sent when a pretend process completes.
-type processFinishedMsg time.Duration
+// msgProcessFinished is sent when a pretend process completes.
+type msgProcessFinished time.Duration
 
 // pretendProcess simulates a long-running process.
 func runPretendProcess() tea.Msg {
 	pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec
 	time.Sleep(pause)
-	return processFinishedMsg(pause)
+	return msgProcessFinished(pause)
 }
 
 func randomEmoji() string {

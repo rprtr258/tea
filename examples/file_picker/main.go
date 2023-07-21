@@ -18,11 +18,11 @@ type model struct {
 	err          error
 }
 
-type clearErrorMsg struct{}
+type msgClearError struct{}
 
 func clearErrorAfter(t time.Duration) tea.Cmd {
 	return tea.Tick(t, func(_ time.Time) tea.Msg {
-		return clearErrorMsg{}
+		return msgClearError{}
 	})
 }
 
@@ -38,7 +38,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			m.quitting = true
 			return tea.Quit
 		}
-	case clearErrorMsg:
+	case msgClearError:
 		m.err = nil
 	}
 

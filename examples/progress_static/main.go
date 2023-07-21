@@ -41,7 +41,7 @@ func Main() {
 	}
 }
 
-type tickMsg time.Time
+type msgTick time.Time
 
 type model struct {
 	percent  float64
@@ -57,14 +57,14 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	case tea.MsgKey:
 		return tea.Quit
 
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
 		return nil
 
-	case tickMsg:
+	case msgTick:
 		m.percent += 0.25
 		if m.percent > 1.0 {
 			m.percent = 1.0
@@ -86,6 +86,6 @@ func (m *model) View(r tea.Renderer) {
 
 func tickCmd() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		return tickMsg(t)
+		return msgTick(t)
 	})
 }

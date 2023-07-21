@@ -64,7 +64,7 @@ func detectSequence(input []byte) (hasSeq bool, width int, msg Msg) { //nolint:n
 	}
 	// Is this an unknown CSI sequence?
 	if loc := unknownCSIRe.FindIndex(input); loc != nil {
-		return true, loc[1], unknownCSISequenceMsg(input[:loc[1]])
+		return true, loc[1], msgUnknownCSISequence(input[:loc[1]])
 	}
 
 	return false, 0, nil

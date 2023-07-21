@@ -23,7 +23,7 @@ func Main() {
 	if _, err := tea.
 		NewProgram(initialModel()).
 		WithFilter(func(m *model, msg tea.Msg) tea.Msg {
-			if _, ok := msg.(tea.QuitMsg); !ok {
+			if _, ok := msg.(tea.MsgQuit); !ok {
 				return msg
 			}
 

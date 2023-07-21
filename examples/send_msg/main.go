@@ -23,12 +23,12 @@ var (
 	appStyle      = lipgloss.NewStyle().Margin(1, 2, 0, 2)
 )
 
-type resultMsg struct {
+type msgResult struct {
 	duration time.Duration
 	food     string
 }
 
-func (r resultMsg) String() string {
+func (r msgResult) String() string {
 	if r.duration == 0 {
 		return dotStyle.Render(strings.Repeat(".", 30))
 	}
@@ -38,7 +38,7 @@ func (r resultMsg) String() string {
 
 type model struct {
 	spinner  spinner.Model
-	results  []resultMsg
+	results  []msgResult
 	quitting bool
 }
 
@@ -48,7 +48,7 @@ func newModel() *model {
 	s.Style = spinnerStyle
 	return &model{
 		spinner: s,
-		results: make([]resultMsg, numLastResults),
+		results: make([]msgResult, numLastResults),
 	}
 }
 
@@ -61,10 +61,10 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	case tea.MsgKey:
 		m.quitting = true
 		return tea.Quit
-	case resultMsg:
+	case msgResult:
 		m.results = append(m.results[1:], msg)
 		return nil
-	case spinner.TickMsg:
+	case spinner.MsgTick:
 		return m.spinner.Update(msg)
 	default:
 		return nil
@@ -109,7 +109,7 @@ func Main() {
 			// Send the Bubble Tea program a message from outside the
 			// tea.Program. This will block until it is ready to receive
 			// messages.
-			p.Send(resultMsg{food: randomFood(), duration: pause})
+			p.Send(msgResult{food: randomFood(), duration: pause})
 		}
 	}()
 

@@ -47,7 +47,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
 		return tea.Quit
-	case tickMsg:
+	case msgTick:
 		*m--
 		if *m <= 0 {
 			return tea.Quit
@@ -65,9 +65,9 @@ func (m *model) View(r tea.Renderer) {
 
 // Messages are events that we respond to in our Update function. This
 // particular one indicates that the timer has ticked.
-type tickMsg time.Time
+type msgTick time.Time
 
 func tick() tea.Msg {
 	time.Sleep(time.Second)
-	return tickMsg{}
+	return msgTick{}
 }

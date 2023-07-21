@@ -6,8 +6,8 @@ import (
 	"os/exec"
 )
 
-// execMsg is used internally to run an ExecCommand sent with Exec.
-type execMsg struct {
+// msgExec is used internally to run an ExecCommand sent with Exec.
+type msgExec struct {
 	cmd ExecCommand
 	fn  ExecCallback
 }
@@ -21,7 +21,7 @@ type execMsg struct {
 // For non-interactive i/o you should use a Cmd (that is, a tea.Cmd).
 func Exec(c ExecCommand, fn ExecCallback) Cmd {
 	return func() Msg {
-		return execMsg{cmd: c, fn: fn}
+		return msgExec{cmd: c, fn: fn}
 	}
 }
 
@@ -34,12 +34,12 @@ func Exec(c ExecCommand, fn ExecCallback) Cmd {
 // a message containing the error which may have occurred when running the
 // ExecCommand.
 //
-//	type VimFinishedMsg struct { err error }
+//	type MsgVimFinished error
 //
 //	c := exec.Command("vim", "file.txt")
 //
 //	cmd := ExecProcess(c, func(err error) Msg {
-//	    return VimFinishedMsg{err: err}
+//	    return MsgVimFinished(err)
 //	})
 //
 // Or, if you don't care about errors, you could simply:

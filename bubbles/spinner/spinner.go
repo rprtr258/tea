@@ -132,8 +132,8 @@ func New(opts ...Option) Model {
 // Deprecated: use [New] instead.
 var NewModel = New
 
-// TickMsg indicates that the timer has ticked and we should render a frame.
-type TickMsg struct {
+// MsgTick indicates that the timer has ticked and we should render a frame.
+type MsgTick struct {
 	Time time.Time
 	tag  int
 	ID   int
@@ -142,7 +142,7 @@ type TickMsg struct {
 // Update is the Tea update function.
 func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case TickMsg:
+	case MsgTick:
 		// If an ID is set, and the ID doesn't belong to this spinner, reject
 		// the message.
 		if msg.ID > 0 && msg.ID != m.id {
@@ -180,7 +180,7 @@ func (m *Model) View() string {
 // Tick is the command used to advance the spinner one frame. Use this command
 // to effectively start the spinner.
 func (m *Model) Tick() tea.Msg {
-	return TickMsg{
+	return MsgTick{
 		// The time at which the tick occurred.
 		Time: time.Now(),
 
@@ -195,7 +195,7 @@ func (m *Model) Tick() tea.Msg {
 
 func (m *Model) tick(id, tag int) tea.Cmd {
 	return tea.Tick(m.Spinner.FPS, func(t time.Time) tea.Msg {
-		return TickMsg{
+		return MsgTick{
 			Time: t,
 			ID:   id,
 			tag:  tag,
@@ -208,7 +208,7 @@ func (m *Model) tick(id, tag int) tea.Cmd {
 //
 // Deprecated: Use [Model.Tick] instead.
 func Tick() tea.Msg {
-	return TickMsg{Time: time.Now()}
+	return MsgTick{Time: time.Now()}
 }
 
 // Option is used to set options in New. For example:

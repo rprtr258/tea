@@ -326,7 +326,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 			}
 		}
 
-	case tea.MouseMsg:
+	case tea.MsgMouse:
 		if !m.MouseWheelEnabled {
 			break
 		}

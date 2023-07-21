@@ -54,5 +54,5 @@ type Renderer interface { //nolint:interfacebloat
 	handleMessages(Msg)
 }
 
-// repaintMsg forces a full repaint.
-type repaintMsg struct{}
+// msgRepaint forces a full repaint.
+type msgRepaint struct{}

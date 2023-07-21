@@ -56,20 +56,17 @@ func checkServer() tea.Msg {
     if err != nil {
         // There was an error making our request. Wrap the error we received
         // in a message and return it.
-        return errMsg{err}
+        return msgErr(err)
     }
     // We received a response from the server. Return the HTTP status code
     // as a message.
-    return statusMsg(res.StatusCode)
+    return msgStatus(res.StatusCode)
 }
 
-type statusMsg int
-
-type errMsg struct{ err error }
-
-// For messages that contain errors it's often handy to also implement the
-// error interface on the message.
-func (e errMsg) Error() string { return e.err.Error() }
+type (
+    msgStatus int
+    msgErr error
+)
 ```
 
 And notice that we've defined two new `Msg` types. They can be any type, even an empty struct. We'll come back to them later in our update function.  First, let's write our initialization function.
@@ -92,7 +89,7 @@ Internally, `Cmd`s run asynchronously in a goroutine. The `Msg` they return is c
 func (m *model) Update(msg tea.Msg) (model, tea.Cmd) {
     switch msg := msg.(type) {
 
-    case statusMsg:
+    case msgStatus:
         // The server returned a status message. Save it to our model. Also
         // tell the Bubble Tea runtime we want to exit because we have nothing
         // else to do. We'll still be able to render a final view with our
@@ -100,7 +97,7 @@ func (m *model) Update(msg tea.Msg) (model, tea.Cmd) {
         m.status = int(msg)
         return m, tea.Quit
 
-    case errMsg:
+    case msgErr:
         // There was an error. Note it in the model. And tell the runtime
         // we're done and want to quit.
         m.err = msg
@@ -165,7 +162,7 @@ And that's that. There's one more thing that is helpful to know about `Cmd`s, th
 ```go
 func cmdWithArg(id int) tea.Cmd {
     return func() tea.Msg {
-        return someMsg{id: id}
+        return msgSome{id: id}
     }
 }
 ```
@@ -178,9 +175,9 @@ func checkSomeUrl(url string) tea.Cmd {
         c := &http.Client{Timeout: 10 * time.Second}
         res, err := c.Get(url)
         if err != nil {
-            return errMsg{err}
+            return msgErr(err)
         }
-        return statusMsg(res.StatusCode)
+        return msgStatus(res.StatusCode)
     }
 }
 ```

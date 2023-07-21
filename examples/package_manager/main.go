@@ -49,14 +49,14 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.width, m.height = msg.Width, msg.Height
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
 			return tea.Quit
 		}
-	case installedPkgMsg:
+	case msgInstalledPkg:
 		if m.index >= len(m.packages)-1 {
 			// Everything's been installed. We're done!
 			m.done = true
@@ -72,9 +72,9 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			tea.Printf("%s %s", checkMark, m.packages[m.index]), // print success message above our program
 			downloadAndInstall(m.packages[m.index]),             // download the next package
 		)
-	case spinner.TickMsg:
+	case spinner.MsgTick:
 		return m.spinner.Update(msg)
-	case progress.FrameMsg:
+	case progress.MsgFrame:
 		return m.progress.Update(msg)
 	}
 	return nil
@@ -104,14 +104,14 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(spin + info + gap + prog + pkgCount)
 }
 
-type installedPkgMsg string
+type msgInstalledPkg string
 
 func downloadAndInstall(pkg string) tea.Cmd {
 	// This is where you'd do i/o stuff to download and install packages. In
 	// our case we're just pausing for a moment to simulate the process.
 	d := time.Millisecond * time.Duration(rand.Intn(500)) //nolint:gosec
 	return tea.Tick(d, func(t time.Time) tea.Msg {
-		return installedPkgMsg(pkg)
+		return msgInstalledPkg(pkg)
 	})
 }
 

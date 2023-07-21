@@ -12,7 +12,7 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-type errMsg error
+type msgErr error
 
 type model struct {
 	spinner  spinner.Model
@@ -42,7 +42,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			return nil
 		}
 
-	case errMsg:
+	case msgErr:
 		m.err = msg
 		return nil
 

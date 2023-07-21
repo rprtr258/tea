@@ -89,7 +89,7 @@ func WithoutPercentage() Option {
 
 // WithWidth sets the initial width of the progress bar. Note that you can also
 // set the width via the Width property, which can come in handy if you're
-// waiting for a tea.WindowSizeMsg.
+// waiting for a tea.MsgWindowSize.
 func WithWidth(w int) Option {
 	return func(m *Model) {
 		m.Width = w
@@ -115,8 +115,8 @@ func WithColorProfile(p termenv.Profile) Option {
 	}
 }
 
-// FrameMsg indicates that an animation step should occur.
-type FrameMsg struct {
+// MsgFrame indicates that an animation step should occur.
+type MsgFrame struct {
 	id  int
 	tag int
 }
@@ -206,7 +206,7 @@ func (m *Model) Init() tea.Cmd {
 // If you're rendering with ViewAs you won't need this.
 func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case FrameMsg:
+	case MsgFrame:
 		if msg.id != m.id || msg.tag != m.tag {
 			return nil
 		}
@@ -283,7 +283,7 @@ func (m *Model) ViewAs(percent float64) string {
 
 func (m *Model) nextFrame() tea.Cmd {
 	return tea.Tick(time.Second/time.Duration(fps), func(time.Time) tea.Msg {
-		return FrameMsg{id: m.id, tag: m.tag}
+		return MsgFrame{id: m.id, tag: m.tag}
 	})
 }
 

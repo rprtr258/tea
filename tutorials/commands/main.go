@@ -20,20 +20,17 @@ func checkServer() tea.Msg {
 	c := &http.Client{Timeout: 10 * time.Second}
 	res, err := c.Get(url) //nolint:noctx
 	if err != nil {
-		return errMsg{err}
+		return msgErr(err)
 	}
 	defer res.Body.Close() // nolint:errcheck
 
-	return statusMsg(res.StatusCode)
+	return msgStatus(res.StatusCode)
 }
 
-type statusMsg int
-
-type errMsg struct{ err error } // TODO: rename all msgs to msgXxx
-
-// For messages that contain errors it's often handy to also implement the
-// error interface on the message.
-func (e errMsg) Error() string { return e.err.Error() }
+type (
+	msgStatus int
+	msgErr    error
+)
 
 func (m *model) Init() tea.Cmd {
 	return checkServer
@@ -41,11 +38,11 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case statusMsg:
+	case msgStatus:
 		m.status = int(msg)
 		return tea.Quit
 
-	case errMsg:
+	case msgErr:
 		m.err = msg
 		return tea.Quit
 

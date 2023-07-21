@@ -69,7 +69,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		default:
 			return nil
 		}
-	case spinner.TickMsg:
+	case spinner.MsgTick:
 		return m.spinner.Update(msg)
 	default:
 		return nil

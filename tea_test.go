@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type incrementMsg struct{}
+type msgIncrement struct{}
 
 type testModel struct {
 	executed atomic.Value
@@ -23,7 +23,7 @@ func (m *testModel) Init() Cmd {
 
 func (m *testModel) Update(msg Msg) Cmd {
 	switch msg.(type) {
-	case incrementMsg:
+	case msgIncrement:
 		i := m.counter.Load()
 		if i == nil {
 			m.counter.Store(1)
@@ -83,7 +83,7 @@ func TestTeaWithFilter(t *testing.T) {
 			WithInput(&bytes.Buffer{}).
 			WithOutput(&bytes.Buffer{}).
 			WithFilter(func(_ *testModel, msg Msg) Msg {
-				if _, ok := msg.(QuitMsg); !ok {
+				if _, ok := msg.(MsgQuit); !ok {
 					return msg
 				}
 				if shutdowns < preventCount {
@@ -146,18 +146,18 @@ func TestTeaContext(t *testing.T) {
 	assert.Equal(t, err, ErrProgramKilled)
 }
 
-func TestTeaBatchMsg(t *testing.T) {
+func TestMsgBatch(t *testing.T) {
 	var buf bytes.Buffer
 	var in bytes.Buffer
 
 	inc := func() Msg {
-		return incrementMsg{}
+		return msgIncrement{}
 	}
 
 	m := &testModel{}
 	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
 	go func() {
-		p.Send(BatchMsg{inc, inc})
+		p.Send(MsgBatch{inc, inc})
 
 		for {
 			time.Sleep(time.Millisecond)
@@ -174,37 +174,37 @@ func TestTeaBatchMsg(t *testing.T) {
 	assert.Equal(t, 2, m.counter.Load())
 }
 
-func TestTeaSequenceMsg(t *testing.T) {
+func TestMsgSequence(t *testing.T) {
 	var buf bytes.Buffer
 	var in bytes.Buffer
 
 	inc := func() Msg {
-		return incrementMsg{}
+		return msgIncrement{}
 	}
 
 	m := &testModel{}
 	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
-	go p.Send(sequenceMsg{inc, inc, Quit})
+	go p.Send(msgSequence{inc, inc, Quit})
 
 	_, err := p.Run()
 	assert.NoError(t, err)
 	assert.Equal(t, 2, m.counter.Load())
 }
 
-func TestTeaSequenceMsgWithBatchMsg(t *testing.T) {
+func TestMsgSequenceWithMsgBatch(t *testing.T) {
 	var buf bytes.Buffer
 	var in bytes.Buffer
 
 	inc := func() Msg {
-		return incrementMsg{}
+		return msgIncrement{}
 	}
 	batch := func() Msg {
-		return BatchMsg{inc, inc}
+		return MsgBatch{inc, inc}
 	}
 
 	m := &testModel{}
 	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
-	go p.Send(sequenceMsg{batch, inc, Quit})
+	go p.Send(msgSequence{batch, inc, Quit})
 
 	_, err := p.Run()
 	assert.NoError(t, err)

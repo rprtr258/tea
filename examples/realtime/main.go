@@ -15,7 +15,7 @@ import (
 
 // A message used to indicate that activity has occurred. In the real world (for
 // example, chat) this would contain actual data.
-type responseMsg struct{}
+type msgResponse struct{}
 
 // Simulate a process that sends events at an irregular interval in real time.
 // In this case, we'll send events on the channel at a random interval between
@@ -33,7 +33,7 @@ func listenForActivity(sub chan struct{}) tea.Cmd {
 // A command that waits for the activity on a channel.
 func waitForActivity(sub chan struct{}) tea.Cmd {
 	return func() tea.Msg {
-		return responseMsg(<-sub)
+		return msgResponse(<-sub)
 	}
 }
 
@@ -57,10 +57,10 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	case tea.MsgKey:
 		m.quitting = true
 		return tea.Quit
-	case responseMsg:
+	case msgResponse:
 		m.responses++                 // record external activity
 		return waitForActivity(m.sub) // wait for next event
-	case spinner.TickMsg:
+	case spinner.MsgTick:
 		return m.spinner.Update(msg)
 	default:
 		return nil

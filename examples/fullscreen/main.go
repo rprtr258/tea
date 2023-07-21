@@ -13,7 +13,7 @@ import (
 
 type model int
 
-type tickMsg time.Time
+type msgTick time.Time
 
 func Main() {
 	m := model(5)
@@ -35,7 +35,7 @@ func (m *model) Update(message tea.Msg) tea.Cmd {
 			return tea.Quit
 		}
 
-	case tickMsg:
+	case msgTick:
 		*m--
 		if *m <= 0 {
 			return tea.Quit
@@ -47,11 +47,11 @@ func (m *model) Update(message tea.Msg) tea.Cmd {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf("\n\n     Hi. This program will exit in %d seconds...", m))
+	r.Write(fmt.Sprintf("\n\n     Hi. This program will exit in %d seconds...", *m))
 }
 
 func tick() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		return tickMsg(t)
+		return msgTick(t)
 	})
 }

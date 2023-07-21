@@ -1,12 +1,12 @@
 package tea
 
-// MouseMsg contains information about a mouse event and are sent to a programs
+// MsgMouse contains information about a mouse event and are sent to a programs
 // update function when mouse activity occurs. Note that the mouse must first
 // be enabled in order for the mouse events to be received.
-type MouseMsg MouseEvent
+type MsgMouse MouseEvent
 
 // String returns a string representation of a mouse event.
-func (m MouseMsg) String() string {
+func (m MsgMouse) String() string {
 	return MouseEvent(m).String()
 }
 

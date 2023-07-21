@@ -8,9 +8,9 @@ import (
 )
 
 //nolint:lll
-func TestClearMsg(t *testing.T) {
+func TestMsgClear(t *testing.T) {
 	for name, test := range map[string]struct {
-		cmds     sequenceMsg
+		cmds     msgSequence
 		expected string
 	}{
 		"clear_screen": {

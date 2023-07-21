@@ -61,7 +61,7 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.list.SetWidth(msg.Width)
 		return nil
 

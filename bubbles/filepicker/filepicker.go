@@ -50,11 +50,9 @@ func New() Model {
 	}
 }
 
-type errorMsg struct {
-	err error
-}
+type msgError error
 
-type readDirMsg struct {
+type msgReadDir struct {
 	id      int
 	entries []os.DirEntry
 }
@@ -207,7 +205,7 @@ func (m *Model) readDir(path string, showHidden bool) tea.Cmd {
 	return func() tea.Msg {
 		dirEntries, err := os.ReadDir(path)
 		if err != nil {
-			return errorMsg{err}
+			return msgError(err)
 		}
 
 		sort.Slice(dirEntries, func(i, j int) bool {
@@ -218,7 +216,7 @@ func (m *Model) readDir(path string, showHidden bool) tea.Cmd {
 		})
 
 		if showHidden {
-			return readDirMsg{id: m.id, entries: dirEntries}
+			return msgReadDir{id: m.id, entries: dirEntries}
 		}
 
 		var sanitizedDirEntries []os.DirEntry
@@ -229,7 +227,7 @@ func (m *Model) readDir(path string, showHidden bool) tea.Cmd {
 			}
 			sanitizedDirEntries = append(sanitizedDirEntries, dirEntry)
 		}
-		return readDirMsg{id: m.id, entries: sanitizedDirEntries}
+		return msgReadDir{id: m.id, entries: sanitizedDirEntries}
 	}
 }
 
@@ -241,13 +239,13 @@ func (m *Model) Init() tea.Cmd {
 // Update handles user interactions within the file picker model.
 func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case readDirMsg:
+	case msgReadDir:
 		if msg.id != m.id {
 			break
 		}
 		m.files = msg.entries
 		m.max = m.Height - 1
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		if m.AutoHeight {
 			m.Height = msg.Height - marginBottom
 		}

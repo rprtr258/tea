@@ -55,7 +55,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			return tea.Quit
 		}
 
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		headerHeight := lipgloss.Height(m.headerView())
 		footerHeight := lipgloss.Height(m.footerView())
 		verticalMarginHeight := headerHeight + footerHeight

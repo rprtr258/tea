@@ -171,13 +171,13 @@ type Program[M Model] struct {
 	fps int
 }
 
-// QuitMsg signals that the program should quit. You can send a QuitMsg with
+// MsgQuit signals that the program should quit. You can send a MsgQuit with
 // Quit.
-type QuitMsg struct{}
+type MsgQuit struct{}
 
 // Quit is a special command that tells the Bubble Tea program to exit.
 func Quit() Msg {
-	return QuitMsg{}
+	return MsgQuit{}
 }
 
 // NewProgram creates a new Program.
@@ -234,7 +234,7 @@ func (p *Program[M]) handleSignals() chan struct{} {
 
 			case <-sig:
 				if !p.ignoreSignals {
-					p.msgs <- QuitMsg{}
+					p.msgs <- MsgQuit{}
 					return
 				}
 			}
@@ -317,45 +317,45 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 
 			// Handle special internal messages.
 			switch msg := msg.(type) {
-			case QuitMsg:
+			case MsgQuit:
 				return model, nil
 
-			case clearScreenMsg:
+			case msgClearScreen:
 				p.renderer.clearScreen()
 
-			case enterAltScreenMsg:
+			case msgEnterAltScreen:
 				p.renderer.enterAltScreen()
 
-			case exitAltScreenMsg:
+			case msgExitAltScreen:
 				p.renderer.exitAltScreen()
 
-			case enableMouseCellMotionMsg:
+			case msgEnableMouseCellMotion:
 				p.renderer.enableMouseCellMotion()
 
-			case enableMouseAllMotionMsg:
+			case msgEnableMouseAllMotion:
 				p.renderer.enableMouseAllMotion()
 
-			case disableMouseMsg:
+			case msgDisableMouse:
 				p.renderer.disableMouseCellMotion()
 				p.renderer.disableMouseAllMotion()
 
-			case showCursorMsg:
+			case msgShowCursor:
 				p.renderer.showCursor()
 
-			case hideCursorMsg:
+			case msgHideCursor:
 				p.renderer.hideCursor()
 
-			case execMsg:
+			case msgExec:
 				// NB: this blocks.
 				p.exec(msg.cmd, msg.fn)
 
-			case BatchMsg:
+			case MsgBatch:
 				for _, cmd := range msg {
 					cmds <- cmd
 				}
 				continue
 
-			case sequenceMsg:
+			case msgSequence:
 				go func() {
 					// Execute commands one at a time, in order.
 					for _, cmd := range msg {
@@ -364,9 +364,9 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 						}
 
 						msg := cmd()
-						if batchMsg, ok := msg.(BatchMsg); ok {
+						if msgBatch, ok := msg.(MsgBatch); ok {
 							g, _ := errgroup.WithContext(p.ctx)
-							for _, cmd := range batchMsg {
+							for _, cmd := range msgBatch {
 								cmd := cmd
 								g.Go(func() error {
 									p.Send(cmd())
@@ -651,7 +651,7 @@ func (p *Program[M]) RestoreTerminal() error {
 		p.renderer.enterAltScreen()
 	} else {
 		// entering alt screen already causes a repaint.
-		go p.Send(repaintMsg{})
+		go p.Send(msgRepaint{})
 	}
 	if p.renderer != nil {
 		p.renderer.start()
@@ -671,7 +671,7 @@ func (p *Program[M]) RestoreTerminal() error {
 //
 // If the altscreen is active no output will be printed.
 func (p *Program[M]) Println(args ...any) {
-	p.msgs <- printLineMessage{
+	p.msgs <- msgPrintLine{
 		messageBody: fmt.Sprint(args...),
 	}
 }
@@ -685,7 +685,7 @@ func (p *Program[M]) Println(args ...any) {
 //
 // If the altscreen is active no output will be printed.
 func (p *Program[M]) Printf(format string, args ...any) {
-	p.msgs <- printLineMessage{
+	p.msgs <- msgPrintLine{
 		messageBody: fmt.Sprintf(format, args...),
 	}
 }

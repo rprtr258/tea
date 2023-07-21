@@ -514,23 +514,23 @@ var sequences = map[string]Key{
 	"\x1bOD": {Type: KeyLeft, Alt: false},
 }
 
-// unknownInputByteMsg is reported by the input reader when an invalid
+// msgUnknownInputByte is reported by the input reader when an invalid
 // utf-8 byte is detected on the input. Currently, it is not handled
 // further by tea. However, having this event makes it possible
 // to troubleshoot invalid inputs.
-type unknownInputByteMsg byte
+type msgUnknownInputByte byte
 
-func (u unknownInputByteMsg) String() string {
+func (u msgUnknownInputByte) String() string {
 	return fmt.Sprintf("?%#02x?", int(u))
 }
 
-// unknownCSISequenceMsg is reported by the input reader when an
+// msgUnknownCSISequence is reported by the input reader when an
 // unrecognized CSI sequence is detected on the input. Currently, it
 // is not handled further by tea. However, having this event
 // makes it possible to troubleshoot invalid inputs.
-type unknownCSISequenceMsg []byte
+type msgUnknownCSISequence []byte
 
-func (u unknownCSISequenceMsg) String() string {
+func (u msgUnknownCSISequence) String() string {
 	return fmt.Sprintf("?CSI%+v?", []byte(u)[2:])
 }
 
@@ -572,7 +572,7 @@ func detectOneMsg(b []byte) (int, Msg) {
 	// Detect mouse events.
 	const mouseEventLen = 6
 	if len(b) >= mouseEventLen && b[0] == '\x1b' && b[1] == '[' && b[2] == 'M' {
-		return mouseEventLen, MouseMsg(parseX10MouseEvent(b))
+		return mouseEventLen, MsgMouse(parseX10MouseEvent(b))
 	}
 
 	// Detect escape sequence and control characters other than NUL,
@@ -634,5 +634,5 @@ func detectOneMsg(b []byte) (int, Msg) {
 	// The character at the current position is neither an escape
 	// sequence, a valid rune start or a sole escape character. Report
 	// it as an invalid byte.
-	return 1, unknownInputByteMsg(b[0])
+	return 1, msgUnknownInputByte(b[0])
 }

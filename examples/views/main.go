@@ -46,19 +46,19 @@ func Main() {
 }
 
 type (
-	tickMsg  struct{}
-	frameMsg struct{}
+	msgTick  struct{}
+	msgFrame struct{}
 )
 
 func tick() tea.Cmd {
 	return tea.Tick(time.Second, func(time.Time) tea.Msg {
-		return tickMsg{}
+		return msgTick{}
 	})
 }
 
 func frame() tea.Cmd {
 	return tea.Tick(time.Second/60, func(time.Time) tea.Msg {
-		return frameMsg{}
+		return msgFrame{}
 	})
 }
 
@@ -133,7 +133,7 @@ func updateChoices(msg tea.Msg, m *model) tea.Cmd {
 			return frame()
 		}
 
-	case tickMsg:
+	case msgTick:
 		if m.Ticks == 0 {
 			m.Quitting = true
 			return tea.Quit
@@ -148,7 +148,7 @@ func updateChoices(msg tea.Msg, m *model) tea.Cmd {
 // Update loop for the second view after a choice has been made
 func updateChosen(msg tea.Msg, m *model) tea.Cmd {
 	switch msg.(type) {
-	case frameMsg:
+	case msgFrame:
 		if !m.Loaded {
 			m.Frames++
 			m.Progress = ease.OutBounce(float64(m.Frames) / float64(100))
@@ -161,7 +161,7 @@ func updateChosen(msg tea.Msg, m *model) tea.Cmd {
 			return frame()
 		}
 
-	case tickMsg:
+	case msgTick:
 		if m.Loaded {
 			if m.Ticks == 0 {
 				m.Quitting = true

@@ -22,9 +22,7 @@ func Main() {
 	}
 }
 
-type (
-	errMsg error
-)
+type msgErr error
 
 type model struct {
 	viewport    viewport.Model
@@ -87,7 +85,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		}
 
 	// We handle errors just like any other message
-	case errMsg:
+	case msgErr:
 		m.err = msg
 		return nil
 	}

@@ -27,8 +27,8 @@ const (
 
 // Internal messages for clipboard operations.
 type (
-	pasteMsg    string
-	pasteErrMsg struct{ error }
+	msgPaste    string
+	msgPasteErr error
 )
 
 // KeyMap is the key bindings for different actions within the textarea.
@@ -1006,10 +1006,10 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 			m.insertRunesFromUserInput(msg.Runes)
 		}
 
-	case pasteMsg:
+	case msgPaste:
 		m.insertRunesFromUserInput([]rune(msg))
 
-	case pasteErrMsg:
+	case msgPasteErr:
 		m.Err = msg
 	}
 
@@ -1256,9 +1256,9 @@ func (m *Model) splitLine(row, col int) {
 func Paste() tea.Msg {
 	str, err := clipboard.ReadAll()
 	if err != nil {
-		return pasteErrMsg{err}
+		return msgPasteErr(err)
 	}
-	return pasteMsg(str)
+	return msgPaste(str)
 }
 
 func wrap(runes []rune, width int) [][]rune {

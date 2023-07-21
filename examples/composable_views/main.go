@@ -108,9 +108,9 @@ func (m *mainModel) Update(msg tea.Msg) tea.Cmd {
 		default:
 			cmds = append(cmds, m.timer.Update(msg))
 		}
-	case spinner.TickMsg:
+	case spinner.MsgTick:
 		cmds = append(cmds, m.spinner.Update(msg))
-	case timer.TickMsg:
+	case timer.MsgTick:
 		cmds = append(cmds, m.timer.Update(msg))
 	}
 	return tea.Batch(cmds...)

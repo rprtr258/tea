@@ -20,7 +20,7 @@ import (
 
 const debounceDuration = time.Second
 
-type exitMsg int
+type msgExit int
 
 type model struct {
 	tag int
@@ -37,9 +37,9 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		m.tag++
 		return tea.Tick(debounceDuration, func(_ time.Time) tea.Msg {
 			// ...and include a copy of that tag value in the message.
-			return exitMsg(m.tag)
+			return msgExit(m.tag)
 		})
-	case exitMsg:
+	case msgExit:
 		// If the tag in the message doesn't match the tag on the model then we
 		// know that this message was not the last one sent and another is on
 		// the way. If that's the case we know, we can ignore this message.

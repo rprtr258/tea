@@ -16,9 +16,10 @@ const (
 	maxWidth = 80
 )
 
-type progressMsg float64
-
-type progressErrMsg struct{ err error }
+type (
+	msgProgress    float64
+	msgProgressErr error
+)
 
 func finalPause() tea.Cmd {
 	return tea.Tick(time.Millisecond*750, func(_ time.Time) tea.Msg {
@@ -41,18 +42,18 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	case tea.MsgKey:
 		return tea.Quit
 
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
 		return nil
 
-	case progressErrMsg:
-		m.err = msg.err
+	case msgProgressErr:
+		m.err = msg
 		return tea.Quit
 
-	case progressMsg:
+	case msgProgress:
 		var cmds []tea.Cmd
 
 		if msg >= 1.0 {
@@ -62,8 +63,8 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		cmds = append(cmds, m.progress.SetPercent(float64(msg)))
 		return tea.Batch(cmds...)
 
-	// FrameMsg is sent when the progress bar wants to animate itself
-	case progress.FrameMsg:
+	// MsgFrame is sent when the progress bar wants to animate itself
+	case progress.MsgFrame:
 		return m.progress.Update(msg)
 
 	default:

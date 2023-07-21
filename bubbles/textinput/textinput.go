@@ -16,8 +16,8 @@ import (
 
 // Internal messages for clipboard operations.
 type (
-	pasteMsg    string
-	pasteErrMsg struct{ error }
+	msgPaste    string
+	msgPasteErr error
 )
 
 // EchoMode sets the input behavior of the text input field.
@@ -581,10 +581,10 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 			m.insertRunesFromUserInput(msg.Runes)
 		}
 
-	case pasteMsg:
+	case msgPaste:
 		m.insertRunesFromUserInput([]rune(msg))
 
-	case pasteErrMsg:
+	case msgPasteErr:
 		m.Err = msg
 	}
 
@@ -662,9 +662,9 @@ func Blink() tea.Msg {
 func Paste() tea.Msg {
 	str, err := clipboard.ReadAll()
 	if err != nil {
-		return pasteErrMsg{err}
+		return msgPasteErr(err)
 	}
-	return pasteMsg(str)
+	return msgPaste(str)
 }
 
 func clamp(v, low, high int) int {

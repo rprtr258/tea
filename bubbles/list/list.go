@@ -67,9 +67,9 @@ func (f filteredItems) items() []Item {
 	return agg
 }
 
-// FilterMatchesMsg contains data about items matched during filtering. The
+// MsgFilterMatches contains data about items matched during filtering. The
 // message should be routed to Update for processing.
-type FilterMatchesMsg []filteredItem
+type MsgFilterMatches []filteredItem
 
 // FilterFunc takes a term and a list of strings to search through
 // (defined by Item#FilterValue).
@@ -113,7 +113,7 @@ func UnsortedFilter(term string, targets []string) []Rank {
 	return result
 }
 
-type statusMessageTimeoutMsg struct{}
+type msgStatusMessageTimeout struct{}
 
 // FilterState describes the current filtering state on the model.
 type FilterState int
@@ -626,7 +626,7 @@ func (m *Model) NewStatusMessage(s string) tea.Cmd {
 	// Wait for timeout
 	return func() tea.Msg {
 		<-m.statusMessageTimer.C
-		return statusMessageTimeoutMsg{}
+		return msgStatusMessageTimeout{}
 	}
 }
 
@@ -777,17 +777,17 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 			return tea.Quit
 		}
 
-	case FilterMatchesMsg:
+	case MsgFilterMatches:
 		m.filteredItems = filteredItems(msg)
 		return nil
 
-	case spinner.TickMsg:
+	case spinner.MsgTick:
 		cmd := m.spinner.Update(msg)
 		if m.showSpinner {
 			cmds = append(cmds, cmd)
 		}
 
-	case statusMessageTimeoutMsg:
+	case msgStatusMessageTimeout:
 		m.hideStatusMessage()
 	}
 
@@ -1214,7 +1214,7 @@ func (m *Model) spinnerView() string {
 func filterItems(m Model) tea.Cmd {
 	return func() tea.Msg {
 		if m.FilterInput.Value() == "" || m.filterState == Unfiltered {
-			return FilterMatchesMsg(m.itemsAsFilterItems()) // return nothing
+			return MsgFilterMatches(m.itemsAsFilterItems()) // return nothing
 		}
 
 		targets := []string{}
@@ -1232,7 +1232,7 @@ func filterItems(m Model) tea.Cmd {
 			})
 		}
 
-		return FilterMatchesMsg(filterMatches)
+		return MsgFilterMatches(filterMatches)
 	}
 }
 

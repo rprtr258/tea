@@ -33,7 +33,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			return tea.Quit
 		}
 
-	case tea.MouseMsg:
+	case tea.MsgMouse:
 		m.init = true
 		m.mouseEvent = tea.MouseEvent(msg)
 	}

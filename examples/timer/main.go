@@ -32,16 +32,16 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case timer.TickMsg:
+	case timer.MsgTick:
 		return m.timer.Update(msg)
 
-	case timer.StartStopMsg:
+	case timer.MsgStartStop:
 		cmd := m.timer.Update(msg)
 		m.keymap.stop.SetEnabled(m.timer.Running())
 		m.keymap.start.SetEnabled(!m.timer.Running())
 		return cmd
 
-	case timer.TimeoutMsg:
+	case timer.MsgTimeout:
 		m.quitting = true
 		return tea.Quit
 

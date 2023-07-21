@@ -148,7 +148,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 				m.focus = len(m.inputs) - 1
 			}
 		}
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.height = msg.Height
 		m.width = msg.Width
 	}

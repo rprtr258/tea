@@ -20,8 +20,8 @@ func nextID() int {
 	return lastID
 }
 
-// TickMsg is a message that is sent on every timer tick.
-type TickMsg struct {
+// MsgTick is a message that is sent on every timer tick.
+type MsgTick struct {
 	// ID is the identifier of the stopwatch that sends the message. This makes
 	// it possible to determine which stopwatch a tick belongs to when there
 	// are multiple stopwatches running.
@@ -32,14 +32,14 @@ type TickMsg struct {
 	ID int
 }
 
-// StartStopMsg is sent when the stopwatch should start or stop.
-type StartStopMsg struct {
+// MsgStartStop is sent when the stopwatch should start or stop.
+type MsgStartStop struct {
 	ID      int
 	running bool
 }
 
-// ResetMsg is sent when the stopwatch should reset.
-type ResetMsg struct {
+// MsgReset is sent when the stopwatch should reset.
+type MsgReset struct {
 	ID int
 }
 
@@ -80,14 +80,14 @@ func (m *Model) Init() tea.Cmd {
 // Start starts the stopwatch.
 func (m *Model) Start() tea.Cmd {
 	return tea.Batch(func() tea.Msg {
-		return StartStopMsg{ID: m.id, running: true}
+		return MsgStartStop{ID: m.id, running: true}
 	}, tick(m.id, m.Interval))
 }
 
 // Stop stops the stopwatch.
 func (m *Model) Stop() tea.Cmd {
 	return func() tea.Msg {
-		return StartStopMsg{ID: m.id, running: false}
+		return MsgStartStop{ID: m.id, running: false}
 	}
 }
 
@@ -102,7 +102,7 @@ func (m *Model) Toggle() tea.Cmd {
 // Reset resets the stopwatch to 0.
 func (m *Model) Reset() tea.Cmd {
 	return func() tea.Msg {
-		return ResetMsg{ID: m.id}
+		return MsgReset{ID: m.id}
 	}
 }
 
@@ -114,17 +114,17 @@ func (m *Model) Running() bool {
 // Update handles the timer tick.
 func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case StartStopMsg:
+	case MsgStartStop:
 		if msg.ID != m.id {
 			return nil
 		}
 		m.running = msg.running
-	case ResetMsg:
+	case MsgReset:
 		if msg.ID != m.id {
 			return nil
 		}
 		m.d = 0
-	case TickMsg:
+	case MsgTick:
 		if !m.running || msg.ID != m.id {
 			break
 		}
@@ -147,6 +147,6 @@ func (m *Model) View() string {
 
 func tick(id int, d time.Duration) tea.Cmd {
 	return tea.Tick(d, func(_ time.Time) tea.Msg {
-		return TickMsg{ID: id}
+		return MsgTick{ID: id}
 	})
 }

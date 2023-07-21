@@ -125,11 +125,11 @@ func (c cellbuffer) String() string {
 	return b.String()
 }
 
-type frameMsg struct{}
+type msgFrame struct{}
 
 func animate() tea.Cmd {
 	return tea.Tick(time.Second/fps, func(_ time.Time) tea.Msg {
-		return frameMsg{}
+		return msgFrame{}
 	})
 }
 
@@ -149,20 +149,20 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		return tea.Quit
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		if !m.cells.ready() {
 			m.targetX, m.targetY = float64(msg.Width)/2, float64(msg.Height)/2
 		}
 		m.cells.init(msg.Width, msg.Height)
 		return nil
-	case tea.MouseMsg:
+	case tea.MsgMouse:
 		if !m.cells.ready() {
 			return nil
 		}
 		m.targetX, m.targetY = float64(msg.X), float64(msg.Y)
 		return nil
 
-	case frameMsg:
+	case msgFrame:
 		if !m.cells.ready() {
 			return nil
 		}

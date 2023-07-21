@@ -32,7 +32,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		if msg.String() == "ctrl+c" {
 			return tea.Quit
 		}
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 	}

@@ -22,7 +22,7 @@ const (
 	maxWidth = 80
 )
 
-type tickMsg time.Time
+type msgTick time.Time
 
 type model struct {
 	progress progress.Model
@@ -37,14 +37,14 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	case tea.MsgKey:
 		return tea.Quit
 
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
 		return nil
 
-	case tickMsg:
+	case msgTick:
 		if m.progress.Percent() == 1.0 {
 			return tea.Quit
 		}
@@ -54,8 +54,8 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		cmd := m.progress.IncrPercent(0.25)
 		return tea.Batch(tickCmd(), cmd)
 
-	// FrameMsg is sent when the progress bar wants to animate itself
-	case progress.FrameMsg:
+	// MsgFrame is sent when the progress bar wants to animate itself
+	case progress.MsgFrame:
 		return m.progress.Update(msg)
 
 	default:
@@ -72,7 +72,7 @@ func (m *model) View(r tea.Renderer) {
 
 func tickCmd() tea.Cmd {
 	return tea.Tick(time.Second*1, func(t time.Time) tea.Msg {
-		return tickMsg(t)
+		return msgTick(t)
 	})
 }
 

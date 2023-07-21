@@ -264,8 +264,8 @@ func TestVerticalNavigationKeepsCursorHorizontalPosition(t *testing.T) {
 	)
 	assert.Equal(t, 2, lineInfo.ColumnOffset)
 
-	downMsg := tea.MsgKey{Type: tea.KeyDown, Alt: false, Runes: []rune{}}
-	textarea.Update(downMsg)
+	msgDown := tea.MsgKey{Type: tea.KeyDown, Alt: false, Runes: []rune{}}
+	textarea.Update(msgDown)
 
 	lineInfo = textarea.LineInfo()
 	assert.Equal(
@@ -301,24 +301,24 @@ func TestVerticalNavigationShouldRememberPositionWhileTraversing(t *testing.T) {
 	assert.Equal(t, 2, textarea.row)
 
 	// Let's go up.
-	upMsg := tea.MsgKey{Type: tea.KeyUp, Alt: false, Runes: []rune{}}
-	textarea.Update(upMsg)
+	msgUp := tea.MsgKey{Type: tea.KeyUp, Alt: false, Runes: []rune{}}
+	textarea.Update(msgUp)
 
 	// We should be at the end of the second line.
 	assert.Equal(t, 5, textarea.col, "Expected cursor to be on the 5th character of the second line")
 	assert.Equal(t, 1, textarea.row)
 
 	// And, again.
-	textarea.Update(upMsg)
+	textarea.Update(msgUp)
 
 	// We should be at the end of the first line.
 	assert.Equal(t, 5, textarea.col, "Expected cursor to be on the 5th character of the first line")
 	assert.Equal(t, 0, textarea.row)
 
 	// Let's go down, twice.
-	downMsg := tea.MsgKey{Type: tea.KeyDown, Alt: false, Runes: []rune{}}
-	textarea.Update(downMsg)
-	textarea.Update(downMsg)
+	msgDown := tea.MsgKey{Type: tea.KeyDown, Alt: false, Runes: []rune{}}
+	textarea.Update(msgDown)
+	textarea.Update(msgDown)
 
 	// We should be at the end of the last line.
 	assert.Equal(t, 20, textarea.col, "Expected cursor to be on the 20th character of the last line")
@@ -329,16 +329,16 @@ func TestVerticalNavigationShouldRememberPositionWhileTraversing(t *testing.T) {
 	// keep the cursor where it is horizontally. This is how most text areas
 	// work.
 
-	textarea.Update(upMsg)
-	leftMsg := tea.MsgKey{Type: tea.KeyLeft, Alt: false, Runes: []rune{}}
-	textarea.Update(leftMsg)
+	textarea.Update(msgUp)
+	msgLeft := tea.MsgKey{Type: tea.KeyLeft, Alt: false, Runes: []rune{}}
+	textarea.Update(msgLeft)
 
 	assert.Equal(t, 4, textarea.col, "Expected cursor to be on the 5th character of the second line")
 	assert.Equal(t, 1, textarea.row)
 
 	// Going down now should keep us at the 4th column since we moved left and
 	// reset the horizontal position saved state.
-	textarea.Update(downMsg)
+	textarea.Update(msgDown)
 	assert.Equal(t, 4, textarea.col, "Expected cursor to be on the 4th character of the last line")
 	assert.Equal(t, 2, textarea.row)
 }

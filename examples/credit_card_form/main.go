@@ -19,9 +19,7 @@ func Main() {
 	}
 }
 
-type (
-	errMsg error
-)
+type msgErr error
 
 const (
 	ccn = iota
@@ -154,7 +152,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		m.inputs[m.focused].Focus()
 
 	// We handle errors just like any other message
-	case errMsg:
+	case msgErr:
 		m.err = msg
 		return nil
 	}

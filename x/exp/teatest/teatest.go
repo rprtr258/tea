@@ -26,7 +26,7 @@ type Program interface {
 
 // TestModelOptions defines all options available to the test function.
 type TestModelOptions struct {
-	size tea.WindowSizeMsg
+	size tea.MsgWindowSize
 }
 
 // TestOption is a functional option.
@@ -35,7 +35,7 @@ type TestOption func(opts *TestModelOptions)
 // WithInitialTermSize ...
 func WithInitialTermSize(x, y int) TestOption {
 	return func(opts *TestModelOptions) {
-		opts.size = tea.WindowSizeMsg{
+		opts.size = tea.MsgWindowSize{
 			Width:  x,
 			Height: y,
 		}

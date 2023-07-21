@@ -92,7 +92,7 @@ func buildBaseSeqTests() []seqTest {
 		// Unrecognized CSI sequence.
 		seqTest{
 			[]byte{'\x1b', '[', '-', '-', '-', '-', 'X'},
-			unknownCSISequenceMsg([]byte{'\x1b', '[', '-', '-', '-', '-', 'X'}),
+			msgUnknownCSISequence([]byte{'\x1b', '[', '-', '-', '-', '-', 'X'}),
 		},
 		// A lone space character.
 		seqTest{
@@ -127,7 +127,7 @@ func TestDetectOneMsg(t *testing.T) {
 		// Mouse event.
 		seqTest{
 			[]byte{'\x1b', '[', 'M', byte(32) + 0b0100_0000, byte(65), byte(49)},
-			MouseMsg{X: 32, Y: 16, Type: MouseWheelUp},
+			MsgMouse{X: 32, Y: 16, Type: MouseWheelUp},
 		},
 		// Runes.
 		seqTest{[]byte{'a'}, MsgKey{Type: KeyRunes, Runes: []rune("a")}},
@@ -143,7 +143,7 @@ func TestDetectOneMsg(t *testing.T) {
 		seqTest{[]byte{byte(keyNUL)}, MsgKey{Type: KeyCtrlAt}},
 		seqTest{[]byte{'\x1b', byte(keyNUL)}, MsgKey{Type: KeyCtrlAt, Alt: true}},
 		// Invalid characters.
-		seqTest{[]byte{'\x80'}, unknownInputByteMsg(0x80)},
+		seqTest{[]byte{'\x80'}, msgUnknownInputByte(0x80)},
 	)
 
 	if runtime.GOOS != "windows" {
@@ -151,7 +151,7 @@ func TestDetectOneMsg(t *testing.T) {
 		// This is incorrect, but it makes our test fail if we try it out.
 		tests = append(tests, seqTest{
 			[]byte{'\xfe'},
-			unknownInputByteMsg(0xfe),
+			msgUnknownInputByte(0xfe),
 		})
 	}
 
@@ -259,7 +259,7 @@ func TestReadInput(t *testing.T) {
 			"wheel up",
 			[]byte{'\x1b', '[', 'M', byte(32) + 0b0100_0000, byte(65), byte(49)},
 			[]Msg{
-				MouseMsg{
+				MsgMouse{
 					X:    32,
 					Y:    16,
 					Type: MouseWheelUp,
@@ -273,12 +273,12 @@ func TestReadInput(t *testing.T) {
 				'\x1b', '[', 'M', byte(32) + 0b0000_0011, byte(64 + 33), byte(32 + 33),
 			},
 			[]Msg{
-				MouseMsg(MouseEvent{
+				MsgMouse(MouseEvent{
 					X:    32,
 					Y:    16,
 					Type: MouseLeft,
 				}),
-				MouseMsg(MouseEvent{
+				MsgMouse(MouseEvent{
 					X:    64,
 					Y:    32,
 					Type: MouseRelease,
@@ -331,7 +331,7 @@ func TestReadInput(t *testing.T) {
 		{
 			"?CSI[45 45 45 45 88]?",
 			[]byte{'\x1b', '[', '-', '-', '-', '-', 'X'},
-			[]Msg{unknownCSISequenceMsg([]byte{'\x1b', '[', '-', '-', '-', '-', 'X'})},
+			[]Msg{msgUnknownCSISequence([]byte{'\x1b', '[', '-', '-', '-', '-', 'X'})},
 		},
 		// Powershell sequences.
 		{
@@ -398,11 +398,11 @@ func TestReadInput(t *testing.T) {
 				//  MsgKey{Type: KeyRunes, Runes: []rune("a b")},
 				//
 				// What we get instead (for now):
-				unknownCSISequenceMsg{0x1b, 0x5b, 0x32, 0x30, 0x30, 0x7e},
+				msgUnknownCSISequence{0x1b, 0x5b, 0x32, 0x30, 0x30, 0x7e},
 				MsgKey{Type: KeyRunes, Runes: []rune{'a'}},
 				MsgKey{Type: KeySpace, Runes: []rune{' '}},
 				MsgKey{Type: KeyRunes, Runes: []rune{'b'}},
-				unknownCSISequenceMsg{0x1b, 0x5b, 0x32, 0x30, 0x31, 0x7e},
+				msgUnknownCSISequence{0x1b, 0x5b, 0x32, 0x30, 0x31, 0x7e},
 			},
 		},
 	}
@@ -413,14 +413,14 @@ func TestReadInput(t *testing.T) {
 			test{
 				"?0xfe?",
 				[]byte{'\xfe'},
-				[]Msg{unknownInputByteMsg(0xfe)},
+				[]Msg{msgUnknownInputByte(0xfe)},
 			},
 			test{
 				"a ?0xfe?   b",
 				[]byte{'a', '\xfe', ' ', 'b'},
 				[]Msg{
 					MsgKey{Type: KeyRunes, Runes: []rune{'a'}},
-					unknownInputByteMsg(0xfe),
+					msgUnknownInputByte(0xfe),
 					MsgKey{Type: KeySpace, Runes: []rune{' '}},
 					MsgKey{Type: KeyRunes, Runes: []rune{'b'}},
 				},

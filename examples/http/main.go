@@ -18,11 +18,10 @@ type model struct {
 	err    error
 }
 
-type statusMsg int
-
-type errMsg struct{ error }
-
-func (e errMsg) Error() string { return e.error.Error() }
+type (
+	msgStatus int
+	msgErr    error
+)
 
 func Main() {
 	p := tea.NewProgram(&model{})
@@ -45,11 +44,11 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			return nil
 		}
 
-	case statusMsg:
+	case msgStatus:
 		m.status = int(msg)
 		return tea.Quit
 
-	case errMsg:
+	case msgErr:
 		m.err = msg
 		return nil
 
@@ -74,9 +73,9 @@ func checkServer() tea.Msg {
 	}
 	res, err := c.Get(url)
 	if err != nil {
-		return errMsg{err}
+		return msgErr(err)
 	}
 	defer res.Body.Close() // nolint:errcheck
 
-	return statusMsg(res.StatusCode)
+	return msgStatus(res.StatusCode)
 }
