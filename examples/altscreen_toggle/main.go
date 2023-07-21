@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/muesli/termenv"
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 var (

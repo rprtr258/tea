@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/textarea"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/textarea"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const (

@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/rprtr258/bubbletea/glamour"
-	"github.com/rprtr258/bubbletea/glamour/ansi"
+	"github.com/rprtr258/tea/glamour"
+	"github.com/rprtr258/tea/glamour/ansi"
 )
 
 func writeStyleJSON(filename string, styleConfig *ansi.StyleConfig) error {

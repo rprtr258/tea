@@ -516,7 +516,7 @@ var sequences = map[string]Key{
 
 // unknownInputByteMsg is reported by the input reader when an invalid
 // utf-8 byte is detected on the input. Currently, it is not handled
-// further by bubbletea. However, having this event makes it possible
+// further by tea. However, having this event makes it possible
 // to troubleshoot invalid inputs.
 type unknownInputByteMsg byte
 
@@ -526,7 +526,7 @@ func (u unknownInputByteMsg) String() string {
 
 // unknownCSISequenceMsg is reported by the input reader when an
 // unrecognized CSI sequence is detected on the input. Currently, it
-// is not handled further by bubbletea. However, having this event
+// is not handled further by tea. However, having this event
 // makes it possible to troubleshoot invalid inputs.
 type unknownCSISequenceMsg []byte
 

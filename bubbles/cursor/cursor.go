@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 const defaultBlinkSpeed = time.Millisecond * 530

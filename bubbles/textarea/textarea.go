@@ -7,12 +7,12 @@ import (
 
 	"github.com/atotto/clipboard"
 	rw "github.com/mattn/go-runewidth"
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/cursor"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/runeutil"
-	"github.com/rprtr258/bubbletea/bubbles/viewport"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/cursor"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/runeutil"
+	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const (
@@ -119,7 +119,7 @@ type LineInfo struct {
 // depending on the focus state.
 //
 // For an introduction to styling with Lip Gloss see:
-// https://github.com/rprtr258/bubbletea/lipgloss
+// https://github.com/rprtr258/tea/lipgloss
 type Style struct {
 	Base             lipgloss.Style
 	CursorLine       lipgloss.Style

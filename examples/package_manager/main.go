@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/progress"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/progress"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 type model struct {

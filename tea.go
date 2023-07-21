@@ -4,9 +4,9 @@
 // both. It's been battle-tested in several large projects and is
 // production-ready.
 //
-// A tutorial is available at https://github.com/rprtr258/bubbletea/tree/master/tutorials
+// A tutorial is available at https://github.com/rprtr258/tea/tree/master/tutorials
 //
-// Example programs can be found at https://github.com/rprtr258/bubbletea/tree/master/examples
+// Example programs can be found at https://github.com/rprtr258/tea/tree/master/examples
 package tea
 
 import (

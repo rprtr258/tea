@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/filepicker"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/filepicker"
 )
 
 type model struct {

@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/timer"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/timer"
 )
 
 const timeout = time.Second * 5

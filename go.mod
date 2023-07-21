@@ -1,4 +1,4 @@
-module github.com/rprtr258/bubbletea
+module github.com/rprtr258/tea
 
 go 1.18
 

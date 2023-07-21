@@ -12,13 +12,13 @@ import (
 
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/reflow/truncate"
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/paginator"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/bubbles/textinput"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/paginator"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/lipgloss"
 	"github.com/sahilm/fuzzy"
 )
 

@@ -14,7 +14,7 @@ import (
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/util"
 
-	"github.com/rprtr258/bubbletea/glamour/ansi"
+	"github.com/rprtr258/tea/glamour/ansi"
 )
 
 // Default styles.

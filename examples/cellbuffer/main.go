@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/harmonica"
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 const (

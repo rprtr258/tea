@@ -3,10 +3,10 @@ package glamour
 import (
 	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/viewport"
-	"github.com/rprtr258/bubbletea/glamour"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/glamour"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const content = `

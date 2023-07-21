@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 // Internal ID management. Used during animating to ensure that frame messages
@@ -100,7 +100,7 @@ type Model struct {
 	// want foreground and background coloring, and potentially some padding.
 	//
 	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/rprtr258/bubbletea/lipgloss
+	// https://github.com/rprtr258/tea/lipgloss
 	Style lipgloss.Style
 
 	frame int

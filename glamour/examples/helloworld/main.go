@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/rprtr258/bubbletea/glamour"
+	"github.com/rprtr258/tea/glamour"
 )
 
 func main() {
 	in := `# Hello World
 
 This is a simple example of Markdown rendering with Glamour!
-Check out the [other examples](https://github.com/rprtr258/bubbletea/glamour/tree/master/examples) too.
+Check out the [other examples](https://github.com/rprtr258/tea/glamour/tree/master/examples) too.
 
 Bye!
 `

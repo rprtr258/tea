@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/textinput"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/textinput"
 )
 
 func Main() {

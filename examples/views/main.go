@@ -3,7 +3,7 @@ package views
 // An example demonstrating an application with multiple views.
 //
 // Note that this example was produced before the Bubbles progress component
-// was available (github.com/rprtr258/bubbletea/bubbles/progress) and thus, we're
+// was available (github.com/rprtr258/tea/bubbles/progress) and thus, we're
 // implementing a progress bar from scratch here.
 
 import (
@@ -17,7 +17,7 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/indent"
 	"github.com/muesli/termenv"
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 const (

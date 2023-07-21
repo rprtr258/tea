@@ -26,7 +26,7 @@ body:
   - type: textarea
     id: version
     attributes:
-      label: Which version of bubbletea are you using?
+      label: Which version of tea are you using?
       description: ''
       render: bash
     validations:

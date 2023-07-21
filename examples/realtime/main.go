@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
 )
 
 // A message used to indicate that activity has occurred. In the real world (for

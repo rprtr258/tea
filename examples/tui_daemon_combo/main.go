@@ -12,9 +12,9 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/muesli/reflow/indent"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render

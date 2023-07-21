@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 	"golang.org/x/term"
 )
 
@@ -223,7 +223,7 @@ func main() {
 
 		desc := lipgloss.JoinVertical(lipgloss.Left,
 			descStyle.Render("Style Definitions for Nice Terminal Layouts"),
-			infoStyle.Render("From Charm"+divider+url("https://github.com/rprtr258/bubbletea/lipgloss")),
+			infoStyle.Render("From Charm"+divider+url("https://github.com/rprtr258/tea/lipgloss")),
 		)
 
 		row := lipgloss.JoinHorizontal(lipgloss.Top, title.String(), desc)

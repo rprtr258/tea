@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/aymanbagabas/go-udiff"
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 	"github.com/stretchr/testify/assert"
 )
 

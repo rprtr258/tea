@@ -1,6 +1,6 @@
 package viewport
 
-import "github.com/rprtr258/bubbletea/bubbles/key"
+import "github.com/rprtr258/tea/bubbles/key"
 
 const spacebar = " "
 

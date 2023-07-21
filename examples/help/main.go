@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // keyMap defines a set of keybindings. To work for help it must satisfy

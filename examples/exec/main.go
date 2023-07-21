@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 type editorFinishedMsg struct{ err error }

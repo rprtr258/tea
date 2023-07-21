@@ -8,13 +8,13 @@ import (
 	"os"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 func Main() {
 	// Log to a file. Useful in debugging since you can't really log to stdout.
 	// Not required.
-	logfilePath := os.Getenv("BUBBLETEA_LOG")
+	logfilePath := os.Getenv("tea_LOG")
 	if logfilePath != "" {
 		if _, err := tea.LogToFile(logfilePath, "simple"); err != nil {
 			log.Fatal(err)

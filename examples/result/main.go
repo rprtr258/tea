@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 var choices = []string{"Taro", "Coffee", "Lychee"}

@@ -2,11 +2,11 @@
 
 <p>
     <img src="https://stuff.charm.sh/glamour/glamour-github-header.png" width="245" alt="Glamour Title Treatment"><br>
-    <a href="https://github.com/rprtr258/bubbletea/glamour/releases"><img src="https://img.shields.io/github/release/rprtr258/bubbletea/glamour.svg" alt="Latest Release"></a>
-    <a href="https://pkg.go.dev/github.com/rprtr258/bubbletea/glamour?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
-    <a href="https://github.com/rprtr258/bubbletea/glamour/actions"><img src="https://github.com/rprtr258/bubbletea/glamour/workflows/build/badge.svg" alt="Build Status"></a>
-    <a href="https://coveralls.io/github/rprtr258/bubbletea/glamour?branch=master"><img src="https://coveralls.io/repos/github/rprtr258/bubbletea/glamour/badge.svg?branch=master" alt="Coverage Status"></a>
-    <a href="https://goreportcard.com/report/rprtr258/bubbletea/glamour"><img src="https://goreportcard.com/badge/rprtr258/bubbletea/glamour" alt="Go ReportCard"></a>
+    <a href="https://github.com/rprtr258/tea/glamour/releases"><img src="https://img.shields.io/github/release/rprtr258/tea/glamour.svg" alt="Latest Release"></a>
+    <a href="https://pkg.go.dev/github.com/rprtr258/tea/glamour?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
+    <a href="https://github.com/rprtr258/tea/glamour/actions"><img src="https://github.com/rprtr258/tea/glamour/workflows/build/badge.svg" alt="Build Status"></a>
+    <a href="https://coveralls.io/github/rprtr258/tea/glamour?branch=master"><img src="https://coveralls.io/repos/github/rprtr258/tea/glamour/badge.svg?branch=master" alt="Coverage Status"></a>
+    <a href="https://goreportcard.com/report/rprtr258/tea/glamour"><img src="https://goreportcard.com/badge/rprtr258/tea/glamour" alt="Go ReportCard"></a>
 </p>
 
 Stylesheet-based markdown rendering for your CLI apps.
@@ -21,12 +21,12 @@ the stylish defaults.
 ## Usage
 
 ```go
-import "github.com/rprtr258/bubbletea/glamour"
+import "github.com/rprtr258/tea/glamour"
 
 in := `# Hello World
 
 This is a simple example of Markdown rendering with Glamour!
-Check out the [other examples](https://github.com/rprtr258/bubbletea/glamour/tree/master/examples) too.
+Check out the [other examples](https://github.com/rprtr258/tea/glamour/tree/master/examples) too.
 
 Bye!
 `
@@ -35,12 +35,12 @@ out, err := glamour.Render(in, "dark")
 fmt.Print(out)
 ```
 
-<img src="https://github.com/rprtr258/bubbletea/glamour/raw/master/examples/helloworld/helloworld.png" width="600" alt="Hello World example">
+<img src="https://github.com/rprtr258/tea/glamour/raw/master/examples/helloworld/helloworld.png" width="600" alt="Hello World example">
 
 ### Custom Renderer
 
 ```go
-import "github.com/rprtr258/bubbletea/glamour"
+import "github.com/rprtr258/tea/glamour"
 
 r, _ := glamour.NewTermRenderer(
     // detect background color and pick either the default dark or light theme
@@ -55,8 +55,8 @@ fmt.Print(out)
 
 ## Styles
 
-You can find all available default styles in our [gallery](https://github.com/rprtr258/bubbletea/glamour/tree/master/styles/gallery).
-Want to create your own style? [Learn how!](https://github.com/rprtr258/bubbletea/glamour/tree/master/styles)
+You can find all available default styles in our [gallery](https://github.com/rprtr258/tea/glamour/tree/master/styles/gallery).
+Want to create your own style? [Learn how!](https://github.com/rprtr258/tea/glamour/tree/master/styles)
 
 There are a few options for using a custom style:
 1. Call `glamour.Render(inputText, "desiredStyle")`
@@ -83,7 +83,7 @@ We’d love to hear your thoughts on this project. Feel free to drop us a note!
 
 ## License
 
-[MIT](https://github.com/rprtr258/bubbletea/glamour/raw/master/LICENSE)
+[MIT](https://github.com/rprtr258/tea/glamour/raw/master/LICENSE)
 
 ***
 

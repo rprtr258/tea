@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/rprtr258/bubbletea/glamour"
+	"github.com/rprtr258/tea/glamour"
 )
 
 func main() {

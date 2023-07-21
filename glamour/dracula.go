@@ -1,6 +1,6 @@
 package glamour
 
-import "github.com/rprtr258/bubbletea/glamour/ansi"
+import "github.com/rprtr258/tea/glamour/ansi"
 
 var DraculaStyleConfig = ansi.StyleConfig{
 	Document: ansi.StyleBlock{

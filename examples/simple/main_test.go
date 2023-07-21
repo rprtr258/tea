@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 	"github.com/stretchr/testify/assert"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/x/exp/teatest"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/x/exp/teatest"
 )
 
 func init() {

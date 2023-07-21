@@ -3,7 +3,7 @@ package glamour
 //go:generate go run ./internal/generate-style-json
 
 import (
-	"github.com/rprtr258/bubbletea/glamour/ansi"
+	"github.com/rprtr258/tea/glamour/ansi"
 )
 
 var (

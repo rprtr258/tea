@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 const url = "https://charm.sh/"

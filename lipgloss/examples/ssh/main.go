@@ -20,7 +20,7 @@ import (
 	lm "github.com/charmbracelet/wish/logging"
 	"github.com/kr/pty"
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // Available styles.

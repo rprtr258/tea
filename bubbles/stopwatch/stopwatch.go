@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 var (

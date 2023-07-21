@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/x/exp/teatest"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/x/exp/teatest"
 )
 
 func TestApp(t *testing.T) {

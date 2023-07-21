@@ -8,7 +8,7 @@ import (
 	"log"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 type model int

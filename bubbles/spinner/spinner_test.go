@@ -3,7 +3,7 @@ package spinner_test
 import (
 	"testing"
 
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
+	"github.com/rprtr258/tea/bubbles/spinner"
 	"github.com/stretchr/testify/assert"
 )
 
