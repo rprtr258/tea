@@ -117,7 +117,6 @@ func (m *model) View(r tea.Renderer) {
 	}
 
 	r.Write(indent.String(s, 1))
-	return
 }
 
 // processFinishedMsg is sent when a pretend process completes.

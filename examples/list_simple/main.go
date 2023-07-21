@@ -95,7 +95,6 @@ func (m *model) View(r tea.Renderer) {
 	}
 
 	r.Write("\n" + m.list.View())
-	return
 }
 
 func Main() {

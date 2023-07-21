@@ -79,7 +79,6 @@ func (m *model) View(r tea.Renderer) {
 	}
 	s.WriteString("\n\n" + m.filepicker.View() + "\n")
 	r.Write(s.String())
-	return
 }
 
 func Main() {

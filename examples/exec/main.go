@@ -62,7 +62,6 @@ func (m *model) View(r tea.Renderer) {
 	}
 
 	r.Write("Press 'e' to open your EDITOR.\nPress 'a' to toggle the altscreen\nPress 'q' to quit.\n")
-	return
 }
 
 func Main() {

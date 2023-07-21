@@ -66,7 +66,6 @@ func (m *model) View(r tea.Renderer) {
 		s += fmt.Sprintf("%d %s", m.status, http.StatusText(m.status))
 	}
 	r.Write(s + "\n")
-	return
 }
 
 func checkServer() tea.Msg {

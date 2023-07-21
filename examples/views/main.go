@@ -109,7 +109,6 @@ func (m *model) View(r tea.Renderer) {
 		s = chosenView(m)
 	}
 	r.Write(indent.String("\n"+s+"\n\n", 2))
-	return
 }
 
 // Sub-update functions
@@ -256,15 +255,16 @@ func makeFgStyle(color string) func(string) string {
 }
 
 // Generate a blend of colors.
-func makeRamp(colorA, colorB string, steps float64) (s []string) {
+func makeRamp(colorA, colorB string, steps float64) []string {
 	cA, _ := colorful.Hex(colorA)
 	cB, _ := colorful.Hex(colorB)
 
+	s := make([]string, 0, int(steps)+1)
 	for i := 0.0; i < steps; i++ {
 		c := cA.BlendLuv(cB, i/steps)
 		s = append(s, colorToHex(c))
 	}
-	return
+	return s
 }
 
 // Convert a colorful.Color to a hexadecimal format compatible with termenv.
@@ -272,12 +272,11 @@ func colorToHex(c colorful.Color) string {
 	return fmt.Sprintf("#%s%s%s", colorFloatToHex(c.R), colorFloatToHex(c.G), colorFloatToHex(c.B))
 }
 
-// Helper function for converting colors to hex. Assumes a value between 0 and
-// 1.
-func colorFloatToHex(f float64) (s string) {
-	s = strconv.FormatInt(int64(f*255), 16)
+// Helper function for converting colors to hex. Assumes a value between 0 and 1.
+func colorFloatToHex(f float64) string {
+	s := strconv.FormatInt(int64(f*255), 16)
 	if len(s) == 1 {
 		s = "0" + s
 	}
-	return
+	return s
 }

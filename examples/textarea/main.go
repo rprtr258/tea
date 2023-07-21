@@ -77,5 +77,4 @@ func (m *model) View(r tea.Renderer) {
 		m.textarea.View(),
 		"(ctrl+c to quit)",
 	) + "\n\n")
-	return
 }

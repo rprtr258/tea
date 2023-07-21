@@ -67,5 +67,4 @@ func (m *model) View(r tea.Renderer) {
 		m.textInput.View(),
 		"(esc to quit)",
 	) + "\n")
-	return
 }

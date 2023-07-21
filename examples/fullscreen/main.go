@@ -48,7 +48,6 @@ func (m *model) Update(message tea.Msg) tea.Cmd {
 
 func (m *model) View(r tea.Renderer) {
 	r.Write(fmt.Sprintf("\n\n     Hi. This program will exit in %d seconds...", m))
-	return
 }
 
 func tick() tea.Cmd {

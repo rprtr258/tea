@@ -43,7 +43,6 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 
 func (m *model) View(r tea.Renderer) {
 	r.Write(docStyle.Render(m.list.View()))
-	return
 }
 
 func Main() {

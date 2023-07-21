@@ -93,5 +93,4 @@ func (m *model) View(r tea.Renderer) {
 	}
 
 	r.Write(fmt.Sprintf("\n %s%s%s\n\n%s", m.spinner.View(), gap, textStyle("Spinning..."), helpStyle("h/l, ←/→: change spinner • q: exit\n")))
-	return
 }

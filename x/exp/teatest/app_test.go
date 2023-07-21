@@ -63,6 +63,7 @@ func TestAppInteractive(t *testing.T) {
 
 func readBts(t *testing.T, r io.Reader) []byte {
 	t.Helper()
+
 	bts, err := io.ReadAll(r)
 	assert.NoError(t, err)
 	return bts

@@ -129,7 +129,6 @@ func (m *model) View(r tea.Renderer) {
 	height := 8 - strings.Count(status, "\n") - strings.Count(helpView, "\n")
 
 	r.Write("\n" + status + strings.Repeat("\n", height) + helpView)
-	return
 }
 
 func Main() {

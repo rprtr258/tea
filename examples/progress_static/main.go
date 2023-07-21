@@ -84,7 +84,6 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" +
 		pad + m.progress.ViewAs(m.percent) + "\n\n" +
 		pad + helpStyle("Press any key to quit"))
-	return
 }
 
 func tickCmd() tea.Cmd {

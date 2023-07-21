@@ -73,7 +73,6 @@ func (m *model) View(r tea.Renderer) {
 		s += "\n"
 	}
 	r.Write(s)
-	return
 }
 
 func Main() {

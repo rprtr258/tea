@@ -81,5 +81,4 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" +
 		pad + m.progress.View() + "\n\n" +
 		pad + helpStyle("Press any key to quit"))
-	return
 }
