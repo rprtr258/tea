@@ -1,7 +1,7 @@
 package exec
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 
@@ -66,7 +66,6 @@ func (m *model) View(r tea.Renderer) {
 
 func Main() {
 	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

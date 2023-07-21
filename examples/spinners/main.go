@@ -2,7 +2,7 @@ package spinners
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
@@ -33,8 +33,7 @@ func Main() {
 	m.resetSpinner()
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("could not run program:", err)
-		os.Exit(1)
+		log.Fatalln("could not run program:", err.Error())
 	}
 }
 

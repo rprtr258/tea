@@ -5,8 +5,8 @@ package send_msg
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 
@@ -114,8 +114,7 @@ func Main() {
 	}()
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }
 

@@ -5,7 +5,7 @@ package result
 
 import (
 	"fmt"
-	"os"
+	"log"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -75,8 +75,7 @@ func Main() {
 	// Run returns the model as a tea.Model.
 	m, err := p.Run()
 	if err != nil {
-		fmt.Println("Oh no:", err)
-		os.Exit(1)
+		log.Fatalln("Oh no:", err.Error())
 	}
 
 	// Assert the final tea.Model to our local model and print the choice.

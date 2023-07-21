@@ -5,8 +5,7 @@ package cellbuffer
 // double-width runes.
 
 import (
-	"fmt"
-	"os"
+	"log"
 	"strings"
 	"time"
 
@@ -187,7 +186,6 @@ func Main() {
 		spring: harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
 	}).WithAltScreen().WithMouseCellMotion()
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
+		log.Fatalln("Uh oh:", err.Error())
 	}
 }

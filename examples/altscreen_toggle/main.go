@@ -67,6 +67,6 @@ func (m *model) View(r tea.Renderer) {
 
 func Main() {
 	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
-		log.Fatal("Error running program: ", err.Error())
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

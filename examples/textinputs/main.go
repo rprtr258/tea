@@ -5,7 +5,7 @@ package textinputs
 
 import (
 	"fmt"
-	"os"
+	"log"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -170,7 +170,6 @@ func (m *model) View(r tea.Renderer) {
 
 func Main() {
 	if _, err := tea.NewProgram(initialModel()).Run(); err != nil {
-		fmt.Printf("could not start program: %s\n", err)
-		os.Exit(1)
+		log.Fatalln("could not start program: %s\n", err.Error())
 	}
 }

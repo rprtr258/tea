@@ -153,6 +153,6 @@ func Main() {
 	p := tea.NewProgram(newModel(defaultTime))
 
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }

@@ -5,7 +5,7 @@ package spinner
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
@@ -68,7 +68,6 @@ func (m *model) View(r tea.Renderer) {
 func Main() {
 	p := tea.NewProgram(initialModel())
 	if _, err := p.Run(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatalln(err.Error())
 	}
 }

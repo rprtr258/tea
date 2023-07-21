@@ -8,8 +8,7 @@ package progress_animated
 // transitions. For details on that approach see the progress-static example.
 
 import (
-	"fmt"
-	"os"
+	"log"
 	"strings"
 	"time"
 
@@ -85,7 +84,6 @@ func Main() {
 	}
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Oh no!", err)
-		os.Exit(1)
+		log.Fatalln("Oh no!", err.Error())
 	}
 }

@@ -16,8 +16,7 @@ import (
 //
 //	  f, err := LogToFile("debug.log", "debug")
 //	  if err != nil {
-//			fmt.Println("fatal:", err)
-//			os.Exit(1)
+//			log.Fatalln("fatal:", err.Error())
 //	  }
 //	  defer f.Close()
 func LogToFile(path string, prefix string) (*os.File, error) {

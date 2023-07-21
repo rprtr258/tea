@@ -1,8 +1,7 @@
 package table
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/table"
@@ -175,7 +174,6 @@ func Main() {
 	t.SetStyles(s)
 
 	if _, err := tea.NewProgram(&model{t}).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

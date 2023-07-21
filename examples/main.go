@@ -49,7 +49,7 @@ import (
 
 func main() {
 	if len(os.Args) != 2 {
-		log.Fatal("Usage: go run main.go <example>")
+		log.Fatalln("Usage: go run main.go <example>")
 	}
 
 	switch os.Args[1] {
@@ -138,6 +138,6 @@ func main() {
 	case "views":
 		views.Main()
 	default:
-		log.Fatal("Unknown example")
+		log.Fatalln("Unknown example")
 	}
 }

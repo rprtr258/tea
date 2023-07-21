@@ -12,7 +12,7 @@ package debounce
 
 import (
 	"fmt"
-	"os"
+	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -60,7 +60,6 @@ func (m *model) View(r tea.Renderer) {
 
 func Main() {
 	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
-		fmt.Println("uh oh:", err)
-		os.Exit(1)
+		log.Fatalln("uh oh:", err.Error())
 	}
 }

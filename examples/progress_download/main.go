@@ -42,7 +42,7 @@ func (pw *progressWriter) Write(p []byte) (int, error) {
 func getResponse(url string) (*http.Response, error) {
 	resp, err := http.Get(url) // nolint:gosec
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("receiving status of %d for url: %s", resp.StatusCode, url)
@@ -61,23 +61,20 @@ func Main() {
 
 	resp, err := getResponse(*url)
 	if err != nil {
-		fmt.Println("could not get response", err)
-		os.Exit(1)
+		log.Fatalln("could not get response", err.Error())
 	}
 	defer resp.Body.Close() // nolint:errcheck
 
 	// Don't add TUI if the header doesn't include content size
 	// it's impossible see progress without total
 	if resp.ContentLength <= 0 {
-		fmt.Println("can't parse content length, aborting download")
-		os.Exit(1)
+		log.Fatalln("can't parse content length, aborting download")
 	}
 
 	filename := filepath.Base(*url)
 	file, err := os.Create(filename)
 	if err != nil {
-		fmt.Println("could not create file:", err)
-		os.Exit(1)
+		log.Fatalln("could not create file:", err.Error())
 	}
 	defer file.Close() // nolint:errcheck
 
@@ -101,7 +98,6 @@ func Main() {
 	go pw.Start()
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("error running program:", err)
-		os.Exit(1)
+		log.Fatalln("error running program:", err.Error())
 	}
 }

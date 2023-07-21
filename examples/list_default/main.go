@@ -1,8 +1,7 @@
 package list_default
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/list"
@@ -80,7 +79,6 @@ func Main() {
 	p := tea.NewProgram(m).WithAltScreen()
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

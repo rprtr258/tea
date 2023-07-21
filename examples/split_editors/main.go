@@ -1,8 +1,7 @@
 package split_editors
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
@@ -196,7 +195,6 @@ func (m *model) View(r tea.Renderer) {
 
 func Main() {
 	if _, err := tea.NewProgram(newModel()).WithAltScreen().Run(); err != nil {
-		fmt.Println("Error while running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error while running program:", err.Error())
 	}
 }

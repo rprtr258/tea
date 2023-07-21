@@ -17,7 +17,7 @@ func Main() {
 	logfilePath := os.Getenv("tea_LOG")
 	if logfilePath != "" {
 		if _, err := tea.LogToFile(logfilePath, "simple"); err != nil {
-			log.Fatal(err)
+			log.Fatalln(err.Error())
 		}
 	}
 
@@ -25,7 +25,7 @@ func Main() {
 	m := model(5)
 	p := tea.NewProgram(&m)
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }
 

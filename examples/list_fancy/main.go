@@ -1,9 +1,8 @@
 package list_fancy
 
 import (
-	"fmt"
+	"log"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -182,7 +181,6 @@ func Main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

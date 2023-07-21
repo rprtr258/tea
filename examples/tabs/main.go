@@ -1,8 +1,7 @@
 package tabs
 
 import (
-	"fmt"
-	"os"
+	"log"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -94,8 +93,7 @@ func Main() {
 	tabContent := []string{"Lip Gloss Tab", "Blush Tab", "Eye Shadow Tab", "Mascara Tab", "Foundation Tab"}
 	m := &model{Tabs: tabs, TabContent: tabContent}
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }
 

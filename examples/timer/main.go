@@ -1,8 +1,7 @@
 package timer
 
 import (
-	"fmt"
-	"os"
+	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -113,7 +112,6 @@ func Main() {
 	m.keymap.start.SetEnabled(false)
 
 	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Uh oh, we encountered an error:", err)
-		os.Exit(1)
+		log.Fatalln("Uh oh, we encountered an error:", err.Error())
 	}
 }

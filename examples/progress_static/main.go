@@ -17,8 +17,7 @@ package progress_static
 // the progress-animated example.
 
 import (
-	"fmt"
-	"os"
+	"log"
 	"strings"
 	"time"
 
@@ -38,8 +37,7 @@ func Main() {
 	prog := progress.New(progress.WithScaledGradient("#FF7CCB", "#FDFF8C"))
 
 	if _, err := tea.NewProgram(&model{progress: prog}).Run(); err != nil {
-		fmt.Println("Oh no!", err)
-		os.Exit(1)
+		log.Fatalln("Oh no!", err.Error())
 	}
 }
 

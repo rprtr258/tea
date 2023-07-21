@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -73,7 +73,6 @@ func (m *model) View(r tea.Renderer) {
 
 func main() {
 	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
-		fmt.Printf("Uh oh, there was an error: %v\n", err)
-		os.Exit(1)
+		log.Fatalln("Uh oh, there was an error:", err.Error())
 	}
 }

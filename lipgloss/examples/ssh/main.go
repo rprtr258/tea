@@ -97,7 +97,7 @@ func outputFromSession(sess ssh.Session) *termenv.Output {
 	sshPty, _, _ := sess.Pty()
 	_, tty, err := pty.Open()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 	o := &sshOutput{
 		Session: sess,
@@ -186,11 +186,9 @@ func main() {
 		wish.WithMiddleware(handler, lm.Middleware()),
 	)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 	log.Printf("SSH server listening on port %d", port)
 	log.Printf("To connect from your local machine run: ssh localhost -p %d", port)
-	if err := s.ListenAndServe(); err != nil {
-		log.Fatal(err)
-	}
+	log.Fatalln(s.ListenAndServe().Error())
 }

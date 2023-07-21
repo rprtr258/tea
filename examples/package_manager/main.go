@@ -124,6 +124,6 @@ func max(a, b int) int {
 
 func Main() {
 	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
-		log.Fatal("Error running program: ", err.Error())
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

@@ -19,7 +19,7 @@ func Main() {
 	m := model(5)
 	p := tea.NewProgram(&m).WithAltScreen()
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }
 

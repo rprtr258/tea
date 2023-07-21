@@ -65,8 +65,7 @@ func Main() {
 	}
 
 	if stat.Mode()&os.ModeNamedPipe == 0 && stat.Size() == 0 {
-		fmt.Println("Try piping in some text.")
-		os.Exit(1)
+		log.Fatalln("Try piping in some text.")
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -79,13 +78,13 @@ func Main() {
 		}
 		_, err = sb.WriteRune(r)
 		if err != nil {
-			log.Fatal("Error getting input: ", err.Error())
+			log.Fatalln("Error getting input:", err.Error())
 		}
 	}
 
 	model := newModel(strings.TrimSpace(sb.String()))
 
 	if _, err := tea.NewProgram(model).Run(); err != nil {
-		log.Fatal("Couldn't start program: ", err.Error())
+		log.Fatalln("Couldn't start program:", err.Error())
 	}
 }

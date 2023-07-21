@@ -122,6 +122,6 @@ func Main() {
 	l.Styles.HelpStyle = helpStyle
 
 	if _, err := tea.NewProgram(&model{list: l}).Run(); err != nil {
-		log.Fatal("Error running program: ", err.Error())
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

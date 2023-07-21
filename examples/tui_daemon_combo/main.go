@@ -31,7 +31,7 @@ func Main() {
 
 	if showHelp {
 		flag.Usage()
-		os.Exit(0)
+		return
 	}
 
 	p := tea.NewProgram(newModel())
@@ -44,8 +44,7 @@ func Main() {
 	}
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Error starting Bubble Tea program:", err)
-		os.Exit(1)
+		log.Fatalln("Error starting Bubble Tea program:", err.Error())
 	}
 }
 

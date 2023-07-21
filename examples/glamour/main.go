@@ -113,10 +113,10 @@ func (e *model) helpView() string {
 func Main() {
 	model, err := newExample()
 	if err != nil {
-		log.Fatal("Could not initialize Bubble Tea model: ", err.Error())
+		log.Fatalln("Could not initialize Bubble Tea model:", err.Error())
 	}
 
 	if _, err := tea.NewProgram(model).Run(); err != nil {
-		log.Fatal("Bummer, there's been an error: ", err.Error())
+		log.Fatalln("Bummer, there's been an error:", err.Error())
 	}
 }

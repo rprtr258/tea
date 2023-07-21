@@ -232,8 +232,7 @@ The last step is to simply run our program. We pass our initial model to
 func main() {
     p := tea.NewProgram(initialModel())
     if _, err := p.Run(); err != nil {
-        fmt.Printf("Alas, there's been an error: %v", err)
-        os.Exit(1)
+        log.Fatalln("Alas, there's been an error:", err.Error())
     }
 }
 ```
@@ -280,8 +279,7 @@ the following prior to starting your Bubble Tea program:
 if len(os.Getenv("DEBUG")) > 0 {
 	f, err := tea.LogToFile("debug.log", "debug")
 	if err != nil {
-		fmt.Println("fatal:", err)
-		os.Exit(1)
+		log.Fatalln("fatal:", err.Error())
 	}
 	defer f.Close()
 }

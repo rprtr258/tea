@@ -5,8 +5,8 @@ package realtime
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -82,7 +82,6 @@ func Main() {
 	})
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("could not start program:", err)
-		os.Exit(1)
+		log.Fatalln("could not start program:", err.Error())
 	}
 }

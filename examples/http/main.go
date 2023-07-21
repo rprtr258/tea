@@ -27,7 +27,7 @@ func (e errMsg) Error() string { return e.error.Error() }
 func Main() {
 	p := tea.NewProgram(&model{})
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }
 
