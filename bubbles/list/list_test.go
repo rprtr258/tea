@@ -32,7 +32,7 @@ func TestStatusBarItemName(t *testing.T) {
 	assert.Contains(t, list.statusView(), "2 items")
 
 	list.SetItems([]Item{item("foo")})
-	assert.NotContains(t, list.statusView(), "1 item") // TODO: fix
+	assert.Contains(t, list.statusView(), "1 item")
 }
 
 func TestStatusBarWithoutItems(t *testing.T) {

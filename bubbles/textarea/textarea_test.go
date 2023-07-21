@@ -148,7 +148,7 @@ func TestWordWrapOverflowing(t *testing.T) {
 	}
 
 	lastLineWidth := textarea.LineInfo().Width
-	assert.Greater(t, lastLineWidth, 20)
+	assert.LessOrEqual(t, lastLineWidth, 20)
 }
 
 func TestValueSoftWrap(t *testing.T) {

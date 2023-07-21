@@ -47,7 +47,7 @@ func TestAppInteractive(t *testing.T) {
 	tm.Send("ignored msg")
 
 	bts := readBts(t, tm.Output())
-	assert.Contains(t, bts, []byte("This program will exit in 9 seconds"))
+	assert.Contains(t, string(bts), "This program will exit in 9 seconds")
 
 	teatest.WaitFor(t, tm.Output(), func(out []byte) bool {
 		return bytes.Contains(out, []byte("This program will exit in 7 seconds"))
