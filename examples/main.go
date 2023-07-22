@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
+	"sort"
 
 	"github.com/rprtr258/tea/examples/altscreen_toggle"
 	"github.com/rprtr258/tea/examples/cellbuffer"
@@ -47,97 +48,79 @@ import (
 	"github.com/rprtr258/tea/examples/views"
 )
 
+var (
+	_examples = map[string]func(){
+		"altscreen-toggle":  altscreen_toggle.Main,
+		"cellbuffer":        cellbuffer.Main,
+		"chat":              chat.Main,
+		"composable-views":  composable_views.Main,
+		"credit-card-form":  credit_card_form.Main,
+		"debounce":          debounce.Main,
+		"exec":              exec.Main,
+		"file-picker":       file_picker.Main,
+		"fullscreen":        fullscreen.Main,
+		"glamour":           glamour.Main,
+		"help":              help.Main,
+		"http":              http.Main,
+		"list-default":      list_default.Main,
+		"list-fancy":        list_fancy.Main,
+		"list-simple":       list_simple.Main,
+		"mouse":             mouse.Main,
+		"package-manager":   package_manager.Main,
+		"pager":             pager.Main,
+		"paginator":         paginator.Main,
+		"pipe":              pipe.Main,
+		"prevent-quit":      prevent_quit.Main,
+		"progress-animated": progress_animated.Main,
+		"progress-download": progress_download.Main,
+		"progress-static":   progress_static.Main,
+		"realtime":          realtime.Main,
+		"result":            result.Main,
+		"send-msg":          send_msg.Main,
+		"sequence":          sequence.Main,
+		"simple":            simple.Main,
+		"spinner":           spinner.Main,
+		"spinners":          spinners.Main,
+		"split-editors":     split_editors.Main,
+		"stopwatch":         stopwatch.Main,
+		"table":             table.Main,
+		"tabs":              tabs.Main,
+		"textarea":          textarea.Main,
+		"textinput":         textinput.Main,
+		"textinputs":        textinputs.Main,
+		"timer":             timer.Main,
+		"tui-daemon-combo":  tui_daemon_combo.Main,
+		"views":             views.Main,
+	}
+	_examplesNames = examplesNames()
+)
+
+func examplesNames() []string {
+	names := make([]string, 0, len(_examples))
+	for name := range _examples {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}
+
+func usage() {
+	fmt.Println("Usage: go run main.go <example>")
+	for _, example := range _examplesNames {
+		fmt.Println(example)
+	}
+	os.Exit(1)
+}
+
 func main() {
 	if len(os.Args) != 2 {
-		log.Fatalln("Usage: go run main.go <example>")
+		usage()
 	}
 
-	switch os.Args[1] {
-	case "--help":
-		log.Println("TODO: print examples list")
-	case "altscreen-toggle":
-		altscreen_toggle.Main()
-	case "cellbuffer":
-		cellbuffer.Main()
-	case "chat":
-		chat.Main()
-	case "composable-views":
-		composable_views.Main()
-	case "credit-card-form":
-		credit_card_form.Main()
-	case "debounce":
-		debounce.Main()
-	case "exec":
-		exec.Main()
-	case "file-picker":
-		file_picker.Main()
-	case "fullscreen":
-		fullscreen.Main()
-	case "glamour":
-		glamour.Main()
-	case "help":
-		help.Main()
-	case "http":
-		http.Main()
-	case "list-default":
-		list_default.Main()
-	case "list-fancy":
-		list_fancy.Main()
-	case "list-simple":
-		list_simple.Main()
-	case "mouse":
-		mouse.Main()
-	case "package-manager":
-		package_manager.Main()
-	case "pager":
-		pager.Main()
-	case "paginator":
-		paginator.Main()
-	case "pipe":
-		pipe.Main()
-	case "prevent-quit":
-		prevent_quit.Main()
-	case "progress-animated":
-		progress_animated.Main()
-	case "progress-download":
-		progress_download.Main()
-	case "progress-static":
-		progress_static.Main()
-	case "realtime":
-		realtime.Main()
-	case "result":
-		result.Main()
-	case "send-msg":
-		send_msg.Main()
-	case "sequence":
-		sequence.Main()
-	case "simple":
-		simple.Main()
-	case "spinner":
-		spinner.Main()
-	case "spinners":
-		spinners.Main()
-	case "split-editors":
-		split_editors.Main()
-	case "stopwatch":
-		stopwatch.Main()
-	case "table":
-		table.Main()
-	case "tabs":
-		tabs.Main()
-	case "textarea":
-		textarea.Main()
-	case "textinput":
-		textinput.Main()
-	case "textinputs":
-		textinputs.Main()
-	case "timer":
-		timer.Main()
-	case "tui-daemon-combo":
-		tui_daemon_combo.Main()
-	case "views":
-		views.Main()
-	default:
-		log.Fatalln("Unknown example")
+	exampleMain, ok := _examples[os.Args[1]]
+	if !ok {
+		usage()
 	}
+
+	exampleMain()
 }
