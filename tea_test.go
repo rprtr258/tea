@@ -233,5 +233,5 @@ func TestTeaNoRun(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
+	assert.NotNil(t, NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf))
 }

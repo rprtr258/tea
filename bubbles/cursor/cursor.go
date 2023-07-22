@@ -3,9 +3,8 @@ package cursor
 import (
 	"time"
 
-	"github.com/rprtr258/tea/lipgloss"
-
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const defaultBlinkSpeed = time.Millisecond * 530

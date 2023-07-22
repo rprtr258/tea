@@ -53,7 +53,7 @@ func (e *TableElement) Render(w io.Writer, ctx RenderContext) error {
 	return nil
 }
 
-func (e *TableElement) Finish(w io.Writer, ctx RenderContext) error {
+func (e *TableElement) Finish(_ io.Writer, ctx RenderContext) error {
 	rules := ctx.options.Styles.Table
 
 	ctx.table.writer.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
@@ -85,7 +85,7 @@ func (e *TableElement) Finish(w io.Writer, ctx RenderContext) error {
 	return ctx.table.styleWriter.Close()
 }
 
-func (e *TableRowElement) Finish(w io.Writer, ctx RenderContext) error {
+func (e *TableRowElement) Finish(_ io.Writer, ctx RenderContext) error {
 	if ctx.table.writer == nil {
 		return nil
 	}
@@ -95,7 +95,7 @@ func (e *TableRowElement) Finish(w io.Writer, ctx RenderContext) error {
 	return nil
 }
 
-func (e *TableHeadElement) Finish(w io.Writer, ctx RenderContext) error {
+func (e *TableHeadElement) Finish(_ io.Writer, ctx RenderContext) error {
 	if ctx.table.writer == nil {
 		return nil
 	}
@@ -105,7 +105,7 @@ func (e *TableHeadElement) Finish(w io.Writer, ctx RenderContext) error {
 	return nil
 }
 
-func (e *TableCellElement) Render(w io.Writer, ctx RenderContext) error {
+func (e *TableCellElement) Render(_ io.Writer, ctx RenderContext) error {
 	if e.Head {
 		ctx.table.header = append(ctx.table.header, e.Text)
 	} else {
