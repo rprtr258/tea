@@ -1,4 +1,4 @@
-package main
+package ssh
 
 // This example demonstrates how to use a custom Lip Gloss renderer with Wish,
 // a package for building custom SSH servers.
@@ -178,7 +178,7 @@ func handler(next ssh.Handler) ssh.Handler {
 	}
 }
 
-func main() {
+func Main() {
 	port := 3456
 	s, err := wish.NewServer(
 		wish.WithAddress(fmt.Sprintf(":%d", port)),

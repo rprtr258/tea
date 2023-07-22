@@ -11,9 +11,9 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/tea/lipgloss"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // Internal ID management. Used during animating to assure that frame messages

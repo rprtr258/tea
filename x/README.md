@@ -16,10 +16,7 @@ into other repositories.
 
 Currently the following packages are available:
 
-* [`higherorder`](./exp/higherorder): generic higher order functions
-* [`ordered`](./exp/ordered): generic `min`, `max`, and `clamp` functions for ordered types
-* [`slice`](./exp/slice): generic slice utilities
-* [`teatest`](./exp/teatest): a library for testing [Bubble Tea](https://github.com/rprtr258/tea) programs
+* [`teatest`](./teatest): a library for testing [Bubble Tea](https://github.com/rprtr258/tea) programs
 
 ## Feedback
 

@@ -1,4 +1,4 @@
-package glamour
+package menu
 
 import (
 	"context"

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
-	"sort"
+
+	"github.com/urfave/cli/v2"
 
 	"github.com/rprtr258/tea/examples/altscreen_toggle"
 	"github.com/rprtr258/tea/examples/cellbuffer"
@@ -14,9 +15,13 @@ import (
 	"github.com/rprtr258/tea/examples/exec"
 	"github.com/rprtr258/tea/examples/file_picker"
 	"github.com/rprtr258/tea/examples/fullscreen"
-	"github.com/rprtr258/tea/examples/glamour"
+	"github.com/rprtr258/tea/examples/glamour/custom_renderer"
+	"github.com/rprtr258/tea/examples/glamour/helloworld"
+	"github.com/rprtr258/tea/examples/glamour/menu"
 	"github.com/rprtr258/tea/examples/help"
 	"github.com/rprtr258/tea/examples/http"
+	"github.com/rprtr258/tea/examples/lipgloss/layout"
+	"github.com/rprtr258/tea/examples/lipgloss/ssh"
 	"github.com/rprtr258/tea/examples/list_default"
 	"github.com/rprtr258/tea/examples/list_fancy"
 	"github.com/rprtr258/tea/examples/list_simple"
@@ -45,82 +50,93 @@ import (
 	"github.com/rprtr258/tea/examples/textinputs"
 	"github.com/rprtr258/tea/examples/timer"
 	"github.com/rprtr258/tea/examples/tui_daemon_combo"
+	"github.com/rprtr258/tea/examples/tutorials/basics"
+	"github.com/rprtr258/tea/examples/tutorials/commands"
 	"github.com/rprtr258/tea/examples/views"
 )
 
-var (
-	_examples = map[string]func(){
-		"altscreen-toggle":  altscreen_toggle.Main,
-		"cellbuffer":        cellbuffer.Main,
-		"chat":              chat.Main,
-		"composable-views":  composable_views.Main,
-		"credit-card-form":  credit_card_form.Main,
-		"debounce":          debounce.Main,
-		"exec":              exec.Main,
-		"file-picker":       file_picker.Main,
-		"fullscreen":        fullscreen.Main,
-		"glamour":           glamour.Main,
-		"help":              help.Main,
-		"http":              http.Main,
-		"list-default":      list_default.Main,
-		"list-fancy":        list_fancy.Main,
-		"list-simple":       list_simple.Main,
-		"mouse":             mouse.Main,
-		"package-manager":   package_manager.Main,
-		"pager":             pager.Main,
-		"paginator":         paginator.Main,
-		"pipe":              pipe.Main,
-		"prevent-quit":      prevent_quit.Main,
-		"progress-animated": progress_animated.Main,
-		"progress-download": progress_download.Main,
-		"progress-static":   progress_static.Main,
-		"realtime":          realtime.Main,
-		"result":            result.Main,
-		"send-msg":          send_msg.Main,
-		"sequence":          sequence.Main,
-		"simple":            simple.Main,
-		"spinner":           spinner.Main,
-		"spinners":          spinners.Main,
-		"split-editors":     split_editors.Main,
-		"stopwatch":         stopwatch.Main,
-		"table":             table.Main,
-		"tabs":              tabs.Main,
-		"textarea":          textarea.Main,
-		"textinput":         textinput.Main,
-		"textinputs":        textinputs.Main,
-		"timer":             timer.Main,
-		"tui-daemon-combo":  tui_daemon_combo.Main,
-		"views":             views.Main,
+func exampleCommand(name string, main func()) *cli.Command {
+	return &cli.Command{
+		Name: name,
+		Action: func(c *cli.Context) error {
+			main()
+			return nil
+		},
 	}
-	_examplesNames = examplesNames()
-)
-
-func examplesNames() []string {
-	names := make([]string, 0, len(_examples))
-	for name := range _examples {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-	return names
-}
-
-func usage() {
-	fmt.Println("Usage: go run main.go <example>")
-	for _, example := range _examplesNames {
-		fmt.Println(example)
-	}
-	os.Exit(1)
 }
 
 func main() {
-	if len(os.Args) != 2 {
-		usage()
+	if err := (&cli.App{
+		Name:  "tea examples",
+		Usage: "tea <example>",
+		Commands: []*cli.Command{
+			exampleCommand("altscreen-toggle", altscreen_toggle.Main),
+			exampleCommand("cellbuffer", cellbuffer.Main),
+			exampleCommand("chat", chat.Main),
+			exampleCommand("composable-views", composable_views.Main),
+			exampleCommand("credit-card-form", credit_card_form.Main),
+			exampleCommand("debounce", debounce.Main),
+			exampleCommand("exec", exec.Main),
+			exampleCommand("file-picker", file_picker.Main),
+			exampleCommand("fullscreen", fullscreen.Main),
+			exampleCommand("help", help.Main),
+			exampleCommand("http", http.Main),
+			exampleCommand("list-default", list_default.Main),
+			exampleCommand("list-fancy", list_fancy.Main),
+			exampleCommand("list-simple", list_simple.Main),
+			exampleCommand("mouse", mouse.Main),
+			exampleCommand("package-manager", package_manager.Main),
+			exampleCommand("pager", pager.Main),
+			exampleCommand("paginator", paginator.Main),
+			exampleCommand("pipe", pipe.Main),
+			exampleCommand("prevent-quit", prevent_quit.Main),
+			exampleCommand("progress-animated", progress_animated.Main),
+			exampleCommand("progress-download", progress_download.Main),
+			exampleCommand("progress-static", progress_static.Main),
+			exampleCommand("realtime", realtime.Main),
+			exampleCommand("result", result.Main),
+			exampleCommand("send-msg", send_msg.Main),
+			exampleCommand("sequence", sequence.Main),
+			exampleCommand("simple", simple.Main),
+			exampleCommand("spinner", spinner.Main),
+			exampleCommand("spinners", spinners.Main),
+			exampleCommand("split-editors", split_editors.Main),
+			exampleCommand("stopwatch", stopwatch.Main),
+			exampleCommand("table", table.Main),
+			exampleCommand("tabs", tabs.Main),
+			exampleCommand("textarea", textarea.Main),
+			exampleCommand("textinput", textinput.Main),
+			exampleCommand("textinputs", textinputs.Main),
+			exampleCommand("timer", timer.Main),
+			exampleCommand("tui-daemon-combo", tui_daemon_combo.Main),
+			exampleCommand("views", views.Main),
+			{
+				Name:  "tutorials",
+				Usage: "Tea tutorials",
+				Subcommands: []*cli.Command{
+					exampleCommand("basics", basics.Main),
+					exampleCommand("commands", commands.Main),
+				},
+			},
+			{
+				Name:  "lipgloss",
+				Usage: "lipgloss examples",
+				Subcommands: []*cli.Command{
+					exampleCommand("layout", layout.Main),
+					exampleCommand("ssh", ssh.Main),
+				},
+			},
+			{
+				Name:  "glamour",
+				Usage: "glamour examples",
+				Subcommands: []*cli.Command{
+					exampleCommand("custom-renderer", custom_renderer.Main),
+					exampleCommand("helloworld", helloworld.Main),
+					exampleCommand("menu", menu.Main),
+				},
+			},
+		},
+	}).Run(os.Args); err != nil {
+		log.Fatalln(err.Error())
 	}
-
-	exampleMain, ok := _examples[os.Args[1]]
-	if !ok {
-		usage()
-	}
-
-	exampleMain()
 }

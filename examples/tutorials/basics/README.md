@@ -188,7 +188,7 @@ func (m *model) View(r tea.Renderer) {
     s += "\nPress q to quit.\n"
 
     // Send the UI for rendering
-    return s
+    r.Write(s)
 }
 ```
 
