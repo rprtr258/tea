@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/x/exp/teatest"
+	"github.com/rprtr258/tea/x/teatest"
 )
 
 func TestApp(t *testing.T) {

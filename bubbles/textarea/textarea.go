@@ -7,6 +7,7 @@ import (
 
 	"github.com/atotto/clipboard"
 	rw "github.com/mattn/go-runewidth"
+
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/cursor"
 	"github.com/rprtr258/tea/bubbles/key"

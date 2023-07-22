@@ -16,8 +16,9 @@ import (
 	"time"
 
 	"github.com/aymanbagabas/go-udiff"
-	"github.com/rprtr258/tea"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/rprtr258/tea"
 )
 
 // Program defines the subset of the tea.Program API we need for testing.

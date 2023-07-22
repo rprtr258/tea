@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"context"
@@ -69,7 +69,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" + s + "\n\n")
 }
 
-func main() {
+func Main() {
 	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
 		log.Fatalln("Uh oh, there was an error:", err.Error())
 	}

@@ -167,10 +167,18 @@ linters-settings:
     ignorePackageGlobs:
       - github.com/rprtr258/xerr
 
+  gci:
+    sections:
+      - standard # Standard section: captures all standard packages.
+      - default # Default section: contains all imports that could not be matched to another section type.
+      - prefix(github.com/rprtr258/tea) # Custom section: groups all imports with the specified Prefix.
+    custom-order: true
+    
 linters:
   disable-all: true
   enable:
     # - errcheck # checking for unchecked errors, these unchecked errors can be critical bugs in some cases
+    - gci # deterministic import order
     - gosimple # specializes in simplifying a code
     - govet # reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used

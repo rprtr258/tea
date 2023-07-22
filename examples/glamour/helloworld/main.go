@@ -1,4 +1,4 @@
-package main
+package helloworld
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/rprtr258/tea/glamour"
 )
 
-func main() {
+func Main() {
 	in := `# Hello World
 
 This is a simple example of Markdown rendering with Glamour!

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/truncate"
+
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/key"
 	"github.com/rprtr258/tea/lipgloss"

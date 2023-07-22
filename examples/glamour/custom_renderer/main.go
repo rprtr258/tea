@@ -1,4 +1,4 @@
-package main
+package custom_renderer
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/rprtr258/tea/glamour"
 )
 
-func main() {
+func Main() {
 	in := `# Custom Renderer
 
 Word-wrapping will occur when lines exceed the limit of 40 characters.

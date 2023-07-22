@@ -3,8 +3,9 @@ package spinner_test
 import (
 	"testing"
 
-	"github.com/rprtr258/tea/bubbles/spinner"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/rprtr258/tea/bubbles/spinner"
 )
 
 func TestSpinnerNew(t *testing.T) {
