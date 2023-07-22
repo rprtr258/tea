@@ -36,12 +36,9 @@ func NewFramebuffer(height, width int) FrameBuffer {
 	}
 }
 
-// Set writes a rune to the framebuffer to the given position
+// Set writes a rune to the framebuffer to the given position.
+// 0 <= y < height, 0 <= x < width
 func (fb FrameBuffer) Set(y, x int, c rune) {
-	// TODO: bounds check?
-	// if y*fb.Width+x >= len(fb.B) {
-	// 	return
-	// }
 	fb.B[y*fb.Width+x] = c
 }
 
@@ -115,8 +112,8 @@ type PaddingOptions struct {
 }
 
 // Padding returns view to current viewbox inner with given paddings and size
+// 0 <= top <= bottom < height, 0 <= left <= right < width
 func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
-	// TODO: check bounds
 	return Viewbox{
 		Y:      vb.Y + opt.Top,
 		X:      vb.X + opt.Left,
@@ -127,8 +124,8 @@ func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
 }
 
 // Set writes a rune to the framebuffer in position relative to viewbox
+// 0 <= y < height, 0 <= x < width
 func (vb Viewbox) Set(y, x int, c rune) {
-	// TODO: bounds check?
 	vb.FB.Set(vb.Y+y, vb.X+x, c)
 }
 
