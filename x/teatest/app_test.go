@@ -76,23 +76,23 @@ type model int
 
 // Init optionally returns an initial command we should run. In this case we
 // want to start the timer.
-func (m *model) Init() tea.Cmd {
-	return tick
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{tick}
 }
 
 // Update is called when messages are received. The idea is that you inspect the
 // message and send back an updated model accordingly. You can also return
 // a command, which is a function that performs I/O and returns a message.
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 	case msgTick:
 		*m--
 		if *m <= 0 {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
-		return tick
+		return []tea.Cmd{tick}
 	}
 	return nil
 }

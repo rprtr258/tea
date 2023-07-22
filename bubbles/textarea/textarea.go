@@ -527,7 +527,7 @@ func (m *Model) Focused() bool {
 
 // Focus sets the focus state on the model. When the model is in focus it can
 // receive keyboard input and the cursor will be hidden.
-func (m *Model) Focus() tea.Cmd {
+func (m *Model) Focus() []tea.Cmd {
 	m.focus = true
 	m.style = &m.FocusedStyle
 	return m.Cursor.Focus()
@@ -901,7 +901,7 @@ func (m *Model) SetHeight(h int) {
 }
 
 // Update is the Bubble Tea update loop.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	if !m.focus {
 		m.Cursor.Blur()
 		return nil
@@ -909,8 +909,6 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 
 	// Used to determine if the cursor should blink.
 	oldRow, oldCol := m.cursorLineNumber(), m.col
-
-	var cmds []tea.Cmd
 
 	if m.value[m.row] == nil {
 		m.value[m.row] = make([]rune, 0)
@@ -983,7 +981,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		case key.Matches(msg, m.KeyMap.WordForward):
 			m.wordRight()
 		case key.Matches(msg, m.KeyMap.Paste):
-			return Paste
+			return []tea.Cmd{Paste}
 		case key.Matches(msg, m.KeyMap.CharacterBackward):
 			m.characterLeft(false /* insideLine */)
 		case key.Matches(msg, m.KeyMap.LinePrevious):
@@ -1014,20 +1012,19 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		m.Err = msg
 	}
 
-	cmd := m.viewport.Update(msg)
-	cmds = append(cmds, cmd)
+	cmds := m.viewport.Update(msg)
 
 	newRow, newCol := m.cursorLineNumber(), m.col
-	cmd = m.Cursor.Update(msg)
+	cmd := m.Cursor.Update(msg)
 	if (newRow != oldRow || newCol != oldCol) && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
 		cmd = m.Cursor.BlinkCmd()
 	}
-	cmds = append(cmds, cmd)
+	cmds = append(cmds, cmd...)
 
 	m.repositionView()
 
-	return tea.Batch(cmds...)
+	return cmds
 }
 
 // View renders the text area in its current state.

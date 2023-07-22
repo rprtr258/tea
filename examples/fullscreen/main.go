@@ -16,32 +16,24 @@ type model int
 
 type msgTick time.Time
 
-func Main() {
-	m := model(5)
-	p := tea.NewProgram(context.Background(), &m).WithAltScreen()
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{tick(), tea.EnterAltScreen}
 }
 
-func (m *model) Init() tea.Cmd {
-	return tea.Batch(tick(), tea.EnterAltScreen)
-}
-
-func (m *model) Update(message tea.Msg) tea.Cmd {
+func (m *model) Update(message tea.Msg) []tea.Cmd {
 	switch msg := message.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 
 	case msgTick:
 		*m--
 		if *m <= 0 {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
-		return tick()
+		return []tea.Cmd{tick()}
 	}
 
 	return nil
@@ -55,4 +47,12 @@ func tick() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
 		return msgTick(t)
 	})
+}
+
+func Main() {
+	m := model(5)
+	p := tea.NewProgram(context.Background(), &m).WithAltScreen()
+	if _, err := p.Run(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }

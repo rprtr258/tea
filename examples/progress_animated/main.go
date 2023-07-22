@@ -29,14 +29,14 @@ type model struct {
 	progress progress.Model
 }
 
-func (m *model) Init() tea.Cmd {
-	return tickCmd()
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{tickCmd()}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 
 	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
@@ -47,13 +47,13 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 
 	case msgTick:
 		if m.progress.Percent() == 1.0 {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 
 		// Note that you can also use progress.Model.SetPercent to set the
 		// percentage value explicitly, too.
 		cmd := m.progress.IncrPercent(0.25)
-		return tea.Batch(tickCmd(), cmd)
+		return []tea.Cmd{tickCmd(), cmd}
 
 	// MsgFrame is sent when the progress bar wants to animate itself
 	case progress.MsgFrame:

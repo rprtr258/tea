@@ -39,13 +39,6 @@ var (
 	ramp = makeRamp("#B14FFF", "#00FFA3", progressBarWidth)
 )
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{0, false, 10, 0, 0, false, false})
-	if _, err := p.Run(); err != nil {
-		fmt.Println("could not start program:", err)
-	}
-}
-
 type (
 	msgTick  struct{}
 	msgFrame struct{}
@@ -73,27 +66,27 @@ type model struct {
 	Quitting bool
 }
 
-func (m *model) Init() tea.Cmd {
-	return tick()
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{tick()}
 }
 
 // Main update function.
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	// Make sure these keys always quit
 	if msg, ok := msg.(tea.MsgKey); ok {
 		k := msg.String()
 		if k == "q" || k == "esc" || k == "ctrl+c" {
 			m.Quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	}
 
 	// Hand off the message and model to the appropriate update function for the
 	// appropriate view based on the current state.
 	if !m.Chosen {
-		return updateChoices(msg, m)
+		return []tea.Cmd{updateChoices(msg, m)}
 	}
-	return updateChosen(msg, m)
+	return []tea.Cmd{updateChosen(msg, m)}
 }
 
 // The main view, which just calls the appropriate sub-view
@@ -280,4 +273,11 @@ func colorFloatToHex(f float64) string {
 		s = "0" + s
 	}
 	return s
+}
+
+func Main() {
+	p := tea.NewProgram(context.Background(), &model{0, false, 10, 0, 0, false, false})
+	if _, err := p.Run(); err != nil {
+		fmt.Println("could not start program:", err)
+	}
 }

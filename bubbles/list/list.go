@@ -769,13 +769,13 @@ func (m *Model) hideStatusMessage() {
 }
 
 // Update is the Bubble Tea update loop.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if key.Matches(msg, m.KeyMap.ForceQuit) {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 
 	case MsgFilterMatches:
@@ -785,7 +785,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	case spinner.MsgTick:
 		cmd := m.spinner.Update(msg)
 		if m.showSpinner {
-			cmds = append(cmds, cmd)
+			cmds = append(cmds, cmd...)
 		}
 
 	case msgStatusMessageTimeout:
@@ -793,16 +793,16 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	}
 
 	if m.filterState == Filtering {
-		cmds = append(cmds, m.handleFiltering(msg))
+		cmds = append(cmds, m.handleFiltering(msg)...)
 	} else {
-		cmds = append(cmds, m.handleBrowsing(msg))
+		cmds = append(cmds, m.handleBrowsing(msg)...)
 	}
 
-	return tea.Batch(cmds...)
+	return cmds
 }
 
 // Updates for when a user is browsing the list.
-func (m *Model) handleBrowsing(msg tea.Msg) tea.Cmd {
+func (m *Model) handleBrowsing(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 	numItems := len(m.VisibleItems())
 
@@ -815,7 +815,7 @@ func (m *Model) handleBrowsing(msg tea.Msg) tea.Cmd {
 			m.resetFiltering()
 
 		case key.Matches(msg, m.KeyMap.Quit):
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 
 		case key.Matches(msg, m.KeyMap.CursorUp):
 			m.CursorUp()
@@ -849,7 +849,7 @@ func (m *Model) handleBrowsing(msg tea.Msg) tea.Cmd {
 			m.FilterInput.CursorEnd()
 			m.FilterInput.Focus()
 			m.updateKeybindings()
-			return textinput.Blink
+			return []tea.Cmd{textinput.Blink}
 
 		case key.Matches(msg, m.KeyMap.ShowFullHelp):
 			fallthrough
@@ -868,11 +868,11 @@ func (m *Model) handleBrowsing(msg tea.Msg) tea.Cmd {
 		m.cursor = max(0, itemsOnPage-1)
 	}
 
-	return tea.Batch(cmds...)
+	return cmds
 }
 
 // Updates for when a user is in the filter editing interface.
-func (m *Model) handleFiltering(msg tea.Msg) tea.Cmd {
+func (m *Model) handleFiltering(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 
 	// Handle keys
@@ -912,7 +912,7 @@ func (m *Model) handleFiltering(msg tea.Msg) tea.Cmd {
 	oldValue := m.FilterInput.Value()
 	inputCmd := m.FilterInput.Update(msg)
 	filterChanged := oldValue != m.FilterInput.Value()
-	cmds = append(cmds, inputCmd)
+	cmds = append(cmds, inputCmd...)
 
 	// If the filtering input has changed, request updated filtering
 	if filterChanged {
@@ -923,7 +923,7 @@ func (m *Model) handleFiltering(msg tea.Msg) tea.Cmd {
 	// Update pagination
 	m.updatePagination()
 
-	return tea.Batch(cmds...)
+	return cmds
 }
 
 // ShortHelp returns bindings to show in the abbreviated help view. It's part

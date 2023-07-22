@@ -43,17 +43,17 @@ type model struct {
 	viewport viewport.Model
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if k := msg.String(); k == "ctrl+c" || k == "q" || k == "esc" {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 
 	case tea.MsgWindowSize:
@@ -93,9 +93,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	}
 
 	// Handle keyboard and mouse events in the viewport
-	cmds = append(cmds, m.viewport.Update(msg))
-
-	return tea.Batch(cmds...)
+	return append(cmds, m.viewport.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {

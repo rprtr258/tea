@@ -279,12 +279,10 @@ func ViewUp(m *Model, lines []string) tea.Cmd {
 }
 
 // Update handles standard message-based viewport updates.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	if !m.initialized {
 		m.setInitialValues()
 	}
-
-	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
@@ -292,37 +290,37 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		case key.Matches(msg, m.KeyMap.PageDown):
 			lines := m.ViewDown()
 			if m.HighPerformanceRendering {
-				cmd = ViewDown(m, lines)
+				return []tea.Cmd{ViewDown(m, lines)}
 			}
 
 		case key.Matches(msg, m.KeyMap.PageUp):
 			lines := m.ViewUp()
 			if m.HighPerformanceRendering {
-				cmd = ViewUp(m, lines)
+				return []tea.Cmd{ViewUp(m, lines)}
 			}
 
 		case key.Matches(msg, m.KeyMap.HalfPageDown):
 			lines := m.HalfViewDown()
 			if m.HighPerformanceRendering {
-				cmd = ViewDown(m, lines)
+				return []tea.Cmd{ViewDown(m, lines)}
 			}
 
 		case key.Matches(msg, m.KeyMap.HalfPageUp):
 			lines := m.HalfViewUp()
 			if m.HighPerformanceRendering {
-				cmd = ViewUp(m, lines)
+				return []tea.Cmd{ViewUp(m, lines)}
 			}
 
 		case key.Matches(msg, m.KeyMap.Down):
 			lines := m.LineDown(1)
 			if m.HighPerformanceRendering {
-				cmd = ViewDown(m, lines)
+				return []tea.Cmd{ViewDown(m, lines)}
 			}
 
 		case key.Matches(msg, m.KeyMap.Up):
 			lines := m.LineUp(1)
 			if m.HighPerformanceRendering {
-				cmd = ViewUp(m, lines)
+				return []tea.Cmd{ViewUp(m, lines)}
 			}
 		}
 
@@ -334,18 +332,18 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		case tea.MouseWheelUp:
 			lines := m.LineUp(m.MouseWheelDelta)
 			if m.HighPerformanceRendering {
-				cmd = ViewUp(m, lines)
+				return []tea.Cmd{ViewUp(m, lines)}
 			}
 
 		case tea.MouseWheelDown:
 			lines := m.LineDown(m.MouseWheelDelta)
 			if m.HighPerformanceRendering {
-				cmd = ViewDown(m, lines)
+				return []tea.Cmd{ViewDown(m, lines)}
 			}
 		}
 	}
 
-	return cmd
+	return nil
 }
 
 // View renders the viewport into a string.

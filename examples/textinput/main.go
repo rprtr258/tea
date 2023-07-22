@@ -12,13 +12,6 @@ import (
 	"github.com/rprtr258/tea/bubbles/textinput"
 )
 
-func Main() {
-	p := tea.NewProgram(context.Background(), initialModel())
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
-}
-
 type model struct {
 	textInput textinput.Model
 }
@@ -35,16 +28,16 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return textinput.Blink
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{textinput.Blink}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	}
 
@@ -57,4 +50,11 @@ func (m *model) View(r tea.Renderer) {
 		m.textInput.View(),
 		"(esc to quit)",
 	) + "\n")
+}
+
+func Main() {
+	p := tea.NewProgram(context.Background(), initialModel())
+	if _, err := p.Run(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }

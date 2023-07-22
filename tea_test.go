@@ -13,33 +13,28 @@ import (
 type msgIncrement struct{}
 
 type testModel struct {
-	executed atomic.Value
-	counter  atomic.Value
+	viewCalled atomic.Bool
+	counter    atomic.Int32
 }
 
-func (m *testModel) Init() Cmd {
+func (m *testModel) Init() []Cmd {
 	return nil
 }
 
-func (m *testModel) Update(msg Msg) Cmd {
+func (m *testModel) Update(msg Msg) []Cmd {
 	switch msg.(type) {
 	case msgIncrement:
-		i := m.counter.Load()
-		if i == nil {
-			m.counter.Store(1)
-		} else {
-			m.counter.Store(i.(int) + 1)
-		}
+		m.counter.Add(1)
 
 	case MsgKey:
-		return Quit
+		return []Cmd{Quit}
 	}
 
 	return nil
 }
 
 func (m *testModel) View(r Renderer) {
-	m.executed.Store(true)
+	m.viewCalled.Store(true)
 	r.Write("success\n")
 }
 
@@ -62,7 +57,7 @@ func TestTeaQuit(t *testing.T) {
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
-			if m.executed.Load() != nil {
+			if m.viewCalled.Load() {
 				p.Quit()
 				return
 			}
@@ -114,7 +109,7 @@ func TestTeaKill(t *testing.T) {
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
-			if m.executed.Load() != nil {
+			if m.viewCalled.Load() {
 				p.Kill()
 				return
 			}
@@ -135,7 +130,7 @@ func TestTeaContext(t *testing.T) {
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
-			if m.executed.Load() != nil {
+			if m.viewCalled.Load() {
 				cancel()
 				return
 			}
@@ -155,14 +150,17 @@ func TestMsgBatch(t *testing.T) {
 	}
 
 	m := &testModel{}
-	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	p := NewProgram(ctx, m).WithInput(&in).WithOutput(&buf)
 	go func() {
-		p.Send(MsgBatch{inc, inc})
+		p.Send(inc())
+		p.Send(inc())
 
 		for {
 			time.Sleep(time.Millisecond)
-			i := m.counter.Load()
-			if i != nil && i.(int) >= 2 {
+			if m.counter.Load() >= 2 { //nolint:lostcancel
 				p.Quit()
 				return
 			}
@@ -171,7 +169,7 @@ func TestMsgBatch(t *testing.T) {
 
 	_, err := p.Run()
 	assert.NoError(t, err)
-	assert.Equal(t, 2, m.counter.Load())
+	assert.Equal(t, int32(2), m.counter.Load())
 }
 
 func TestMsgSequence(t *testing.T) {
@@ -188,7 +186,7 @@ func TestMsgSequence(t *testing.T) {
 
 	_, err := p.Run()
 	assert.NoError(t, err)
-	assert.Equal(t, 2, m.counter.Load())
+	assert.Equal(t, int32(2), m.counter.Load())
 }
 
 func TestMsgSequenceWithMsgBatch(t *testing.T) {
@@ -198,17 +196,14 @@ func TestMsgSequenceWithMsgBatch(t *testing.T) {
 	inc := func() Msg {
 		return msgIncrement{}
 	}
-	batch := func() Msg {
-		return MsgBatch{inc, inc}
-	}
 
 	m := &testModel{}
 	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
-	go p.Send(msgSequence{batch, inc, Quit})
+	go p.Send(msgSequence{inc, inc, inc, Quit})
 
 	_, err := p.Run()
 	assert.NoError(t, err)
-	assert.Equal(t, 3, m.counter.Load())
+	assert.Equal(t, int32(3), m.counter.Load())
 }
 
 func TestTeaSend(t *testing.T) {

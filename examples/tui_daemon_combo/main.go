@@ -20,35 +20,6 @@ import (
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
 
-func Main() {
-	var (
-		daemonMode bool
-		showHelp   bool
-	)
-
-	flag.BoolVar(&daemonMode, "d", false, "run as a daemon")
-	flag.BoolVar(&showHelp, "h", false, "show help")
-	flag.Parse()
-
-	if showHelp {
-		flag.Usage()
-		return
-	}
-
-	p := tea.NewProgram(context.Background(), newModel())
-	if daemonMode || !isatty.IsTerminal(os.Stdout.Fd()) {
-		// If we're in daemon mode don't render the TUI
-		p = p.WithoutRenderer()
-	} else {
-		// If we're in TUI mode, discard log output
-		log.SetOutput(io.Discard)
-	}
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("Error starting Bubble Tea program:", err.Error())
-	}
-}
-
 type result struct {
 	duration time.Duration
 	emoji    string
@@ -72,19 +43,19 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	log.Println("Starting work...")
-	return tea.Batch(
+	return []tea.Cmd{
 		m.spinner.Tick,
 		runPretendProcess,
-	)
+	}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 	case spinner.MsgTick:
 		return m.spinner.Update(msg)
 	case msgProcessFinished:
@@ -92,7 +63,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		res := result{emoji: randomEmoji(), duration: d}
 		log.Printf("%s Job finished in %s", res.emoji, res.duration)
 		m.results = append(m.results[1:], res)
-		return runPretendProcess
+		return []tea.Cmd{runPretendProcess}
 	default:
 		return nil
 	}
@@ -132,4 +103,33 @@ func runPretendProcess() tea.Msg {
 func randomEmoji() string {
 	emojis := []rune("🍦🧋🍡🤠👾😭🦊🐯🦆🥨🎏🍔🍒🍥🎮📦🦁🐶🐸🍕🥐🧲🚒🥇🏆🌽")
 	return string(emojis[rand.Intn(len(emojis))]) // nolint:gosec
+}
+
+func Main() {
+	var (
+		daemonMode bool
+		showHelp   bool
+	)
+
+	flag.BoolVar(&daemonMode, "d", false, "run as a daemon")
+	flag.BoolVar(&showHelp, "h", false, "show help")
+	flag.Parse()
+
+	if showHelp {
+		flag.Usage()
+		return
+	}
+
+	p := tea.NewProgram(context.Background(), newModel())
+	if daemonMode || !isatty.IsTerminal(os.Stdout.Fd()) {
+		// If we're in daemon mode don't render the TUI
+		p = p.WithoutRenderer()
+	} else {
+		// If we're in TUI mode, discard log output
+		log.SetOutput(io.Discard)
+	}
+
+	if _, err := p.Run(); err != nil {
+		log.Fatalln("Error starting Bubble Tea program:", err.Error())
+	}
 }

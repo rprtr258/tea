@@ -16,18 +16,18 @@ type testExecModel struct {
 	err error
 }
 
-func (m *testExecModel) Init() Cmd {
+func (m *testExecModel) Init() []Cmd {
 	c := exec.Command(m.cmd)
-	return ExecProcess(c, func(err error) Msg {
+	return []Cmd{ExecProcess(c, func(err error) Msg {
 		return msgExecFinished{err}
-	})
+	})}
 }
 
-func (m *testExecModel) Update(msg Msg) Cmd {
+func (m *testExecModel) Update(msg Msg) []Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case msgExecFinished:
 		m.err = msg.err
-		return Quit
+		return []Cmd{Quit}
 	}
 
 	return nil

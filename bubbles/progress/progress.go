@@ -204,7 +204,7 @@ func (m *Model) Init() tea.Cmd {
 // SetPercent to create the command you'll need to trigger the animation.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case MsgFrame:
 		if msg.id != m.id || msg.tag != m.tag {
@@ -217,7 +217,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		}
 
 		m.percentShown, m.velocity = m.spring.Update(m.percentShown, m.velocity, m.targetPercent)
-		return m.nextFrame()
+		return []tea.Cmd{m.nextFrame()}
 
 	default:
 		return nil

@@ -56,11 +56,11 @@ type model struct {
 	quitting bool
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.list.SetWidth(msg.Width)
@@ -70,14 +70,14 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		switch keypress := msg.String(); keypress {
 		case "ctrl+c":
 			m.quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				m.choice = string(i)
 			}
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	}
 

@@ -81,11 +81,11 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		// If we set a width on the help menu it can gracefully truncate
@@ -106,7 +106,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			m.help.ShowAll = !m.help.ShowAll
 		case key.Matches(msg, m.keys.Quit):
 			m.quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	}
 

@@ -139,7 +139,7 @@ type MsgTick struct {
 }
 
 // Update is the Tea update function.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case MsgTick:
 		// If an ID is set, and the ID doesn't belong to this spinner, reject
@@ -161,7 +161,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		}
 
 		m.tag++
-		return m.tick(m.id, m.tag)
+		return []tea.Cmd{m.tick(m.id, m.tag)}
 	default:
 		return nil
 	}

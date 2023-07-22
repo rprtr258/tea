@@ -27,17 +27,17 @@ func clearErrorAfter(t time.Duration) tea.Cmd {
 	})
 }
 
-func (m *model) Init() tea.Cmd {
-	return m.filepicker.Init()
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{m.filepicker.Init()}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	case msgClearError:
 		m.err = nil
@@ -57,10 +57,10 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		// Let's clear the selectedFile and display an error.
 		m.err = errors.New(path + " is not valid.")
 		m.selectedFile = ""
-		return tea.Batch(cmd, clearErrorAfter(2*time.Second))
+		return []tea.Cmd{cmd, clearErrorAfter(2 * time.Second)}
 	}
 
-	return cmd
+	return []tea.Cmd{cmd}
 }
 
 func (m *model) View(r tea.Renderer) {

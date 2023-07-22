@@ -19,21 +19,21 @@ type model struct {
 	choice string
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 
 		case "enter":
 			// Send the choice on the channel and exit.
 			m.choice = choices[m.cursor]
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 
 		case "down", "j":
 			m.cursor++

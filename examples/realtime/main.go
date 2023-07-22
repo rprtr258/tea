@@ -45,22 +45,22 @@ type model struct {
 	quitting  bool
 }
 
-func (m *model) Init() tea.Cmd {
-	return tea.Batch(
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{
 		m.spinner.Tick,
 		listenForActivity(m.sub), // generate activity
 		waitForActivity(m.sub),   // wait for activity
-	)
+	}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 	case msgResponse:
-		m.responses++                 // record external activity
-		return waitForActivity(m.sub) // wait for next event
+		m.responses++                            // record external activity
+		return []tea.Cmd{waitForActivity(m.sub)} // wait for next event
 	case spinner.MsgTick:
 		return m.spinner.Update(msg)
 	default:
