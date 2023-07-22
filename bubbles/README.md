@@ -5,18 +5,18 @@ Bubbles
   <img src="https://stuff.charm.sh/bubbles/bubbles-github.png" width="233" alt="The Bubbles Logo">
 </p>
 
-[![Latest Release](https://img.shields.io/github/release/charmbracelet/bubbles.svg)](https://github.com/rprtr258/bubbletea/bubbles/releases)
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://pkg.go.dev/github.com/rprtr258/bubbletea/bubbles)
-[![Build Status](https://github.com/rprtr258/bubbletea/bubbles/workflows/build/badge.svg)](https://github.com/rprtr258/bubbletea/bubbles/actions)
+[![Latest Release](https://img.shields.io/github/release/charmbracelet/bubbles.svg)](https://github.com/rprtr258/tea/bubbles/releases)
+[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://pkg.go.dev/github.com/rprtr258/tea/bubbles)
+[![Build Status](https://github.com/rprtr258/tea/bubbles/workflows/build/badge.svg)](https://github.com/rprtr258/tea/bubbles/actions)
 [![Go ReportCard](https://goreportcard.com/badge/charmbracelet/bubbles)](https://goreportcard.com/report/charmbracelet/bubbles)
 
-Some components for [Bubble Tea](https://github.com/rprtr258/bubbletea)
+Some components for [Bubble Tea](https://github.com/rprtr258/tea)
 applications. These components are used in production in [Glow][glow],
 [Charm][charm] and [many other applications][otherstuff].
 
 [glow]: https://github.com/charmbracelet/glow
 [charm]: https://github.com/charmbracelet/charm
-[otherstuff]: https://github.com/rprtr258/bubbletea/#bubble-tea-in-the-wild
+[otherstuff]: https://github.com/rprtr258/tea/#bubble-tea-in-the-wild
 
 
 ## Spinner
@@ -26,8 +26,8 @@ applications. These components are used in production in [Glow][glow],
 A spinner, useful for indicating that some kind an operation is happening.
 There are a couple default ones, but you can also pass your own ”frames.”
 
-* [Example code, basic spinner](https://github.com/rprtr258/bubbletea/tree/master/examples/spinner/main.go)
-* [Example code, various spinners](https://github.com/rprtr258/bubbletea/tree/master/examples/spinners/main.go)
+* [Example code, basic spinner](https://github.com/rprtr258/tea/tree/master/examples/spinner/main.go)
+* [Example code, various spinners](https://github.com/rprtr258/tea/tree/master/examples/spinners/main.go)
 
 
 ## Text Input
@@ -38,8 +38,8 @@ A text input field, akin to an `<input type="text">` in HTML. Supports unicode,
 pasting, in-place scrolling when the value exceeds the width of the element and
 the common, and many customization options.
 
-* [Example code, one field](https://github.com/rprtr258/bubbletea/tree/master/examples/textinput/main.go)
-* [Example code, many fields](https://github.com/rprtr258/bubbletea/tree/master/examples/textinputs/main.go)
+* [Example code, one field](https://github.com/rprtr258/tea/tree/master/examples/textinput/main.go)
+* [Example code, many fields](https://github.com/rprtr258/tea/tree/master/examples/textinputs/main.go)
 
 ## Text Area
 
@@ -50,8 +50,8 @@ spans multiple lines. Supports unicode, pasting, vertical scrolling when the
 value exceeds the width and height of the element,  and many customization
 options.
 
-* [Example code, chat input](https://github.com/rprtr258/bubbletea/tree/master/examples/chat/main.go)
-* [Example code, story time input](https://github.com/rprtr258/bubbletea/tree/master/examples/textarea/main.go)
+* [Example code, chat input](https://github.com/rprtr258/tea/tree/master/examples/chat/main.go)
+* [Example code, story time input](https://github.com/rprtr258/tea/tree/master/examples/textarea/main.go)
 
 ## Table
 
@@ -60,7 +60,7 @@ options.
 A component for displaying and navigating tabular data (columns and rows).
 Supports vertical scrolling and many customization options.
 
-* [Example code, countries and populations](https://github.com/rprtr258/bubbletea/tree/master/examples/table/main.go)
+* [Example code, countries and populations](https://github.com/rprtr258/tea/tree/master/examples/table/main.go)
 
 ## Progress
 
@@ -71,8 +71,8 @@ A simple, customizable progress meter, with optional animation via
 runes can be set to whatever you'd like. The percentage readout is customizable
 and can also be omitted entirely.
 
-* [Animated example](https://github.com/rprtr258/bubbletea/blob/master/examples/progress-animated/main.go)
-* [Static example](https://github.com/rprtr258/bubbletea/blob/master/examples/progress-static/main.go)
+* [Animated example](https://github.com/rprtr258/tea/blob/master/examples/progress-animated/main.go)
+* [Static example](https://github.com/rprtr258/tea/blob/master/examples/progress-static/main.go)
 
 [harmonica]: https://github.com/charmbracelet/harmonica
 
@@ -86,7 +86,7 @@ Supports "dot-style" pagination (similar to what you might see on iOS) and
 numeric page numbering, but you could also just use this component for the
 logic and visualize pagination however you like.
 
-* [Example code](https://github.com/rprtr258/bubbletea/blob/master/examples/paginator/main.go)
+* [Example code](https://github.com/rprtr258/tea/blob/master/examples/paginator/main.go)
 
 
 ## Viewport
@@ -97,7 +97,7 @@ A viewport for vertically scrolling content. Optionally includes standard
 pager keybindings and mouse wheel support. A high performance mode is available
 for applications which make use of the alternate screen buffer.
 
-* [Example code](https://github.com/rprtr258/bubbletea/tree/master/examples/pager/main.go)
+* [Example code](https://github.com/rprtr258/tea/tree/master/examples/pager/main.go)
 
 This component is well complemented with [Reflow][reflow] for ANSI-aware
 indenting and text wrapping.
@@ -114,9 +114,9 @@ Features pagination, fuzzy filtering, auto-generated help, an activity spinner,
 and status messages, all of which can be enabled and disabled as needed.
 Extrapolated from [Glow][glow].
 
-* [Example code, default list](https://github.com/rprtr258/bubbletea/tree/master/examples/list-default/main.go)
-* [Example code, simple list](https://github.com/rprtr258/bubbletea/tree/master/examples/list-simple/main.go)
-* [Example code, all features](https://github.com/rprtr258/bubbletea/tree/master/examples/list-fancy/main.go)
+* [Example code, default list](https://github.com/rprtr258/tea/tree/master/examples/list-default/main.go)
+* [Example code, simple list](https://github.com/rprtr258/tea/tree/master/examples/list-simple/main.go)
+* [Example code, all features](https://github.com/rprtr258/tea/tree/master/examples/list-fancy/main.go)
 
 ## File Picker
 
@@ -126,7 +126,7 @@ A customizable component for picking a file from the file system. Navigate
 through directories and select files, optionally limit to certain file
 extensions.
 
-* [Example code](https://github.com/rprtr258/bubbletea/tree/master/examples/file-picker/main.go)
+* [Example code](https://github.com/rprtr258/tea/tree/master/examples/file-picker/main.go)
 
 ## Timer
 
@@ -135,7 +135,7 @@ can be customized as you like.
 
 <img src="https://stuff.charm.sh/bubbles-examples/timer.gif" width="400" alt="Timer example">
 
-* [Example code](https://github.com/rprtr258/bubbletea/blob/master/examples/timer/main.go)
+* [Example code](https://github.com/rprtr258/tea/blob/master/examples/timer/main.go)
 
 
 ## Stopwatch
@@ -145,7 +145,7 @@ can be customized as you like.
 A simple, flexible component for counting up. The update frequency and output
 can be customized as you see fit.
 
-* [Example code](https://github.com/rprtr258/bubbletea/blob/master/examples/stopwatch/main.go)
+* [Example code](https://github.com/rprtr258/tea/blob/master/examples/stopwatch/main.go)
 
 
 ## Help
@@ -157,7 +157,7 @@ from your keybindings. It features single and multi-line modes, which the user
 can optionally toggle between. It will truncate gracefully if the terminal is
 too wide for the content.
 
-* [Example code](https://github.com/rprtr258/bubbletea/blob/master/examples/help/main.go)
+* [Example code](https://github.com/rprtr258/tea/blob/master/examples/help/main.go)
 
 
 ## Key
@@ -183,7 +183,7 @@ var DefaultKeyMap = KeyMap{
     ),
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     switch msg := msg.(type) {
     case tea.MsgKey:
         switch {
@@ -236,7 +236,7 @@ We’d love to hear your thoughts on this project. Feel free to drop us a note!
 
 ## License
 
-[MIT](https://github.com/rprtr258/bubbletea/raw/master/LICENSE)
+[MIT](https://github.com/rprtr258/tea/raw/master/LICENSE)
 
 ***
 

@@ -4,15 +4,16 @@ package send_msg
 // from outside the program using Program.Send(Msg).
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var (
@@ -23,12 +24,12 @@ var (
 	appStyle      = lipgloss.NewStyle().Margin(1, 2, 0, 2)
 )
 
-type resultMsg struct {
+type msgResult struct {
 	duration time.Duration
 	food     string
 }
 
-func (r resultMsg) String() string {
+func (r msgResult) String() string {
 	if r.duration == 0 {
 		return dotStyle.Render(strings.Repeat(".", 30))
 	}
@@ -38,42 +39,40 @@ func (r resultMsg) String() string {
 
 type model struct {
 	spinner  spinner.Model
-	results  []resultMsg
+	results  []msgResult
 	quitting bool
 }
 
-func newModel() model {
+func newModel() *model {
 	const numLastResults = 5
 	s := spinner.New()
 	s.Style = spinnerStyle
-	return model{
+	return &model{
 		spinner: s,
-		results: make([]resultMsg, numLastResults),
+		results: make([]msgResult, numLastResults),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return m, tea.Quit
-	case resultMsg:
+		return tea.Quit
+	case msgResult:
 		m.results = append(m.results[1:], msg)
-		return m, nil
-	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return nil
+	case spinner.MsgTick:
+		return m.spinner.Update(msg)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	var s string
 
 	if m.quitting {
@@ -100,7 +99,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(newModel())
+	p := tea.NewProgram(context.Background(), newModel())
 
 	// Simulate activity
 	go func() {
@@ -111,13 +110,12 @@ func Main() {
 			// Send the Bubble Tea program a message from outside the
 			// tea.Program. This will block until it is ready to receive
 			// messages.
-			p.Send(resultMsg{food: randomFood(), duration: pause})
+			p.Send(msgResult{food: randomFood(), duration: pause})
 		}
 	}()
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }
 

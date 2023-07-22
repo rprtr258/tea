@@ -65,7 +65,7 @@ func JoinHorizontal(pos Position, strs ...string) string {
 			blocks[i] = append(blocks[i], extraLines...)
 
 		case Bottom:
-			blocks[i] = append(extraLines, blocks[i]...)
+			blocks[i] = append(extraLines, blocks[i]...) //nolint:makezero
 
 		default: // Somewhere in the middle
 			n := len(extraLines)

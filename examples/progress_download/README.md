@@ -29,6 +29,6 @@ This example originally came from [this discussion][discussion].
 Charm热爱开源 • Charm loves open source
 
 
-[progress]: https://github.com/rprtr258/bubbletea/bubbles/
+[progress]: https://github.com/rprtr258/tea/bubbles/
 [tee]: https://pkg.go.dev/io#TeeReader
-[discussion]: https://github.com/rprtr258/bubbletea/bubbles/discussions/127
+[discussion]: https://github.com/rprtr258/tea/bubbles/discussions/127

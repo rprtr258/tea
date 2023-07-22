@@ -4,16 +4,17 @@ package mouse
 // coordinates and events.
 
 import (
+	"context"
 	"fmt"
 	"log"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 func Main() {
-	p := tea.NewProgram(model{}).WithAltScreen().WithMouseAllMotion()
+	p := tea.NewProgram(context.Background(), &model{}).WithAltScreen().WithMouseAllMotion()
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }
 
@@ -22,26 +23,26 @@ type model struct {
 	mouseEvent tea.MouseEvent
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if s := msg.String(); s == "ctrl+c" || s == "q" || s == "esc" {
-			return m, tea.Quit
+			return tea.Quit
 		}
 
-	case tea.MouseMsg:
+	case tea.MsgMouse:
 		m.init = true
 		m.mouseEvent = tea.MouseEvent(msg)
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := "Do mouse stuff. When you're done press q to quit.\n\n"
 
 	if m.init {

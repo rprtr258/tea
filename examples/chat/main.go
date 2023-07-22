@@ -4,27 +4,24 @@ package chat
 // component library.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/textarea"
-	"github.com/rprtr258/bubbletea/bubbles/viewport"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/textarea"
+	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 func Main() {
-	p := tea.NewProgram(initialModel())
+	p := tea.NewProgram(context.Background(), initialModel())
 
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }
-
-type (
-	errMsg error
-)
 
 type model struct {
 	viewport    viewport.Model
@@ -34,7 +31,7 @@ type model struct {
 	err         error
 }
 
-func initialModel() model {
+func initialModel() *model {
 	ta := textarea.New()
 	ta.Placeholder = "Send a message..."
 	ta.Focus()
@@ -56,7 +53,7 @@ Type a message and press Enter to send.`)
 
 	ta.KeyMap.InsertNewline.SetEnabled(false)
 
-	return model{
+	return &model{
 		textarea:    ta,
 		messages:    []string{},
 		viewport:    vp,
@@ -65,42 +62,32 @@ Type a message and press Enter to send.`)
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
-	var (
-		tiCmd tea.Cmd
-		vpCmd tea.Cmd
-	)
-
-	m.textarea, tiCmd = m.textarea.Update(msg)
-	m.viewport, vpCmd = m.viewport.Update(msg)
+func (m *model) Update(msg tea.Msg) tea.Cmd {
+	tiCmd := m.textarea.Update(msg)
+	vpCmd := m.viewport.Update(msg)
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			fmt.Println(m.textarea.Value())
-			return m, tea.Quit
+			return tea.Quit
 		case tea.KeyEnter:
 			m.messages = append(m.messages, m.senderStyle.Render("You: ")+m.textarea.Value())
 			m.viewport.SetContent(strings.Join(m.messages, "\n"))
 			m.textarea.Reset()
 			m.viewport.GotoBottom()
 		}
-
-	// We handle errors just like any other message
-	case errMsg:
-		m.err = msg
-		return m, nil
 	}
 
-	return m, tea.Batch(tiCmd, vpCmd)
+	return tea.Batch(tiCmd, vpCmd)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(fmt.Sprintf(
 		"%s\n\n%s",
 		m.viewport.View(),

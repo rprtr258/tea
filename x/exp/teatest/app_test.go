@@ -9,14 +9,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/x/exp/teatest"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/x/exp/teatest"
 )
 
 func TestApp(t *testing.T) {
 	m := model(10)
-	tm := teatest.NewTestModel(
-		t, m,
+	tm := teatest.NewTestModel(t, &m,
 		teatest.WithInitialTermSize(70, 30),
 	)
 	t.Cleanup(func() {
@@ -36,12 +35,12 @@ func TestApp(t *testing.T) {
 	assert.Regexp(t, `This program will exit in \d+ seconds`, string(out))
 	teatest.RequireEqualOutput(t, out)
 
-	assert.Equal(t, model(9), tm.FinalModel(t))
+	assert.Equal(t, model(9), *tm.FinalModel(t))
 }
 
 func TestAppInteractive(t *testing.T) {
 	m := model(10)
-	tm := teatest.NewTestModel(t, m, teatest.WithInitialTermSize(70, 30))
+	tm := teatest.NewTestModel(t, &m, teatest.WithInitialTermSize(70, 30))
 
 	time.Sleep(time.Second + time.Millisecond*200)
 	tm.Send("ignored msg")
@@ -59,11 +58,12 @@ func TestAppInteractive(t *testing.T) {
 
 	assert.NoError(t, tm.Quit())
 
-	assert.Equal(t, model(7), tm.FinalModel(t))
+	assert.Equal(t, model(7), *tm.FinalModel(t))
 }
 
 func readBts(t *testing.T, r io.Reader) []byte {
 	t.Helper()
+
 	bts, err := io.ReadAll(r)
 	assert.NoError(t, err)
 	return bts
@@ -76,38 +76,38 @@ type model int
 
 // Init optionally returns an initial command we should run. In this case we
 // want to start the timer.
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tick
 }
 
 // Update is called when messages are received. The idea is that you inspect the
 // message and send back an updated model accordingly. You can also return
 // a command, which is a function that performs I/O and returns a message.
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
-		return m, tea.Quit
-	case tickMsg:
-		m--
-		if m <= 0 {
-			return m, tea.Quit
+		return tea.Quit
+	case msgTick:
+		*m--
+		if *m <= 0 {
+			return tea.Quit
 		}
-		return m, tick
+		return tick
 	}
-	return m, nil
+	return nil
 }
 
 // View returns a string based on data in the model. That string which will be
 // rendered to the terminal.
-func (m model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf("Hi. This program will exit in %d seconds. To quit sooner press any key.\n", m))
+func (m *model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf("Hi. This program will exit in %d seconds. To quit sooner press any key.\n", *m))
 }
 
 // Messages are events that we respond to in our Update function. This
 // particular one indicates that the timer has ticked.
-type tickMsg time.Time
+type msgTick time.Time
 
 func tick() tea.Msg {
 	time.Sleep(time.Second)
-	return tickMsg{}
+	return msgTick{}
 }

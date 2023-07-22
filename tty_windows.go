@@ -9,7 +9,7 @@ import (
 	"github.com/containerd/console"
 )
 
-func (p *Program) initInput() error {
+func (p *Program[M]) initInput() error {
 	// If input's a file, use console to manage it
 	if f, ok := p.input.(*os.File); ok {
 		// Save a reference to the current stdin then replace stdin with our
@@ -29,7 +29,7 @@ func (p *Program) initInput() error {
 
 // restoreInput restores stdout in the event that we placed it aside to handle
 // input with CONIN$, above.
-func (p *Program) restoreInput() error {
+func (p *Program[M]) restoreInput() error {
 	if p.windowsStdin != nil {
 		os.Stdin = p.windowsStdin
 	}

@@ -3,12 +3,13 @@ package http
 // A simple program that makes a GET request and prints the response status.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 const url = "https://charm.sh/"
@@ -18,47 +19,46 @@ type model struct {
 	err    error
 }
 
-type statusMsg int
-
-type errMsg struct{ error }
-
-func (e errMsg) Error() string { return e.error.Error() }
+type (
+	msgStatus int
+	msgErr    error
+)
 
 func Main() {
-	p := tea.NewProgram(model{})
+	p := tea.NewProgram(context.Background(), &model{})
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return checkServer
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return m, tea.Quit
+			return tea.Quit
 		default:
-			return m, nil
+			return nil
 		}
 
-	case statusMsg:
+	case msgStatus:
 		m.status = int(msg)
-		return m, tea.Quit
+		return tea.Quit
 
-	case errMsg:
+	case msgErr:
 		m.err = msg
-		return m, nil
+		return nil
 
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := fmt.Sprintf("Checking %s...", url)
 	if m.err != nil {
 		s += fmt.Sprintf("something went wrong: %s", m.err)
@@ -66,7 +66,6 @@ func (m model) View(r tea.Renderer) {
 		s += fmt.Sprintf("%d %s", m.status, http.StatusText(m.status))
 	}
 	r.Write(s + "\n")
-	return
 }
 
 func checkServer() tea.Msg {
@@ -75,9 +74,9 @@ func checkServer() tea.Msg {
 	}
 	res, err := c.Get(url)
 	if err != nil {
-		return errMsg{err}
+		return msgErr(err)
 	}
 	defer res.Body.Close() // nolint:errcheck
 
-	return statusMsg(res.StatusCode)
+	return msgStatus(res.StatusCode)
 }

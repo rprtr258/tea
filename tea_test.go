@@ -10,20 +10,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type incrementMsg struct{}
+type msgIncrement struct{}
 
 type testModel struct {
 	executed atomic.Value
 	counter  atomic.Value
 }
 
-func (m testModel) Init() Cmd {
+func (m *testModel) Init() Cmd {
 	return nil
 }
 
-func (m *testModel) Update(msg Msg) (*testModel, Cmd) {
+func (m *testModel) Update(msg Msg) Cmd {
 	switch msg.(type) {
-	case incrementMsg:
+	case msgIncrement:
 		i := m.counter.Load()
 		if i == nil {
 			m.counter.Store(1)
@@ -32,10 +32,10 @@ func (m *testModel) Update(msg Msg) (*testModel, Cmd) {
 		}
 
 	case MsgKey:
-		return m, Quit
+		return Quit
 	}
 
-	return m, nil
+	return nil
 }
 
 func (m *testModel) View(r Renderer) {
@@ -47,7 +47,7 @@ func TestTeaModel(t *testing.T) {
 	in := bytes.NewBuffer([]byte("q"))
 
 	var buf bytes.Buffer
-	_, err := NewProgram(&testModel{}).WithInput(in).WithOutput(&buf).Run()
+	_, err := NewProgram(context.Background(), &testModel{}).WithInput(in).WithOutput(&buf).Run()
 	assert.NoError(t, err)
 
 	assert.NotEmpty(t, buf.Bytes())
@@ -58,7 +58,7 @@ func TestTeaQuit(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
@@ -75,16 +75,15 @@ func TestTeaQuit(t *testing.T) {
 
 func TestTeaWithFilter(t *testing.T) {
 	for preventCount := uint32(0); preventCount < 3; preventCount++ {
-		var buf bytes.Buffer
-		var in bytes.Buffer
+		preventCount := preventCount
 
 		m := &testModel{}
 		shutdowns := uint32(0)
-		p := NewProgram(m).
-			WithInput(&in).
-			WithOutput(&buf).
+		p := NewProgram(context.Background(), m).
+			WithInput(&bytes.Buffer{}).
+			WithOutput(&bytes.Buffer{}).
 			WithFilter(func(_ *testModel, msg Msg) Msg {
-				if _, ok := msg.(QuitMsg); !ok {
+				if _, ok := msg.(MsgQuit); !ok {
 					return msg
 				}
 				if shutdowns < preventCount {
@@ -111,7 +110,7 @@ func TestTeaKill(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
@@ -132,7 +131,7 @@ func TestTeaContext(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithContext(ctx).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(ctx, m).WithInput(&in).WithOutput(&buf)
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
@@ -147,18 +146,18 @@ func TestTeaContext(t *testing.T) {
 	assert.Equal(t, err, ErrProgramKilled)
 }
 
-func TestTeaBatchMsg(t *testing.T) {
+func TestMsgBatch(t *testing.T) {
 	var buf bytes.Buffer
 	var in bytes.Buffer
 
 	inc := func() Msg {
-		return incrementMsg{}
+		return msgIncrement{}
 	}
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go func() {
-		p.Send(BatchMsg{inc, inc})
+		p.Send(MsgBatch{inc, inc})
 
 		for {
 			time.Sleep(time.Millisecond)
@@ -175,37 +174,37 @@ func TestTeaBatchMsg(t *testing.T) {
 	assert.Equal(t, 2, m.counter.Load())
 }
 
-func TestTeaSequenceMsg(t *testing.T) {
+func TestMsgSequence(t *testing.T) {
 	var buf bytes.Buffer
 	var in bytes.Buffer
 
 	inc := func() Msg {
-		return incrementMsg{}
+		return msgIncrement{}
 	}
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
-	go p.Send(sequenceMsg{inc, inc, Quit})
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
+	go p.Send(msgSequence{inc, inc, Quit})
 
 	_, err := p.Run()
 	assert.NoError(t, err)
 	assert.Equal(t, 2, m.counter.Load())
 }
 
-func TestTeaSequenceMsgWithBatchMsg(t *testing.T) {
+func TestMsgSequenceWithMsgBatch(t *testing.T) {
 	var buf bytes.Buffer
 	var in bytes.Buffer
 
 	inc := func() Msg {
-		return incrementMsg{}
+		return msgIncrement{}
 	}
 	batch := func() Msg {
-		return BatchMsg{inc, inc}
+		return MsgBatch{inc, inc}
 	}
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
-	go p.Send(sequenceMsg{batch, inc, Quit})
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
+	go p.Send(msgSequence{batch, inc, Quit})
 
 	_, err := p.Run()
 	assert.NoError(t, err)
@@ -217,7 +216,7 @@ func TestTeaSend(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 
 	// sending before the program is started is a blocking operation
 	go p.Send(Quit())
@@ -234,5 +233,5 @@ func TestTeaNoRun(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	NewProgram(m).WithInput(&in).WithOutput(&buf)
+	NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 }

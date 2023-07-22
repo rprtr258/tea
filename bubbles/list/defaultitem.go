@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/truncate"
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // DefaultItemStyles defines styling for a default list item.
@@ -136,7 +136,7 @@ func (d DefaultDelegate) Update(msg tea.Msg, m *Model) tea.Cmd {
 }
 
 // Render prints an item.
-func (d DefaultDelegate) Render(w io.Writer, m Model, index int, item Item) {
+func (d DefaultDelegate) Render(w io.Writer, m *Model, index int, item Item) {
 	i, ok := item.(DefaultItem)
 	if !ok {
 		return

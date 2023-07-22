@@ -4,9 +4,9 @@ import (
 	"math"
 	"strings"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // New returns a new model with the given width and height as well as default
@@ -66,29 +66,29 @@ func (m *Model) setInitialValues() {
 }
 
 // Init exists to satisfy the tea.Model interface for composability purposes.
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return nil
 }
 
 // AtTop returns whether or not the viewport is at the very top position.
-func (m Model) AtTop() bool {
+func (m *Model) AtTop() bool {
 	return m.YOffset <= 0
 }
 
 // AtBottom returns whether or not the viewport is at or past the very bottom
 // position.
-func (m Model) AtBottom() bool {
+func (m *Model) AtBottom() bool {
 	return m.YOffset >= m.maxYOffset()
 }
 
 // PastBottom returns whether or not the viewport is scrolled beyond the last
 // line. This can happen when adjusting the viewport height.
-func (m Model) PastBottom() bool {
+func (m *Model) PastBottom() bool {
 	return m.YOffset > m.maxYOffset()
 }
 
 // ScrollPercent returns the amount scrolled as a float between 0 and 1.
-func (m Model) ScrollPercent() float64 {
+func (m *Model) ScrollPercent() float64 {
 	if m.Height >= len(m.lines) {
 		return 1.0
 	}
@@ -112,13 +112,13 @@ func (m *Model) SetContent(s string) {
 
 // maxYOffset returns the maximum possible value of the y-offset based on the
 // viewport's content and set height.
-func (m Model) maxYOffset() int {
+func (m *Model) maxYOffset() int {
 	return max(0, len(m.lines)-m.Height)
 }
 
 // visibleLines returns the lines that should currently be visible in the
 // viewport.
-func (m Model) visibleLines() []string {
+func (m *Model) visibleLines() []string {
 	if len(m.lines) == 0 {
 		return nil
 	}
@@ -129,7 +129,7 @@ func (m Model) visibleLines() []string {
 }
 
 // scrollArea returns the scrollable boundaries for high performance rendering.
-func (m Model) scrollArea() (top, bottom int) {
+func (m *Model) scrollArea() (top, bottom int) { //nolint:nonamedreturns
 	top = max(0, m.YPosition)
 	bottom = max(top, top+m.Height)
 	if top > 0 && bottom > top {
@@ -215,12 +215,12 @@ func (m *Model) LineUp(n int) []string {
 }
 
 // TotalLineCount returns the total number of lines (both hidden and visible) within the viewport.
-func (m Model) TotalLineCount() int {
+func (m *Model) TotalLineCount() int {
 	return len(m.lines)
 }
 
 // VisibleLineCount returns the number of the visible lines within the viewport.
-func (m Model) VisibleLineCount() int {
+func (m *Model) VisibleLineCount() int {
 	return len(m.visibleLines())
 }
 
@@ -259,7 +259,7 @@ func Sync(m Model) tea.Cmd {
 //
 //	lines := model.ViewDown(1)
 //	cmd := ViewDown(m, lines)
-func ViewDown(m Model, lines []string) tea.Cmd {
+func ViewDown(m *Model, lines []string) tea.Cmd {
 	if len(lines) == 0 {
 		return nil
 	}
@@ -270,7 +270,7 @@ func ViewDown(m Model, lines []string) tea.Cmd {
 // ViewUp is a high performance command the moves the viewport down by a given
 // number of lines height. Use Model.ViewUp to get the lines that should be
 // rendered.
-func ViewUp(m Model, lines []string) tea.Cmd {
+func ViewUp(m *Model, lines []string) tea.Cmd {
 	if len(lines) == 0 {
 		return nil
 	}
@@ -279,15 +279,7 @@ func ViewUp(m Model, lines []string) tea.Cmd {
 }
 
 // Update handles standard message-based viewport updates.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
-	var cmd tea.Cmd
-	m, cmd = m.updateAsModel(msg)
-	return m, cmd
-}
-
-// Author's note: this method has been broken out to make it easier to
-// potentially transition Update to satisfy tea.Model.
-func (m Model) updateAsModel(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	if !m.initialized {
 		m.setInitialValues()
 	}
@@ -334,7 +326,7 @@ func (m Model) updateAsModel(msg tea.Msg) (Model, tea.Cmd) {
 			}
 		}
 
-	case tea.MouseMsg:
+	case tea.MsgMouse:
 		if !m.MouseWheelEnabled {
 			break
 		}
@@ -353,11 +345,11 @@ func (m Model) updateAsModel(msg tea.Msg) (Model, tea.Cmd) {
 		}
 	}
 
-	return m, cmd
+	return cmd
 }
 
 // View renders the viewport into a string.
-func (m Model) View() string {
+func (m *Model) View() string {
 	if m.HighPerformanceRendering {
 		// Just send newlines since we're going to be rendering the actual
 		// content separately. We still need to send something that equals the

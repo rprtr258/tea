@@ -12,13 +12,13 @@ import (
 
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/reflow/truncate"
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/paginator"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/bubbles/textinput"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/paginator"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/lipgloss"
 	"github.com/sahilm/fuzzy"
 )
 
@@ -37,7 +37,7 @@ type Item interface {
 // help items will be added to the help view.
 type ItemDelegate interface {
 	// Render renders the item's view.
-	Render(w io.Writer, m Model, index int, item Item)
+	Render(w io.Writer, m *Model, index int, item Item)
 
 	// Height is the height of the list item.
 	Height() int
@@ -67,9 +67,9 @@ func (f filteredItems) items() []Item {
 	return agg
 }
 
-// FilterMatchesMsg contains data about items matched during filtering. The
+// MsgFilterMatches contains data about items matched during filtering. The
 // message should be routed to Update for processing.
-type FilterMatchesMsg []filteredItem
+type MsgFilterMatches []filteredItem
 
 // FilterFunc takes a term and a list of strings to search through
 // (defined by Item#FilterValue).
@@ -113,7 +113,7 @@ func UnsortedFilter(term string, targets []string) []Rank {
 	return result
 }
 
-type statusMessageTimeoutMsg struct{}
+type msgStatusMessageTimeout struct{}
 
 // FilterState describes the current filtering state on the model.
 type FilterState int
@@ -260,7 +260,7 @@ func (m *Model) SetFilteringEnabled(v bool) {
 }
 
 // FilteringEnabled returns whether or not filtering is enabled.
-func (m Model) FilteringEnabled() bool {
+func (m *Model) FilteringEnabled() bool {
 	return m.filteringEnabled
 }
 
@@ -271,7 +271,7 @@ func (m *Model) SetShowTitle(v bool) {
 }
 
 // ShowTitle returns whether or not the title bar is set to be rendered.
-func (m Model) ShowTitle() bool {
+func (m *Model) ShowTitle() bool {
 	return m.showTitle
 }
 
@@ -290,7 +290,7 @@ func (m *Model) SetShowFilter(v bool) {
 // that this is separate from FilteringEnabled, so filtering can be hidden yet
 // still invoked. This allows you to render filtering differently without
 // having to re-implement it from scratch.
-func (m Model) ShowFilter() bool {
+func (m *Model) ShowFilter() bool {
 	return m.showFilter
 }
 
@@ -302,7 +302,7 @@ func (m *Model) SetShowStatusBar(v bool) {
 }
 
 // ShowStatusBar returns whether or not the status bar is set to be rendered.
-func (m Model) ShowStatusBar() bool {
+func (m *Model) ShowStatusBar() bool {
 	return m.showStatusBar
 }
 
@@ -314,7 +314,7 @@ func (m *Model) SetStatusBarItemName(singular, plural string) {
 }
 
 // StatusBarItemName returns singular and plural status bar item names.
-func (m Model) StatusBarItemName() (string, string) {
+func (m *Model) StatusBarItemName() (string, string) {
 	return m.itemNameSingular, m.itemNamePlural
 }
 
@@ -337,12 +337,12 @@ func (m *Model) SetShowHelp(v bool) {
 }
 
 // ShowHelp returns whether or not the help is set to be rendered.
-func (m Model) ShowHelp() bool {
+func (m *Model) ShowHelp() bool {
 	return m.showHelp
 }
 
 // Items returns the items in the list.
-func (m Model) Items() []Item {
+func (m *Model) Items() []Item {
 	return m.items
 }
 
@@ -426,7 +426,7 @@ func (m *Model) SetDelegate(d ItemDelegate) {
 }
 
 // VisibleItems returns the total items available to be shown.
-func (m Model) VisibleItems() []Item {
+func (m *Model) VisibleItems() []Item {
 	if m.filterState != Unfiltered {
 		return m.filteredItems.items()
 	}
@@ -434,7 +434,7 @@ func (m Model) VisibleItems() []Item {
 }
 
 // SelectedItem returns the current selected item in the list.
-func (m Model) SelectedItem() Item {
+func (m *Model) SelectedItem() Item {
 	i := m.Index()
 
 	items := m.VisibleItems()
@@ -449,7 +449,7 @@ func (m Model) SelectedItem() Item {
 // Use this to style runes matched by the active filter.
 //
 // See DefaultItemView for a usage example.
-func (m Model) MatchesForItem(index int) []int {
+func (m *Model) MatchesForItem(index int) []int {
 	if m.filteredItems == nil || index >= len(m.filteredItems) {
 		return nil
 	}
@@ -458,12 +458,12 @@ func (m Model) MatchesForItem(index int) []int {
 
 // Index returns the index of the currently selected item as it appears in the
 // entire slice of items.
-func (m Model) Index() int {
+func (m *Model) Index() int {
 	return m.Paginator.Page*m.Paginator.PerPage + m.cursor
 }
 
 // Cursor returns the index of the cursor on the current page.
-func (m Model) Cursor() int {
+func (m *Model) Cursor() int {
 	return m.cursor
 }
 
@@ -532,22 +532,22 @@ func (m *Model) CursorDown() {
 }
 
 // PrevPage moves to the previous page, if available.
-func (m Model) PrevPage() {
+func (m *Model) PrevPage() {
 	m.Paginator.PrevPage()
 }
 
 // NextPage moves to the next page, if available.
-func (m Model) NextPage() {
+func (m *Model) NextPage() {
 	m.Paginator.NextPage()
 }
 
 // FilterState returns the current filter state.
-func (m Model) FilterState() FilterState {
+func (m *Model) FilterState() FilterState {
 	return m.filterState
 }
 
 // FilterValue returns the current value of the filter.
-func (m Model) FilterValue() string {
+func (m *Model) FilterValue() string {
 	return m.FilterInput.Value()
 }
 
@@ -558,7 +558,7 @@ func (m Model) FilterValue() string {
 //
 // It's included here because it's a common thing to check for when
 // implementing this component.
-func (m Model) SettingFilter() bool {
+func (m *Model) SettingFilter() bool {
 	return m.filterState == Filtering
 }
 
@@ -566,17 +566,17 @@ func (m Model) SettingFilter() bool {
 // It's purely a convenience method for the following:
 //
 //	m.FilterState() == FilterApplied
-func (m Model) IsFiltered() bool {
+func (m *Model) IsFiltered() bool {
 	return m.filterState == FilterApplied
 }
 
 // Width returns the current width setting.
-func (m Model) Width() int {
+func (m *Model) Width() int {
 	return m.width
 }
 
 // Height returns the current height setting.
-func (m Model) Height() int {
+func (m *Model) Height() int {
 	return m.height
 }
 
@@ -626,7 +626,7 @@ func (m *Model) NewStatusMessage(s string) tea.Cmd {
 	// Wait for timeout
 	return func() tea.Msg {
 		<-m.statusMessageTimer.C
-		return statusMessageTimeoutMsg{}
+		return msgStatusMessageTimeout{}
 	}
 }
 
@@ -667,7 +667,7 @@ func (m *Model) resetFiltering() {
 	m.updateKeybindings()
 }
 
-func (m Model) itemsAsFilterItems() filteredItems {
+func (m *Model) itemsAsFilterItems() filteredItems {
 	fi := make([]filteredItem, len(m.items))
 	for i, item := range m.items {
 		fi[i] = filteredItem{
@@ -768,27 +768,26 @@ func (m *Model) hideStatusMessage() {
 }
 
 // Update is the Bubble Tea update loop.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if key.Matches(msg, m.KeyMap.ForceQuit) {
-			return m, tea.Quit
+			return tea.Quit
 		}
 
-	case FilterMatchesMsg:
+	case MsgFilterMatches:
 		m.filteredItems = filteredItems(msg)
-		return m, nil
+		return nil
 
-	case spinner.TickMsg:
-		newSpinnerModel, cmd := m.spinner.Update(msg)
-		m.spinner = newSpinnerModel
+	case spinner.MsgTick:
+		cmd := m.spinner.Update(msg)
 		if m.showSpinner {
 			cmds = append(cmds, cmd)
 		}
 
-	case statusMessageTimeoutMsg:
+	case msgStatusMessageTimeout:
 		m.hideStatusMessage()
 	}
 
@@ -798,7 +797,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		cmds = append(cmds, m.handleBrowsing(msg))
 	}
 
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
 // Updates for when a user is browsing the list.
@@ -806,7 +805,7 @@ func (m *Model) handleBrowsing(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 	numItems := len(m.VisibleItems())
 
-	switch msg := msg.(type) {
+	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {
 		// Note: we match clear filter before quit because, by default, they're
@@ -909,9 +908,9 @@ func (m *Model) handleFiltering(msg tea.Msg) tea.Cmd {
 	}
 
 	// Update the filter text input component
-	newFilterInputModel, inputCmd := m.FilterInput.Update(msg)
-	filterChanged := m.FilterInput.Value() != newFilterInputModel.Value()
-	m.FilterInput = newFilterInputModel
+	oldValue := m.FilterInput.Value()
+	inputCmd := m.FilterInput.Update(msg)
+	filterChanged := oldValue != m.FilterInput.Value()
 	cmds = append(cmds, inputCmd)
 
 	// If the filtering input has changed, request updated filtering
@@ -928,7 +927,7 @@ func (m *Model) handleFiltering(msg tea.Msg) tea.Cmd {
 
 // ShortHelp returns bindings to show in the abbreviated help view. It's part
 // of the help.KeyMap interface.
-func (m Model) ShortHelp() []key.Binding {
+func (m *Model) ShortHelp() []key.Binding {
 	kb := []key.Binding{
 		m.KeyMap.CursorUp,
 		m.KeyMap.CursorDown,
@@ -963,7 +962,7 @@ func (m Model) ShortHelp() []key.Binding {
 
 // FullHelp returns bindings to show the full help view. It's part of the
 // help.KeyMap interface.
-func (m Model) FullHelp() [][]key.Binding {
+func (m *Model) FullHelp() [][]key.Binding {
 	kb := [][]key.Binding{{
 		m.KeyMap.CursorUp,
 		m.KeyMap.CursorDown,
@@ -1003,7 +1002,7 @@ func (m Model) FullHelp() [][]key.Binding {
 }
 
 // View renders the component.
-func (m Model) View() string {
+func (m *Model) View() string {
 	var (
 		sections    []string
 		availHeight = m.height
@@ -1047,7 +1046,7 @@ func (m Model) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left, sections...)
 }
 
-func (m Model) titleView() string {
+func (m *Model) titleView() string {
 	var (
 		view          string
 		titleBarStyle = m.Styles.TitleBar.Copy()
@@ -1095,7 +1094,7 @@ func (m Model) titleView() string {
 	return view
 }
 
-func (m Model) statusView() string {
+func (m *Model) statusView() string {
 	visibleItems := len(m.VisibleItems())
 
 	var itemName string
@@ -1142,7 +1141,7 @@ func (m Model) statusView() string {
 	return m.Styles.StatusBar.Render(status)
 }
 
-func (m Model) paginationView() string {
+func (m *Model) paginationView() string {
 	if m.Paginator.TotalPages < 2 { //nolint:gomnd
 		return ""
 	}
@@ -1164,7 +1163,7 @@ func (m Model) paginationView() string {
 	return style.Render(s)
 }
 
-func (m Model) populatedView() string {
+func (m *Model) populatedView() string {
 	items := m.VisibleItems()
 
 	var b strings.Builder
@@ -1204,18 +1203,18 @@ func (m Model) populatedView() string {
 	return b.String()
 }
 
-func (m Model) helpView() string {
+func (m *Model) helpView() string {
 	return m.Styles.HelpStyle.Render(m.Help.View(m))
 }
 
-func (m Model) spinnerView() string {
+func (m *Model) spinnerView() string {
 	return m.spinner.View()
 }
 
 func filterItems(m Model) tea.Cmd {
 	return func() tea.Msg {
 		if m.FilterInput.Value() == "" || m.filterState == Unfiltered {
-			return FilterMatchesMsg(m.itemsAsFilterItems()) // return nothing
+			return MsgFilterMatches(m.itemsAsFilterItems()) // return nothing
 		}
 
 		targets := []string{}
@@ -1233,7 +1232,7 @@ func filterItems(m Model) tea.Cmd {
 			})
 		}
 
-		return FilterMatchesMsg(filterMatches)
+		return MsgFilterMatches(filterMatches)
 	}
 }
 

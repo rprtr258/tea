@@ -1,14 +1,15 @@
 package composable_views
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/bubbles/timer"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/bubbles/timer"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 /*
@@ -17,8 +18,8 @@ haven't already read our tutorials on the basics of Bubble Tea and working
 with commands, we recommend reading those first.
 
 Find them at:
-https://github.com/rprtr258/bubbletea/tree/master/tutorials/commands
-https://github.com/rprtr258/bubbletea/tree/master/tutorials/basics
+https://github.com/rprtr258/tea/tree/master/tutorials/commands
+https://github.com/rprtr258/tea/tree/master/tutorials/basics
 */
 
 // sessionState is used to track which model is focused
@@ -65,26 +66,26 @@ type mainModel struct {
 	index   int
 }
 
-func newModel(timeout time.Duration) mainModel {
-	m := mainModel{state: timerView}
-	m.timer = timer.New(timeout)
-	m.spinner = spinner.New()
-	return m
+func newModel(timeout time.Duration) *mainModel {
+	return &mainModel{
+		state:   timerView,
+		timer:   timer.New(timeout),
+		spinner: spinner.New(),
+	}
 }
 
-func (m mainModel) Init() tea.Cmd {
+func (m *mainModel) Init() tea.Cmd {
 	// start the timer and spinner on program start
 	return tea.Batch(m.timer.Init(), m.spinner.Tick)
 }
 
-func (m mainModel) Update(msg tea.Msg) (mainModel, tea.Cmd) {
-	var cmd tea.Cmd
+func (m *mainModel) Update(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			return m, tea.Quit
+			return tea.Quit
 		case "tab":
 			if m.state == timerView {
 				m.state = spinnerView
@@ -104,23 +105,19 @@ func (m mainModel) Update(msg tea.Msg) (mainModel, tea.Cmd) {
 		switch m.state {
 		// update whichever model is focused
 		case spinnerView:
-			m.spinner, cmd = m.spinner.Update(msg)
-			cmds = append(cmds, cmd)
+			cmds = append(cmds, m.spinner.Update(msg))
 		default:
-			m.timer, cmd = m.timer.Update(msg)
-			cmds = append(cmds, cmd)
+			cmds = append(cmds, m.timer.Update(msg))
 		}
-	case spinner.TickMsg:
-		m.spinner, cmd = m.spinner.Update(msg)
-		cmds = append(cmds, cmd)
-	case timer.TickMsg:
-		m.timer, cmd = m.timer.Update(msg)
-		cmds = append(cmds, cmd)
+	case spinner.MsgTick:
+		cmds = append(cmds, m.spinner.Update(msg))
+	case timer.MsgTick:
+		cmds = append(cmds, m.timer.Update(msg))
 	}
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
-func (m mainModel) View(r tea.Renderer) {
+func (m *mainModel) View(r tea.Renderer) {
 	var s string
 	model := m.currentFocusedModel()
 	if m.state == timerView {
@@ -154,9 +151,9 @@ func (m *mainModel) resetSpinner() {
 }
 
 func Main() {
-	p := tea.NewProgram(newModel(defaultTime))
+	p := tea.NewProgram(context.Background(), newModel(defaultTime))
 
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }

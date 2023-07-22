@@ -1,15 +1,15 @@
 package list_fancy
 
 import (
-	"fmt"
+	"context"
+	"log"
 	"math/rand"
-	"os"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/list"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/list"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var (
@@ -79,7 +79,7 @@ type model struct {
 	delegateKeys  *delegateKeyMap
 }
 
-func newModel() model {
+func newModel() *model {
 	var (
 		itemGenerator randomItemGenerator
 		delegateKeys  = newDelegateKeyMap()
@@ -109,7 +109,7 @@ func newModel() model {
 		}
 	}
 
-	return model{
+	return &model{
 		list:          groceryList,
 		keys:          listKeys,
 		delegateKeys:  delegateKeys,
@@ -117,15 +117,15 @@ func newModel() model {
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.EnterAltScreen
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		h, v := appStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 
@@ -138,53 +138,50 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keys.toggleSpinner):
 			cmd := m.list.ToggleSpinner()
-			return m, cmd
+			return cmd
 
 		case key.Matches(msg, m.keys.toggleTitleBar):
 			v := !m.list.ShowTitle()
 			m.list.SetShowTitle(v)
 			m.list.SetShowFilter(v)
 			m.list.SetFilteringEnabled(v)
-			return m, nil
+			return nil
 
 		case key.Matches(msg, m.keys.toggleStatusBar):
 			m.list.SetShowStatusBar(!m.list.ShowStatusBar())
-			return m, nil
+			return nil
 
 		case key.Matches(msg, m.keys.togglePagination):
 			m.list.SetShowPagination(!m.list.ShowPagination())
-			return m, nil
+			return nil
 
 		case key.Matches(msg, m.keys.toggleHelpMenu):
 			m.list.SetShowHelp(!m.list.ShowHelp())
-			return m, nil
+			return nil
 
 		case key.Matches(msg, m.keys.insertItem):
 			m.delegateKeys.remove.SetEnabled(true)
 			newItem := m.itemGenerator.next()
 			insCmd := m.list.InsertItem(0, newItem)
 			statusCmd := m.list.NewStatusMessage(statusMessageStyle("Added " + newItem.Title()))
-			return m, tea.Batch(insCmd, statusCmd)
+			return tea.Batch(insCmd, statusCmd)
 		}
 	}
 
 	// This will also call our delegate's update function.
-	newListModel, cmd := m.list.Update(msg)
-	m.list = newListModel
-	cmds = append(cmds, cmd)
+	cmds = append(cmds, m.list.Update(msg))
 
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(appStyle.Render(m.list.View()))
 }
 
 func Main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

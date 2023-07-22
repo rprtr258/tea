@@ -1,12 +1,13 @@
 package spinners
 
 import (
+	"context"
 	"fmt"
-	"os"
+	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var (
@@ -29,12 +30,11 @@ var (
 )
 
 func Main() {
-	m := model{}
+	m := &model{}
 	m.resetSpinner()
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("could not run program:", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
+		log.Fatalln("could not run program:", err.Error())
 	}
 }
 
@@ -43,39 +43,37 @@ type model struct {
 	spinner spinner.Model
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			return m, tea.Quit
+			return tea.Quit
 		case "h", "left":
 			m.index--
 			if m.index < 0 {
 				m.index = len(spinners) - 1
 			}
 			m.resetSpinner()
-			return m, m.spinner.Tick
+			return m.spinner.Tick
 		case "l", "right":
 			m.index++
 			if m.index >= len(spinners) {
 				m.index = 0
 			}
 			m.resetSpinner()
-			return m, m.spinner.Tick
+			return m.spinner.Tick
 		default:
-			return m, nil
+			return nil
 		}
-	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+	case spinner.MsgTick:
+		return m.spinner.Update(msg)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
@@ -85,7 +83,7 @@ func (m *model) resetSpinner() {
 	m.spinner.Spinner = spinners[m.index]
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	var gap string
 	switch m.index {
 	case 1:
@@ -95,5 +93,4 @@ func (m model) View(r tea.Renderer) {
 	}
 
 	r.Write(fmt.Sprintf("\n %s%s%s\n\n%s", m.spinner.View(), gap, textStyle("Spinning..."), helpStyle("h/l, ←/→: change spinner • q: exit\n")))
-	return
 }

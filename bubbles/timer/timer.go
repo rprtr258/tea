@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 var (
@@ -26,7 +26,7 @@ func nextID() int {
 // case is extraneous. To stop the timer we'd just need to set the 'running'
 // property on the model to false which cause logic in the update function to
 // stop responding to TickMsgs. To start the model we'd set 'running' to true
-// and fire off a TickMsg. Helper functions would look like:
+// and fire off a MsgTick. Helper functions would look like:
 //
 //     func (m *model) Start() tea.Cmd
 //     func (m *model) Stop()
@@ -42,38 +42,38 @@ func nextID() int {
 //     return m, cmd
 //
 // Thus, because of potential pitfalls like the ones above, we've introduced
-// the extraneous StartStopMsg to simplify the mental model when using this
+// the extraneous MsgStartStop to simplify the mental model when using this
 // package. Bear in mind that the practice of sending commands to simply
 // communicate with other parts of your application, such as in this package,
 // is still not recommended.
 
-// StartStopMsg is used to start and stop the timer.
-type StartStopMsg struct {
+// MsgStartStop is used to start and stop the timer.
+type MsgStartStop struct {
 	ID      int
 	running bool
 }
 
-// TickMsg is a message that is sent on every timer tick.
-type TickMsg struct {
+// MsgTick is a message that is sent on every timer tick.
+type MsgTick struct {
 	// ID is the identifier of the timer that sends the message. This makes
 	// it possible to determine which timer a tick belongs to when there
 	// are multiple timers running.
 	//
 	// Note, however, that a timer will reject ticks from other timers, so
-	// it's safe to flow all TickMsgs through all timers and have them still
+	// it's safe to flow all MsgTick-s through all timers and have them still
 	// behave appropriately.
 	ID int
 
 	// Timeout returns whether or not this tick is a timeout tick. You can
-	// alternatively listen for TimeoutMsg.
+	// alternatively listen for MsgTimeout.
 	Timeout bool
 }
 
-// TimeoutMsg is a message that is sent once when the timer times out.
+// MsgTimeout is a message that is sent once when the timer times out.
 //
-// It's a convenience message sent alongside a TickMsg with the Timeout value
+// It's a convenience message sent alongside a MsgTick with the Timeout value
 // set to true.
-type TimeoutMsg struct {
+type MsgTimeout struct {
 	ID int
 }
 
@@ -106,13 +106,13 @@ func New(timeout time.Duration) Model {
 
 // ID returns the model's identifier. This can be used to determine if messages
 // belong to this timer instance when there are multiple timers.
-func (m Model) ID() int {
+func (m *Model) ID() int {
 	return m.id
 }
 
 // Running returns whether or not the timer is running. If the timer has timed
 // out this will always return false.
-func (m Model) Running() bool {
+func (m *Model) Running() bool {
 	if m.Timedout() || !m.running {
 		return false
 	}
@@ -120,38 +120,38 @@ func (m Model) Running() bool {
 }
 
 // Timedout returns whether or not the timer has timed out.
-func (m Model) Timedout() bool {
+func (m *Model) Timedout() bool {
 	return m.Timeout <= 0
 }
 
 // Init starts the timer.
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return m.tick()
 }
 
 // Update handles the timer tick.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case StartStopMsg:
+	case MsgStartStop:
 		if msg.ID != 0 && msg.ID != m.id {
-			return m, nil
+			return nil
 		}
 		m.running = msg.running
-		return m, m.tick()
-	case TickMsg:
+		return m.tick()
+	case MsgTick:
 		if !m.Running() || (msg.ID != 0 && msg.ID != m.id) {
 			break
 		}
 
 		m.Timeout -= m.Interval
-		return m, tea.Batch(m.tick(), m.timedout())
+		return tea.Batch(m.tick(), m.timedout())
 	}
 
-	return m, nil
+	return nil
 }
 
 // View of the timer component.
-func (m Model) View() string {
+func (m *Model) View() string {
 	return m.Timeout.String()
 }
 
@@ -170,23 +170,23 @@ func (m *Model) Toggle() tea.Cmd {
 	return m.startStop(!m.Running())
 }
 
-func (m Model) tick() tea.Cmd {
+func (m *Model) tick() tea.Cmd {
 	return tea.Tick(m.Interval, func(_ time.Time) tea.Msg {
-		return TickMsg{ID: m.id, Timeout: m.Timedout()}
+		return MsgTick{ID: m.id, Timeout: m.Timedout()}
 	})
 }
 
-func (m Model) timedout() tea.Cmd {
+func (m *Model) timedout() tea.Cmd {
 	if !m.Timedout() {
 		return nil
 	}
 	return func() tea.Msg {
-		return TimeoutMsg{ID: m.id}
+		return MsgTimeout{ID: m.id}
 	}
 }
 
-func (m Model) startStop(v bool) tea.Cmd {
+func (m *Model) startStop(v bool) tea.Cmd {
 	return func() tea.Msg {
-		return StartStopMsg{ID: m.id, running: v}
+		return MsgStartStop{ID: m.id, running: v}
 	}
 }

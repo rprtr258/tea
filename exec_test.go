@@ -2,38 +2,35 @@ package tea
 
 import (
 	"bytes"
+	"context"
 	"os/exec"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-type execFinishedMsg struct {
-	err error
-}
+type msgExecFinished struct{ err error }
 
 type testExecModel struct {
 	cmd string
 	err error
 }
 
-func (m testExecModel) Init() Cmd {
-	c := exec.Command(m.cmd) //nolint:gosec
+func (m *testExecModel) Init() Cmd {
+	c := exec.Command(m.cmd)
 	return ExecProcess(c, func(err error) Msg {
-		return execFinishedMsg{err: err}
+		return msgExecFinished{err}
 	})
 }
 
-func (m *testExecModel) Update(msg Msg) (*testExecModel, Cmd) {
-	switch msg := msg.(type) {
-	case execFinishedMsg:
-		if msg.err != nil {
-			m.err = msg.err
-		}
-		return m, Quit
+func (m *testExecModel) Update(msg Msg) Cmd {
+	switch msg := msg.(type) { //nolint:gocritic
+	case msgExecFinished:
+		m.err = msg.err
+		return Quit
 	}
 
-	return m, nil
+	return nil
 }
 
 func (m *testExecModel) View(Renderer) {}
@@ -61,7 +58,7 @@ func TestTeaExec(t *testing.T) {
 			var in bytes.Buffer
 
 			m := &testExecModel{cmd: test.cmd}
-			_, err := NewProgram(m).WithInput(&in).WithOutput(&buf).Run()
+			_, err := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf).Run()
 			assert.NoError(t, err)
 			assert.IsType(t, test.expectErr, m.err)
 		})

@@ -537,7 +537,7 @@ func (s Style) Renderer(r *Renderer) Style {
 // 3 args:  top -> horizontal -> bottom
 // 4 args:  top -> right -> bottom -> left
 // 5+ args: do nothing.
-func whichSidesInt(i ...int) (top, right, bottom, left int, ok bool) {
+func whichSidesInt(i ...int) (top, right, bottom, left int, ok bool) { //nolint:nonamedreturns
 	switch len(i) {
 	case 1:
 		top = i[0]
@@ -570,7 +570,7 @@ func whichSidesInt(i ...int) (top, right, bottom, left int, ok bool) {
 // whichSidesBool is like whichSidesInt, except it operates on a series of
 // boolean values. See the comment on whichSidesInt for details on how this
 // works.
-func whichSidesBool(i ...bool) (top, right, bottom, left bool, ok bool) {
+func whichSidesBool(i ...bool) (top, right, bottom, left bool, ok bool) { //nolint:nonamedreturns
 	switch len(i) {
 	case 1:
 		top = i[0]
@@ -603,7 +603,7 @@ func whichSidesBool(i ...bool) (top, right, bottom, left bool, ok bool) {
 // whichSidesColor is like whichSides, except it operates on a series of
 // boolean values. See the comment on whichSidesInt for details on how this
 // works.
-func whichSidesColor(i ...TerminalColor) (top, right, bottom, left TerminalColor, ok bool) {
+func whichSidesColor(i ...TerminalColor) (top, right, bottom, left TerminalColor, ok bool) { //nolint:nonamedreturns
 	switch len(i) {
 	case 1:
 		top = i[0]

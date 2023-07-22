@@ -1,4 +1,4 @@
-module github.com/rprtr258/bubbletea
+module github.com/rprtr258/tea
 
 go 1.18
 
@@ -10,9 +10,9 @@ require (
 	github.com/charmbracelet/ssh v0.0.0-20221117183211-483d43d97103
 	github.com/charmbracelet/wish v1.1.1
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81
+	github.com/creack/pty v1.1.7
 	github.com/dustin/go-humanize v1.0.1
 	github.com/fogleman/ease v0.0.0-20170301025033-8da417bf1776
-	github.com/kr/pty v1.1.8
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/mattn/go-isatty v0.0.18
 	github.com/mattn/go-localereader v0.0.1
@@ -41,7 +41,6 @@ require (
 	github.com/charmbracelet/keygen v0.4.2 // indirect
 	github.com/charmbracelet/lipgloss v0.7.1 // indirect
 	github.com/charmbracelet/log v0.2.1 // indirect
-	github.com/creack/pty v1.1.7 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect

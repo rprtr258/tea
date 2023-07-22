@@ -34,7 +34,7 @@ func (NoColor) color(*Renderer) termenv.Color {
 // Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
 //
 // Deprecated.
-func (n NoColor) RGBA() (r, g, b, a uint32) {
+func (n NoColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
 	return 0x0, 0x0, 0x0, 0xFFFF
 }
 
@@ -54,7 +54,7 @@ func (c Color) color(r *Renderer) termenv.Color {
 // Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
 //
 // Deprecated.
-func (c Color) RGBA() (r, g, b, a uint32) {
+func (c Color) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
 	return termenv.ConvertToRGB(c.color(renderer)).RGBA()
 }
 
@@ -79,7 +79,7 @@ func (ac ANSIColor) color(r *Renderer) termenv.Color {
 // Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
 //
 // Deprecated.
-func (ac ANSIColor) RGBA() (r, g, b, a uint32) {
+func (ac ANSIColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
 	cf := Color(strconv.FormatUint(uint64(ac), 10))
 	return cf.RGBA()
 }
@@ -109,7 +109,7 @@ func (ac AdaptiveColor) color(r *Renderer) termenv.Color {
 // Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
 //
 // Deprecated.
-func (ac AdaptiveColor) RGBA() (r, g, b, a uint32) {
+func (ac AdaptiveColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
 	return termenv.ConvertToRGB(ac.color(renderer)).RGBA()
 }
 
@@ -142,7 +142,7 @@ func (c CompleteColor) color(r *Renderer) termenv.Color {
 // CompleteAdaptiveColor specifies exact values for truecolor, ANSI256, and ANSI color
 //
 // Deprecated.
-func (c CompleteColor) RGBA() (r, g, b, a uint32) {
+func (c CompleteColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
 	return termenv.ConvertToRGB(c.color(renderer)).RGBA()
 }
 
@@ -167,6 +167,6 @@ func (cac CompleteAdaptiveColor) color(r *Renderer) termenv.Color {
 // Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
 //
 // Deprecated.
-func (cac CompleteAdaptiveColor) RGBA() (r, g, b, a uint32) {
+func (cac CompleteAdaptiveColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
 	return termenv.ConvertToRGB(cac.color(renderer)).RGBA()
 }

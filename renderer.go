@@ -1,7 +1,7 @@
 package tea
 
 // Renderer is the interface for Bubble Tea renderers.
-type Renderer interface {
+type Renderer interface { //nolint:interfacebloat
 	// Start the renderer.
 	start()
 
@@ -54,5 +54,5 @@ type Renderer interface {
 	handleMessages(Msg)
 }
 
-// repaintMsg forces a full repaint.
-type repaintMsg struct{}
+// msgRepaint forces a full repaint.
+type msgRepaint struct{}

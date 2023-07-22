@@ -40,7 +40,7 @@ very flexible and powerful.
 If you just want to alter the default style you could do something like:
 
 ```go
-import "github.com/rprtr258/bubbletea/bubbles/list"
+import "github.com/rprtr258/tea/bubbles/list"
 
 // Create a new default delegate
 d := list.NewDefaultDelegate()
@@ -66,7 +66,7 @@ own `ItemDelegate` too ([example][customDelegate]).
 
 
 [kancli]: https://github.com/charmbracelet/kancli/blob/main/main.go#L45
-[itemDelegate]: https://pkg.go.dev/github.com/rprtr258/bubbletea/bubbles@v0.10.2/list#ItemDelegate
-[replacedLine]: https://github.com/rprtr258/bubbletea/blob/master/examples/list-default/main.go#L77
-[listDefault]: https://github.com/rprtr258/bubbletea/tree/master/examples/list-default
-[customDelegate]: https://github.com/rprtr258/bubbletea/blob/a6f46172ec4436991b90c2270253b2d212de7ef3/examples/list-simple/main.go#L28-L49
+[itemDelegate]: https://pkg.go.dev/github.com/rprtr258/tea/bubbles@v0.10.2/list#ItemDelegate
+[replacedLine]: https://github.com/rprtr258/tea/blob/master/examples/list-default/main.go#L77
+[listDefault]: https://github.com/rprtr258/tea/tree/master/examples/list-default
+[customDelegate]: https://github.com/rprtr258/tea/blob/a6f46172ec4436991b90c2270253b2d212de7ef3/examples/list-simple/main.go#L28-L49

@@ -1,14 +1,15 @@
 package exec
 
 import (
-	"fmt"
+	"context"
+	"log"
 	"os"
 	"os/exec"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
-type editorFinishedMsg struct{ err error }
+type msgEditorFinished struct{ err error }
 
 func openEditor() tea.Cmd {
 	editor := os.Getenv("EDITOR")
@@ -17,7 +18,7 @@ func openEditor() tea.Cmd {
 	}
 	c := exec.Command(editor) //nolint:gosec
 	return tea.ExecProcess(c, func(err error) tea.Msg {
-		return editorFinishedMsg{err}
+		return msgEditorFinished{err}
 	})
 }
 
@@ -26,11 +27,11 @@ type model struct {
 	err             error
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -40,35 +41,32 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 			if !m.altscreenActive {
 				cmd = tea.ExitAltScreen
 			}
-			return m, cmd
+			return cmd
 		case "e":
-			return m, openEditor()
+			return openEditor()
 		case "ctrl+c", "q":
-			return m, tea.Quit
+			return tea.Quit
 		}
-	case editorFinishedMsg:
+	case msgEditorFinished:
 		if msg.err != nil {
 			m.err = msg.err
-			return m, tea.Quit
+			return tea.Quit
 		}
 	}
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.err != nil {
 		r.Write("Error: " + m.err.Error() + "\n")
 		return
 	}
 
 	r.Write("Press 'e' to open your EDITOR.\nPress 'a' to toggle the altscreen\nPress 'q' to quit.\n")
-	return
 }
 
 func Main() {
-	m := model{}
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

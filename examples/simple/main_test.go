@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 	"github.com/stretchr/testify/assert"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/x/exp/teatest"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/x/exp/teatest"
 )
 
 func init() {
@@ -20,8 +20,7 @@ func init() {
 
 func TestApp(t *testing.T) {
 	m := model(10)
-	tm := teatest.NewTestModel(
-		t, m,
+	tm := teatest.NewTestModel(t, &m,
 		teatest.WithInitialTermSize(70, 30),
 	)
 	t.Cleanup(func() {
@@ -41,13 +40,12 @@ func TestApp(t *testing.T) {
 	assert.Regexp(t, `This program will exit in \d+ seconds`, string(out))
 	teatest.RequireEqualOutput(t, out)
 
-	assert.Equal(t, model(9), tm.FinalModel(t))
+	assert.Equal(t, model(9), *tm.FinalModel(t))
 }
 
 func TestAppInteractive(t *testing.T) {
 	m := model(10)
-	tm := teatest.NewTestModel(
-		t, m,
+	tm := teatest.NewTestModel(t, &m,
 		teatest.WithInitialTermSize(70, 30),
 	)
 
@@ -65,7 +63,7 @@ func TestAppInteractive(t *testing.T) {
 	})
 
 	assert.NoError(t, tm.Quit())
-	assert.Equal(t, model(7), tm.FinalModel(t))
+	assert.Equal(t, model(7), *tm.FinalModel(t))
 }
 
 func readBts(t *testing.T, r io.Reader) []byte {

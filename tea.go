@@ -4,9 +4,9 @@
 // both. It's been battle-tested in several large projects and is
 // production-ready.
 //
-// A tutorial is available at https://github.com/rprtr258/bubbletea/tree/master/tutorials
+// A tutorial is available at https://github.com/rprtr258/tea/tree/master/tutorials
 //
-// Example programs can be found at https://github.com/rprtr258/bubbletea/tree/master/examples
+// Example programs can be found at https://github.com/rprtr258/tea/tree/master/examples
 package tea
 
 import (
@@ -35,14 +35,14 @@ var ErrProgramKilled = errors.New("program was killed")
 type Msg any
 
 // Model contains the program's state as well as its core functions.
-type Model[M any] interface {
+type Model interface {
 	// Init is the first function that will be called. It returns an optional
 	// initial command. To not perform an initial command return nil.
 	Init() Cmd
 
 	// Update is called when a message is received. Use it to inspect messages
 	// and, in response, update the model and/or send a command.
-	Update(Msg) (M, Cmd) // TODO: remove M from return
+	Update(Msg) Cmd
 
 	// View renders the program's UI, which is just a string. The view is
 	// rendered after every Update.
@@ -124,7 +124,7 @@ func (h handlers) shutdown() {
 }
 
 // Program is a terminal user interface.
-type Program[M Model[M]] struct {
+type Program[M Model] struct {
 	initialModel M
 
 	// Configuration options that will set as the program is initializing,
@@ -133,7 +133,7 @@ type Program[M Model[M]] struct {
 
 	inputType inputType
 
-	ctx    context.Context
+	ctx    context.Context //nolint:containedctx // TODO: is needed? check and remove nolint:containedctx if so
 	cancel context.CancelFunc
 
 	msgs     chan Msg
@@ -171,27 +171,23 @@ type Program[M Model[M]] struct {
 	fps int
 }
 
-// QuitMsg signals that the program should quit. You can send a QuitMsg with
+// MsgQuit signals that the program should quit. You can send a MsgQuit with
 // Quit.
-type QuitMsg struct{}
+type MsgQuit struct{}
 
 // Quit is a special command that tells the Bubble Tea program to exit.
 func Quit() Msg {
-	return QuitMsg{}
+	return MsgQuit{}
 }
 
 // NewProgram creates a new Program.
-func NewProgram[M Model[M]](model M) *Program[M] {
+func NewProgram[M Model](ctx context.Context, model M) *Program[M] {
 	p := &Program[M]{
 		initialModel: model,
 		msgs:         make(chan Msg),
+		ctx:          ctx,
 	}
 
-	// A context can be provided with a ProgramOption, but if none was provided
-	// we'll use the default background context.
-	if p.ctx == nil {
-		p.ctx = context.Background()
-	}
 	// Initialize context and teardown channel.
 	p.ctx, p.cancel = context.WithCancel(p.ctx)
 
@@ -234,7 +230,7 @@ func (p *Program[M]) handleSignals() chan struct{} {
 
 			case <-sig:
 				if !p.ignoreSignals {
-					p.msgs <- QuitMsg{}
+					p.msgs <- MsgQuit{}
 					return
 				}
 			}
@@ -317,45 +313,45 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 
 			// Handle special internal messages.
 			switch msg := msg.(type) {
-			case QuitMsg:
+			case MsgQuit:
 				return model, nil
 
-			case clearScreenMsg:
+			case msgClearScreen:
 				p.renderer.clearScreen()
 
-			case enterAltScreenMsg:
+			case msgEnterAltScreen:
 				p.renderer.enterAltScreen()
 
-			case exitAltScreenMsg:
+			case msgExitAltScreen:
 				p.renderer.exitAltScreen()
 
-			case enableMouseCellMotionMsg:
+			case msgEnableMouseCellMotion:
 				p.renderer.enableMouseCellMotion()
 
-			case enableMouseAllMotionMsg:
+			case msgEnableMouseAllMotion:
 				p.renderer.enableMouseAllMotion()
 
-			case disableMouseMsg:
+			case msgDisableMouse:
 				p.renderer.disableMouseCellMotion()
 				p.renderer.disableMouseAllMotion()
 
-			case showCursorMsg:
+			case msgShowCursor:
 				p.renderer.showCursor()
 
-			case hideCursorMsg:
+			case msgHideCursor:
 				p.renderer.hideCursor()
 
-			case execMsg:
+			case msgExec:
 				// NB: this blocks.
 				p.exec(msg.cmd, msg.fn)
 
-			case BatchMsg:
+			case MsgBatch:
 				for _, cmd := range msg {
 					cmds <- cmd
 				}
 				continue
 
-			case sequenceMsg:
+			case msgSequence:
 				go func() {
 					// Execute commands one at a time, in order.
 					for _, cmd := range msg {
@@ -364,9 +360,9 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 						}
 
 						msg := cmd()
-						if batchMsg, ok := msg.(BatchMsg); ok {
+						if msgBatch, ok := msg.(MsgBatch); ok {
 							g, _ := errgroup.WithContext(p.ctx)
-							for _, cmd := range batchMsg {
+							for _, cmd := range msgBatch {
 								cmd := cmd
 								g.Go(func() error {
 									p.Send(cmd())
@@ -386,10 +382,8 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 
 			p.renderer.handleMessages(msg)
 
-			var cmd Cmd
-			model, cmd = model.Update(msg) // run update
-			cmds <- cmd                    // process command (if any)
-			model.View(p.renderer)         // TODO: do not retain renderer, give it back to user
+			cmds <- model.Update(msg) // run update, process command (if any)
+			model.View(p.renderer)    // TODO: do not retain renderer, give it back to user
 		}
 	}
 }
@@ -398,7 +392,7 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 // terminated by either [Program.Quit], [Program.Kill], or its signal handler.
 // Returns the final model.
 func (p *Program[M]) Run() (M, error) {
-	handlers := handlers{}
+	myHandlers := handlers{}
 	cmds := make(chan Cmd)
 	p.errs = make(chan error)
 	p.finished = make(chan struct{}, 1)
@@ -445,7 +439,7 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Handle signals.
 	if !p.startupOptions.has(withoutSignalHandler) {
-		handlers.add(p.handleSignals())
+		myHandlers.add(p.handleSignals())
 	}
 
 	// Recover from panics.
@@ -465,8 +459,7 @@ func (p *Program[M]) Run() (M, error) {
 		p.renderer = newRenderer(p.output, p.startupOptions.has(withANSICompressor), p.fps)
 	}
 
-	// Check if output is a TTY before entering raw mode, hiding the cursor and
-	// so on.
+	// Check if output is a TTY before entering raw mode, hiding the cursor and so on.
 	if err := p.initTerminal(); err != nil {
 		return p.initialModel, err
 	}
@@ -485,7 +478,7 @@ func (p *Program[M]) Run() (M, error) {
 	model := p.initialModel
 	if initCmd := model.Init(); initCmd != nil {
 		ch := make(chan struct{})
-		handlers.add(ch)
+		myHandlers.add(ch)
 
 		go func() {
 			defer close(ch)
@@ -511,10 +504,10 @@ func (p *Program[M]) Run() (M, error) {
 	}
 
 	// Handle resize events.
-	handlers.add(p.handleResize())
+	myHandlers.add(p.handleResize())
 
 	// Process commands.
-	handlers.add(p.handleCommands(cmds))
+	myHandlers.add(p.handleCommands(cmds))
 
 	// Run event loop, handle updates and draw.
 	model, err := p.eventLoop(model, cmds)
@@ -539,7 +532,7 @@ func (p *Program[M]) Run() (M, error) {
 	}
 
 	// Wait for all handlers to finish.
-	handlers.shutdown()
+	myHandlers.shutdown()
 
 	// Restore terminal state.
 	p.shutdown(killed)
@@ -573,7 +566,7 @@ func (p *Program[M]) Start() error {
 // If the program hasn't started yet this will be a blocking operation.
 // If the program has already been terminated this will be a no-op, so it's safe
 // to send messages after the program has exited.
-func (p *Program[M]) Send(msg Msg) { // TODO: remove
+func (p *Program[M]) Send(msg Msg) { // TODO: remove, give dispatch to user instead
 	select {
 	case <-p.ctx.Done():
 	case p.msgs <- msg:
@@ -653,7 +646,7 @@ func (p *Program[M]) RestoreTerminal() error {
 		p.renderer.enterAltScreen()
 	} else {
 		// entering alt screen already causes a repaint.
-		go p.Send(repaintMsg{})
+		go p.Send(msgRepaint{})
 	}
 	if p.renderer != nil {
 		p.renderer.start()
@@ -673,7 +666,7 @@ func (p *Program[M]) RestoreTerminal() error {
 //
 // If the altscreen is active no output will be printed.
 func (p *Program[M]) Println(args ...any) {
-	p.msgs <- printLineMessage{
+	p.msgs <- msgPrintLine{
 		messageBody: fmt.Sprint(args...),
 	}
 }
@@ -687,7 +680,7 @@ func (p *Program[M]) Println(args ...any) {
 //
 // If the altscreen is active no output will be printed.
 func (p *Program[M]) Printf(format string, args ...any) {
-	p.msgs <- printLineMessage{
+	p.msgs <- msgPrintLine{
 		messageBody: fmt.Sprintf(format, args...),
 	}
 }

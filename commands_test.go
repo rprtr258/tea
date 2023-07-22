@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type stringMsg string
+type msgString string
 
 func TestEvery(t *testing.T) {
-	expected := stringMsg("every ms")
+	expected := msgString("every ms")
 	msg := Every(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
@@ -19,20 +19,18 @@ func TestEvery(t *testing.T) {
 }
 
 func TestTick(t *testing.T) {
-	expected := stringMsg("tick")
+	expected := msgString("tick")
 	msg := Tick(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
 	assert.Equal(t, expected, msg)
 }
 
-type errorMsg struct {
-	error
-}
+type msgError struct{ err error }
 
 func TestSequentially(t *testing.T) {
-	expectedErrMsg := errorMsg{error: errors.New("some err")}
-	expectedStrMsg := stringMsg("some msg")
+	expectedMsgError := msgError{errors.New("some err")}
+	expectedMsgString := msgString("some msg")
 
 	nilReturnCmd := func() Msg {
 		return nil
@@ -54,21 +52,21 @@ func TestSequentially(t *testing.T) {
 			cmds: []Cmd{
 				nilReturnCmd,
 				func() Msg {
-					return expectedErrMsg
+					return expectedMsgError
 				},
 				nilReturnCmd,
 			},
-			expected: expectedErrMsg,
+			expected: expectedMsgError,
 		},
 		"some msg": {
 			cmds: []Cmd{
 				nilReturnCmd,
 				func() Msg {
-					return expectedStrMsg
+					return expectedMsgString
 				},
 				nilReturnCmd,
 			},
-			expected: expectedStrMsg,
+			expected: expectedMsgString,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {

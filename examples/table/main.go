@@ -1,12 +1,12 @@
 package table
 
 import (
-	"fmt"
-	"os"
+	"context"
+	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/table"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/table"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var baseStyle = lipgloss.NewStyle().
@@ -17,10 +17,9 @@ type model struct {
 	table table.Model
 }
 
-func (m model) Init() tea.Cmd { return nil }
+func (m *model) Init() tea.Cmd { return nil }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
-	var cmd tea.Cmd
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -31,18 +30,17 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 				m.table.Focus()
 			}
 		case "q", "ctrl+c":
-			return m, tea.Quit
+			return tea.Quit
 		case "enter":
-			return m, tea.Batch(
+			return tea.Batch(
 				tea.Printf("Let's go to %s!", m.table.SelectedRow()[1]),
 			)
 		}
 	}
-	m.table, cmd = m.table.Update(msg)
-	return m, cmd
+	return m.table.Update(msg)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(baseStyle.Render(m.table.View()) + "\n")
 }
 
@@ -176,9 +174,7 @@ func Main() {
 		Bold(false)
 	t.SetStyles(s)
 
-	m := model{t}
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), &model{t}).Run(); err != nil {
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

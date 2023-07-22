@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/mattn/go-runewidth"
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/viewport"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // Model defines a state for the table widget.
@@ -183,12 +183,12 @@ func WithKeyMap(km KeyMap) Option {
 }
 
 // Update is the Bubble Tea update loop.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	if !m.focus {
-		return m, nil
+		return nil
 	}
 
-	switch msg := msg.(type) {
+	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.KeyMap.LineUp):
@@ -210,11 +210,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
 // Focused returns the focus state of the table.
-func (m Model) Focused() bool {
+func (m *Model) Focused() bool {
 	return m.focus
 }
 
@@ -232,7 +232,7 @@ func (m *Model) Blur() {
 }
 
 // View renders the component.
-func (m Model) View() string {
+func (m *Model) View() string {
 	return m.headersView() + "\n" + m.viewport.View()
 }
 
@@ -261,7 +261,7 @@ func (m *Model) UpdateViewport() {
 
 // SelectedRow returns the selected row.
 // You can cast it to your own implementation.
-func (m Model) SelectedRow() Row {
+func (m *Model) SelectedRow() Row {
 	if m.cursor < 0 || m.cursor >= len(m.rows) {
 		return nil
 	}
@@ -270,7 +270,7 @@ func (m Model) SelectedRow() Row {
 }
 
 // Rows returns the current rows.
-func (m Model) Rows() []Row {
+func (m *Model) Rows() []Row {
 	return m.rows
 }
 
@@ -299,17 +299,17 @@ func (m *Model) SetHeight(h int) {
 }
 
 // Height returns the viewport height of the table.
-func (m Model) Height() int {
+func (m *Model) Height() int {
 	return m.viewport.Height
 }
 
 // Width returns the viewport width of the table.
-func (m Model) Width() int {
+func (m *Model) Width() int {
 	return m.viewport.Width
 }
 
 // Cursor returns the index of the selected row.
-func (m Model) Cursor() int {
+func (m *Model) Cursor() int {
 	return m.cursor
 }
 
@@ -377,7 +377,7 @@ func (m *Model) FromValues(value, separator string) {
 	m.SetRows(rows)
 }
 
-func (m Model) headersView() string {
+func (m *Model) headersView() string {
 	s := make([]string, 0, len(m.cols))
 	for _, col := range m.cols {
 		style := lipgloss.NewStyle().Width(col.Width).MaxWidth(col.Width).Inline(true)

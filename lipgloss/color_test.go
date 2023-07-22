@@ -53,7 +53,11 @@ func TestHexToColor(t *testing.T) {
 		"#6B50FF":       0x6B50FF,
 		"invalid color": 0x0,
 	} {
+		input := input
+		expected := expected
 		t.Run(input, func(t *testing.T) {
+			t.Parallel()
+
 			h := hexToColor(input)
 			o := uint(h.R)<<16 + uint(h.G)<<8 + uint(h.B)
 			assert.Equal(t, expected, o)

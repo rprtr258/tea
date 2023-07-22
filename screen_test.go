@@ -2,14 +2,16 @@ package tea
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestClearMsg(t *testing.T) {
+//nolint:lll
+func TestMsgClear(t *testing.T) {
 	for name, test := range map[string]struct {
-		cmds     sequenceMsg
+		cmds     msgSequence
 		expected string
 	}{
 		"clear_screen": {
@@ -50,7 +52,7 @@ func TestClearMsg(t *testing.T) {
 				in  bytes.Buffer
 				out bytes.Buffer
 			)
-			p := NewProgram(&testModel{}).WithInput(&in).WithOutput(&out)
+			p := NewProgram(context.Background(), &testModel{}).WithInput(&in).WithOutput(&out)
 
 			go p.Send(append(test.cmds, Quit))
 

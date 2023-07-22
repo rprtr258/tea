@@ -3,9 +3,9 @@ package help
 import (
 	"strings"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // KeyMap is a map of keybindings used to generate help. Since it's an
@@ -95,12 +95,12 @@ func New() Model {
 var NewModel = New
 
 // Update helps satisfy the Bubble Tea Model interface. It's a no-op.
-func (m Model) Update(_ tea.Msg) (Model, tea.Cmd) {
-	return m, nil
+func (m *Model) Update(_ tea.Msg) tea.Cmd {
+	return nil
 }
 
 // View renders the help view's current state.
-func (m Model) View(k KeyMap) string {
+func (m *Model) View(k KeyMap) string {
 	if m.ShowAll {
 		return m.FullHelpView(k.FullHelp())
 	}
@@ -110,7 +110,7 @@ func (m Model) View(k KeyMap) string {
 // ShortHelpView renders a single line help view from a slice of keybindings.
 // If the line is longer than the maximum width it will be gracefully
 // truncated, showing only as many help items as possible.
-func (m Model) ShortHelpView(bindings []key.Binding) string {
+func (m *Model) ShortHelpView(bindings []key.Binding) string {
 	if len(bindings) == 0 {
 		return ""
 	}
@@ -158,7 +158,7 @@ func (m Model) ShortHelpView(bindings []key.Binding) string {
 
 // FullHelpView renders help columns from a slice of key binding slices. Each
 // top level slice entry renders into a column.
-func (m Model) FullHelpView(groups [][]key.Binding) string {
+func (m *Model) FullHelpView(groups [][]key.Binding) string {
 	if len(groups) == 0 {
 		return ""
 	}

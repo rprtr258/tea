@@ -11,9 +11,9 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 // Internal ID management. Used during animating to assure that frame messages
@@ -89,7 +89,7 @@ func WithoutPercentage() Option {
 
 // WithWidth sets the initial width of the progress bar. Note that you can also
 // set the width via the Width property, which can come in handy if you're
-// waiting for a tea.WindowSizeMsg.
+// waiting for a tea.MsgWindowSize.
 func WithWidth(w int) Option {
 	return func(m *Model) {
 		m.Width = w
@@ -115,8 +115,8 @@ func WithColorProfile(p termenv.Profile) Option {
 	}
 }
 
-// FrameMsg indicates that an animation step should occur.
-type FrameMsg struct {
+// MsgFrame indicates that an animation step should occur.
+type MsgFrame struct {
 	id  int
 	tag int
 }
@@ -196,7 +196,7 @@ func New(opts ...Option) Model {
 var NewModel = New
 
 // Init exists to satisfy the tea.Model interface.
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return nil
 }
 
@@ -204,23 +204,23 @@ func (m Model) Init() tea.Cmd {
 // SetPercent to create the command you'll need to trigger the animation.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case FrameMsg:
+	case MsgFrame:
 		if msg.id != m.id || msg.tag != m.tag {
-			return m, nil
+			return nil
 		}
 
 		// If we've more or less reached equilibrium, stop updating.
 		if !m.IsAnimating() {
-			return m, nil
+			return nil
 		}
 
 		m.percentShown, m.velocity = m.spring.Update(m.percentShown, m.velocity, m.targetPercent)
-		return m, m.nextFrame()
+		return m.nextFrame()
 
 	default:
-		return m, nil
+		return nil
 	}
 }
 
@@ -236,7 +236,7 @@ func (m *Model) SetSpringOptions(frequency, damping float64) {
 // relevant when you're animating the progress bar.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m Model) Percent() float64 {
+func (m *Model) Percent() float64 {
 	return m.targetPercent
 }
 
@@ -268,12 +268,12 @@ func (m *Model) DecrPercent(v float64) tea.Cmd {
 
 // View renders an animated progress bar in its current state. To render
 // a static progress bar based on your own calculations use ViewAs instead.
-func (m Model) View() string {
+func (m *Model) View() string {
 	return m.ViewAs(m.percentShown)
 }
 
 // ViewAs renders the progress bar with a given percentage.
-func (m Model) ViewAs(percent float64) string {
+func (m *Model) ViewAs(percent float64) string {
 	b := strings.Builder{}
 	percentView := m.percentageView(percent)
 	m.barView(&b, percent, ansi.PrintableRuneWidth(percentView))
@@ -283,11 +283,11 @@ func (m Model) ViewAs(percent float64) string {
 
 func (m *Model) nextFrame() tea.Cmd {
 	return tea.Tick(time.Second/time.Duration(fps), func(time.Time) tea.Msg {
-		return FrameMsg{id: m.id, tag: m.tag}
+		return MsgFrame{id: m.id, tag: m.tag}
 	})
 }
 
-func (m Model) barView(b *strings.Builder, percent float64, textWidth int) {
+func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
 	var (
 		tw = max(0, m.Width-textWidth)                // total width
 		fw = int(math.Round((float64(tw) * percent))) // filled width
@@ -329,7 +329,7 @@ func (m Model) barView(b *strings.Builder, percent float64, textWidth int) {
 	b.WriteString(strings.Repeat(e, n))
 }
 
-func (m Model) percentageView(percent float64) string {
+func (m *Model) percentageView(percent float64) string {
 	if !m.ShowPercentage {
 		return ""
 	}
@@ -352,7 +352,7 @@ func (m *Model) setRamp(colorA, colorB string, scaled bool) {
 	m.rampColorB = b
 }
 
-func (m Model) color(c string) termenv.Color {
+func (m *Model) color(c string) termenv.Color {
 	return m.colorProfile.Color(c)
 }
 

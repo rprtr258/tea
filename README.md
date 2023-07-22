@@ -1,10 +1,10 @@
 # Bubble Tea
 
 <p>
-    <img src="https://stuff.charm.sh/bubbletea/bubbletea-github-header-simple.png" width="313" alt="Bubble Tea Title Treatment"><br>
-    <a href="https://github.com/rprtr258/bubbletea/releases"><img src="https://img.shields.io/github/release/charmbracelet/bubbletea.svg" alt="Latest Release"></a>
-    <a href="https://pkg.go.dev/github.com/rprtr258/bubbletea?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
-    <a href="https://github.com/rprtr258/bubbletea/actions"><img src="https://github.com/rprtr258/bubbletea/workflows/build/badge.svg" alt="Build Status"></a>
+    <img src="https://stuff.charm.sh/tea/tea-github-header-simple.png" width="313" alt="Bubble Tea Title Treatment"><br>
+    <a href="https://github.com/rprtr258/tea/releases"><img src="https://img.shields.io/github/release/charmbracelet/tea.svg" alt="Latest Release"></a>
+    <a href="https://pkg.go.dev/github.com/rprtr258/tea?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
+    <a href="https://github.com/rprtr258/tea/actions"><img src="https://github.com/rprtr258/tea/workflows/build/badge.svg" alt="Build Status"></a>
 </p>
 
 The fun, functional and stateful way to build terminal apps. A Go framework
@@ -12,7 +12,7 @@ based on [The Elm Architecture][elm]. Bubble Tea is well-suited for simple and
 complex terminal applications, either inline, full-window, or a mix of both.
 
 <p>
-    <img src="https://stuff.charm.sh/bubbletea/bubbletea-example.gif" width="100%" alt="Bubble Tea Example">
+    <img src="https://stuff.charm.sh/tea/tea-example.gif" width="100%" alt="Bubble Tea Example">
 </p>
 
 Bubble Tea is in use in production and includes a number of features and
@@ -30,8 +30,8 @@ To get started, see the tutorial below, the [examples][examples], the
 Be sure to check out [Bubbles][bubbles], a library of common UI components for Bubble Tea.
 
 <p>
-    <a href="https://github.com/rprtr258/bubbletea/bubbles"><img src="https://stuff.charm.sh/bubbles/bubbles-badge.png" width="174" alt="Bubbles Badge"></a>&nbsp;&nbsp;
-    <a href="https://github.com/rprtr258/bubbletea/bubbles"><img src="https://stuff.charm.sh/bubbles-examples/textinput.gif" width="400" alt="Text Input Example from Bubbles"></a>
+    <a href="https://github.com/rprtr258/tea/bubbles"><img src="https://stuff.charm.sh/bubbles/bubbles-badge.png" width="174" alt="Bubbles Badge"></a>&nbsp;&nbsp;
+    <a href="https://github.com/rprtr258/tea/bubbles"><img src="https://stuff.charm.sh/bubbles-examples/textinput.gif" width="400" alt="Text Input Example from Bubbles"></a>
 </p>
 
 ***
@@ -48,7 +48,7 @@ By the way, the non-annotated source code for this program is available
 [on GitHub][tut-source].
 
 [elm]: https://guide.elm-lang.org/architecture/
-[tut-source]:https://github.com/rprtr258/bubbletea/tree/master/tutorials/basics
+[tut-source]:https://github.com/rprtr258/tea/tree/master/tutorials/basics
 
 ### Enough! Let's get to it.
 
@@ -64,7 +64,7 @@ import (
     "fmt"
     "os"
 
-    tea "github.com/rprtr258/bubbletea"
+    "github.com/rprtr258/tea"
 )
 ```
 
@@ -113,7 +113,7 @@ some initial I/O. For now, we don't need to do any I/O, so for the command,
 we'll just return `nil`, which translates to "no command."
 
 ```go
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
     // Just return `nil`, which means "no I/O right now, please."
     return nil
 }
@@ -140,7 +140,7 @@ For now, we'll just deal with `tea.MsgKey` messages, which are automatically
 sent to the update function when keys are pressed.
 
 ```go
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (model, tea.Cmd) {
     switch msg := msg.(type) {
     // Is it a key press?
     case tea.MsgKey:
@@ -192,7 +192,7 @@ worry about redrawing logic and stuff like that. Bubble Tea takes care of it
 for you.
 
 ```go
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
     // The header
     s := "What should we buy at the market?\n\n"
 
@@ -230,10 +230,9 @@ The last step is to simply run our program. We pass our initial model to
 
 ```go
 func main() {
-    p := tea.NewProgram(initialModel())
+    p := tea.NewProgram(context.Background(), initialModel())
     if _, err := p.Run(); err != nil {
-        fmt.Printf("Alas, there's been an error: %v", err)
-        os.Exit(1)
+        log.Fatalln("Alas, there's been an error:", err.Error())
     }
 }
 ```
@@ -247,9 +246,9 @@ look at the [Command Tutorial][cmd]. It's pretty simple.
 There are also several [Bubble Tea examples][examples] available and, of course,
 there are [Go Docs][docs].
 
-[cmd]: http://github.com/rprtr258/bubbletea/tree/master/tutorials/commands/
-[examples]: http://github.com/rprtr258/bubbletea/tree/master/examples
-[docs]: https://pkg.go.dev/github.com/rprtr258/bubbletea?tab=doc
+[cmd]: http://github.com/rprtr258/tea/tree/master/tutorials/commands/
+[examples]: http://github.com/rprtr258/tea/tree/master/examples
+[docs]: https://pkg.go.dev/github.com/rprtr258/tea?tab=doc
 
 ## Debugging
 
@@ -280,8 +279,7 @@ the following prior to starting your Bubble Tea program:
 if len(os.Getenv("DEBUG")) > 0 {
 	f, err := tea.LogToFile("debug.log", "debug")
 	if err != nil {
-		fmt.Println("fatal:", err)
-		os.Exit(1)
+		log.Fatalln("fatal:", err.Error())
 	}
 	defer f.Close()
 }
@@ -299,8 +297,8 @@ your program in another window.
 * [Termenv][termenv]: Advanced ANSI styling for terminal applications
 * [Reflow][reflow]: Advanced ANSI-aware methods for working with text
 
-[bubbles]: https://github.com/rprtr258/bubbletea/bubbles
-[lipgloss]: https://github.com/rprtr258/bubbletea/lipgloss
+[bubbles]: https://github.com/rprtr258/tea/bubbles
+[lipgloss]: https://github.com/rprtr258/tea/lipgloss
 [harmonica]: https://github.com/charmbracelet/harmonica
 [bubblezone]: https://github.com/lrstanley/bubblezone
 [termenv]: https://github.com/muesli/termenv
@@ -389,7 +387,7 @@ of days past.
 
 ## License
 
-[MIT](https://github.com/rprtr258/bubbletea/raw/master/LICENSE)
+[MIT](https://github.com/rprtr258/tea/raw/master/LICENSE)
 
 ***
 

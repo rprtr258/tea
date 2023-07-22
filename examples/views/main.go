@@ -3,10 +3,11 @@ package views
 // An example demonstrating an application with multiple views.
 //
 // Note that this example was produced before the Bubbles progress component
-// was available (github.com/rprtr258/bubbletea/bubbles/progress) and thus, we're
+// was available (github.com/rprtr258/tea/bubbles/progress) and thus, we're
 // implementing a progress bar from scratch here.
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"strconv"
@@ -17,7 +18,7 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/indent"
 	"github.com/muesli/termenv"
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 const (
@@ -39,27 +40,26 @@ var (
 )
 
 func Main() {
-	initialModel := model{0, false, 10, 0, 0, false, false}
-	p := tea.NewProgram(initialModel)
+	p := tea.NewProgram(context.Background(), &model{0, false, 10, 0, 0, false, false})
 	if _, err := p.Run(); err != nil {
 		fmt.Println("could not start program:", err)
 	}
 }
 
 type (
-	tickMsg  struct{}
-	frameMsg struct{}
+	msgTick  struct{}
+	msgFrame struct{}
 )
 
 func tick() tea.Cmd {
 	return tea.Tick(time.Second, func(time.Time) tea.Msg {
-		return tickMsg{}
+		return msgTick{}
 	})
 }
 
 func frame() tea.Cmd {
 	return tea.Tick(time.Second/60, func(time.Time) tea.Msg {
-		return frameMsg{}
+		return msgFrame{}
 	})
 }
 
@@ -73,18 +73,18 @@ type model struct {
 	Quitting bool
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tick()
 }
 
 // Main update function.
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	// Make sure these keys always quit
 	if msg, ok := msg.(tea.MsgKey); ok {
 		k := msg.String()
 		if k == "q" || k == "esc" || k == "ctrl+c" {
 			m.Quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		}
 	}
 
@@ -97,7 +97,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 }
 
 // The main view, which just calls the appropriate sub-view
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.Quitting {
 		r.Write("\n  See you later!\n\n")
 		return
@@ -110,13 +110,12 @@ func (m model) View(r tea.Renderer) {
 		s = chosenView(m)
 	}
 	r.Write(indent.String("\n"+s+"\n\n", 2))
-	return
 }
 
 // Sub-update functions
 
 // Update loop for the first view where you're choosing a task.
-func updateChoices(msg tea.Msg, m model) (model, tea.Cmd) {
+func updateChoices(msg tea.Msg, m *model) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -132,25 +131,25 @@ func updateChoices(msg tea.Msg, m model) (model, tea.Cmd) {
 			}
 		case "enter":
 			m.Chosen = true
-			return m, frame()
+			return frame()
 		}
 
-	case tickMsg:
+	case msgTick:
 		if m.Ticks == 0 {
 			m.Quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		}
 		m.Ticks--
-		return m, tick()
+		return tick()
 	}
 
-	return m, nil
+	return nil
 }
 
 // Update loop for the second view after a choice has been made
-func updateChosen(msg tea.Msg, m model) (model, tea.Cmd) {
+func updateChosen(msg tea.Msg, m *model) tea.Cmd {
 	switch msg.(type) {
-	case frameMsg:
+	case msgFrame:
 		if !m.Loaded {
 			m.Frames++
 			m.Progress = ease.OutBounce(float64(m.Frames) / float64(100))
@@ -158,29 +157,29 @@ func updateChosen(msg tea.Msg, m model) (model, tea.Cmd) {
 				m.Progress = 1
 				m.Loaded = true
 				m.Ticks = 3
-				return m, tick()
+				return tick()
 			}
-			return m, frame()
+			return frame()
 		}
 
-	case tickMsg:
+	case msgTick:
 		if m.Loaded {
 			if m.Ticks == 0 {
 				m.Quitting = true
-				return m, tea.Quit
+				return tea.Quit
 			}
 			m.Ticks--
-			return m, tick()
+			return tick()
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
 // Sub-views
 
 // The first view, where you're choosing a task
-func choicesView(m model) string {
+func choicesView(m *model) string {
 	c := m.Choice
 
 	tpl := "What to do today?\n\n"
@@ -200,7 +199,7 @@ func choicesView(m model) string {
 }
 
 // The second view, after a task has been chosen
-func chosenView(m model) string {
+func chosenView(m *model) string {
 	var msg string
 
 	switch m.Choice {
@@ -257,15 +256,16 @@ func makeFgStyle(color string) func(string) string {
 }
 
 // Generate a blend of colors.
-func makeRamp(colorA, colorB string, steps float64) (s []string) {
+func makeRamp(colorA, colorB string, steps float64) []string {
 	cA, _ := colorful.Hex(colorA)
 	cB, _ := colorful.Hex(colorB)
 
+	s := make([]string, 0, int(steps)+1)
 	for i := 0.0; i < steps; i++ {
 		c := cA.BlendLuv(cB, i/steps)
 		s = append(s, colorToHex(c))
 	}
-	return
+	return s
 }
 
 // Convert a colorful.Color to a hexadecimal format compatible with termenv.
@@ -273,12 +273,11 @@ func colorToHex(c colorful.Color) string {
 	return fmt.Sprintf("#%s%s%s", colorFloatToHex(c.R), colorFloatToHex(c.G), colorFloatToHex(c.B))
 }
 
-// Helper function for converting colors to hex. Assumes a value between 0 and
-// 1.
-func colorFloatToHex(f float64) (s string) {
-	s = strconv.FormatInt(int64(f*255), 16)
+// Helper function for converting colors to hex. Assumes a value between 0 and 1.
+func colorFloatToHex(f float64) string {
+	s := strconv.FormatInt(int64(f*255), 16)
 	if len(s) == 1 {
 		s = "0" + s
 	}
-	return
+	return s
 }

@@ -1,14 +1,14 @@
 package split_editors
 
 import (
-	"fmt"
-	"os"
+	"context"
+	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/textarea"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/textarea"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const (
@@ -75,8 +75,8 @@ type model struct {
 	focus  int
 }
 
-func newModel() model {
-	m := model{
+func newModel() *model {
+	m := &model{
 		inputs: make([]textarea.Model, initialInputs),
 		help:   help.New(),
 		keymap: keymap{
@@ -110,11 +110,11 @@ func newModel() model {
 	return m
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
@@ -124,7 +124,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 			for i := range m.inputs {
 				m.inputs[i].Blur()
 			}
-			return m, tea.Quit
+			return tea.Quit
 		case key.Matches(msg, m.keymap.next):
 			m.inputs[m.focus].Blur()
 			m.focus++
@@ -149,7 +149,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 				m.focus = len(m.inputs) - 1
 			}
 		}
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.height = msg.Height
 		m.width = msg.Width
 	}
@@ -159,12 +159,10 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 
 	// Update all textareas
 	for i := range m.inputs {
-		newModel, cmd := m.inputs[i].Update(msg)
-		m.inputs[i] = newModel
-		cmds = append(cmds, cmd)
+		cmds = append(cmds, m.inputs[i].Update(msg))
 	}
 
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
 func (m *model) sizeInputs() {
@@ -179,7 +177,7 @@ func (m *model) updateKeybindings() {
 	m.keymap.remove.SetEnabled(len(m.inputs) > minInputs)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	help := m.help.ShortHelpView([]key.Binding{
 		m.keymap.next,
 		m.keymap.prev,
@@ -197,8 +195,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(newModel()).WithAltScreen().Run(); err != nil {
-		fmt.Println("Error while running program:", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), newModel()).WithAltScreen().Run(); err != nil {
+		log.Fatalln("Error while running program:", err.Error())
 	}
 }

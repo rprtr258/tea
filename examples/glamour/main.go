@@ -1,12 +1,13 @@
 package glamour
 
 import (
+	"context"
 	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/viewport"
-	"github.com/rprtr258/bubbletea/glamour"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/glamour"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const content = `
@@ -55,7 +56,7 @@ type model struct {
 	viewport viewport.Model
 }
 
-func newExample() (model, error) {
+func newExample() (*model, error) {
 	const width = 78
 
 	vp := viewport.New(width, 20)
@@ -69,56 +70,54 @@ func newExample() (model, error) {
 		glamour.WithWordWrap(width),
 	)
 	if err != nil {
-		return model{}, err
+		return nil, err
 	}
 
 	str, err := renderer.Render(content)
 	if err != nil {
-		return model{}, err
+		return nil, err
 	}
 
 	vp.SetContent(str)
 
-	return model{
+	return &model{
 		viewport: vp,
 	}, nil
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return m, tea.Quit
+			return tea.Quit
 		default:
-			var cmd tea.Cmd
-			m.viewport, cmd = m.viewport.Update(msg)
-			return m, cmd
+			return m.viewport.Update(msg)
 		}
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(m.viewport.View() + m.helpView()) // TODO: do not concat strings
 }
 
-func (e model) helpView() string {
+func (e *model) helpView() string {
 	return helpStyle("\n  ↑/↓: Navigate • q: Quit\n")
 }
 
 func Main() {
 	model, err := newExample()
 	if err != nil {
-		log.Fatal("Could not initialize Bubble Tea model: ", err.Error())
+		log.Fatalln("Could not initialize Bubble Tea model:", err.Error())
 	}
 
-	if _, err := tea.NewProgram(model).Run(); err != nil {
-		log.Fatal("Bummer, there's been an error: ", err.Error())
+	if _, err := tea.NewProgram(context.Background(), model).Run(); err != nil {
+		log.Fatalln("Bummer, there's been an error:", err.Error())
 	}
 }

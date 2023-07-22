@@ -4,18 +4,19 @@ package realtime
 // through a channel.
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"math/rand"
-	"os"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
 )
 
 // A message used to indicate that activity has occurred. In the real world (for
 // example, chat) this would contain actual data.
-type responseMsg struct{}
+type msgResponse struct{}
 
 // Simulate a process that sends events at an irregular interval in real time.
 // In this case, we'll send events on the channel at a random interval between
@@ -33,7 +34,7 @@ func listenForActivity(sub chan struct{}) tea.Cmd {
 // A command that waits for the activity on a channel.
 func waitForActivity(sub chan struct{}) tea.Cmd {
 	return func() tea.Msg {
-		return responseMsg(<-sub)
+		return msgResponse(<-sub)
 	}
 }
 
@@ -44,7 +45,7 @@ type model struct {
 	quitting  bool
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		m.spinner.Tick,
 		listenForActivity(m.sub), // generate activity
@@ -52,40 +53,36 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return m, tea.Quit
-	case responseMsg:
-		m.responses++                    // record external activity
-		return m, waitForActivity(m.sub) // wait for next event
-	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return tea.Quit
+	case msgResponse:
+		m.responses++                 // record external activity
+		return waitForActivity(m.sub) // wait for next event
+	case spinner.MsgTick:
+		return m.spinner.Update(msg)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := fmt.Sprintf("\n %s Events received: %d\n\n Press any key to exit\n", m.spinner.View(), m.responses)
 	if m.quitting {
 		s += "\n"
 	}
 	r.Write(s)
-	return
 }
 
 func Main() {
-	p := tea.NewProgram(model{
+	p := tea.NewProgram(context.Background(), &model{
 		sub:     make(chan struct{}),
 		spinner: spinner.New(),
 	})
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("could not start program:", err)
-		os.Exit(1)
+		log.Fatalln("could not start program:", err.Error())
 	}
 }

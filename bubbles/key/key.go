@@ -18,7 +18,7 @@
 //	    ),
 //	}
 //
-//	func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+//	func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 //	    switch msg := msg.(type) {
 //	    case tea.MsgKey:
 //	        switch {
@@ -37,7 +37,7 @@
 package key
 
 import (
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 // Binding describes a set of keybindings and, optionally, their associated

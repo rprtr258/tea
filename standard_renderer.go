@@ -505,19 +505,19 @@ func (r *standardRenderer) insertBottom(lines []string, topBoundary, bottomBound
 // handleMessages handles internal messages for the renderer.
 func (r *standardRenderer) handleMessages(msg Msg) {
 	switch msg := msg.(type) {
-	case repaintMsg:
+	case msgRepaint:
 		// Force a repaint by clearing the render cache as we slide into a
 		// render.
 		r.mu.Lock()
 		r.repaint()
 		r.mu.Unlock()
-	case WindowSizeMsg:
+	case MsgWindowSize:
 		r.mu.Lock()
 		r.width = msg.Width
 		r.height = msg.Height
 		r.repaint()
 		r.mu.Unlock()
-	case clearScrollAreaMsg:
+	case msgClearScrollArea:
 		r.clearIgnoredLines()
 
 		// Force a repaint on the area where the scrollable stuff was in this
@@ -525,7 +525,7 @@ func (r *standardRenderer) handleMessages(msg Msg) {
 		r.mu.Lock()
 		r.repaint()
 		r.mu.Unlock()
-	case syncScrollAreaMsg:
+	case msgSyncScrollArea:
 		// Re-render scrolling area
 		r.clearIgnoredLines()
 		r.setIgnoredLines(msg.topBoundary, msg.bottomBoundary)
@@ -535,11 +535,11 @@ func (r *standardRenderer) handleMessages(msg Msg) {
 		r.mu.Lock()
 		r.repaint()
 		r.mu.Unlock()
-	case scrollUpMsg:
+	case msgScrollUp:
 		r.insertTop(msg.lines, msg.topBoundary, msg.bottomBoundary)
-	case scrollDownMsg:
+	case msgScrollDown:
 		r.insertBottom(msg.lines, msg.topBoundary, msg.bottomBoundary)
-	case printLineMessage:
+	case msgPrintLine:
 		if !r.altScreenActive {
 			lines := strings.Split(msg.messageBody, "\n")
 			r.mu.Lock()
@@ -552,7 +552,7 @@ func (r *standardRenderer) handleMessages(msg Msg) {
 
 // HIGH-PERFORMANCE RENDERING STUFF
 
-type syncScrollAreaMsg struct {
+type msgSyncScrollArea struct {
 	lines          []string
 	topBoundary    int
 	bottomBoundary int
@@ -560,12 +560,12 @@ type syncScrollAreaMsg struct {
 
 // SyncScrollArea performs a paint of the entire region designated to be the
 // scrollable area. This is required to initialize the scrollable region and
-// should also be called on resize (WindowSizeMsg).
+// should also be called on resize (MsgWindowSize).
 //
 // For high-performance, scroll-based rendering only.
 func SyncScrollArea(lines []string, topBoundary int, bottomBoundary int) Cmd {
 	return func() Msg {
-		return syncScrollAreaMsg{
+		return msgSyncScrollArea{
 			lines:          lines,
 			topBoundary:    topBoundary,
 			bottomBoundary: bottomBoundary,
@@ -573,17 +573,17 @@ func SyncScrollArea(lines []string, topBoundary int, bottomBoundary int) Cmd {
 	}
 }
 
-type clearScrollAreaMsg struct{}
+type msgClearScrollArea struct{}
 
 // ClearScrollArea deallocates the scrollable region and returns the control of
 // those lines to the main rendering routine.
 //
 // For high-performance, scroll-based rendering only.
 func ClearScrollArea() Msg {
-	return clearScrollAreaMsg{}
+	return msgClearScrollArea{}
 }
 
-type scrollUpMsg struct {
+type msgScrollUp struct {
 	lines          []string
 	topBoundary    int
 	bottomBoundary int
@@ -596,7 +596,7 @@ type scrollUpMsg struct {
 // For high-performance, scroll-based rendering only.
 func ScrollUp(newLines []string, topBoundary, bottomBoundary int) Cmd {
 	return func() Msg {
-		return scrollUpMsg{
+		return msgScrollUp{
 			lines:          newLines,
 			topBoundary:    topBoundary,
 			bottomBoundary: bottomBoundary,
@@ -604,7 +604,7 @@ func ScrollUp(newLines []string, topBoundary, bottomBoundary int) Cmd {
 	}
 }
 
-type scrollDownMsg struct {
+type msgScrollDown struct {
 	lines          []string
 	topBoundary    int
 	bottomBoundary int
@@ -617,7 +617,7 @@ type scrollDownMsg struct {
 // For high-performance, scroll-based rendering only.
 func ScrollDown(newLines []string, topBoundary, bottomBoundary int) Cmd {
 	return func() Msg {
-		return scrollDownMsg{
+		return msgScrollDown{
 			lines:          newLines,
 			topBoundary:    topBoundary,
 			bottomBoundary: bottomBoundary,
@@ -625,7 +625,7 @@ func ScrollDown(newLines []string, topBoundary, bottomBoundary int) Cmd {
 	}
 }
 
-type printLineMessage struct {
+type msgPrintLine struct {
 	messageBody string
 }
 
@@ -638,7 +638,7 @@ type printLineMessage struct {
 // If the altscreen is active no output will be printed.
 func Println(args ...any) Cmd {
 	return func() Msg {
-		return printLineMessage{
+		return msgPrintLine{
 			messageBody: fmt.Sprint(args...),
 		}
 	}
@@ -654,7 +654,7 @@ func Println(args ...any) Cmd {
 // If the altscreen is active no output will be printed.
 func Printf(template string, args ...any) Cmd {
 	return func() Msg {
-		return printLineMessage{
+		return msgPrintLine{
 			messageBody: fmt.Sprintf(template, args...),
 		}
 	}

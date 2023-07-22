@@ -1,11 +1,12 @@
 package altscreen_toggle
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	"github.com/muesli/termenv"
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 var (
@@ -19,17 +20,17 @@ type model struct {
 	quitting  bool
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		case " ":
 			var cmd tea.Cmd
 			if m.altscreen {
@@ -38,13 +39,13 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 				cmd = tea.EnterAltScreen
 			}
 			m.altscreen = !m.altscreen
-			return m, cmd
+			return cmd
 		}
 	}
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.quitting {
 		r.Write("Bye!\n")
 		return
@@ -66,7 +67,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(model{}).Run(); err != nil {
-		log.Fatal("Error running program: ", err.Error())
+	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

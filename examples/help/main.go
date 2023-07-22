@@ -1,14 +1,15 @@
 package help
 
 import (
-	"fmt"
+	"context"
+	"log"
 	"os"
 	"strings"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // keyMap defines a set of keybindings. To work for help it must satisfy
@@ -72,21 +73,21 @@ type model struct {
 	quitting   bool
 }
 
-func newModel() model {
-	return model{
+func newModel() *model {
+	return &model{
 		keys:       keys,
 		help:       help.New(),
 		inputStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		// If we set a width on the help menu it can gracefully truncate
 		// its view as needed.
 		m.help.Width = msg.Width
@@ -105,14 +106,14 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 			m.help.ShowAll = !m.help.ShowAll
 		case key.Matches(msg, m.keys.Quit):
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		}
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.quitting {
 		r.Write("Bye!\n")
 		return
@@ -129,21 +130,18 @@ func (m model) View(r tea.Renderer) {
 	height := 8 - strings.Count(status, "\n") - strings.Count(helpView, "\n")
 
 	r.Write("\n" + status + strings.Repeat("\n", height) + helpView)
-	return
 }
 
 func Main() {
 	if os.Getenv("HELP_DEBUG") != "" {
 		f, err := tea.LogToFile("debug.log", "help")
 		if err != nil {
-			fmt.Println("Couldn't open a file for logging:", err)
-			os.Exit(1)
+			log.Fatalln("Couldn't open a file for logging:", err.Error())
 		}
 		defer f.Close() // nolint:errcheck
 	}
 
-	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
-		fmt.Printf("Could not start program :(\n%v\n", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
+		log.Fatalf("Could not start program :(\n%s\n", err.Error())
 	}
 }

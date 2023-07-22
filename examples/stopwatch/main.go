@@ -1,14 +1,14 @@
 package stopwatch
 
 import (
-	"fmt"
-	"os"
+	"context"
+	"log"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/help"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/stopwatch"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/help"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/stopwatch"
 )
 
 type model struct {
@@ -25,11 +25,11 @@ type keymap struct {
 	quit  key.Binding
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.stopwatch.Init()
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	// Note: you could further customize the time output by getting the
 	// duration from m.stopwatch.Elapsed(), which returns a time.Duration, and
 	// skip m.stopwatch.View() altogether.
@@ -41,7 +41,7 @@ func (m model) View(r tea.Renderer) {
 	r.Write(s)
 }
 
-func (m model) helpView() string {
+func (m *model) helpView() string {
 	return "\n" + m.help.ShortHelpView([]key.Binding{
 		m.keymap.start,
 		m.keymap.stop,
@@ -50,28 +50,26 @@ func (m model) helpView() string {
 	})
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		case key.Matches(msg, m.keymap.reset):
-			return m, m.stopwatch.Reset()
+			return m.stopwatch.Reset()
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
 			m.keymap.stop.SetEnabled(!m.stopwatch.Running())
 			m.keymap.start.SetEnabled(m.stopwatch.Running())
-			return m, m.stopwatch.Toggle()
+			return m.stopwatch.Toggle()
 		}
 	}
-	var cmd tea.Cmd
-	m.stopwatch, cmd = m.stopwatch.Update(msg)
-	return m, cmd
+	return m.stopwatch.Update(msg)
 }
 
 func Main() {
-	m := model{
+	m := &model{
 		stopwatch: stopwatch.NewWithInterval(time.Millisecond),
 		keymap: keymap{
 			start: key.NewBinding(
@@ -96,8 +94,7 @@ func Main() {
 
 	m.keymap.start.SetEnabled(false)
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Oh no, it didn't work:", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
+		log.Fatalln("Oh no, it didn't work:", err.Error())
 	}
 }

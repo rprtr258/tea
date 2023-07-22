@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/progress"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/progress"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
@@ -16,9 +16,10 @@ const (
 	maxWidth = 80
 )
 
-type progressMsg float64
-
-type progressErrMsg struct{ err error }
+type (
+	msgProgress    float64
+	msgProgressErr struct{ err error }
+)
 
 func finalPause() tea.Cmd {
 	return tea.Tick(time.Millisecond*750, func(_ time.Time) tea.Msg {
@@ -32,27 +33,27 @@ type model struct {
 	err      error
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return m, tea.Quit
+		return tea.Quit
 
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
-		return m, nil
+		return nil
 
-	case progressErrMsg:
+	case msgProgressErr:
 		m.err = msg.err
-		return m, tea.Quit
+		return tea.Quit
 
-	case progressMsg:
+	case msgProgress:
 		var cmds []tea.Cmd
 
 		if msg >= 1.0 {
@@ -60,20 +61,18 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		}
 
 		cmds = append(cmds, m.progress.SetPercent(float64(msg)))
-		return m, tea.Batch(cmds...)
+		return tea.Batch(cmds...)
 
-	// FrameMsg is sent when the progress bar wants to animate itself
-	case progress.FrameMsg:
-		var cmd tea.Cmd
-		m.progress, cmd = m.progress.Update(msg)
-		return m, cmd
+	// MsgFrame is sent when the progress bar wants to animate itself
+	case progress.MsgFrame:
+		return m.progress.Update(msg)
 
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.err != nil {
 		r.Write("Error downloading: " + m.err.Error() + "\n")
 		return
@@ -83,5 +82,4 @@ func (m model) View(r tea.Renderer) {
 	r.Write("\n" +
 		pad + m.progress.View() + "\n\n" +
 		pad + helpStyle("Press any key to quit"))
-	return
 }

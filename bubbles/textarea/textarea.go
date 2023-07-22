@@ -7,12 +7,12 @@ import (
 
 	"github.com/atotto/clipboard"
 	rw "github.com/mattn/go-runewidth"
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/cursor"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/runeutil"
-	"github.com/rprtr258/bubbletea/bubbles/viewport"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/cursor"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/runeutil"
+	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const (
@@ -27,8 +27,8 @@ const (
 
 // Internal messages for clipboard operations.
 type (
-	pasteMsg    string
-	pasteErrMsg struct{ error }
+	msgPaste    string
+	msgPasteErr error
 )
 
 // KeyMap is the key bindings for different actions within the textarea.
@@ -119,7 +119,7 @@ type LineInfo struct {
 // depending on the focus state.
 //
 // For an introduction to styling with Lip Gloss see:
-// https://github.com/rprtr258/bubbletea/lipgloss
+// https://github.com/rprtr258/tea/lipgloss
 type Style struct {
 	Base             lipgloss.Style
 	CursorLine       lipgloss.Style
@@ -398,7 +398,7 @@ func (m *Model) insertRunesFromUserInput(runes []rune) {
 }
 
 // Value returns the value of the text input.
-func (m Model) Value() string {
+func (m *Model) Value() string {
 	if m.value == nil {
 		return ""
 	}
@@ -428,7 +428,7 @@ func (m *Model) LineCount() int {
 }
 
 // Line returns the line position.
-func (m Model) Line() int {
+func (m *Model) Line() int {
 	return m.row
 }
 
@@ -520,7 +520,7 @@ func (m *Model) CursorEnd() {
 }
 
 // Focused returns the focus state on the model.
-func (m Model) Focused() bool {
+func (m *Model) Focused() bool {
 	return m.focus
 }
 
@@ -766,7 +766,7 @@ func (m *Model) capitalizeRight() {
 
 // LineInfo returns the number of characters from the start of the
 // (soft-wrapped) line and the (soft-wrapped) line width.
-func (m Model) LineInfo() LineInfo {
+func (m *Model) LineInfo() LineInfo {
 	grid := wrap(m.value[m.row], m.width)
 
 	// Find out which line we are currently on. This can be determined by the
@@ -819,7 +819,7 @@ func (m *Model) repositionView() {
 }
 
 // Width returns the width of the textarea.
-func (m Model) Width() int {
+func (m *Model) Width() int {
 	return m.width
 }
 
@@ -884,7 +884,7 @@ func (m *Model) SetPromptFunc(promptWidth int, fn func(lineIdx int) string) {
 }
 
 // Height returns the current height of the textarea.
-func (m Model) Height() int {
+func (m *Model) Height() int {
 	return m.height
 }
 
@@ -900,10 +900,10 @@ func (m *Model) SetHeight(h int) {
 }
 
 // Update is the Bubble Tea update loop.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	if !m.focus {
 		m.Cursor.Blur()
-		return m, nil
+		return nil
 	}
 
 	// Used to determine if the cursor should blink.
@@ -967,7 +967,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.deleteWordRight()
 		case key.Matches(msg, m.KeyMap.InsertNewline):
 			if m.MaxHeight > 0 && len(m.value) >= m.MaxHeight {
-				return m, nil
+				return nil
 			}
 			m.col = clamp(m.col, 0, len(m.value[m.row]))
 			m.splitLine(m.row, m.col)
@@ -982,7 +982,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case key.Matches(msg, m.KeyMap.WordForward):
 			m.wordRight()
 		case key.Matches(msg, m.KeyMap.Paste):
-			return m, Paste
+			return Paste
 		case key.Matches(msg, m.KeyMap.CharacterBackward):
 			m.characterLeft(false /* insideLine */)
 		case key.Matches(msg, m.KeyMap.LinePrevious):
@@ -1006,19 +1006,18 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.insertRunesFromUserInput(msg.Runes)
 		}
 
-	case pasteMsg:
+	case msgPaste:
 		m.insertRunesFromUserInput([]rune(msg))
 
-	case pasteErrMsg:
+	case msgPasteErr:
 		m.Err = msg
 	}
 
-	vp, cmd := m.viewport.Update(msg)
-	m.viewport = &vp
+	cmd := m.viewport.Update(msg)
 	cmds = append(cmds, cmd)
 
 	newRow, newCol := m.cursorLineNumber(), m.col
-	m.Cursor, cmd = m.Cursor.Update(msg)
+	cmd = m.Cursor.Update(msg)
 	if (newRow != oldRow || newCol != oldCol) && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
 		cmd = m.Cursor.BlinkCmd()
@@ -1027,11 +1026,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 	m.repositionView()
 
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
 // View renders the text area in its current state.
-func (m Model) View() string {
+func (m *Model) View() string {
 	if m.Value() == "" && m.row == 0 && m.col == 0 && m.Placeholder != "" {
 		return m.placeholderView()
 	}
@@ -1122,7 +1121,7 @@ func (m Model) View() string {
 	return m.style.Base.Render(m.viewport.View())
 }
 
-func (m Model) getPromptString(displayLine int) string {
+func (m *Model) getPromptString(displayLine int) string {
 	if m.promptFunc == nil {
 		return m.Prompt
 	}
@@ -1136,7 +1135,7 @@ func (m Model) getPromptString(displayLine int) string {
 }
 
 // placeholderView returns the prompt and placeholder view, if any.
-func (m Model) placeholderView() string {
+func (m *Model) placeholderView() string {
 	var (
 		s     strings.Builder
 		p     = rw.Truncate(m.Placeholder, m.width, "...")
@@ -1182,7 +1181,7 @@ func Blink() tea.Msg {
 
 // cursorLineNumber returns the line number that the cursor is on.
 // This accounts for soft wrapped lines.
-func (m Model) cursorLineNumber() int {
+func (m *Model) cursorLineNumber() int {
 	line := 0
 	for i := 0; i < m.row; i++ {
 		// Calculate the number of lines that the current line will be split
@@ -1257,9 +1256,9 @@ func (m *Model) splitLine(row, col int) {
 func Paste() tea.Msg {
 	str, err := clipboard.ReadAll()
 	if err != nil {
-		return pasteErrMsg{err}
+		return msgPasteErr(err)
 	}
-	return pasteMsg(str)
+	return msgPaste(str)
 }
 
 func wrap(runes []rune, width int) [][]rune {

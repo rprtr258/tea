@@ -8,14 +8,14 @@ package progress_animated
 // transitions. For details on that approach see the progress-static example.
 
 import (
-	"fmt"
-	"os"
+	"context"
+	"log"
 	"strings"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/progress"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/progress"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const (
@@ -23,63 +23,48 @@ const (
 	maxWidth = 80
 )
 
-var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
-
-func Main() {
-	m := model{
-		progress: progress.New(progress.WithDefaultGradient()),
-	}
-
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Oh no!", err)
-		os.Exit(1)
-	}
-}
-
-type tickMsg time.Time
+type msgTick time.Time
 
 type model struct {
 	progress progress.Model
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tickCmd()
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return m, tea.Quit
+		return tea.Quit
 
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
-		return m, nil
+		return nil
 
-	case tickMsg:
+	case msgTick:
 		if m.progress.Percent() == 1.0 {
-			return m, tea.Quit
+			return tea.Quit
 		}
 
 		// Note that you can also use progress.Model.SetPercent to set the
 		// percentage value explicitly, too.
 		cmd := m.progress.IncrPercent(0.25)
-		return m, tea.Batch(tickCmd(), cmd)
+		return tea.Batch(tickCmd(), cmd)
 
-	// FrameMsg is sent when the progress bar wants to animate itself
-	case progress.FrameMsg:
-		var cmd tea.Cmd
-		m.progress, cmd = m.progress.Update(msg)
-		return m, cmd
+	// MsgFrame is sent when the progress bar wants to animate itself
+	case progress.MsgFrame:
+		return m.progress.Update(msg)
 
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	pad := strings.Repeat(" ", padding)
 	r.Write("\n" +
 		pad + m.progress.View() + "\n\n" +
@@ -88,6 +73,18 @@ func (m model) View(r tea.Renderer) {
 
 func tickCmd() tea.Cmd {
 	return tea.Tick(time.Second*1, func(t time.Time) tea.Msg {
-		return tickMsg(t)
+		return msgTick(t)
 	})
+}
+
+var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
+
+func Main() {
+	m := &model{
+		progress: progress.New(progress.WithDefaultGradient()),
+	}
+
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
+		log.Fatalln("Oh no!", err.Error())
+	}
 }

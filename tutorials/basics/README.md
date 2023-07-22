@@ -11,7 +11,7 @@ By the way, the non-annotated source code for this program is available
 [on GitHub][tut-source].
 
 [elm]: https://guide.elm-lang.org/architecture/
-[tut-source]:https://github.com/rprtr258/bubbletea/tree/master/tutorials/basics
+[tut-source]:https://github.com/rprtr258/tea/tree/master/tutorials/basics
 
 ## Enough! Let's get to it.
 
@@ -27,7 +27,7 @@ import (
     "fmt"
     "os"
 
-    tea "github.com/rprtr258/bubbletea"
+    "github.com/rprtr258/tea"
 )
 ```
 
@@ -76,7 +76,7 @@ some initial I/O. For now, we don't need to do any I/O, so for the command,
 we'll just return `nil`, which translates to "no command."
 
 ```go
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
     // Just return `nil`, which means "no I/O right now, please."
     return nil
 }
@@ -103,7 +103,7 @@ For now, we'll just deal with `tea.MsgKey` messages, which are automatically
 sent to the update function when keys are pressed.
 
 ```go
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (model, tea.Cmd) {
     switch msg := msg.(type) {
 
     // Is it a key press?
@@ -161,7 +161,7 @@ worry about redrawing logic and stuff like that. Bubble Tea takes care of it
 for you.
 
 ```go
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
     // The header
     s := "What should we buy at the market?\n\n"
 
@@ -199,10 +199,9 @@ The last step is to simply run our program. We pass our initial model to
 
 ```go
 func main() {
-    p := tea.NewProgram(initialModel())
+    p := tea.NewProgram(context.Background(),initialModel())
     if _, err := p.Run(); err != nil {
-        fmt.Printf("Alas, there's been an error: %v", err)
-        os.Exit(1)
+        log.Fatalln("Alas, there's been an error:", err.Error())
     }
 }
 ```
@@ -216,14 +215,14 @@ look at the [Command Tutorial][cmd]. It's pretty simple.
 There are also several [Bubble Tea examples][examples] available and, of course,
 there are [Go Docs][docs].
 
-[cmd]: http://github.com/rprtr258/bubbletea/tree/master/tutorials/commands/
-[examples]: http://github.com/rprtr258/bubbletea/tree/master/examples
-[docs]: https://pkg.go.dev/github.com/rprtr258/bubbletea?tab=doc
+[cmd]: http://github.com/rprtr258/tea/tree/master/tutorials/commands/
+[examples]: http://github.com/rprtr258/tea/tree/master/examples
+[docs]: https://pkg.go.dev/github.com/rprtr258/tea?tab=doc
 
 ## Additional Resources
 
-* [Libraries we use with Bubble Tea](https://github.com/rprtr258/bubbletea/#libraries-we-use-with-bubble-tea)
-* [Bubble Tea in the Wild](https://github.com/rprtr258/bubbletea/#bubble-tea-in-the-wild)
+* [Libraries we use with Bubble Tea](https://github.com/rprtr258/tea/#libraries-we-use-with-bubble-tea)
+* [Bubble Tea in the Wild](https://github.com/rprtr258/tea/#bubble-tea-in-the-wild)
 
 ### Feedback
 

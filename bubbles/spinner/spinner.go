@@ -4,9 +4,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea/lipgloss"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 // Internal ID management. Used during animating to ensure that frame messages
@@ -100,7 +100,7 @@ type Model struct {
 	// want foreground and background coloring, and potentially some padding.
 	//
 	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/rprtr258/bubbletea/lipgloss
+	// https://github.com/rprtr258/tea/lipgloss
 	Style lipgloss.Style
 
 	frame int
@@ -109,7 +109,7 @@ type Model struct {
 }
 
 // ID returns the spinner's unique ID.
-func (m Model) ID() int {
+func (m *Model) ID() int {
 	return m.id
 }
 
@@ -132,28 +132,28 @@ func New(opts ...Option) Model {
 // Deprecated: use [New] instead.
 var NewModel = New
 
-// TickMsg indicates that the timer has ticked and we should render a frame.
-type TickMsg struct {
+// MsgTick indicates that the timer has ticked and we should render a frame.
+type MsgTick struct {
 	Time time.Time
 	tag  int
 	ID   int
 }
 
 // Update is the Tea update function.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case TickMsg:
+	case MsgTick:
 		// If an ID is set, and the ID doesn't belong to this spinner, reject
 		// the message.
 		if msg.ID > 0 && msg.ID != m.id {
-			return m, nil
+			return nil
 		}
 
 		// If a tag is set, and it's not the one we expect, reject the message.
 		// This prevents the spinner from receiving too many messages and
 		// thus spinning too fast.
 		if msg.tag > 0 && msg.tag != m.tag {
-			return m, nil
+			return nil
 		}
 
 		m.frame++
@@ -162,14 +162,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 
 		m.tag++
-		return m, m.tick(m.id, m.tag)
+		return m.tick(m.id, m.tag)
 	default:
-		return m, nil
+		return nil
 	}
 }
 
 // View renders the model's view.
-func (m Model) View() string {
+func (m *Model) View() string {
 	if m.frame >= len(m.Spinner.Frames) {
 		return "(error)"
 	}
@@ -179,8 +179,8 @@ func (m Model) View() string {
 
 // Tick is the command used to advance the spinner one frame. Use this command
 // to effectively start the spinner.
-func (m Model) Tick() tea.Msg {
-	return TickMsg{
+func (m *Model) Tick() tea.Msg {
+	return MsgTick{
 		// The time at which the tick occurred.
 		Time: time.Now(),
 
@@ -193,9 +193,9 @@ func (m Model) Tick() tea.Msg {
 	}
 }
 
-func (m Model) tick(id, tag int) tea.Cmd {
+func (m *Model) tick(id, tag int) tea.Cmd {
 	return tea.Tick(m.Spinner.FPS, func(t time.Time) tea.Msg {
-		return TickMsg{
+		return MsgTick{
 			Time: t,
 			ID:   id,
 			tag:  tag,
@@ -208,7 +208,7 @@ func (m Model) tick(id, tag int) tea.Cmd {
 //
 // Deprecated: Use [Model.Tick] instead.
 func Tick() tea.Msg {
-	return TickMsg{Time: time.Now()}
+	return MsgTick{Time: time.Now()}
 }
 
 // Option is used to set options in New. For example:

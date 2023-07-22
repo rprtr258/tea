@@ -4,9 +4,9 @@ import (
 	"time"
 )
 
-// BatchMsg is a message used to perform a bunch of commands concurrently with
-// no ordering guarantees. You can send a BatchMsg with Batch.
-type BatchMsg []Cmd
+// MsgBatch is a message used to perform a bunch of commands concurrently with
+// no ordering guarantees. You can send a MsgBatch with Batch.
+type MsgBatch []Cmd
 
 // Batch performs a bunch of commands concurrently with no ordering guarantees
 // about the results. Use a Batch to return several commands.
@@ -30,18 +30,18 @@ func Batch(cmds ...Cmd) Cmd {
 		validCmds = append(validCmds, c)
 	}
 	return func() Msg {
-		return BatchMsg(validCmds)
+		return MsgBatch(validCmds)
 	}
 }
 
-// sequenceMsg is used internally to run the given commands in order.
-type sequenceMsg []Cmd
+// msgSequence is used internally to run the given commands in order.
+type msgSequence []Cmd
 
 // Sequence runs the given commands one at a time, in order. Contrast this with
 // Batch, which runs commands concurrently.
 func Sequence(cmds ...Cmd) Cmd {
 	return func() Msg {
-		return sequenceMsg(cmds)
+		return msgSequence(cmds)
 	}
 }
 
@@ -57,33 +57,33 @@ func Sequence(cmds ...Cmd) Cmd {
 // To produce the command, pass a duration and a function which returns
 // a message containing the time at which the tick occurred.
 //
-//	type TickMsg time.Time
+//	type MsgTick time.Time
 //
 //	cmd := Every(time.Second, func(t time.Time) Msg {
-//	   return TickMsg(t)
+//	   return MsgTick(t)
 //	})
 //
 // Beginners' note: Every sends a single message and won't automatically
 // dispatch messages at an interval. To do that, you'll want to return another
 // Every command after receiving your tick message. For example:
 //
-//	type TickMsg time.Time
+//	type MsgTick time.Time
 //
 //	// Send a message every second.
 //	func tickEvery() Cmd {
 //	    return Every(time.Second, func(t time.Time) Msg {
-//	        return TickMsg(t)
+//	        return MsgTick(t)
 //	    })
 //	}
 //
-//	func (m model) Init() Cmd {
+//	func (m *model) Init() Cmd {
 //	    // Start ticking.
 //	    return tickEvery()
 //	}
 //
-//	func (m model) Update(msg Msg) (Model, Cmd) {
+//	func (m *model) Update(msg Msg) (Model, Cmd) {
 //	    switch msg.(type) {
-//	    case TickMsg:
+//	    case MsgTick:
 //	        // Return your Every command again to loop.
 //	        return m, tickEvery()
 //	    }
@@ -107,32 +107,32 @@ func Every(duration time.Duration, fn func(time.Time) Msg) Cmd {
 // To produce the command, pass a duration and a function which returns
 // a message containing the time at which the tick occurred.
 //
-//	type TickMsg time.Time
+//	type MsgTick time.Time
 //
 //	cmd := Tick(time.Second, func(t time.Time) Msg {
-//	   return TickMsg(t)
+//	   return MsgTick(t)
 //	})
 //
 // Beginners' note: Tick sends a single message and won't automatically
 // dispatch messages at an interval. To do that, you'll want to return another
 // Tick command after receiving your tick message. For example:
 //
-//	type TickMsg time.Time
+//	type MsgTick time.Time
 //
 //	func doTick() Cmd {
 //	    return Tick(time.Second, func(t time.Time) Msg {
-//	        return TickMsg(t)
+//	        return MsgTick(t)
 //	    })
 //	}
 //
-//	func (m model) Init() Cmd {
+//	func (m *model) Init() Cmd {
 //	    // Start ticking.
 //	    return doTick()
 //	}
 //
-//	func (m model) Update(msg Msg) (Model, Cmd) {
+//	func (m *model) Update(msg Msg) (Model, Cmd) {
 //	    switch msg.(type) {
-//	    case TickMsg:
+//	    case MsgTick:
 //	        // Return your Tick command again to loop.
 //	        return m, doTick()
 //	    }
@@ -151,7 +151,7 @@ func Tick(d time.Duration, fn func(time.Time) Msg) Cmd {
 //
 //	func saveStateCmd() Msg {
 //	   if err := save(); err != nil {
-//	       return errMsg{err}
+//	       return msgErr(err)
 //	   }
 //	   return nil
 //	}

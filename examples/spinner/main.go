@@ -4,61 +4,48 @@ package spinner
 // component library.
 
 import (
+	"context"
 	"fmt"
-	"os"
+	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/lipgloss"
 )
-
-type errMsg error
 
 type model struct {
 	spinner  spinner.Model
 	quitting bool
-	err      error
 }
 
-func initialModel() model {
+func initialModel() *model {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-	return model{spinner: s}
+	return &model{spinner: s}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		default:
-			return m, nil
+			return nil
 		}
 
-	case errMsg:
-		m.err = msg
-		return m, nil
-
 	default:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
+		return m.spinner.Update(msg)
 	}
 }
 
-func (m model) View(r tea.Renderer) {
-	if m.err != nil {
-		r.Write(m.err.Error())
-		return
-	}
-
+func (m *model) View(r tea.Renderer) {
 	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
 	if m.quitting {
 		str += "\n"
@@ -68,9 +55,8 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(initialModel())
+	p := tea.NewProgram(context.Background(), initialModel())
 	if _, err := p.Run(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatalln(err.Error())
 	}
 }

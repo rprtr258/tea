@@ -1,6 +1,7 @@
 package tui_daemon_combo
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -12,9 +13,9 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/muesli/reflow/indent"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/spinner"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
@@ -31,10 +32,10 @@ func Main() {
 
 	if showHelp {
 		flag.Usage()
-		os.Exit(0)
+		return
 	}
 
-	p := tea.NewProgram(newModel())
+	p := tea.NewProgram(context.Background(), newModel())
 	if daemonMode || !isatty.IsTerminal(os.Stdout.Fd()) {
 		// If we're in daemon mode don't render the TUI
 		p = p.WithoutRenderer()
@@ -44,8 +45,7 @@ func Main() {
 	}
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Error starting Bubble Tea program:", err)
-		os.Exit(1)
+		log.Fatalln("Error starting Bubble Tea program:", err.Error())
 	}
 }
 
@@ -60,19 +60,19 @@ type model struct {
 	quitting bool
 }
 
-func newModel() model {
+func newModel() *model {
 	const showLastResults = 5
 
 	sp := spinner.New()
 	sp.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("206"))
 
-	return model{
+	return &model{
 		spinner: sp,
 		results: make([]result, showLastResults),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	log.Println("Starting work...")
 	return tea.Batch(
 		m.spinner.Tick,
@@ -80,27 +80,25 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return m, tea.Quit
-	case spinner.TickMsg:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
-		return m, cmd
-	case processFinishedMsg:
+		return tea.Quit
+	case spinner.MsgTick:
+		return m.spinner.Update(msg)
+	case msgProcessFinished:
 		d := time.Duration(msg)
 		res := result{emoji: randomEmoji(), duration: d}
 		log.Printf("%s Job finished in %s", res.emoji, res.duration)
 		m.results = append(m.results[1:], res)
-		return m, runPretendProcess
+		return runPretendProcess
 	default:
-		return m, nil
+		return nil
 	}
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	s := "\n" +
 		m.spinner.View() + " Doing some work...\n\n"
 
@@ -119,17 +117,16 @@ func (m model) View(r tea.Renderer) {
 	}
 
 	r.Write(indent.String(s, 1))
-	return
 }
 
-// processFinishedMsg is sent when a pretend process completes.
-type processFinishedMsg time.Duration
+// msgProcessFinished is sent when a pretend process completes.
+type msgProcessFinished time.Duration
 
 // pretendProcess simulates a long-running process.
 func runPretendProcess() tea.Msg {
 	pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec
 	time.Sleep(pause)
-	return processFinishedMsg(pause)
+	return msgProcessFinished(pause)
 }
 
 func randomEmoji() string {

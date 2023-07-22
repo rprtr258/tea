@@ -4,54 +4,55 @@ package fullscreen
 // from 5 and then exits.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 type model int
 
-type tickMsg time.Time
+type msgTick time.Time
 
 func Main() {
-	p := tea.NewProgram(model(5)).WithAltScreen()
+	m := model(5)
+	p := tea.NewProgram(context.Background(), &m).WithAltScreen()
 	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err.Error())
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.Batch(tick(), tea.EnterAltScreen)
 }
 
-func (m model) Update(message tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(message tea.Msg) tea.Cmd {
 	switch msg := message.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
-			return m, tea.Quit
+			return tea.Quit
 		}
 
-	case tickMsg:
-		m--
-		if m <= 0 {
-			return m, tea.Quit
+	case msgTick:
+		*m--
+		if *m <= 0 {
+			return tea.Quit
 		}
-		return m, tick()
+		return tick()
 	}
 
-	return m, nil
+	return nil
 }
 
-func (m model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf("\n\n     Hi. This program will exit in %d seconds...", m))
-	return
+func (m *model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf("\n\n     Hi. This program will exit in %d seconds...", *m))
 }
 
 func tick() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		return tickMsg(t)
+		return msgTick(t)
 	})
 }

@@ -1,12 +1,12 @@
 package list_default
 
 import (
-	"fmt"
-	"os"
+	"context"
+	"log"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/list"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/list"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
@@ -23,29 +23,26 @@ type model struct {
 	list list.Model
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if msg.String() == "ctrl+c" {
-			return m, tea.Quit
+			return tea.Quit
 		}
-	case tea.WindowSizeMsg:
+	case tea.MsgWindowSize:
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 	}
 
-	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
-	return m, cmd
+	return m.list.Update(msg)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	r.Write(docStyle.Render(m.list.View()))
-	return
 }
 
 func Main() {
@@ -75,13 +72,14 @@ func Main() {
 		item{title: "Terrycloth", desc: "In other words, towel fabric"},
 	}
 
-	m := model{list: list.New(items, list.NewDefaultDelegate(), 0, 0)}
+	m := &model{
+		list: list.New(items, list.NewDefaultDelegate(), 0, 0),
+	}
 	m.list.Title = "My Fave Things"
 
-	p := tea.NewProgram(m).WithAltScreen()
+	p := tea.NewProgram(context.Background(), m).WithAltScreen()
 
 	if _, err := p.Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+		log.Fatalln("Error running program:", err.Error())
 	}
 }

@@ -7,17 +7,17 @@ import (
 
 	"github.com/atotto/clipboard"
 	rw "github.com/mattn/go-runewidth"
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/cursor"
-	"github.com/rprtr258/bubbletea/bubbles/key"
-	"github.com/rprtr258/bubbletea/bubbles/runeutil"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/cursor"
+	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/bubbles/runeutil"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 // Internal messages for clipboard operations.
 type (
-	pasteMsg    string
-	pasteErrMsg struct{ error }
+	msgPaste    string
+	msgPasteErr struct{ err error }
 )
 
 // EchoMode sets the input behavior of the text input field.
@@ -93,7 +93,7 @@ type Model struct {
 	// Styles. These will be applied as inline styles.
 	//
 	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/rprtr258/bubbletea/lipgloss
+	// https://github.com/rprtr258/tea/lipgloss
 	PromptStyle      lipgloss.Style
 	TextStyle        lipgloss.Style
 	PlaceholderStyle lipgloss.Style
@@ -190,12 +190,12 @@ func (m *Model) setValueInternal(runes []rune) {
 }
 
 // Value returns the value of the text input.
-func (m Model) Value() string {
+func (m *Model) Value() string {
 	return string(m.value)
 }
 
 // Position returns the cursor position.
-func (m Model) Position() int {
+func (m *Model) Position() int {
 	return m.pos
 }
 
@@ -217,7 +217,7 @@ func (m *Model) CursorEnd() {
 }
 
 // Focused returns the focus state on the model.
-func (m Model) Focused() bool {
+func (m *Model) Focused() bool {
 	return m.focus
 }
 
@@ -295,8 +295,7 @@ func (m *Model) insertRunesFromUserInput(v []rune) {
 	}
 
 	// Put it all back together
-	value := append(head, tail...)
-	m.setValueInternal(value)
+	m.setValueInternal(append(head, tail...))
 
 	if m.Err != nil {
 		m.pos = oldPos
@@ -512,7 +511,7 @@ func (m *Model) wordForward() {
 	}
 }
 
-func (m Model) echoTransform(v string) string {
+func (m *Model) echoTransform(v string) string {
 	switch m.EchoMode {
 	case EchoPassword:
 		return strings.Repeat(string(m.EchoCharacter), rw.StringWidth(v))
@@ -526,9 +525,9 @@ func (m Model) echoTransform(v string) string {
 }
 
 // Update is the Bubble Tea update loop.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	if !m.focus {
-		return m, nil
+		return nil
 	}
 
 	// Let's remember where the position of the cursor currently is so that if
@@ -574,7 +573,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case key.Matches(msg, m.KeyMap.DeleteBeforeCursor):
 			m.deleteBeforeCursor()
 		case key.Matches(msg, m.KeyMap.Paste):
-			return m, Paste
+			return Paste
 		case key.Matches(msg, m.KeyMap.DeleteWordForward):
 			m.deleteWordForward()
 		default:
@@ -582,30 +581,25 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.insertRunesFromUserInput(msg.Runes)
 		}
 
-	case pasteMsg:
+	case msgPaste:
 		m.insertRunesFromUserInput([]rune(msg))
 
-	case pasteErrMsg:
-		m.Err = msg
+	case msgPasteErr:
+		m.Err = msg.err
 	}
 
-	var cmds []tea.Cmd
-	var cmd tea.Cmd
-
-	m.Cursor, cmd = m.Cursor.Update(msg)
-	cmds = append(cmds, cmd)
-
+	cmds := []tea.Cmd{m.Cursor.Update(msg)}
 	if oldPos != m.pos && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
 		cmds = append(cmds, m.Cursor.BlinkCmd())
 	}
 
 	m.handleOverflow()
-	return m, tea.Batch(cmds...)
+	return tea.Batch(cmds...)
 }
 
 // View renders the textinput in its current state.
-func (m Model) View() string {
+func (m *Model) View() string {
 	// Placeholder text
 	if len(m.value) == 0 && m.Placeholder != "" {
 		return m.placeholderView()
@@ -642,7 +636,7 @@ func (m Model) View() string {
 }
 
 // placeholderView returns the prompt and placeholder view, if any.
-func (m Model) placeholderView() string {
+func (m *Model) placeholderView() string {
 	var (
 		v     string
 		p     = m.Placeholder
@@ -668,9 +662,9 @@ func Blink() tea.Msg {
 func Paste() tea.Msg {
 	str, err := clipboard.ReadAll()
 	if err != nil {
-		return pasteErrMsg{err}
+		return msgPasteErr{err}
 	}
-	return pasteMsg(str)
+	return msgPaste(str)
 }
 
 func clamp(v, low, high int) int {
@@ -713,7 +707,7 @@ func (c CursorMode) String() string {
 }
 
 // Deprecated: use cursor.Mode().
-func (m Model) CursorMode() CursorMode {
+func (m *Model) CursorMode() CursorMode {
 	return CursorMode(m.Cursor.Mode())
 }
 

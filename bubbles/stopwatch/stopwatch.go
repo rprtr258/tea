@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
+	"github.com/rprtr258/tea"
 )
 
 var (
@@ -20,8 +20,8 @@ func nextID() int {
 	return lastID
 }
 
-// TickMsg is a message that is sent on every timer tick.
-type TickMsg struct {
+// MsgTick is a message that is sent on every timer tick.
+type MsgTick struct {
 	// ID is the identifier of the stopwatch that sends the message. This makes
 	// it possible to determine which stopwatch a tick belongs to when there
 	// are multiple stopwatches running.
@@ -32,14 +32,14 @@ type TickMsg struct {
 	ID int
 }
 
-// StartStopMsg is sent when the stopwatch should start or stop.
-type StartStopMsg struct {
+// MsgStartStop is sent when the stopwatch should start or stop.
+type MsgStartStop struct {
 	ID      int
 	running bool
 }
 
-// ResetMsg is sent when the stopwatch should reset.
-type ResetMsg struct {
+// MsgReset is sent when the stopwatch should reset.
+type MsgReset struct {
 	ID int
 }
 
@@ -68,31 +68,31 @@ func New() Model {
 }
 
 // ID returns the unique ID of the model.
-func (m Model) ID() int {
+func (m *Model) ID() int {
 	return m.id
 }
 
 // Init starts the stopwatch.
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
 	return m.Start()
 }
 
 // Start starts the stopwatch.
-func (m Model) Start() tea.Cmd {
+func (m *Model) Start() tea.Cmd {
 	return tea.Batch(func() tea.Msg {
-		return StartStopMsg{ID: m.id, running: true}
+		return MsgStartStop{ID: m.id, running: true}
 	}, tick(m.id, m.Interval))
 }
 
 // Stop stops the stopwatch.
-func (m Model) Stop() tea.Cmd {
+func (m *Model) Stop() tea.Cmd {
 	return func() tea.Msg {
-		return StartStopMsg{ID: m.id, running: false}
+		return MsgStartStop{ID: m.id, running: false}
 	}
 }
 
 // Toggle stops the stopwatch if it is running and starts it if it is stopped.
-func (m Model) Toggle() tea.Cmd {
+func (m *Model) Toggle() tea.Cmd {
 	if m.Running() {
 		return m.Stop()
 	}
@@ -100,53 +100,53 @@ func (m Model) Toggle() tea.Cmd {
 }
 
 // Reset resets the stopwatch to 0.
-func (m Model) Reset() tea.Cmd {
+func (m *Model) Reset() tea.Cmd {
 	return func() tea.Msg {
-		return ResetMsg{ID: m.id}
+		return MsgReset{ID: m.id}
 	}
 }
 
 // Running returns true if the stopwatch is running or false if it is stopped.
-func (m Model) Running() bool {
+func (m *Model) Running() bool {
 	return m.running
 }
 
 // Update handles the timer tick.
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
-	case StartStopMsg:
+	case MsgStartStop:
 		if msg.ID != m.id {
-			return m, nil
+			return nil
 		}
 		m.running = msg.running
-	case ResetMsg:
+	case MsgReset:
 		if msg.ID != m.id {
-			return m, nil
+			return nil
 		}
 		m.d = 0
-	case TickMsg:
+	case MsgTick:
 		if !m.running || msg.ID != m.id {
 			break
 		}
 		m.d += m.Interval
-		return m, tick(m.id, m.Interval)
+		return tick(m.id, m.Interval)
 	}
 
-	return m, nil
+	return nil
 }
 
 // Elapsed returns the time elapsed.
-func (m Model) Elapsed() time.Duration {
+func (m *Model) Elapsed() time.Duration {
 	return m.d
 }
 
 // View of the timer component.
-func (m Model) View() string {
+func (m *Model) View() string {
 	return m.d.String()
 }
 
 func tick(id int, d time.Duration) tea.Cmd {
 	return tea.Tick(d, func(_ time.Time) tea.Msg {
-		return TickMsg{ID: id}
+		return MsgTick{ID: id}
 	})
 }

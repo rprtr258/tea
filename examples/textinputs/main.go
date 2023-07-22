@@ -4,14 +4,15 @@ package textinputs
 // from the Bubbles component library.
 
 import (
+	"context"
 	"fmt"
-	"os"
+	"log"
 	"strings"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/cursor"
-	"github.com/rprtr258/bubbletea/bubbles/textinput"
-	"github.com/rprtr258/bubbletea/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/cursor"
+	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 var (
@@ -32,8 +33,8 @@ type model struct {
 	cursorMode cursor.Mode
 }
 
-func initialModel() model {
-	m := model{
+func initialModel() *model {
+	m := &model{
 		inputs: make([]textinput.Model, 3),
 	}
 
@@ -64,16 +65,16 @@ func initialModel() model {
 	return m
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "esc":
-			return m, tea.Quit
+			return tea.Quit
 
 		// Change cursor mode
 		case "ctrl+r":
@@ -85,7 +86,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 			for i := range m.inputs {
 				cmds[i] = m.inputs[i].Cursor.SetMode(m.cursorMode)
 			}
-			return m, tea.Batch(cmds...)
+			return tea.Batch(cmds...)
 
 		// Set focus to next input
 		case "tab", "shift+tab", "enter", "up", "down":
@@ -94,7 +95,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 			// Did the user press enter while the submit button was focused?
 			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
-				return m, tea.Quit
+				return tea.Quit
 			}
 
 			// Cycle indexes
@@ -125,14 +126,12 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 				m.inputs[i].TextStyle = noStyle
 			}
 
-			return m, tea.Batch(cmds...)
+			return tea.Batch(cmds...)
 		}
 	}
 
 	// Handle character input and blinking
-	cmd := m.updateInputs(msg)
-
-	return m, cmd
+	return m.updateInputs(msg)
 }
 
 func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
@@ -141,13 +140,13 @@ func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
 	// Only text inputs with Focus() set will respond, so it's safe to simply
 	// update all of them here without any further logic.
 	for i := range m.inputs {
-		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
+		cmds[i] = m.inputs[i].Update(msg)
 	}
 
 	return tea.Batch(cmds...)
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	var b strings.Builder
 
 	for i := range m.inputs {
@@ -171,8 +170,7 @@ func (m model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(initialModel()).Run(); err != nil {
-		fmt.Printf("could not start program: %s\n", err)
-		os.Exit(1)
+	if _, err := tea.NewProgram(context.Background(), initialModel()).Run(); err != nil {
+		log.Fatalln("could not start program:", err.Error())
 	}
 }

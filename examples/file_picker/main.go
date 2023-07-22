@@ -1,14 +1,15 @@
 package file_picker
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
-	tea "github.com/rprtr258/bubbletea"
-	"github.com/rprtr258/bubbletea/bubbles/filepicker"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/filepicker"
 )
 
 type model struct {
@@ -18,32 +19,31 @@ type model struct {
 	err          error
 }
 
-type clearErrorMsg struct{}
+type msgClearError struct{}
 
 func clearErrorAfter(t time.Duration) tea.Cmd {
 	return tea.Tick(t, func(_ time.Time) tea.Msg {
-		return clearErrorMsg{}
+		return msgClearError{}
 	})
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return m.filepicker.Init()
 }
 
-func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
-			return m, tea.Quit
+			return tea.Quit
 		}
-	case clearErrorMsg:
+	case msgClearError:
 		m.err = nil
 	}
 
-	var cmd tea.Cmd
-	m.filepicker, cmd = m.filepicker.Update(msg)
+	cmd := m.filepicker.Update(msg)
 
 	// Did the user select a file?
 	if didSelect, path := m.filepicker.DidSelectFile(msg); didSelect {
@@ -57,13 +57,13 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		// Let's clear the selectedFile and display an error.
 		m.err = errors.New(path + " is not valid.")
 		m.selectedFile = ""
-		return m, tea.Batch(cmd, clearErrorAfter(2*time.Second))
+		return tea.Batch(cmd, clearErrorAfter(2*time.Second))
 	}
 
-	return m, cmd
+	return cmd
 }
 
-func (m model) View(r tea.Renderer) {
+func (m *model) View(r tea.Renderer) {
 	if m.quitting {
 		r.Write("")
 		return
@@ -80,7 +80,6 @@ func (m model) View(r tea.Renderer) {
 	}
 	s.WriteString("\n\n" + m.filepicker.View() + "\n")
 	r.Write(s.String())
-	return
 }
 
 func Main() {
@@ -88,9 +87,9 @@ func Main() {
 	fp.AllowedTypes = []string{".mod", ".sum", ".go", ".txt", ".md"}
 	fp.CurrentDirectory, _ = os.UserHomeDir()
 
-	m := model{
+	m := &model{
 		filepicker: fp,
 	}
-	mm, _ := tea.NewProgram(m).WithOutput(os.Stderr).Run()
+	mm, _ := tea.NewProgram(context.Background(), m).WithOutput(os.Stderr).Run()
 	fmt.Println("\n  You selected: " + m.filepicker.Styles.Selected.Render(mm.selectedFile) + "\n")
 }
