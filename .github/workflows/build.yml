@@ -27,6 +27,11 @@ jobs:
 
       - name: Test
         run: go test ./...
+        if: matrix.os != 'windows-latest'
+
+      - name: Test-windows
+        run: go test $(go list ./... | grep -v glamour)
+        if: matrix.os == 'windows-latest'
 
       - name: Build examples
         run: go build -v ./...
