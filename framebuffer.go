@@ -85,7 +85,6 @@ func (fb FrameBuffer) Render() string {
 	return strings.Join(rows, "\n")
 }
 
-// TODO: is it needed? may be it is enough to use FrameBuffer as viewbox?
 // Viewbox is rectangular view to terminal frame part
 type Viewbox struct {
 	FB     FrameBuffer

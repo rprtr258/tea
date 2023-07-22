@@ -104,7 +104,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(m.viewport.View() + m.helpView()) // TODO: do not concat strings
+	r.Write(m.viewport.View() + m.helpView())
 }
 
 func (e *model) helpView() string {

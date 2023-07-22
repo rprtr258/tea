@@ -44,8 +44,7 @@ type Model interface {
 	// and, in response, update the model and/or send a command.
 	Update(Msg) Cmd
 
-	// View renders the program's UI, which is just a string. The view is
-	// rendered after every Update.
+	// View renders the program's UI. The view is rendered after every Update.
 	View(Renderer)
 }
 
@@ -133,7 +132,7 @@ type Program[M Model] struct {
 
 	inputType inputType
 
-	ctx    context.Context //nolint:containedctx // TODO: is needed? check and remove nolint:containedctx if so
+	ctx    context.Context //nolint:containedctx
 	cancel context.CancelFunc
 
 	msgs     chan Msg
@@ -383,7 +382,7 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 			p.renderer.handleMessages(msg)
 
 			cmds <- model.Update(msg) // run update, process command (if any)
-			model.View(p.renderer)    // TODO: do not retain renderer, give it back to user
+			model.View(p.renderer)
 		}
 	}
 }
@@ -566,7 +565,7 @@ func (p *Program[M]) Start() error {
 // If the program hasn't started yet this will be a blocking operation.
 // If the program has already been terminated this will be a no-op, so it's safe
 // to send messages after the program has exited.
-func (p *Program[M]) Send(msg Msg) { // TODO: remove, give dispatch to user instead
+func (p *Program[M]) Send(msg Msg) {
 	select {
 	case <-p.ctx.Done():
 	case p.msgs <- msg:
