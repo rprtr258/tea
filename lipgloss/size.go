@@ -30,14 +30,3 @@ func Width(str string) int {
 func Height(str string) int {
 	return strings.Count(str, "\n") + 1
 }
-
-// Size returns the width and height of the string in cells. ANSI sequences are
-// ignored and characters wider than one cell (such as Chinese characters and
-// emojis) are appropriately measured.
-//
-// TODO: is it needed?
-func Size(str string) (width, height int) { //nolint:nonamedreturns
-	width = Width(str)
-	height = Height(str)
-	return width, height
-}
