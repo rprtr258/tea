@@ -190,7 +190,7 @@ func NewProgram[M Model](model M) *Program[M] {
 	// A context can be provided with a ProgramOption, but if none was provided
 	// we'll use the default background context.
 	if p.ctx == nil {
-		p.ctx = context.Background()
+		p.ctx = context.Background() // TODO: remove
 	}
 	// Initialize context and teardown channel.
 	p.ctx, p.cancel = context.WithCancel(p.ctx)
@@ -463,8 +463,7 @@ func (p *Program[M]) Run() (M, error) {
 		p.renderer = newRenderer(p.output, p.startupOptions.has(withANSICompressor), p.fps)
 	}
 
-	// Check if output is a TTY before entering raw mode, hiding the cursor and
-	// so on.
+	// Check if output is a TTY before entering raw mode, hiding the cursor and so on.
 	if err := p.initTerminal(); err != nil {
 		return p.initialModel, err
 	}
