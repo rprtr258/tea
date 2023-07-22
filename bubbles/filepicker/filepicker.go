@@ -50,7 +50,7 @@ func New() Model {
 	}
 }
 
-type msgError error
+type msgError struct{ err error }
 
 type msgReadDir struct {
 	id      int
@@ -205,7 +205,7 @@ func (m *Model) readDir(path string, showHidden bool) tea.Cmd {
 	return func() tea.Msg {
 		dirEntries, err := os.ReadDir(path)
 		if err != nil {
-			return msgError(err)
+			return msgError{err}
 		}
 
 		sort.Slice(dirEntries, func(i, j int) bool {

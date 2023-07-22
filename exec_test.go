@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type msgExecFinished error
+type msgExecFinished struct{ err error }
 
 type testExecModel struct {
 	cmd string
@@ -18,14 +18,14 @@ type testExecModel struct {
 func (m *testExecModel) Init() Cmd {
 	c := exec.Command(m.cmd)
 	return ExecProcess(c, func(err error) Msg {
-		return msgExecFinished(err)
+		return msgExecFinished{err}
 	})
 }
 
 func (m *testExecModel) Update(msg Msg) Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case msgExecFinished:
-		m.err = msg
+		m.err = msg.err
 		return Quit
 	}
 

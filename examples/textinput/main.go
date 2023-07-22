@@ -18,11 +18,8 @@ func Main() {
 	}
 }
 
-type msgErr error
-
 type model struct {
 	textInput textinput.Model
-	err       error
 }
 
 func initialModel() *model {
@@ -34,7 +31,6 @@ func initialModel() *model {
 
 	return &model{
 		textInput: ti,
-		err:       nil,
 	}
 }
 
@@ -49,11 +45,6 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
 			return tea.Quit
 		}
-
-	// We handle errors just like any other message
-	case msgErr:
-		m.err = msg
-		return nil
 	}
 
 	return m.textInput.Update(msg)

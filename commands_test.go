@@ -26,10 +26,10 @@ func TestTick(t *testing.T) {
 	assert.Equal(t, expected, msg)
 }
 
-type msgError error
+type msgError struct{ err error }
 
 func TestSequentially(t *testing.T) {
-	expectedMsgError := msgError(errors.New("some err"))
+	expectedMsgError := msgError{errors.New("some err")}
 	expectedMsgString := msgString("some msg")
 
 	nilReturnCmd := func() Msg {

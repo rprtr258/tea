@@ -8,7 +8,7 @@ import (
 	"github.com/rprtr258/tea"
 )
 
-type msgEditorFinished error
+type msgEditorFinished struct{ err error }
 
 func openEditor() tea.Cmd {
 	editor := os.Getenv("EDITOR")
@@ -17,7 +17,7 @@ func openEditor() tea.Cmd {
 	}
 	c := exec.Command(editor) //nolint:gosec
 	return tea.ExecProcess(c, func(err error) tea.Msg {
-		return msgEditorFinished(err)
+		return msgEditorFinished{err}
 	})
 }
 
@@ -47,8 +47,8 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			return tea.Quit
 		}
 	case msgEditorFinished:
-		if msg != nil {
-			m.err = msg
+		if msg.err != nil {
+			m.err = msg.err
 			return tea.Quit
 		}
 	}

@@ -22,8 +22,6 @@ func Main() {
 	}
 }
 
-type msgErr error
-
 type model struct {
 	viewport    viewport.Model
 	messages    []string
@@ -83,11 +81,6 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			m.textarea.Reset()
 			m.viewport.GotoBottom()
 		}
-
-	// We handle errors just like any other message
-	case msgErr:
-		m.err = msg
-		return nil
 	}
 
 	return tea.Batch(tiCmd, vpCmd)

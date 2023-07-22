@@ -12,12 +12,9 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-type msgErr error
-
 type model struct {
 	spinner  spinner.Model
 	quitting bool
-	err      error
 }
 
 func initialModel() *model {
@@ -42,21 +39,12 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			return nil
 		}
 
-	case msgErr:
-		m.err = msg
-		return nil
-
 	default:
 		return m.spinner.Update(msg)
 	}
 }
 
 func (m *model) View(r tea.Renderer) {
-	if m.err != nil {
-		r.Write(m.err.Error())
-		return
-	}
-
 	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
 	if m.quitting {
 		str += "\n"

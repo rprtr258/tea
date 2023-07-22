@@ -18,7 +18,7 @@ const (
 
 type (
 	msgProgress    float64
-	msgProgressErr error
+	msgProgressErr struct{ err error }
 )
 
 func finalPause() tea.Cmd {
@@ -50,7 +50,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		return nil
 
 	case msgProgressErr:
-		m.err = msg
+		m.err = msg.err
 		return tea.Quit
 
 	case msgProgress:

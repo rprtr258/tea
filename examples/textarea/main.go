@@ -23,7 +23,6 @@ type msgErr error
 
 type model struct {
 	textarea textarea.Model
-	err      error
 }
 
 func initialModel() *model {
@@ -33,7 +32,6 @@ func initialModel() *model {
 
 	return &model{
 		textarea: ti,
-		err:      nil,
 	}
 }
 
@@ -60,11 +58,6 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 				cmds = append(cmds, cmd)
 			}
 		}
-
-	// We handle errors just like any other message
-	case msgErr:
-		m.err = msg
-		return nil
 	}
 
 	cmds = append(cmds, m.textarea.Update(msg))

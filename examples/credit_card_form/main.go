@@ -19,8 +19,6 @@ func Main() {
 	}
 }
 
-type msgErr error
-
 const (
 	ccn = iota
 	exp
@@ -150,11 +148,6 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			m.inputs[i].Blur()
 		}
 		m.inputs[m.focused].Focus()
-
-	// We handle errors just like any other message
-	case msgErr:
-		m.err = msg
-		return nil
 	}
 
 	for i := range m.inputs {
