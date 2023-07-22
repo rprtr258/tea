@@ -24,7 +24,6 @@ import (
 	isatty "github.com/mattn/go-isatty"
 	"github.com/muesli/cancelreader"
 	"github.com/muesli/termenv"
-	"golang.org/x/sync/errgroup"
 )
 
 // ErrProgramKilled is returned by [Program.Run] when the program got killed.
@@ -36,13 +35,12 @@ type Msg any
 
 // Model contains the program's state as well as its core functions.
 type Model interface {
-	// Init is the first function that will be called. It returns an optional
-	// initial command. To not perform an initial command return nil.
-	Init() Cmd
+	// Init is the first function that will be called. It returns list of initial commands.
+	Init() []Cmd
 
 	// Update is called when a message is received. Use it to inspect messages
 	// and, in response, update the model and/or send a command.
-	Update(Msg) Cmd
+	Update(Msg) []Cmd
 
 	// View renders the program's UI. The view is rendered after every Update.
 	View(Renderer)
@@ -258,7 +256,7 @@ func (p *Program[M]) handleResize() chan struct{} {
 
 // handleCommands runs commands in a goroutine and sends the result to the
 // program's message channel.
-func (p *Program[M]) handleCommands(cmds chan Cmd) chan struct{} {
+func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 	ch := make(chan struct{})
 
 	go func() {
@@ -280,8 +278,9 @@ func (p *Program[M]) handleCommands(cmds chan Cmd) chan struct{} {
 				// possible to cancel them so we'll have to leak the goroutine
 				// until Cmd returns.
 				go func() {
-					msg := cmd() // this can be long.
-					p.Send(msg)
+					for _, c := range cmd {
+						p.Send(c()) // this can be long.
+					}
 				}()
 			}
 		}
@@ -292,7 +291,7 @@ func (p *Program[M]) handleCommands(cmds chan Cmd) chan struct{} {
 
 // eventLoop is the central message loop. It receives and handles the default
 // Bubble Tea messages, update the model and triggers redraws.
-func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
+func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 	for {
 		select {
 		case <-p.ctx.Done():
@@ -344,37 +343,11 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 				// NB: this blocks.
 				p.exec(msg.cmd, msg.fn)
 
-			case MsgBatch:
-				for _, cmd := range msg {
-					cmds <- cmd
-				}
-				continue
-
 			case msgSequence:
 				go func() {
 					// Execute commands one at a time, in order.
 					for _, cmd := range msg {
-						if cmd == nil {
-							continue
-						}
-
-						msg := cmd()
-						if msgBatch, ok := msg.(MsgBatch); ok {
-							g, _ := errgroup.WithContext(p.ctx)
-							for _, cmd := range msgBatch {
-								cmd := cmd
-								g.Go(func() error {
-									p.Send(cmd())
-									return nil
-								})
-							}
-
-							//nolint:errcheck
-							g.Wait() // wait for all commands from batch msg to finish
-							continue
-						}
-
-						p.Send(msg)
+						p.Send(cmd())
 					}
 				}()
 			}
@@ -392,7 +365,7 @@ func (p *Program[M]) eventLoop(model M, cmds chan Cmd) (M, error) {
 // Returns the final model.
 func (p *Program[M]) Run() (M, error) {
 	myHandlers := handlers{}
-	cmds := make(chan Cmd)
+	cmds := make(chan []Cmd)
 	p.errs = make(chan error)
 	p.finished = make(chan struct{}, 1)
 
@@ -475,7 +448,7 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Initialize the program.
 	model := p.initialModel
-	if initCmd := model.Init(); initCmd != nil {
+	if initCmds := model.Init(); len(initCmds) > 0 {
 		ch := make(chan struct{})
 		myHandlers.add(ch)
 
@@ -483,7 +456,7 @@ func (p *Program[M]) Run() (M, error) {
 			defer close(ch)
 
 			select {
-			case cmds <- initCmd:
+			case cmds <- initCmds:
 			case <-p.ctx.Done():
 			}
 		}()

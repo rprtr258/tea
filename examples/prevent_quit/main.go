@@ -20,25 +20,6 @@ var (
 	quitViewStyle = lipgloss.NewStyle().Padding(1).Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("170"))
 )
 
-func Main() {
-	if _, err := tea.
-		NewProgram(context.Background(), initialModel()).
-		WithFilter(func(m *model, msg tea.Msg) tea.Msg {
-			if _, ok := msg.(tea.MsgQuit); !ok {
-				return msg
-			}
-
-			if !m.hasChanges {
-				return msg
-			}
-
-			return nil
-		}).
-		Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
-}
-
 type model struct {
 	textarea   textarea.Model
 	help       help.Model
@@ -74,22 +55,20 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return textarea.Blink
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{textarea.Blink}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	if m.quitting {
-		return m.updatePromptView(msg)
+		return []tea.Cmd{m.updatePromptView(msg)}
 	}
 
 	return m.updateTextView(msg)
 }
 
-func (m *model) updateTextView(msg tea.Msg) tea.Cmd {
+func (m *model) updateTextView(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
-	var cmd tea.Cmd
-
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.saveText = ""
@@ -99,20 +78,18 @@ func (m *model) updateTextView(msg tea.Msg) tea.Cmd {
 			m.hasChanges = false
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case msg.Type == tea.KeyRunes:
 			m.saveText = ""
 			m.hasChanges = true
 			fallthrough
 		default:
 			if !m.textarea.Focused() {
-				cmd = m.textarea.Focus()
-				cmds = append(cmds, cmd)
+				cmds = append(cmds, m.textarea.Focus()...)
 			}
 		}
 	}
-	cmds = append(cmds, m.textarea.Update(msg))
-	return tea.Batch(cmds...)
+	return append(cmds, m.textarea.Update(msg)...)
 }
 
 func (m *model) updatePromptView(msg tea.Msg) tea.Cmd {
@@ -152,4 +129,23 @@ func (m *model) View(r tea.Renderer) {
 		saveTextStyle.Render(m.saveText),
 		helpView,
 	) + "\n\n")
+}
+
+func Main() {
+	if _, err := tea.
+		NewProgram(context.Background(), initialModel()).
+		WithFilter(func(m *model, msg tea.Msg) tea.Msg {
+			if _, ok := msg.(tea.MsgQuit); !ok {
+				return msg
+			}
+
+			if !m.hasChanges {
+				return msg
+			}
+
+			return nil
+		}).
+		Run(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }

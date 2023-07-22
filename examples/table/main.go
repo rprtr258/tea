@@ -17,9 +17,11 @@ type model struct {
 	table table.Model
 }
 
-func (m *model) Init() tea.Cmd { return nil }
+func (m *model) Init() []tea.Cmd {
+	return nil
+}
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -30,11 +32,9 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 				m.table.Focus()
 			}
 		case "q", "ctrl+c":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case "enter":
-			return tea.Batch(
-				tea.Printf("Let's go to %s!", m.table.SelectedRow()[1]),
-			)
+			return []tea.Cmd{tea.Printf("Let's go to %s!", m.table.SelectedRow()[1])}
 		}
 	}
 	return m.table.Update(msg)

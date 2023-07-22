@@ -15,16 +15,16 @@ type model struct {
 	activeTab  int
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch keypress := msg.String(); keypress {
 		case "ctrl+c", "q":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case "right", "l", "n", "tab":
 			m.activeTab = min(m.activeTab+1, len(m.Tabs)-1)
 			return nil
@@ -89,15 +89,6 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(docStyle.Render(doc.String()))
 }
 
-func Main() {
-	tabs := []string{"Lip Gloss", "Blush", "Eye Shadow", "Mascara", "Foundation"}
-	tabContent := []string{"Lip Gloss Tab", "Blush Tab", "Eye Shadow Tab", "Mascara Tab", "Foundation Tab"}
-	m := &model{Tabs: tabs, TabContent: tabContent}
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
-}
-
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -110,4 +101,13 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func Main() {
+	tabs := []string{"Lip Gloss", "Blush", "Eye Shadow", "Mascara", "Foundation"}
+	tabContent := []string{"Lip Gloss Tab", "Blush Tab", "Eye Shadow Tab", "Mascara Tab", "Foundation Tab"}
+	m := &model{Tabs: tabs, TabContent: tabContent}
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
+		log.Fatalln("Error running program:", err.Error())
+	}
 }

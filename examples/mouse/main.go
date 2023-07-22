@@ -11,27 +11,20 @@ import (
 	"github.com/rprtr258/tea"
 )
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{}).WithAltScreen().WithMouseAllMotion()
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
-}
-
 type model struct {
 	init       bool
 	mouseEvent tea.MouseEvent
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if s := msg.String(); s == "ctrl+c" || s == "q" || s == "esc" {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 
 	case tea.MsgMouse:
@@ -51,4 +44,11 @@ func (m *model) View(r tea.Renderer) {
 	}
 
 	r.Write(s)
+}
+
+func Main() {
+	p := tea.NewProgram(context.Background(), &model{}).WithAltScreen().WithMouseAllMotion()
+	if _, err := p.Run(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }

@@ -33,23 +33,23 @@ type (
 	msgErr    error
 )
 
-func (m *model) Init() tea.Cmd {
-	return checkServer
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{checkServer}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case msgStatus:
 		m.status = int(msg)
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 
 	case msgErr:
 		m.err = msg
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 
 	case tea.MsgKey:
 		if msg.Type == tea.KeyCtrlC {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	}
 

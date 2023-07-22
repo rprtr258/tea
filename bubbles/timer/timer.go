@@ -125,26 +125,26 @@ func (m *Model) Timedout() bool {
 }
 
 // Init starts the timer.
-func (m *Model) Init() tea.Cmd {
-	return m.tick()
+func (m *Model) Init() []tea.Cmd {
+	return []tea.Cmd{m.tick()}
 }
 
 // Update handles the timer tick.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case MsgStartStop:
 		if msg.ID != 0 && msg.ID != m.id {
 			return nil
 		}
 		m.running = msg.running
-		return m.tick()
+		return []tea.Cmd{m.tick()}
 	case MsgTick:
 		if !m.Running() || (msg.ID != 0 && msg.ID != m.id) {
 			break
 		}
 
 		m.Timeout -= m.Interval
-		return tea.Batch(m.tick(), m.timedout())
+		return []tea.Cmd{m.tick(), m.timedout()}
 	}
 
 	return nil

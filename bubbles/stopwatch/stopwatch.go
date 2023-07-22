@@ -73,15 +73,18 @@ func (m *Model) ID() int {
 }
 
 // Init starts the stopwatch.
-func (m *Model) Init() tea.Cmd {
+func (m *Model) Init() []tea.Cmd {
 	return m.Start()
 }
 
 // Start starts the stopwatch.
-func (m *Model) Start() tea.Cmd {
-	return tea.Batch(func() tea.Msg {
-		return MsgStartStop{ID: m.id, running: true}
-	}, tick(m.id, m.Interval))
+func (m *Model) Start() []tea.Cmd {
+	return []tea.Cmd{
+		func() tea.Msg {
+			return MsgStartStop{ID: m.id, running: true}
+		},
+		tick(m.id, m.Interval),
+	}
 }
 
 // Stop stops the stopwatch.
@@ -92,9 +95,9 @@ func (m *Model) Stop() tea.Cmd {
 }
 
 // Toggle stops the stopwatch if it is running and starts it if it is stopped.
-func (m *Model) Toggle() tea.Cmd {
+func (m *Model) Toggle() []tea.Cmd {
 	if m.Running() {
-		return m.Stop()
+		return []tea.Cmd{m.Stop()}
 	}
 	return m.Start()
 }
@@ -112,7 +115,7 @@ func (m *Model) Running() bool {
 }
 
 // Update handles the timer tick.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case MsgStartStop:
 		if msg.ID != m.id {
@@ -129,7 +132,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 			break
 		}
 		m.d += m.Interval
-		return tick(m.id, m.Interval)
+		return []tea.Cmd{tick(m.id, m.Interval)}
 	}
 
 	return nil

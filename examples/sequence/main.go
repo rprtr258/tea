@@ -11,28 +11,27 @@ import (
 
 type model struct{}
 
-func (m *model) Init() tea.Cmd {
-	return tea.Sequence(
-		tea.Batch(
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{
+		tea.Sequence(
 			tea.Println("A"),
 			tea.Println("B"),
 			tea.Println("C"),
 		),
 		tea.Println("Z"),
 		tea.Quit,
-	)
+	}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg.(type) {
 	case tea.MsgKey:
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 	}
 	return nil
 }
 
-func (m *model) View(r tea.Renderer) {
-}
+func (m *model) View(r tea.Renderer) {}
 
 func Main() {
 	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {

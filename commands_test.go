@@ -74,35 +74,3 @@ func TestSequentially(t *testing.T) {
 		})
 	}
 }
-
-func TestBatch(t *testing.T) {
-	for name, test := range map[string]struct {
-		cmds        []Cmd
-		expectedLen int
-	}{
-		"nil cmd": {
-			cmds:        []Cmd{nil},
-			expectedLen: 0,
-		},
-		"empty cmd": {
-			cmds:        nil,
-			expectedLen: 0,
-		},
-		"single cmd": {
-			cmds:        []Cmd{Quit},
-			expectedLen: 1,
-		},
-		"mixed nil cmds": {
-			cmds:        []Cmd{nil, Quit, nil, Quit, nil, nil},
-			expectedLen: 2,
-		},
-	} {
-		t.Run(name, func(t *testing.T) {
-			if test.expectedLen == 0 {
-				assert.Nil(t, Batch(test.cmds...))
-			} else {
-				assert.Len(t, Batch(test.cmds...)(), test.expectedLen)
-			}
-		})
-	}
-}

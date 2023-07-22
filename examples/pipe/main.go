@@ -37,15 +37,15 @@ func newModel(initialValue string) *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return textinput.Blink
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{textinput.Blink}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	if key, ok := msg.(tea.MsgKey); ok {
 		switch key.Type {
 		case tea.KeyCtrlC, tea.KeyEscape, tea.KeyEnter:
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	}
 

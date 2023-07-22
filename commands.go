@@ -4,36 +4,6 @@ import (
 	"time"
 )
 
-// MsgBatch is a message used to perform a bunch of commands concurrently with
-// no ordering guarantees. You can send a MsgBatch with Batch.
-type MsgBatch []Cmd
-
-// Batch performs a bunch of commands concurrently with no ordering guarantees
-// about the results. Use a Batch to return several commands.
-func Batch(cmds ...Cmd) Cmd {
-	count := 0
-	for _, c := range cmds {
-		if c != nil {
-			count++
-		}
-	}
-
-	if count == 0 {
-		return nil
-	}
-
-	validCmds := make([]Cmd, 0, count)
-	for _, c := range cmds {
-		if c == nil {
-			continue
-		}
-		validCmds = append(validCmds, c)
-	}
-	return func() Msg {
-		return MsgBatch(validCmds)
-	}
-}
-
 // msgSequence is used internally to run the given commands in order.
 type msgSequence []Cmd
 

@@ -12,14 +12,6 @@ import (
 	"github.com/rprtr258/tea/bubbles/textarea"
 )
 
-func Main() {
-	p := tea.NewProgram(context.Background(), initialModel())
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
-}
-
 type msgErr error
 
 type model struct {
@@ -36,13 +28,12 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return textarea.Blink
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{textarea.Blink}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
-	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
@@ -52,17 +43,15 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 				m.textarea.Blur()
 			}
 		case tea.KeyCtrlC:
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		default:
 			if !m.textarea.Focused() {
-				cmd = m.textarea.Focus()
-				cmds = append(cmds, cmd)
+				cmds = append(cmds, m.textarea.Focus()...)
 			}
 		}
 	}
 
-	cmds = append(cmds, m.textarea.Update(msg))
-	return tea.Batch(cmds...)
+	return append(cmds, m.textarea.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {
@@ -71,4 +60,12 @@ func (m *model) View(r tea.Renderer) {
 		m.textarea.View(),
 		"(ctrl+c to quit)",
 	) + "\n\n")
+}
+
+func Main() {
+	p := tea.NewProgram(context.Background(), initialModel())
+
+	if _, err := p.Run(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }

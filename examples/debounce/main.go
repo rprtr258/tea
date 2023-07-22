@@ -27,19 +27,19 @@ type model struct {
 	tag int
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		// Increment the tag on the model...
 		m.tag++
-		return tea.Tick(debounceDuration, func(_ time.Time) tea.Msg {
+		return []tea.Cmd{tea.Tick(debounceDuration, func(_ time.Time) tea.Msg {
 			// ...and include a copy of that tag value in the message.
 			return msgExit(m.tag)
-		})
+		})}
 	case msgExit:
 		// If the tag in the message doesn't match the tag on the model then we
 		// know that this message was not the last one sent and another is on
@@ -47,7 +47,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 		// Otherwise, the debounce timeout has passed and this message is a
 		// valid debounced one.
 		if int(msg) == m.tag {
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 	}
 

@@ -21,36 +21,29 @@ type model struct {
 
 type (
 	msgStatus int
-	msgErr    error
+	msgErr    struct{ err error }
 )
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{})
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{checkServer}
 }
 
-func (m *model) Init() tea.Cmd {
-	return checkServer
-}
-
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		default:
 			return nil
 		}
 
 	case msgStatus:
 		m.status = int(msg)
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 
 	case msgErr:
-		m.err = msg
+		m.err = msg.err
 		return nil
 
 	default:
@@ -74,9 +67,16 @@ func checkServer() tea.Msg {
 	}
 	res, err := c.Get(url)
 	if err != nil {
-		return msgErr(err)
+		return msgErr{err}
 	}
 	defer res.Body.Close() // nolint:errcheck
 
 	return msgStatus(res.StatusCode)
+}
+
+func Main() {
+	p := tea.NewProgram(context.Background(), &model{})
+	if _, err := p.Run(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }

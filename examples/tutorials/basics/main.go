@@ -25,16 +25,16 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case "up", "k":
 			if m.cursor > 0 {
 				m.cursor--

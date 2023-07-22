@@ -53,15 +53,15 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return m.spinner.Tick
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{m.spinner.Tick}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 	case msgResult:
 		m.results = append(m.results[1:], msg)
 		return nil

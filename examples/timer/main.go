@@ -27,11 +27,11 @@ type keymap struct {
 	quit  key.Binding
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return m.timer.Init()
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case timer.MsgTick:
 		return m.timer.Update(msg)
@@ -44,17 +44,17 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 
 	case timer.MsgTimeout:
 		m.quitting = true
-		return tea.Quit
+		return []tea.Cmd{tea.Quit}
 
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case key.Matches(msg, m.keymap.reset):
 			m.timer.Timeout = timeout
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
-			return m.timer.Toggle()
+			return []tea.Cmd{m.timer.Toggle()}
 		}
 	}
 

@@ -29,44 +29,35 @@ var (
 	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
 )
 
-func Main() {
-	m := &model{}
-	m.resetSpinner()
-
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("could not run program:", err.Error())
-	}
-}
-
 type model struct {
 	index   int
 	spinner spinner.Model
 }
 
-func (m *model) Init() tea.Cmd {
-	return m.spinner.Tick
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{m.spinner.Tick}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case "h", "left":
 			m.index--
 			if m.index < 0 {
 				m.index = len(spinners) - 1
 			}
 			m.resetSpinner()
-			return m.spinner.Tick
+			return []tea.Cmd{m.spinner.Tick}
 		case "l", "right":
 			m.index++
 			if m.index >= len(spinners) {
 				m.index = 0
 			}
 			m.resetSpinner()
-			return m.spinner.Tick
+			return []tea.Cmd{m.spinner.Tick}
 		default:
 			return nil
 		}
@@ -93,4 +84,13 @@ func (m *model) View(r tea.Renderer) {
 	}
 
 	r.Write(fmt.Sprintf("\n %s%s%s\n\n%s", m.spinner.View(), gap, textStyle("Spinning..."), helpStyle("h/l, ←/→: change spinner • q: exit\n")))
+}
+
+func Main() {
+	m := &model{}
+	m.resetSpinner()
+
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
+		log.Fatalln("could not run program:", err.Error())
+	}
 }

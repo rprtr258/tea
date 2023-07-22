@@ -74,18 +74,18 @@ func newModel(timeout time.Duration) *mainModel {
 	}
 }
 
-func (m *mainModel) Init() tea.Cmd {
+func (m *mainModel) Init() []tea.Cmd {
 	// start the timer and spinner on program start
-	return tea.Batch(m.timer.Init(), m.spinner.Tick)
+	return append(m.timer.Init(), m.spinner.Tick)
 }
 
-func (m *mainModel) Update(msg tea.Msg) tea.Cmd {
+func (m *mainModel) Update(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case "tab":
 			if m.state == timerView {
 				m.state = spinnerView
@@ -95,7 +95,7 @@ func (m *mainModel) Update(msg tea.Msg) tea.Cmd {
 		case "n":
 			if m.state == timerView {
 				m.timer = timer.New(defaultTime)
-				cmds = append(cmds, m.timer.Init())
+				cmds = append(cmds, m.timer.Init()...)
 			} else {
 				m.Next()
 				m.resetSpinner()
@@ -105,16 +105,16 @@ func (m *mainModel) Update(msg tea.Msg) tea.Cmd {
 		switch m.state {
 		// update whichever model is focused
 		case spinnerView:
-			cmds = append(cmds, m.spinner.Update(msg))
+			cmds = append(cmds, m.spinner.Update(msg)...)
 		default:
-			cmds = append(cmds, m.timer.Update(msg))
+			cmds = append(cmds, m.timer.Update(msg)...)
 		}
 	case spinner.MsgTick:
-		cmds = append(cmds, m.spinner.Update(msg))
+		cmds = append(cmds, m.spinner.Update(msg)...)
 	case timer.MsgTick:
-		cmds = append(cmds, m.timer.Update(msg))
+		cmds = append(cmds, m.timer.Update(msg)...)
 	}
-	return tea.Batch(cmds...)
+	return cmds
 }
 
 func (m *mainModel) View(r tea.Renderer) {

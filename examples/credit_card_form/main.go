@@ -12,14 +12,6 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-func Main() {
-	p := tea.NewProgram(context.Background(), initialModel())
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
-}
-
 const (
 	ccn = iota
 	exp
@@ -123,23 +115,23 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return textinput.Blink
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{textinput.Blink}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
-	var cmds []tea.Cmd = make([]tea.Cmd, len(m.inputs))
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
+	var cmds []tea.Cmd = make([]tea.Cmd, 0, len(m.inputs))
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.focused == len(m.inputs)-1 {
-				return tea.Quit
+				return []tea.Cmd{tea.Quit}
 			}
 			m.nextInput()
 		case tea.KeyCtrlC, tea.KeyEsc:
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case tea.KeyShiftTab, tea.KeyCtrlP:
 			m.prevInput()
 		case tea.KeyTab, tea.KeyCtrlN:
@@ -152,9 +144,9 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 	}
 
 	for i := range m.inputs {
-		cmds[i] = m.inputs[i].Update(msg)
+		cmds = append(cmds, m.inputs[i].Update(msg)...)
 	}
-	return tea.Batch(cmds...)
+	return cmds
 }
 
 func (m *model) View(r tea.Renderer) {
@@ -190,5 +182,13 @@ func (m *model) prevInput() {
 	// Wrap around
 	if m.focused < 0 {
 		m.focused = len(m.inputs) - 1
+	}
+}
+
+func Main() {
+	p := tea.NewProgram(context.Background(), initialModel())
+
+	if _, err := p.Run(); err != nil {
+		log.Fatalln(err.Error())
 	}
 }

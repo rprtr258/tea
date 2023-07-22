@@ -184,7 +184,7 @@ func WithKeyMap(km KeyMap) Option {
 }
 
 // Update is the Bubble Tea update loop.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	if !m.focus {
 		return nil
 	}

@@ -145,7 +145,7 @@ func New() Model {
 var NewModel = New
 
 // Update is the Tea update function which binds keystrokes to pagination.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {

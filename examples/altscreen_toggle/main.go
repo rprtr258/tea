@@ -20,17 +20,17 @@ type model struct {
 	quitting  bool
 }
 
-func (m *model) Init() tea.Cmd {
+func (m *model) Init() []tea.Cmd {
 	return nil
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
 			m.quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		case " ":
 			var cmd tea.Cmd
 			if m.altscreen {
@@ -39,7 +39,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 				cmd = tea.EnterAltScreen
 			}
 			m.altscreen = !m.altscreen
-			return cmd
+			return []tea.Cmd{cmd}
 		}
 	}
 	return nil

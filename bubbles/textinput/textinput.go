@@ -224,7 +224,7 @@ func (m *Model) Focused() bool {
 
 // Focus sets the focus state on the model. When the model is in focus it can
 // receive keyboard input and the cursor will be shown.
-func (m *Model) Focus() tea.Cmd {
+func (m *Model) Focus() []tea.Cmd {
 	m.focus = true
 	return m.Cursor.Focus()
 }
@@ -526,7 +526,7 @@ func (m *Model) echoTransform(v string) string {
 }
 
 // Update is the Bubble Tea update loop.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	if !m.focus {
 		return nil
 	}
@@ -574,7 +574,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		case key.Matches(msg, m.KeyMap.DeleteBeforeCursor):
 			m.deleteBeforeCursor()
 		case key.Matches(msg, m.KeyMap.Paste):
-			return Paste
+			return []tea.Cmd{Paste}
 		case key.Matches(msg, m.KeyMap.DeleteWordForward):
 			m.deleteWordForward()
 		default:
@@ -589,14 +589,14 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 		m.Err = msg.err
 	}
 
-	cmds := []tea.Cmd{m.Cursor.Update(msg)}
+	cmds := m.Cursor.Update(msg)
 	if oldPos != m.pos && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
-		cmds = append(cmds, m.Cursor.BlinkCmd())
+		cmds = append(cmds, m.Cursor.BlinkCmd()...)
 	}
 
 	m.handleOverflow()
-	return tea.Batch(cmds...)
+	return cmds
 }
 
 // View renders the textinput in its current state.

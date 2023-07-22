@@ -117,11 +117,11 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return tea.EnterAltScreen
+func (m *model) Init() []tea.Cmd {
+	return []tea.Cmd{tea.EnterAltScreen}
 }
 
-func (m *model) Update(msg tea.Msg) tea.Cmd {
+func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
@@ -137,9 +137,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 
 		switch {
 		case key.Matches(msg, m.keys.toggleSpinner):
-			cmd := m.list.ToggleSpinner()
-			return cmd
-
+			return []tea.Cmd{m.list.ToggleSpinner()}
 		case key.Matches(msg, m.keys.toggleTitleBar):
 			v := !m.list.ShowTitle()
 			m.list.SetShowTitle(v)
@@ -164,14 +162,12 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 			newItem := m.itemGenerator.next()
 			insCmd := m.list.InsertItem(0, newItem)
 			statusCmd := m.list.NewStatusMessage(statusMessageStyle("Added " + newItem.Title()))
-			return tea.Batch(insCmd, statusCmd)
+			return []tea.Cmd{insCmd, statusCmd}
 		}
 	}
 
 	// This will also call our delegate's update function.
-	cmds = append(cmds, m.list.Update(msg))
-
-	return tea.Batch(cmds...)
+	return append(cmds, m.list.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {

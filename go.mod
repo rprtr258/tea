@@ -29,7 +29,6 @@ require (
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/yuin/goldmark v1.5.2
 	github.com/yuin/goldmark-emoji v1.0.1
-	golang.org/x/sync v0.1.0
 	golang.org/x/term v0.10.0
 )
 
