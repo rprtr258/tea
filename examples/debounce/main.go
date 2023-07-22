@@ -11,6 +11,7 @@ package debounce
 // normal. If not, we simply ignore the inbound message.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -59,7 +60,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
 		log.Fatalln("uh oh:", err.Error())
 	}
 }

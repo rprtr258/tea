@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -78,7 +79,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func main() {
-	p := tea.NewProgram(initialModel())
+	p := tea.NewProgram(context.Background(), initialModel())
 	if _, err := p.Run(); err != nil {
 		log.Fatalln("Alas, there's been an error:", err.Error())
 	}

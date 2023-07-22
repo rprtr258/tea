@@ -4,6 +4,7 @@ package textinputs
 // from the Bubbles component library.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -169,7 +170,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(initialModel()).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), initialModel()).Run(); err != nil {
 		log.Fatalln("could not start program:", err.Error())
 	}
 }

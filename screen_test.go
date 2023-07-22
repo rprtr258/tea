@@ -2,6 +2,7 @@ package tea
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -51,7 +52,7 @@ func TestMsgClear(t *testing.T) {
 				in  bytes.Buffer
 				out bytes.Buffer
 			)
-			p := NewProgram(&testModel{}).WithInput(&in).WithOutput(&out)
+			p := NewProgram(context.Background(), &testModel{}).WithInput(&in).WithOutput(&out)
 
 			go p.Send(append(test.cmds, Quit))
 

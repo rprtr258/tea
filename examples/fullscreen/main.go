@@ -4,6 +4,7 @@ package fullscreen
 // from 5 and then exits.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -17,7 +18,7 @@ type msgTick time.Time
 
 func Main() {
 	m := model(5)
-	p := tea.NewProgram(&m).WithAltScreen()
+	p := tea.NewProgram(context.Background(), &m).WithAltScreen()
 	if _, err := p.Run(); err != nil {
 		log.Fatalln(err.Error())
 	}

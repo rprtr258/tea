@@ -1,6 +1,7 @@
 package progress_download
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -92,7 +93,7 @@ func Main() {
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
 	// Start Bubble Tea
-	p = tea.NewProgram(m)
+	p = tea.NewProgram(context.Background(), m)
 
 	// Start the download
 	go pw.Start()

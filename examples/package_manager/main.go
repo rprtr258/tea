@@ -1,6 +1,7 @@
 package package_manager
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/rand"
@@ -123,7 +124,7 @@ func max(a, b int) int {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
 		log.Fatalln("Error running program:", err.Error())
 	}
 }

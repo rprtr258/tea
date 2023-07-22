@@ -1,6 +1,7 @@
 package list_simple
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -121,7 +122,7 @@ func Main() {
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpStyle
 
-	if _, err := tea.NewProgram(&model{list: l}).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), &model{list: l}).Run(); err != nil {
 		log.Fatalln("Error running program:", err.Error())
 	}
 }

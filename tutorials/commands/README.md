@@ -147,7 +147,7 @@ The only thing left to do is run the program, so let's do that! Our initial mode
 
 ```go
 func main() {
-    if _, err := tea.NewProgram(model{}).Run(); err != nil {
+    if _, err := tea.NewProgram(context.Background(), model{}).Run(); err != nil {
         log.Fatalln("Uh oh, there was an error:", err.Error())
     }
 }

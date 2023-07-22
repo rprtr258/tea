@@ -4,6 +4,7 @@ package result
 // program after the Bubble Tea has exited.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -70,7 +71,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(&model{})
+	p := tea.NewProgram(context.Background(), &model{})
 
 	// Run returns the model as a tea.Model.
 	m, err := p.Run()

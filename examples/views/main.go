@@ -7,6 +7,7 @@ package views
 // implementing a progress bar from scratch here.
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"strconv"
@@ -39,7 +40,7 @@ var (
 )
 
 func Main() {
-	p := tea.NewProgram(&model{0, false, 10, 0, 0, false, false})
+	p := tea.NewProgram(context.Background(), &model{0, false, 10, 0, 0, false, false})
 	if _, err := p.Run(); err != nil {
 		fmt.Println("could not start program:", err)
 	}

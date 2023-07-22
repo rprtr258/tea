@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -69,7 +70,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func main() {
-	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
 		log.Fatalln("Uh oh, there was an error:", err.Error())
 	}
 }

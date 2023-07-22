@@ -1,6 +1,7 @@
 package glamour
 
 import (
+	"context"
 	"log"
 
 	"github.com/rprtr258/tea"
@@ -116,7 +117,7 @@ func Main() {
 		log.Fatalln("Could not initialize Bubble Tea model:", err.Error())
 	}
 
-	if _, err := tea.NewProgram(model).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), model).Run(); err != nil {
 		log.Fatalln("Bummer, there's been an error:", err.Error())
 	}
 }

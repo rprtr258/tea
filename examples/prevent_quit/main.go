@@ -3,6 +3,7 @@ package prevent_quit
 // A program demonstrating how to use the WithFilter option to intercept events.
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -21,7 +22,7 @@ var (
 
 func Main() {
 	if _, err := tea.
-		NewProgram(initialModel()).
+		NewProgram(context.Background(), initialModel()).
 		WithFilter(func(m *model, msg tea.Msg) tea.Msg {
 			if _, ok := msg.(tea.MsgQuit); !ok {
 				return msg

@@ -181,17 +181,13 @@ func Quit() Msg {
 }
 
 // NewProgram creates a new Program.
-func NewProgram[M Model](model M) *Program[M] {
+func NewProgram[M Model](ctx context.Context, model M) *Program[M] {
 	p := &Program[M]{
 		initialModel: model,
 		msgs:         make(chan Msg),
+		ctx:          ctx,
 	}
 
-	// A context can be provided with a ProgramOption, but if none was provided
-	// we'll use the default background context.
-	if p.ctx == nil {
-		p.ctx = context.Background() // TODO: remove
-	}
 	// Initialize context and teardown channel.
 	p.ctx, p.cancel = context.WithCancel(p.ctx)
 

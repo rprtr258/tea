@@ -4,6 +4,7 @@ package realtime
 // through a channel.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/rand"
@@ -76,7 +77,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(&model{
+	p := tea.NewProgram(context.Background(), &model{
 		sub:     make(chan struct{}),
 		spinner: spinner.New(),
 	})

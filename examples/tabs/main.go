@@ -1,6 +1,7 @@
 package tabs
 
 import (
+	"context"
 	"log"
 	"strings"
 
@@ -92,7 +93,7 @@ func Main() {
 	tabs := []string{"Lip Gloss", "Blush", "Eye Shadow", "Mascara", "Foundation"}
 	tabContent := []string{"Lip Gloss Tab", "Blush Tab", "Eye Shadow Tab", "Mascara Tab", "Foundation Tab"}
 	m := &model{Tabs: tabs, TabContent: tabContent}
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
 		log.Fatalln("Error running program:", err.Error())
 	}
 }

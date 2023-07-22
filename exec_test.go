@@ -2,6 +2,7 @@ package tea
 
 import (
 	"bytes"
+	"context"
 	"os/exec"
 	"testing"
 
@@ -57,7 +58,7 @@ func TestTeaExec(t *testing.T) {
 			var in bytes.Buffer
 
 			m := &testExecModel{cmd: test.cmd}
-			_, err := NewProgram(m).WithInput(&in).WithOutput(&buf).Run()
+			_, err := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf).Run()
 			assert.NoError(t, err)
 			assert.IsType(t, test.expectErr, m.err)
 		})

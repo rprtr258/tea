@@ -3,6 +3,7 @@ package sequence
 // A simple example illustrating how to run a series of commands in order.
 
 import (
+	"context"
 	"log"
 
 	"github.com/rprtr258/tea"
@@ -34,7 +35,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(&model{}).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
 		log.Fatalln("Uh oh:", err.Error())
 	}
 }

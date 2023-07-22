@@ -1,19 +1,10 @@
 package tea
 
 import (
-	"context"
 	"io"
 
 	"github.com/muesli/termenv"
 )
-
-// WithContext lets you specify a context in which to run the Program. This is
-// useful if you want to cancel the execution from outside. When a Program gets
-// cancelled it will exit with an error ErrProgramKilled.
-func (p *Program[M]) WithContext(ctx context.Context) *Program[M] {
-	p.ctx = ctx
-	return p
-}
 
 // WithOutput sets the output which, by default, is stdout. In most cases you
 // won't need to use this.
@@ -148,7 +139,7 @@ func (p *Program[M]) WithANSICompressor() *Program[M] {
 //
 // Example:
 //
-//	tea.NewProgram(Model{}).
+//	tea.NewProgram(context.Background(), model{}).
 //		.WithFilter(func (m tea.Model, msg tea.Msg) tea.Msg {
 //			if _, ok := msg.(tea.QuitMsg); !ok {
 //				return msg

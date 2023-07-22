@@ -1,6 +1,7 @@
 package timer
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -111,7 +112,7 @@ func Main() {
 	}
 	m.keymap.start.SetEnabled(false)
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
 		log.Fatalln("Uh oh, we encountered an error:", err.Error())
 	}
 }

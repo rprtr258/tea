@@ -7,6 +7,7 @@ package pipe
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -84,7 +85,7 @@ func Main() {
 
 	model := newModel(strings.TrimSpace(sb.String()))
 
-	if _, err := tea.NewProgram(model).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), model).Run(); err != nil {
 		log.Fatalln("Couldn't start program:", err.Error())
 	}
 }

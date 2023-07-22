@@ -1,6 +1,7 @@
 package split_editors
 
 import (
+	"context"
 	"log"
 
 	"github.com/rprtr258/tea"
@@ -194,7 +195,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	if _, err := tea.NewProgram(newModel()).WithAltScreen().Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), newModel()).WithAltScreen().Run(); err != nil {
 		log.Fatalln("Error while running program:", err.Error())
 	}
 }

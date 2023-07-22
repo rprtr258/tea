@@ -47,7 +47,7 @@ func TestTeaModel(t *testing.T) {
 	in := bytes.NewBuffer([]byte("q"))
 
 	var buf bytes.Buffer
-	_, err := NewProgram(&testModel{}).WithInput(in).WithOutput(&buf).Run()
+	_, err := NewProgram(context.Background(), &testModel{}).WithInput(in).WithOutput(&buf).Run()
 	assert.NoError(t, err)
 
 	assert.NotEmpty(t, buf.Bytes())
@@ -58,7 +58,7 @@ func TestTeaQuit(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
@@ -79,7 +79,7 @@ func TestTeaWithFilter(t *testing.T) {
 
 		m := &testModel{}
 		shutdowns := uint32(0)
-		p := NewProgram(m).
+		p := NewProgram(context.Background(), m).
 			WithInput(&bytes.Buffer{}).
 			WithOutput(&bytes.Buffer{}).
 			WithFilter(func(_ *testModel, msg Msg) Msg {
@@ -110,7 +110,7 @@ func TestTeaKill(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
@@ -131,7 +131,7 @@ func TestTeaContext(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithContext(ctx).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(ctx, m).WithInput(&in).WithOutput(&buf)
 	go func() {
 		for {
 			time.Sleep(time.Millisecond)
@@ -155,7 +155,7 @@ func TestMsgBatch(t *testing.T) {
 	}
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go func() {
 		p.Send(MsgBatch{inc, inc})
 
@@ -183,7 +183,7 @@ func TestMsgSequence(t *testing.T) {
 	}
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go p.Send(msgSequence{inc, inc, Quit})
 
 	_, err := p.Run()
@@ -203,7 +203,7 @@ func TestMsgSequenceWithMsgBatch(t *testing.T) {
 	}
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 	go p.Send(msgSequence{batch, inc, Quit})
 
 	_, err := p.Run()
@@ -216,7 +216,7 @@ func TestTeaSend(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	p := NewProgram(m).WithInput(&in).WithOutput(&buf)
+	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 
 	// sending before the program is started is a blocking operation
 	go p.Send(Quit())
@@ -233,5 +233,5 @@ func TestTeaNoRun(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	NewProgram(m).WithInput(&in).WithOutput(&buf)
+	NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
 }

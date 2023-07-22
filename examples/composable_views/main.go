@@ -1,6 +1,7 @@
 package composable_views
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -150,7 +151,7 @@ func (m *mainModel) resetSpinner() {
 }
 
 func Main() {
-	p := tea.NewProgram(newModel(defaultTime))
+	p := tea.NewProgram(context.Background(), newModel(defaultTime))
 
 	if _, err := p.Run(); err != nil {
 		log.Fatalln(err.Error())

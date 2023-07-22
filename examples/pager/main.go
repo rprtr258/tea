@@ -4,6 +4,7 @@ package pager
 // component library.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -132,7 +133,7 @@ func Main() {
 		log.Fatalln("could not load file:", err.Error())
 	}
 
-	p := tea.NewProgram(&model{content: string(content)}).
+	p := tea.NewProgram(context.Background(), &model{content: string(content)}).
 		WithAltScreen().      // use the full size of the terminal in its "alternate screen buffer"
 		WithMouseCellMotion() // turn on mouse support so we can track the mouse wheel
 

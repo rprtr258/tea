@@ -5,6 +5,7 @@ package cellbuffer
 // double-width runes.
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
@@ -182,7 +183,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(&model{
+	p := tea.NewProgram(context.Background(), &model{
 		spring: harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
 	}).WithAltScreen().WithMouseCellMotion()
 	if _, err := p.Run(); err != nil {

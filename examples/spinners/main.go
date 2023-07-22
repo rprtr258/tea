@@ -1,6 +1,7 @@
 package spinners
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -32,7 +33,7 @@ func Main() {
 	m := &model{}
 	m.resetSpinner()
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
 		log.Fatalln("could not run program:", err.Error())
 	}
 }

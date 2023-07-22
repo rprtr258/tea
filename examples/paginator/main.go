@@ -4,6 +4,7 @@ package paginator
 // component library.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -67,7 +68,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(newModel())
+	p := tea.NewProgram(context.Background(), newModel())
 	if _, err := p.Run(); err != nil {
 		log.Fatalln(err.Error())
 	}

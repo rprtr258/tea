@@ -4,6 +4,7 @@ package send_msg
 // from outside the program using Program.Send(Msg).
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/rand"
@@ -98,7 +99,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	p := tea.NewProgram(newModel())
+	p := tea.NewProgram(context.Background(), newModel())
 
 	// Simulate activity
 	go func() {

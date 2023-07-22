@@ -8,6 +8,7 @@ package progress_animated
 // transitions. For details on that approach see the progress-static example.
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
@@ -83,7 +84,7 @@ func Main() {
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
 		log.Fatalln("Oh no!", err.Error())
 	}
 }

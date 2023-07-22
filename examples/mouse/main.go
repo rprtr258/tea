@@ -4,6 +4,7 @@ package mouse
 // coordinates and events.
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func Main() {
-	p := tea.NewProgram(&model{}).WithAltScreen().WithMouseAllMotion()
+	p := tea.NewProgram(context.Background(), &model{}).WithAltScreen().WithMouseAllMotion()
 	if _, err := p.Run(); err != nil {
 		log.Fatalln(err.Error())
 	}

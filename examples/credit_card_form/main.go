@@ -1,6 +1,7 @@
 package credit_card_form
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -12,7 +13,7 @@ import (
 )
 
 func Main() {
-	p := tea.NewProgram(initialModel())
+	p := tea.NewProgram(context.Background(), initialModel())
 
 	if _, err := p.Run(); err != nil {
 		log.Fatalln(err.Error())

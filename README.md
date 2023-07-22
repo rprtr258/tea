@@ -230,7 +230,7 @@ The last step is to simply run our program. We pass our initial model to
 
 ```go
 func main() {
-    p := tea.NewProgram(initialModel())
+    p := tea.NewProgram(context.Background(), initialModel())
     if _, err := p.Run(); err != nil {
         log.Fatalln("Alas, there's been an error:", err.Error())
     }

@@ -1,6 +1,7 @@
 package tui_daemon_combo
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -34,7 +35,7 @@ func Main() {
 		return
 	}
 
-	p := tea.NewProgram(newModel())
+	p := tea.NewProgram(context.Background(), newModel())
 	if daemonMode || !isatty.IsTerminal(os.Stdout.Fd()) {
 		// If we're in daemon mode don't render the TUI
 		p = p.WithoutRenderer()

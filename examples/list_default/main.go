@@ -1,6 +1,7 @@
 package list_default
 
 import (
+	"context"
 	"log"
 
 	"github.com/rprtr258/tea"
@@ -76,7 +77,7 @@ func Main() {
 	}
 	m.list.Title = "My Fave Things"
 
-	p := tea.NewProgram(m).WithAltScreen()
+	p := tea.NewProgram(context.Background(), m).WithAltScreen()
 
 	if _, err := p.Run(); err != nil {
 		log.Fatalln("Error running program:", err.Error())

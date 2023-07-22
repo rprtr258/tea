@@ -1,6 +1,7 @@
 package help
 
 import (
+	"context"
 	"log"
 	"os"
 	"strings"
@@ -140,7 +141,7 @@ func Main() {
 		defer f.Close() // nolint:errcheck
 	}
 
-	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
 		log.Fatalf("Could not start program :(\n%s\n", err.Error())
 	}
 }

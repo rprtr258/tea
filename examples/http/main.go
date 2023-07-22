@@ -3,6 +3,7 @@ package http
 // A simple program that makes a GET request and prints the response status.
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,7 +25,7 @@ type (
 )
 
 func Main() {
-	p := tea.NewProgram(&model{})
+	p := tea.NewProgram(context.Background(), &model{})
 	if _, err := p.Run(); err != nil {
 		log.Fatalln(err.Error())
 	}

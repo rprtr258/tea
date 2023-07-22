@@ -1,7 +1,6 @@
 package cursor
 
 import (
-	"context"
 	"time"
 
 	"github.com/rprtr258/tea/lipgloss"
@@ -19,15 +18,6 @@ type msgInitialBlink struct{}
 type MsgBlink struct {
 	id  int
 	tag int
-}
-
-// blinkCanceled is sent when a blink operation is canceled.
-type blinkCanceled struct{}
-
-// blinkCtx manages cursor blinking.
-type blinkCtx struct {
-	ctx    context.Context //nolint:containedctx
-	cancel context.CancelFunc
 }
 
 // Mode describes the behavior of the cursor.
@@ -52,7 +42,7 @@ func (c Mode) String() string {
 
 // Model is the Bubble Tea model for this cursor element.
 type Model struct {
-	BlinkSpeed time.Duration
+	// BlinkSpeed time.Duration
 	// Style for styling the cursor block.
 	Style lipgloss.Style
 	// TextStyle is the style used for the cursor when it is hidden (when blinking).
@@ -68,7 +58,7 @@ type Model struct {
 	// Cursor Blink state.
 	Blink bool
 	// Used to manage cursor blink
-	blinkCtx *blinkCtx
+	blinkCtx *time.Ticker
 	// The ID of the blink message we're expecting to receive.
 	blinkTag int
 	// mode determines the behavior of the cursor
@@ -78,14 +68,12 @@ type Model struct {
 // New creates a new model with default settings.
 func New() Model {
 	return Model{
-		BlinkSpeed: defaultBlinkSpeed,
+		// BlinkSpeed: defaultBlinkSpeed,
 
 		Blink: true,
 		mode:  CursorBlink,
 
-		blinkCtx: &blinkCtx{
-			ctx: context.Background(),
-		},
+		blinkCtx: time.NewTicker(defaultBlinkSpeed),
 	}
 }
 
@@ -122,9 +110,6 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 			cmd = m.BlinkCmd()
 		}
 		return cmd
-
-	case blinkCanceled: // no-op
-		return nil
 	}
 	return nil
 }
@@ -153,22 +138,13 @@ func (m *Model) BlinkCmd() tea.Cmd {
 		return nil
 	}
 
-	if m.blinkCtx != nil && m.blinkCtx.cancel != nil {
-		m.blinkCtx.cancel()
-	}
-
-	ctx, cancel := context.WithTimeout(m.blinkCtx.ctx, m.BlinkSpeed)
-	m.blinkCtx.cancel = cancel
+	m.blinkCtx.Reset(defaultBlinkSpeed)
 
 	m.blinkTag++
 
 	return func() tea.Msg {
-		defer cancel()
-		<-ctx.Done()
-		if ctx.Err() == context.DeadlineExceeded {
-			return MsgBlink{id: m.id, tag: m.blinkTag}
-		}
-		return blinkCanceled{}
+		<-m.blinkCtx.C
+		return MsgBlink{id: m.id, tag: m.blinkTag}
 	}
 }
 

@@ -3,6 +3,7 @@ package teatest
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -128,7 +129,7 @@ func NewTestModel[M tea.Model](t *testing.T, m M, options ...TestOption) *TestMo
 		doneCh:  make(chan bool, 1),
 	}
 
-	tm.program = tea.NewProgram(m).
+	tm.program = tea.NewProgram(context.Background(), m).
 		WithInput(tm.in).
 		WithOutput(tm.out).
 		WithoutSignals()

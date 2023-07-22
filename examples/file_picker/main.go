@@ -1,6 +1,7 @@
 package file_picker
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -89,6 +90,6 @@ func Main() {
 	m := &model{
 		filepicker: fp,
 	}
-	mm, _ := tea.NewProgram(m).WithOutput(os.Stderr).Run()
+	mm, _ := tea.NewProgram(context.Background(), m).WithOutput(os.Stderr).Run()
 	fmt.Println("\n  You selected: " + m.filepicker.Styles.Selected.Render(mm.selectedFile) + "\n")
 }

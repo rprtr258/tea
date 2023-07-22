@@ -1,6 +1,7 @@
 package table
 
 import (
+	"context"
 	"log"
 
 	"github.com/rprtr258/tea"
@@ -173,7 +174,7 @@ func Main() {
 		Bold(false)
 	t.SetStyles(s)
 
-	if _, err := tea.NewProgram(&model{t}).Run(); err != nil {
+	if _, err := tea.NewProgram(context.Background(), &model{t}).Run(); err != nil {
 		log.Fatalln("Error running program:", err.Error())
 	}
 }
