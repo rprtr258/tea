@@ -31,8 +31,6 @@ func (m *initCmdModel) View(r Renderer) {
 
 //nolint:lll
 func TestMsgClear(t *testing.T) {
-	t.Parallel()
-
 	for name, test := range map[string]struct {
 		cmds     []Cmd
 		expected string
@@ -72,11 +70,11 @@ func TestMsgClear(t *testing.T) {
 	} {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
 			var in bytes.Buffer
 			var out bytes.Buffer
-			p := NewProgram(context.Background(), &initCmdModel{append(test.cmds, Quit)}).WithInput(&in).WithOutput(&out)
+			p := NewProgram(context.Background(), &initCmdModel{append(test.cmds, Quit)}).
+				WithInput(&in).
+				WithOutput(&out)
 
 			_, err := p.Run()
 			assert.NoError(t, err)
