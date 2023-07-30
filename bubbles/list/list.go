@@ -199,8 +199,7 @@ type Model[I Item] struct {
 func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I] {
 	styles := DefaultStyles()
 
-	sp := spinner.New()
-	sp.Spinner = spinner.Line
+	sp := spinner.New(spinner.WithSpinner(spinner.Line))
 	sp.Style = styles.Spinner
 
 	filterInput := textinput.New()

@@ -22,6 +22,7 @@ var (
 		spinner.Globe,
 		spinner.Moon,
 		spinner.Monkey,
+		spinner.Circle,
 	}
 
 	textStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Render
