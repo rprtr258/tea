@@ -2,7 +2,7 @@ package menu
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/viewport"
@@ -111,13 +111,12 @@ func (e *model) helpView() string {
 	return helpStyle("\n  ↑/↓: Navigate • q: Quit\n")
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	model, err := newExample()
 	if err != nil {
-		log.Fatalln("Could not initialize Bubble Tea model:", err.Error())
+		return fmt.Errorf("initialize model: %w", err)
 	}
 
-	if _, err := tea.NewProgram(context.Background(), model).Run(); err != nil {
-		log.Fatalln("Bummer, there's been an error:", err.Error())
-	}
+	_, err = tea.NewProgram(ctx, model).Run()
+	return err
 }

@@ -10,6 +10,7 @@ package ssh
 // For details on wish see: https://github.com/charmbracelet/wish/
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -180,7 +181,7 @@ func handler(next ssh.Handler) ssh.Handler {
 	}
 }
 
-func Main() {
+func Main(context.Context) error {
 	port := 3456
 	s, err := wish.NewServer(
 		wish.WithAddress(fmt.Sprintf(":%d", port)),
@@ -188,9 +189,10 @@ func Main() {
 		wish.WithMiddleware(handler, lm.Middleware()),
 	)
 	if err != nil {
-		log.Fatalln(err.Error())
+		return err
 	}
+
 	log.Printf("SSH server listening on port %d", port)
 	log.Printf("To connect from your local machine run: ssh localhost -p %d", port)
-	log.Fatalln(s.ListenAndServe().Error())
+	return s.ListenAndServe()
 }

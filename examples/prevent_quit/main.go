@@ -5,7 +5,6 @@ package prevent_quit
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
@@ -131,9 +130,9 @@ func (m *model) View(r tea.Renderer) {
 	) + "\n\n")
 }
 
-func Main() {
-	if _, err := tea.
-		NewProgram(context.Background(), initialModel()).
+func Main(ctx context.Context) error {
+	_, err := tea.
+		NewProgram(ctx, initialModel()).
 		WithFilter(func(m *model, msg tea.Msg) tea.Msg {
 			if _, ok := msg.(tea.MsgQuit); !ok {
 				return msg
@@ -145,7 +144,6 @@ func Main() {
 
 			return nil
 		}).
-		Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+		Run()
+	return err
 }

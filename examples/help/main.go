@@ -132,7 +132,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" + status + strings.Repeat("\n", height) + helpView)
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	if os.Getenv("HELP_DEBUG") != "" {
 		f, err := tea.LogToFile("debug.log", "help")
 		if err != nil {
@@ -141,7 +141,6 @@ func Main() {
 		defer f.Close() // nolint:errcheck
 	}
 
-	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
-		log.Fatalf("Could not start program :(\n%s\n", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, newModel()).Run()
+	return err
 }

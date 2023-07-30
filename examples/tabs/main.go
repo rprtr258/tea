@@ -2,7 +2,6 @@ package tabs
 
 import (
 	"context"
-	"log"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -103,11 +102,10 @@ func min(a, b int) int {
 	return b
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	tabs := []string{"Lip Gloss", "Blush", "Eye Shadow", "Mascara", "Foundation"}
 	tabContent := []string{"Lip Gloss Tab", "Blush Tab", "Eye Shadow Tab", "Mascara Tab", "Foundation Tab"}
 	m := &model{Tabs: tabs, TabContent: tabContent}
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, m).Run()
+	return err
 }

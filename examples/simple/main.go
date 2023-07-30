@@ -55,7 +55,7 @@ func tickCmd() tea.Msg {
 	return msgTick{}
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	// Log to a file. Useful in debugging since you can't really log to stdout.
 	// Not required.
 	logfilePath := os.Getenv("tea_LOG")
@@ -67,8 +67,6 @@ func Main() {
 
 	// Initialize our program
 	m := model(5)
-	p := tea.NewProgram(context.Background(), &m)
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+	_, err := tea.NewProgram(ctx, &m).Run()
+	return err
 }

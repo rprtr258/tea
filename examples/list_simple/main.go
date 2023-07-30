@@ -4,14 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/list"
 	"github.com/rprtr258/tea/lipgloss"
 )
-
-const listHeight = 14
 
 var (
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
@@ -90,7 +87,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" + m.list.View())
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	items := []item{
 		"Ramen",
 		"Tomato Soup",
@@ -104,7 +101,10 @@ func Main() {
 		"Just Wine",
 	}
 
-	const defaultWidth = 20
+	const (
+		listHeight   = 14
+		defaultWidth = 20
+	)
 
 	l := list.New[item](items, itemDelegate{}, defaultWidth, listHeight)
 	l.Title = "What do you want for dinner?"
@@ -114,7 +114,6 @@ func Main() {
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpStyle
 
-	if _, err := tea.NewProgram(context.Background(), &model{list: l}).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, &model{list: l}).Run()
+	return err
 }

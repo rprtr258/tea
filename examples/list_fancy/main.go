@@ -2,7 +2,6 @@ package list_fancy
 
 import (
 	"context"
-	"log"
 	"math/rand"
 	"time"
 
@@ -174,10 +173,9 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(appStyle.Render(m.list.View()))
 }
 
-func Main() {
-	rand.Seed(time.Now().UTC().UnixNano())
+func Main(ctx context.Context) error {
+	rand.Seed(time.Now().UnixNano())
 
-	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, newModel()).Run()
+	return err
 }

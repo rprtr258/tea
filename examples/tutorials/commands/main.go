@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -69,8 +68,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" + s + "\n\n")
 }
 
-func Main() {
-	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
-		log.Fatalln("Uh oh, there was an error:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{}).Run()
+	return err
 }

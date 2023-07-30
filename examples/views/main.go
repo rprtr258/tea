@@ -276,9 +276,7 @@ func colorFloatToHex(f float64) string {
 	return s
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{0, false, 10, 0, 0, false, false})
-	if _, err := p.Run(); err != nil {
-		fmt.Println("could not start program:", err)
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{0, false, 10, 0, 0, false, false}).Run()
+	return err
 }

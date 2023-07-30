@@ -2,6 +2,7 @@ package progress_download
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -51,13 +52,13 @@ func getResponse(url string) (*http.Response, error) {
 	return resp, nil
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	url := flag.String("url", "", "url for the file to download")
 	flag.Parse()
 
 	if *url == "" {
 		flag.Usage()
-		os.Exit(1)
+		return errors.New("url is required")
 	}
 
 	resp, err := getResponse(*url)
@@ -69,13 +70,13 @@ func Main() {
 	// Don't add TUI if the header doesn't include content size
 	// it's impossible see progress without total
 	if resp.ContentLength <= 0 {
-		log.Fatalln("can't parse content length, aborting download")
+		return errors.New("can't parse content length, aborting download")
 	}
 
 	filename := filepath.Base(*url)
 	file, err := os.Create(filename)
 	if err != nil {
-		log.Fatalln("could not create file:", err.Error())
+		return fmt.Errorf("create file: %w", err)
 	}
 	defer file.Close() // nolint:errcheck
 
@@ -88,17 +89,14 @@ func Main() {
 		},
 	}
 
+	// Start the download
+	go pw.Start()
+
 	m := &model{
 		pw:       pw,
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
-	// Start Bubble Tea
-	p = tea.NewProgram(context.Background(), m)
 
-	// Start the download
-	go pw.Start()
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("error running program:", err.Error())
-	}
+	_, err = tea.NewProgram(ctx, m).Run()
+	return err
 }

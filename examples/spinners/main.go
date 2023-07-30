@@ -3,7 +3,6 @@ package spinners
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
@@ -91,11 +90,10 @@ func (m *model) View(r tea.Renderer) {
 	))
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	m := &model{}
 	m.resetSpinner()
 
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("could not run program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, m).Run()
+	return err
 }

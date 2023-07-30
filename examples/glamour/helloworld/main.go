@@ -1,12 +1,13 @@
 package helloworld
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/rprtr258/tea/glamour"
 )
 
-func Main() {
+func Main(context.Context) error {
 	in := `# Hello World
 
 This is a simple example of Markdown rendering with Glamour!
@@ -17,4 +18,5 @@ Bye!
 
 	out, _ := glamour.Render(in, "dark")
 	fmt.Print(out)
+	return nil
 }

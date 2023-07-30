@@ -8,9 +8,9 @@ package pipe
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 
@@ -59,14 +59,14 @@ func (m *model) View(r tea.Renderer) {
 	))
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	stat, err := os.Stdin.Stat()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if stat.Mode()&os.ModeNamedPipe == 0 && stat.Size() == 0 {
-		log.Fatalln("Try piping in some text.")
+		return errors.New("Try piping in some text.")
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -77,15 +77,12 @@ func Main() {
 		if err != nil && err == io.EOF {
 			break
 		}
-		_, err = sb.WriteRune(r)
-		if err != nil {
-			log.Fatalln("Error getting input:", err.Error())
-		}
+
+		sb.WriteRune(r)
 	}
 
 	model := newModel(strings.TrimSpace(sb.String()))
 
-	if _, err := tea.NewProgram(context.Background(), model).Run(); err != nil {
-		log.Fatalln("Couldn't start program:", err.Error())
-	}
+	_, err = tea.NewProgram(ctx, model).Run()
+	return err
 }

@@ -82,7 +82,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(s.String())
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	fp := filepicker.New()
 	fp.AllowedTypes = []string{".mod", ".sum", ".go", ".txt", ".md"}
 	fp.CurrentDirectory, _ = os.UserHomeDir()
@@ -90,6 +90,14 @@ func Main() {
 	m := &model{
 		filepicker: fp,
 	}
-	mm, _ := tea.NewProgram(context.Background(), m).WithOutput(os.Stderr).Run()
-	fmt.Println("\n  You selected: " + m.filepicker.Styles.Selected.Render(mm.selectedFile) + "\n")
+	mm, err := tea.NewProgram(ctx, m).WithOutput(os.Stderr).Run()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf(
+		"\n  You selected: %s\n\n",
+		m.filepicker.Styles.Selected.Render(mm.selectedFile),
+	)
+	return nil
 }

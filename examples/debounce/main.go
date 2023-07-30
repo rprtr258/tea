@@ -13,7 +13,6 @@ package debounce
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -59,8 +58,7 @@ func (m *model) View(r tea.Renderer) {
 		"\nTo exit press any key, then wait for one second without pressing anything.")
 }
 
-func Main() {
-	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
-		log.Fatalln("uh oh:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{}).Run()
+	return err
 }

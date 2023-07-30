@@ -3,6 +3,7 @@ package layout
 // This example demonstrates various Lip Gloss style and layout features.
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -221,7 +222,7 @@ func max(a, b int) int {
 	return b
 }
 
-func Main() {
+func Main(context.Context) error {
 	physicalWidth, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	doc := strings.Builder{}
 
@@ -370,4 +371,5 @@ func Main() {
 
 	// Okay, let's print it
 	fmt.Println(docStyle.Render(doc.String()))
+	return nil
 }

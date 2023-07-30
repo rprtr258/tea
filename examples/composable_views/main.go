@@ -3,7 +3,6 @@ package composable_views
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -150,10 +149,7 @@ func (m *mainModel) resetSpinner() {
 	m.spinner.Spinner = spinners[m.index]
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), newModel(defaultTime))
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, newModel(defaultTime)).Run()
+	return err
 }

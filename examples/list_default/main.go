@@ -2,7 +2,6 @@ package list_default
 
 import (
 	"context"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/list"
@@ -45,7 +44,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(docStyle.Render(m.list.View()))
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	items := []item{
 		{title: "Raspberry Pi’s", desc: "I have ’em all over my house"},
 		{title: "Nutella", desc: "It's good on toast"},
@@ -77,9 +76,9 @@ func Main() {
 	}
 	m.list.Title = "My Fave Things"
 
-	p := tea.NewProgram(context.Background(), m).WithAltScreen()
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+	_, err := tea.
+		NewProgram(context.Background(), m).
+		WithAltScreen().
+		Run()
+	return err
 }
