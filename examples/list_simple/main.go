@@ -61,7 +61,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 		return nil
 	case tea.MsgKey:
 		switch msg.String() {
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			m.quitting = true
 			return []tea.Cmd{tea.Quit}
 		case "enter":
