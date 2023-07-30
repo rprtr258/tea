@@ -204,7 +204,7 @@ func TestRGBA(t *testing.T) {
 			r.SetColorProfile(test.profile)
 			r.SetHasDarkBackground(test.darkBg)
 
-			r, g, b, _ := test.input.RGBA()
+			r, g, b, _ := termenv.ConvertToRGB(test.input.color(_renderer)).RGBA()
 			o := uint(r/256)<<16 + uint(g/256)<<8 + uint(b/256)
 			assert.Equal(t, test.expected, o)
 		})
