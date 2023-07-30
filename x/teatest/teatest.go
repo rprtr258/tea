@@ -93,14 +93,16 @@ func doWaitFor(r io.Reader, condition func(bts []byte) bool, options ...WaitForO
 		opt(&wf)
 	}
 
+	ticker := time.NewTicker(wf.CheckInterval)
+	defer ticker.Stop()
+
 	var sb bytes.Buffer
 	timeoutCh := time.After(wf.Duration)
-	tickCh := time.Tick(wf.CheckInterval)
 	for {
 		select {
 		case <-timeoutCh:
 			return fmt.Errorf("WaitFor: condition not met after %s", wf.Duration)
-		case <-tickCh:
+		case <-ticker.C:
 			if _, err := io.ReadAll(io.TeeReader(r, &sb)); err != nil {
 				return fmt.Errorf("WaitFor: %w", err)
 			}
