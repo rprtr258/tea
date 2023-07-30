@@ -343,14 +343,6 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 			case msgExec:
 				// NB: this blocks.
 				p.exec(msg.cmd, msg.fn)
-
-			case msgSequence:
-				go func() {
-					// Execute commands one at a time, in order.
-					for _, cmd := range msg {
-						p.Send(cmd())
-					}
-				}()
 			}
 
 			p.renderer.handleMessages(msg)

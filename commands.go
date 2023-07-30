@@ -4,18 +4,6 @@ import (
 	"time"
 )
 
-// msgSequence is used internally to run the given commands in order.
-// TODO: remove?
-type msgSequence []Cmd
-
-// Sequence runs the given commands one at a time, in order. Contrast this with
-// Batch, which runs commands concurrently.
-func Sequence(cmds ...Cmd) Cmd {
-	return func() Msg {
-		return msgSequence(cmds)
-	}
-}
-
 // Every is a command that ticks in sync with the system clock. So, if you
 // wanted to tick with the system clock every second, minute or hour you
 // could use this. It's also handy for having different things tick in sync.

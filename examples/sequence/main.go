@@ -12,11 +12,9 @@ type model struct{}
 
 func (m *model) Init() []tea.Cmd {
 	return []tea.Cmd{
-		tea.Sequence(
-			tea.Println("A"),
-			tea.Println("B"),
-			tea.Println("C"),
-		),
+		tea.Println("A"),
+		tea.Println("B"),
+		tea.Println("C"),
 		tea.Println("Z"),
 		tea.Quit,
 	}

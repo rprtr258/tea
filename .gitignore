@@ -1,3 +1,4 @@
 .vscode/
 ssh_example
 ssh_example.pub
+cmd/main.go
