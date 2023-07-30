@@ -1174,7 +1174,7 @@ func (m *Model) placeholderView() string {
 
 // Blink returns the blink command for the cursor.
 func Blink() tea.Msg {
-	return cursor.Blink()
+	return cursor.CmdBlink()
 }
 
 // cursorLineNumber returns the line number that the cursor is on.

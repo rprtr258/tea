@@ -656,7 +656,7 @@ func (m *Model) placeholderView() string {
 
 // Blink is a command used to initialize cursor blinking.
 func Blink() tea.Msg {
-	return cursor.Blink()
+	return cursor.CmdBlink()
 }
 
 // Paste is a command for pasting from the clipboard into the text input.
@@ -713,6 +713,6 @@ func (m *Model) CursorMode() CursorMode {
 }
 
 // Deprecated: use cursor.SetMode().
-func (m *Model) SetCursorMode(mode CursorMode) tea.Cmd {
+func (m *Model) SetCursorMode(mode CursorMode) []tea.Cmd {
 	return m.Cursor.SetMode(cursor.Mode(mode))
 }

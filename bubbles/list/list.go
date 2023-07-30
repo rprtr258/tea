@@ -379,12 +379,12 @@ func (m *Model) ResetFilter() {
 }
 
 // SetItem replaces an item at the given index. This returns a command.
-func (m *Model) SetItem(index int, item Item) tea.Cmd {
-	var cmd tea.Cmd
+func (m *Model) SetItem(index int, item Item) []tea.Cmd {
 	m.items[index] = item
 
+	var cmd []tea.Cmd
 	if m.filterState != Unfiltered {
-		cmd = filterItems(*m)
+		cmd = append(cmd, filterItems(*m))
 	}
 
 	m.updatePagination()
@@ -393,12 +393,12 @@ func (m *Model) SetItem(index int, item Item) tea.Cmd {
 
 // InsertItem inserts an item at the given index. If the index is out of the upper bound,
 // the item will be appended. This returns a command.
-func (m *Model) InsertItem(index int, item Item) tea.Cmd {
-	var cmd tea.Cmd
+func (m *Model) InsertItem(index int, item Item) []tea.Cmd {
 	m.items = insertItemIntoSlice(m.items, item, index)
 
+	var cmd []tea.Cmd
 	if m.filterState != Unfiltered {
-		cmd = filterItems(*m)
+		cmd = append(cmd, filterItems(*m))
 	}
 
 	m.updatePagination()
@@ -587,10 +587,11 @@ func (m *Model) SetSpinner(spinner spinner.Spinner) {
 }
 
 // ToggleSpinner toggles the spinner. Note that this also returns a command.
-func (m *Model) ToggleSpinner() tea.Cmd {
+func (m *Model) ToggleSpinner() []tea.Cmd {
 	if !m.showSpinner {
-		return m.StartSpinner()
+		return []tea.Cmd{m.StartSpinner()}
 	}
+
 	m.StopSpinner()
 	return nil
 }

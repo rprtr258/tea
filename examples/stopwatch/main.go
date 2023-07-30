@@ -58,7 +58,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			m.quitting = true
 			return []tea.Cmd{tea.Quit}
 		case key.Matches(msg, m.keymap.reset):
-			return []tea.Cmd{m.stopwatch.Reset()}
+			return []tea.Cmd{m.stopwatch.CmdReset()}
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
 			m.keymap.stop.SetEnabled(!m.stopwatch.Running())
 			m.keymap.start.SetEnabled(m.stopwatch.Running())

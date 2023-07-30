@@ -88,7 +88,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			// initialize the viewport and when the window is resized.
 			//
 			// This is needed for high-performance rendering only.
-			cmds = append(cmds, viewport.Sync(m.viewport))
+			cmds = append(cmds, viewport.Sync(m.viewport)...)
 		}
 	}
 

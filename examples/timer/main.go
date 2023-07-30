@@ -54,7 +54,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 		case key.Matches(msg, m.keymap.reset):
 			m.timer.Timeout = timeout
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
-			return []tea.Cmd{m.timer.Toggle()}
+			return []tea.Cmd{m.timer.CmdToggle()}
 		}
 	}
 

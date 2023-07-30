@@ -144,7 +144,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 		}
 
 		m.Timeout -= m.Interval
-		return []tea.Cmd{m.tick(), m.timedout()}
+		return append(m.timedout(), m.tick())
 	}
 
 	return nil
@@ -155,19 +155,19 @@ func (m *Model) View() string {
 	return m.Timeout.String()
 }
 
-// Start resumes the timer. Has no effect if the timer has timed out.
-func (m *Model) Start() tea.Cmd {
-	return m.startStop(true)
+// CmdStart resumes the timer. Has no effect if the timer has timed out.
+func (m *Model) CmdStart() tea.Cmd {
+	return m.cmdStartStop(true)
 }
 
-// Stop pauses the timer. Has no effect if the timer has timed out.
-func (m *Model) Stop() tea.Cmd {
-	return m.startStop(false)
+// CmdStop pauses the timer. Has no effect if the timer has timed out.
+func (m *Model) CmdStop() tea.Cmd {
+	return m.cmdStartStop(false)
 }
 
-// Toggle stops the timer if it's running and starts it if it's stopped.
-func (m *Model) Toggle() tea.Cmd {
-	return m.startStop(!m.Running())
+// CmdToggle stops the timer if it's running and starts it if it's stopped.
+func (m *Model) CmdToggle() tea.Cmd {
+	return m.cmdStartStop(!m.Running())
 }
 
 func (m *Model) tick() tea.Cmd {
@@ -176,16 +176,17 @@ func (m *Model) tick() tea.Cmd {
 	})
 }
 
-func (m *Model) timedout() tea.Cmd {
+func (m *Model) timedout() []tea.Cmd {
 	if !m.Timedout() {
 		return nil
 	}
-	return func() tea.Msg {
+
+	return []tea.Cmd{func() tea.Msg {
 		return MsgTimeout{ID: m.id}
-	}
+	}}
 }
 
-func (m *Model) startStop(v bool) tea.Cmd {
+func (m *Model) cmdStartStop(v bool) tea.Cmd {
 	return func() tea.Msg {
 		return MsgStartStop{ID: m.id, running: v}
 	}

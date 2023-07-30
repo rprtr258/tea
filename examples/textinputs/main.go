@@ -82,9 +82,9 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			if m.cursorMode > cursor.CursorHide {
 				m.cursorMode = cursor.CursorBlink
 			}
-			cmds := make([]tea.Cmd, len(m.inputs))
+			cmds := []tea.Cmd{}
 			for i := range m.inputs {
-				cmds[i] = m.inputs[i].Cursor.SetMode(m.cursorMode)
+				cmds = append(cmds, m.inputs[i].Cursor.SetMode(m.cursorMode)...)
 			}
 			return cmds
 

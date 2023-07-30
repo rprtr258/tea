@@ -57,10 +57,10 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 		// Let's clear the selectedFile and display an error.
 		m.err = errors.New(path + " is not valid.")
 		m.selectedFile = ""
-		return []tea.Cmd{cmd, clearErrorAfter(2 * time.Second)}
+		return append(cmd, clearErrorAfter(2*time.Second))
 	}
 
-	return []tea.Cmd{cmd}
+	return cmd
 }
 
 func (m *model) View(r tea.Renderer) {

@@ -95,7 +95,7 @@ func New() Model {
 var NewModel = New
 
 // Update helps satisfy the Bubble Tea Model interface. It's a no-op.
-func (m *Model) Update(_ tea.Msg) tea.Cmd {
+func (m *Model) Update(_ tea.Msg) []tea.Cmd {
 	return nil
 }
 

@@ -61,7 +61,7 @@ func (m *model) Init() []tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	if m.quitting {
-		return []tea.Cmd{m.updatePromptView(msg)}
+		return m.updatePromptView(msg)
 	}
 
 	return m.updateTextView(msg)
@@ -92,13 +92,13 @@ func (m *model) updateTextView(msg tea.Msg) []tea.Cmd {
 	return append(cmds, m.textarea.Update(msg)...)
 }
 
-func (m *model) updatePromptView(msg tea.Msg) tea.Cmd {
+func (m *model) updatePromptView(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		// For simplicity's sake, we'll treat any key besides "y" as "no"
 		if key.Matches(msg, m.keymap.quit) || msg.String() == "y" {
 			m.hasChanges = false
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 		m.quitting = false
 	}

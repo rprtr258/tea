@@ -245,12 +245,13 @@ func (m *Model) GotoBottom() []string {
 // first render and after a window resize.
 //
 // For high performance rendering only.
-func Sync(m Model) tea.Cmd {
+func Sync(m Model) []tea.Cmd {
 	if len(m.lines) == 0 {
 		return nil
 	}
+
 	top, bottom := m.scrollArea()
-	return tea.SyncScrollArea(m.visibleLines(), top, bottom)
+	return []tea.Cmd{tea.SyncScrollArea(m.visibleLines(), top, bottom)}
 }
 
 // ViewDown is a high performance command that moves the viewport up by a given
@@ -259,23 +260,25 @@ func Sync(m Model) tea.Cmd {
 //
 //	lines := model.ViewDown(1)
 //	cmd := ViewDown(m, lines)
-func ViewDown(m *Model, lines []string) tea.Cmd {
+func ViewDown(m *Model, lines []string) []tea.Cmd {
 	if len(lines) == 0 {
 		return nil
 	}
+
 	top, bottom := m.scrollArea()
-	return tea.ScrollDown(lines, top, bottom)
+	return []tea.Cmd{tea.ScrollDown(lines, top, bottom)}
 }
 
 // ViewUp is a high performance command the moves the viewport down by a given
 // number of lines height. Use Model.ViewUp to get the lines that should be
 // rendered.
-func ViewUp(m *Model, lines []string) tea.Cmd {
+func ViewUp(m *Model, lines []string) []tea.Cmd {
 	if len(lines) == 0 {
 		return nil
 	}
+
 	top, bottom := m.scrollArea()
-	return tea.ScrollUp(lines, top, bottom)
+	return []tea.Cmd{tea.ScrollUp(lines, top, bottom)}
 }
 
 // Update handles standard message-based viewport updates.
@@ -290,37 +293,37 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 		case key.Matches(msg, m.KeyMap.PageDown):
 			lines := m.ViewDown()
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewDown(m, lines)}
+				return ViewDown(m, lines)
 			}
 
 		case key.Matches(msg, m.KeyMap.PageUp):
 			lines := m.ViewUp()
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewUp(m, lines)}
+				return ViewUp(m, lines)
 			}
 
 		case key.Matches(msg, m.KeyMap.HalfPageDown):
 			lines := m.HalfViewDown()
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewDown(m, lines)}
+				return ViewDown(m, lines)
 			}
 
 		case key.Matches(msg, m.KeyMap.HalfPageUp):
 			lines := m.HalfViewUp()
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewUp(m, lines)}
+				return ViewUp(m, lines)
 			}
 
 		case key.Matches(msg, m.KeyMap.Down):
 			lines := m.LineDown(1)
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewDown(m, lines)}
+				return ViewDown(m, lines)
 			}
 
 		case key.Matches(msg, m.KeyMap.Up):
 			lines := m.LineUp(1)
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewUp(m, lines)}
+				return ViewUp(m, lines)
 			}
 		}
 
@@ -332,13 +335,13 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 		case tea.MouseWheelUp:
 			lines := m.LineUp(m.MouseWheelDelta)
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewUp(m, lines)}
+				return ViewUp(m, lines)
 			}
 
 		case tea.MouseWheelDown:
 			lines := m.LineDown(m.MouseWheelDelta)
 			if m.HighPerformanceRendering {
-				return []tea.Cmd{ViewDown(m, lines)}
+				return ViewDown(m, lines)
 			}
 		}
 	}

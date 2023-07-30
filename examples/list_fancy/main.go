@@ -137,7 +137,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 
 		switch {
 		case key.Matches(msg, m.keys.toggleSpinner):
-			return []tea.Cmd{m.list.ToggleSpinner()}
+			return m.list.ToggleSpinner()
 		case key.Matches(msg, m.keys.toggleTitleBar):
 			v := !m.list.ShowTitle()
 			m.list.SetShowTitle(v)
@@ -162,7 +162,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			newItem := m.itemGenerator.next()
 			insCmd := m.list.InsertItem(0, newItem)
 			statusCmd := m.list.NewStatusMessage(statusMessageStyle("Added " + newItem.Title()))
-			return []tea.Cmd{insCmd, statusCmd}
+			return append(insCmd, statusCmd)
 		}
 	}
 

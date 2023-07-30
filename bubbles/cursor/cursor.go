@@ -120,11 +120,11 @@ func (m *Model) Mode() Mode {
 // SetMode sets the model's cursor mode. This method returns a command.
 //
 // For available cursor modes, see type CursorMode.
-func (m *Model) SetMode(mode Mode) tea.Cmd {
+func (m *Model) SetMode(mode Mode) []tea.Cmd {
 	m.mode = mode
 	m.Blink = m.mode == CursorHide || !m.focus
 	if mode == CursorBlink {
-		return Blink
+		return []tea.Cmd{CmdBlink}
 	}
 	return nil
 }
@@ -145,8 +145,8 @@ func (m *Model) BlinkCmd() []tea.Cmd {
 	}}
 }
 
-// Blink is a command used to initialize cursor blinking.
-func Blink() tea.Msg {
+// CmdBlink is a command used to initialize cursor blinking.
+func CmdBlink() tea.Msg {
 	return msgInitialBlink{}
 }
 
