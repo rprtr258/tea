@@ -656,7 +656,7 @@ func Println(args ...any) Cmd {
 // If the altscreen is active no output will be printed.
 func Printf(format string, args ...any) Cmd {
 	return func() Msg {
-		log.Printf(format, args...) // TODO: remove?
+		log.Printf(format, args...)
 		return msgPrintLine{
 			messageBody: fmt.Sprintf(format, args...),
 		}

@@ -17,7 +17,7 @@ func (m *initCmdModel) Init() []Cmd {
 }
 
 func (m *initCmdModel) Update(msg Msg) []Cmd {
-	switch msg.(type) {
+	switch msg.(type) { //nolint:gocritic
 	case MsgKey:
 		return []Cmd{Quit}
 	}
