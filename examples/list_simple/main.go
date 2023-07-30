@@ -29,15 +29,10 @@ func (i item) FilterValue() string { return "" }
 
 type itemDelegate struct{}
 
-func (d itemDelegate) Height() int                               { return 1 }
-func (d itemDelegate) Spacing() int                              { return 0 }
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) []tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m *list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(item)
-	if !ok {
-		return
-	}
-
+func (d itemDelegate) Height() int                                     { return 1 }
+func (d itemDelegate) Spacing() int                                    { return 0 }
+func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return nil }
+func (d itemDelegate) Render(w io.Writer, m *list.Model[item], index int, i item) {
 	str := fmt.Sprintf("%d. %s", index+1, i)
 
 	fn := itemStyle.Render
@@ -51,7 +46,7 @@ func (d itemDelegate) Render(w io.Writer, m *list.Model, index int, listItem lis
 }
 
 type model struct {
-	list     list.Model
+	list     list.Model[item]
 	choice   string
 	quitting bool
 }
@@ -99,7 +94,7 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main() {
-	items := []list.Item{
+	items := []item{
 		item("Ramen"),
 		item("Tomato Soup"),
 		item("Hamburgers"),
@@ -114,7 +109,7 @@ func Main() {
 
 	const defaultWidth = 20
 
-	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
+	l := list.New[item](items, itemDelegate{}, defaultWidth, listHeight)
 	l.Title = "What do you want for dinner?"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)

@@ -73,7 +73,7 @@ func newListKeyMap() *listKeyMap {
 }
 
 type model struct {
-	list          list.Model
+	list          list.Model[item]
 	itemGenerator *randomItemGenerator
 	keys          *listKeyMap
 	delegateKeys  *delegateKeyMap
@@ -88,14 +88,14 @@ func newModel() *model {
 
 	// Make initial list of items
 	const numItems = 24
-	items := make([]list.Item, numItems)
+	items := make([]item, numItems)
 	for i := 0; i < numItems; i++ {
 		items[i] = itemGenerator.next()
 	}
 
 	// Setup list
-	delegate := newItemDelegate(delegateKeys)
-	groceryList := list.New(items, delegate, 0, 0)
+	delegate := newItemDelegate[item](delegateKeys)
+	groceryList := list.New[item](items, delegate, 0, 0)
 	groceryList.Title = "Groceries"
 	groceryList.Styles.Title = titleStyle
 	groceryList.AdditionalFullHelpKeys = func() []key.Binding {
