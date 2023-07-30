@@ -110,7 +110,6 @@ func doWaitFor(r io.Reader, condition func(bts []byte) bool, options ...WaitForO
 			}
 		}
 	}
-
 }
 
 // TestModel is a model that is being tested.

@@ -28,7 +28,6 @@ type TableCellElement struct {
 }
 
 func (e *TableElement) Render(w io.Writer, ctx RenderContext) error {
-
 	rules := ctx.options.Styles.Table
 
 	var indentation uint
