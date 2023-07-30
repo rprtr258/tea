@@ -199,9 +199,6 @@ type Model[I Item] struct {
 func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I] {
 	styles := DefaultStyles()
 
-	sp := spinner.New(spinner.WithSpinner(spinner.Line))
-	sp.Style = styles.Spinner
-
 	filterInput := textinput.New()
 	filterInput.Prompt = "Filter: "
 	filterInput.PromptStyle = styles.FilterPrompt
@@ -235,8 +232,11 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 		delegate:  delegate,
 		items:     items,
 		Paginator: p,
-		spinner:   sp,
-		Help:      help.New(),
+		spinner: spinner.New(
+			spinner.WithSpinner(spinner.Line),
+			spinner.WithStyle(styles.Spinner),
+		),
+		Help: help.New(),
 	}
 
 	m.updatePagination()

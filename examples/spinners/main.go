@@ -70,21 +70,25 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 func (m *model) resetSpinner() {
-	m.spinner = spinner.New()
-	m.spinner.Style = spinnerStyle
-	m.spinner.Spinner = spinners[m.index]
+	m.spinner = spinner.New(
+		spinner.WithSpinner(spinners[m.index]),
+		spinner.WithStyle(spinnerStyle),
+	)
 }
 
 func (m *model) View(r tea.Renderer) {
 	var gap string
-	switch m.index {
-	case 1:
-		gap = ""
-	default:
+	if m.index != 1 {
 		gap = " "
 	}
 
-	r.Write(fmt.Sprintf("\n %s%s%s\n\n%s", m.spinner.View(), gap, textStyle("Spinning..."), helpStyle("h/l, ←/→: change spinner • q: exit\n")))
+	r.Write(fmt.Sprintf(
+		"\n %s%s%s\n\n%s",
+		m.spinner.View(),
+		gap,
+		textStyle("Spinning..."),
+		helpStyle("h/l, ←/→: change spinner • q: exit\n"),
+	))
 }
 
 func Main() {
