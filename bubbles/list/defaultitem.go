@@ -34,31 +34,27 @@ type DefaultItemStyles struct {
 // NewDefaultItemStyles returns style definitions for a default item. See
 // DefaultItemView for when these come into play.
 func NewDefaultItemStyles() DefaultItemStyles {
-	var s DefaultItemStyles
-	s.NormalTitle = lipgloss.NewStyle().
-		Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}).
-		Padding(0, 0, 0, 2)
-
+	s := DefaultItemStyles{
+		NormalTitle: lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}).
+			Padding(0, 0, 0, 2),
+		SelectedTitle: lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder(), false, false, false, true).
+			BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
+			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}).
+			Padding(0, 0, 0, 1),
+		DimmedTitle: lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}).
+			Padding(0, 0, 0, 2),
+		FilterMatch: lipgloss.NewStyle().
+			Underline(true),
+	}
 	s.NormalDesc = s.NormalTitle.Copy().
 		Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"})
-
-	s.SelectedTitle = lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder(), false, false, false, true).
-		BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
-		Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}).
-		Padding(0, 0, 0, 1)
-
 	s.SelectedDesc = s.SelectedTitle.Copy().
 		Foreground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"})
-
-	s.DimmedTitle = lipgloss.NewStyle().
-		Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}).
-		Padding(0, 0, 0, 2)
-
 	s.DimmedDesc = s.DimmedTitle.Copy().
 		Foreground(lipgloss.AdaptiveColor{Light: "#C2B8C2", Dark: "#4D4D4D"})
-
-	s.FilterMatch = lipgloss.NewStyle().Underline(true)
 
 	return s
 }
@@ -83,10 +79,10 @@ type DefaultItem interface {
 //
 // Settings ShortHelpFunc and FullHelpFunc is optional. They can be set to
 // include items in the list's default short and full help menus.
-type DefaultDelegate struct {
+type DefaultDelegate[I DefaultItem] struct {
 	ShowDescription bool
 	Styles          DefaultItemStyles
-	UpdateFunc      func(tea.Msg, *Model) tea.Cmd
+	UpdateFunc      func(tea.Msg, *Model[I]) []tea.Cmd
 	ShortHelpFunc   func() []key.Binding
 	FullHelpFunc    func() [][]key.Binding
 	height          int
@@ -94,8 +90,8 @@ type DefaultDelegate struct {
 }
 
 // NewDefaultDelegate creates a new delegate with default styles.
-func NewDefaultDelegate() DefaultDelegate {
-	return DefaultDelegate{
+func NewDefaultDelegate[I DefaultItem]() DefaultDelegate[I] {
+	return DefaultDelegate[I]{
 		ShowDescription: true,
 		Styles:          NewDefaultItemStyles(),
 		height:          2,
@@ -104,14 +100,14 @@ func NewDefaultDelegate() DefaultDelegate {
 }
 
 // SetHeight sets delegate's preferred height.
-func (d *DefaultDelegate) SetHeight(i int) {
+func (d *DefaultDelegate[I]) SetHeight(i int) {
 	d.height = i
 }
 
 // Height returns the delegate's preferred height.
 // This has effect only if ShowDescription is true,
 // otherwise height is always 1.
-func (d DefaultDelegate) Height() int {
+func (d DefaultDelegate[I]) Height() int {
 	if d.ShowDescription {
 		return d.height
 	}
@@ -119,17 +115,17 @@ func (d DefaultDelegate) Height() int {
 }
 
 // SetSpacing sets the delegate's spacing.
-func (d *DefaultDelegate) SetSpacing(i int) {
+func (d *DefaultDelegate[I]) SetSpacing(i int) {
 	d.spacing = i
 }
 
 // Spacing returns the delegate's spacing.
-func (d DefaultDelegate) Spacing() int {
+func (d DefaultDelegate[I]) Spacing() int {
 	return d.spacing
 }
 
 // Update checks whether the delegate's UpdateFunc is set and calls it.
-func (d DefaultDelegate) Update(msg tea.Msg, m *Model) tea.Cmd {
+func (d DefaultDelegate[I]) Update(msg tea.Msg, m *Model[I]) []tea.Cmd {
 	if d.UpdateFunc == nil {
 		return nil
 	}
@@ -137,14 +133,9 @@ func (d DefaultDelegate) Update(msg tea.Msg, m *Model) tea.Cmd {
 }
 
 // Render prints an item.
-func (d DefaultDelegate) Render(w io.Writer, m *Model, index int, item Item) {
-	i, ok := item.(DefaultItem)
-	if !ok {
-		return
-	}
-
-	title := i.Title()
-	desc := i.Description()
+func (d DefaultDelegate[I]) Render(w io.Writer, m *Model[I], index int, item I) {
+	title := item.Title()
+	desc := item.Description()
 
 	if m.width <= 0 {
 		// short-circuit
@@ -167,11 +158,9 @@ func (d DefaultDelegate) Render(w io.Writer, m *Model, index int, item Item) {
 	}
 
 	// Conditions
-	var (
-		isSelected  = index == m.Index()
-		emptyFilter = m.FilterState() == Filtering && m.FilterValue() == ""
-		isFiltered  = m.FilterState() == Filtering || m.FilterState() == FilterApplied
-	)
+	isSelected := index == m.Index()
+	emptyFilter := m.FilterState() == Filtering && m.FilterValue() == ""
+	isFiltered := m.FilterState() == Filtering || m.FilterState() == FilterApplied
 
 	var matchedRunes []int
 	if isFiltered && index < len(m.filteredItems) {
@@ -207,11 +196,12 @@ func (d DefaultDelegate) Render(w io.Writer, m *Model, index int, item Item) {
 		fmt.Fprintf(w, "%s\n%s", title, desc)
 		return
 	}
-	fmt.Fprintf(w, "%s", title)
+
+	fmt.Fprint(w, title)
 }
 
 // ShortHelp returns the delegate's short help.
-func (d DefaultDelegate) ShortHelp() []key.Binding {
+func (d DefaultDelegate[I]) ShortHelp() []key.Binding {
 	if d.ShortHelpFunc != nil {
 		return d.ShortHelpFunc()
 	}
@@ -219,7 +209,7 @@ func (d DefaultDelegate) ShortHelp() []key.Binding {
 }
 
 // FullHelp returns the delegate's full help.
-func (d DefaultDelegate) FullHelp() [][]key.Binding {
+func (d DefaultDelegate[I]) FullHelp() [][]key.Binding {
 	if d.FullHelpFunc != nil {
 		return d.FullHelpFunc()
 	}

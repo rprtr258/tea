@@ -6,7 +6,6 @@ package mouse
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/rprtr258/tea"
 )
@@ -46,9 +45,11 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(s)
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{}).WithAltScreen().WithMouseAllMotion()
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.
+		NewProgram(ctx, &model{}).
+		WithAltScreen().
+		WithMouseAllMotion().
+		Run()
+	return err
 }

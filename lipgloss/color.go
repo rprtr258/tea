@@ -9,10 +9,7 @@ import (
 // TerminalColor is a color intended to be rendered in the terminal.
 type TerminalColor interface {
 	color(*Renderer) termenv.Color
-	RGBA() (r, g, b, a uint32)
 }
-
-var noColor = NoColor{}
 
 // NoColor is used to specify the absence of color styling. When this is active
 // foreground colors will be rendered with the terminal's default text color,
@@ -23,19 +20,10 @@ var noColor = NoColor{}
 //	var style = someStyle.Copy().Background(lipgloss.NoColor{})
 type NoColor struct{}
 
+var noColor = NoColor{}
+
 func (NoColor) color(*Renderer) termenv.Color {
 	return termenv.NoColor{}
-}
-
-// RGBA returns the RGBA value of this color. Because we have to return
-// something, despite this color being the absence of color, we're returning
-// black with 100% opacity.
-//
-// Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
-//
-// Deprecated.
-func (n NoColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return 0x0, 0x0, 0x0, 0xFFFF
 }
 
 // Color specifies a color by hex or ANSI value. For example:
@@ -46,16 +34,6 @@ type Color string
 
 func (c Color) color(r *Renderer) termenv.Color {
 	return r.ColorProfile().Color(string(c))
-}
-
-// RGBA returns the RGBA value of this color. This satisfies the Go Color
-// interface. Note that on error we return black with 100% opacity, or:
-//
-// Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
-//
-// Deprecated.
-func (c Color) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(c.color(renderer)).RGBA()
 }
 
 // ANSIColor is a color specified by an ANSI color value. It's merely syntactic
@@ -71,17 +49,6 @@ type ANSIColor uint
 
 func (ac ANSIColor) color(r *Renderer) termenv.Color {
 	return Color(strconv.FormatUint(uint64(ac), 10)).color(r)
-}
-
-// RGBA returns the RGBA value of this color. This satisfies the Go Color
-// interface. Note that on error we return black with 100% opacity, or:
-//
-// Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
-//
-// Deprecated.
-func (ac ANSIColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	cf := Color(strconv.FormatUint(uint64(ac), 10))
-	return cf.RGBA()
 }
 
 // AdaptiveColor provides color options for light and dark backgrounds. The
@@ -101,16 +68,6 @@ func (ac AdaptiveColor) color(r *Renderer) termenv.Color {
 		return Color(ac.Dark).color(r)
 	}
 	return Color(ac.Light).color(r)
-}
-
-// RGBA returns the RGBA value of this color. This satisfies the Go Color
-// interface. Note that on error we return black with 100% opacity, or:
-//
-// Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
-//
-// Deprecated.
-func (ac AdaptiveColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(ac.color(renderer)).RGBA()
 }
 
 // CompleteColor specifies exact values for truecolor, ANSI256, and ANSI color
@@ -135,17 +92,6 @@ func (c CompleteColor) color(r *Renderer) termenv.Color {
 	}
 }
 
-// RGBA returns the RGBA value of this color. This satisfies the Go Color
-// interface. Note that on error we return black with 100% opacity, or:
-//
-// Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
-// CompleteAdaptiveColor specifies exact values for truecolor, ANSI256, and ANSI color
-//
-// Deprecated.
-func (c CompleteColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(c.color(renderer)).RGBA()
-}
-
 // CompleteAdaptiveColor specifies exact values for truecolor, ANSI256, and ANSI color
 // profiles, with separate options for light and dark backgrounds. Automatic
 // color degradation will not be performed.
@@ -159,14 +105,4 @@ func (cac CompleteAdaptiveColor) color(r *Renderer) termenv.Color {
 		return cac.Dark.color(r)
 	}
 	return cac.Light.color(r)
-}
-
-// RGBA returns the RGBA value of this color. This satisfies the Go Color
-// interface. Note that on error we return black with 100% opacity, or:
-//
-// Red: 0x0, Green: 0x0, Blue: 0x0, Alpha: 0xFFFF.
-//
-// Deprecated.
-func (cac CompleteAdaptiveColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(cac.color(renderer)).RGBA()
 }

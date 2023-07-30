@@ -2,7 +2,6 @@ package timer
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -54,7 +53,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 		case key.Matches(msg, m.keymap.reset):
 			m.timer.Timeout = timeout
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
-			return []tea.Cmd{m.timer.Toggle()}
+			return []tea.Cmd{m.timer.CmdToggle()}
 		}
 	}
 
@@ -87,13 +86,14 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(s)
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	m := &model{
 		timer: timer.NewWithInterval(timeout, time.Millisecond),
 		keymap: keymap{
 			start: key.NewBinding(
 				key.WithKeys("s"),
 				key.WithHelp("s", "start"),
+				key.WithDisabled(),
 			),
 			stop: key.NewBinding(
 				key.WithKeys("s"),
@@ -110,9 +110,7 @@ func Main() {
 		},
 		help: help.New(),
 	}
-	m.keymap.start.SetEnabled(false)
 
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("Uh oh, we encountered an error:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, m).Run()
+	return err
 }

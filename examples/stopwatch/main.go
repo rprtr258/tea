@@ -2,7 +2,6 @@ package stopwatch
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -58,7 +57,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			m.quitting = true
 			return []tea.Cmd{tea.Quit}
 		case key.Matches(msg, m.keymap.reset):
-			return []tea.Cmd{m.stopwatch.Reset()}
+			return []tea.Cmd{m.stopwatch.CmdReset()}
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
 			m.keymap.stop.SetEnabled(!m.stopwatch.Running())
 			m.keymap.start.SetEnabled(m.stopwatch.Running())
@@ -68,7 +67,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	return m.stopwatch.Update(msg)
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	m := &model{
 		stopwatch: stopwatch.NewWithInterval(time.Millisecond),
 		keymap: keymap{
@@ -94,7 +93,6 @@ func Main() {
 
 	m.keymap.start.SetEnabled(false)
 
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("Oh no, it didn't work:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, m).Run()
+	return err
 }

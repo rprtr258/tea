@@ -6,7 +6,6 @@ package realtime
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
 
@@ -47,7 +46,7 @@ type model struct {
 
 func (m *model) Init() []tea.Cmd {
 	return []tea.Cmd{
-		m.spinner.Tick,
+		m.spinner.CmdTick,
 		listenForActivity(m.sub), // generate activity
 		waitForActivity(m.sub),   // wait for activity
 	}
@@ -76,13 +75,10 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(s)
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{
 		sub:     make(chan struct{}),
 		spinner: spinner.New(),
-	})
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("could not start program:", err.Error())
-	}
+	}).Run()
+	return err
 }

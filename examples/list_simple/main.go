@@ -4,22 +4,18 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
-	"strings"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/list"
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-const listHeight = 14
-
 var (
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
 	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
 	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
-	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
-	helpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
+	paginationStyle   = list.DefaultStyle.PaginationStyle.PaddingLeft(4)
+	helpStyle         = list.DefaultStyle.HelpStyle.PaddingLeft(4).PaddingBottom(1)
 	quitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
 )
 
@@ -29,29 +25,24 @@ func (i item) FilterValue() string { return "" }
 
 type itemDelegate struct{}
 
-func (d itemDelegate) Height() int                             { return 1 }
-func (d itemDelegate) Spacing() int                            { return 0 }
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m *list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(item)
-	if !ok {
-		return
-	}
-
+func (d itemDelegate) Height() int                                     { return 1 }
+func (d itemDelegate) Spacing() int                                    { return 0 }
+func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return nil }
+func (d itemDelegate) Render(w io.Writer, m *list.Model[item], index int, i item) {
 	str := fmt.Sprintf("%d. %s", index+1, i)
 
-	fn := itemStyle.Render
+	var res string
 	if index == m.Index() {
-		fn = func(s ...string) string {
-			return selectedItemStyle.Render("> " + strings.Join(s, " "))
-		}
+		res = selectedItemStyle.Render("> " + str)
+	} else {
+		res = itemStyle.Render(str)
 	}
 
-	fmt.Fprint(w, fn(str))
+	fmt.Fprint(w, res)
 }
 
 type model struct {
-	list     list.Model
+	list     list.Model[item]
 	choice   string
 	quitting bool
 }
@@ -65,15 +56,13 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	case tea.MsgWindowSize:
 		m.list.SetWidth(msg.Width)
 		return nil
-
 	case tea.MsgKey:
-		switch keypress := msg.String(); keypress {
-		case "ctrl+c":
+		switch msg.String() {
+		case "ctrl+c", "q":
 			m.quitting = true
 			return []tea.Cmd{tea.Quit}
-
 		case "enter":
-			i, ok := m.list.SelectedItem().(item)
+			i, ok := m.list.SelectedItem()
 			if ok {
 				m.choice = string(i)
 			}
@@ -98,23 +87,26 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" + m.list.View())
 }
 
-func Main() {
-	items := []list.Item{
-		item("Ramen"),
-		item("Tomato Soup"),
-		item("Hamburgers"),
-		item("Cheeseburgers"),
-		item("Currywurst"),
-		item("Okonomiyaki"),
-		item("Pasta"),
-		item("Fillet Mignon"),
-		item("Caviar"),
-		item("Just Wine"),
+func Main(ctx context.Context) error {
+	items := []item{
+		"Ramen",
+		"Tomato Soup",
+		"Hamburgers",
+		"Cheeseburgers",
+		"Currywurst",
+		"Okonomiyaki",
+		"Pasta",
+		"Fillet Mignon",
+		"Caviar",
+		"Just Wine",
 	}
 
-	const defaultWidth = 20
+	const (
+		listHeight   = 14
+		defaultWidth = 20
+	)
 
-	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
+	l := list.New[item](items, itemDelegate{}, defaultWidth, listHeight)
 	l.Title = "What do you want for dinner?"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
@@ -122,7 +114,6 @@ func Main() {
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpStyle
 
-	if _, err := tea.NewProgram(context.Background(), &model{list: l}).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, &model{list: l}).Run()
+	return err
 }

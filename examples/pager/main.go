@@ -6,7 +6,6 @@ package pager
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -88,7 +87,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			// initialize the viewport and when the window is resized.
 			//
 			// This is needed for high-performance rendering only.
-			cmds = append(cmds, viewport.Sync(m.viewport))
+			cmds = append(cmds, viewport.Sync(m.viewport)...)
 		}
 	}
 
@@ -124,18 +123,16 @@ func max(a, b int) int {
 	return b
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	// Load some text for our viewport
 	content, err := os.ReadFile("artichoke.md")
 	if err != nil {
-		log.Fatalln("could not load file:", err.Error())
+		return fmt.Errorf("load file: %w", err)
 	}
 
-	p := tea.NewProgram(context.Background(), &model{content: string(content)}).
-		WithAltScreen().      // use the full size of the terminal in its "alternate screen buffer"
-		WithMouseCellMotion() // turn on mouse support so we can track the mouse wheel
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("could not run program:", err.Error())
-	}
+	_, err = tea.NewProgram(context.Background(), &model{content: string(content)}).
+		WithAltScreen().       // use the full size of the terminal in its "alternate screen buffer"
+		WithMouseCellMotion(). // turn on mouse support so we can track the mouse wheel
+		Run()
+	return err
 }

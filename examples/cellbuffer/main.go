@@ -6,7 +6,6 @@ package cellbuffer
 
 import (
 	"context"
-	"log"
 	"strings"
 	"time"
 
@@ -182,11 +181,13 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(m.cells.String())
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{
-		spring: harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
-	}).WithAltScreen().WithMouseCellMotion()
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("Uh oh:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.
+		NewProgram(ctx, &model{
+			spring: harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
+		}).
+		WithAltScreen().
+		WithMouseCellMotion().
+		Run()
+	return err
 }

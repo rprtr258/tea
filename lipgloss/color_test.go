@@ -10,7 +10,7 @@ import (
 )
 
 func TestSetColorProfile(t *testing.T) {
-	r := renderer
+	r := _renderer
 	input := "hello"
 
 	for name, test := range map[string]struct {
@@ -204,7 +204,7 @@ func TestRGBA(t *testing.T) {
 			r.SetColorProfile(test.profile)
 			r.SetHasDarkBackground(test.darkBg)
 
-			r, g, b, _ := test.input.RGBA()
+			r, g, b, _ := termenv.ConvertToRGB(test.input.color(_renderer)).RGBA()
 			o := uint(r/256)<<16 + uint(g/256)<<8 + uint(b/256)
 			assert.Equal(t, test.expected, o)
 		})
@@ -215,32 +215,30 @@ func TestRGBA(t *testing.T) {
 // which satisfies the color.Color interface. If an invalid string is passed
 // black with 100% opacity will be returned: or, in hex format, 0x000000FF.
 func hexToColor(hex string) color.RGBA {
-	var c color.RGBA
-	c.A = 0xFF
-
 	if hex == "" || hex[0] != '#' {
-		return c
+		return color.RGBA{0, 0, 0, 0xFF}
 	}
-
-	const (
-		fullFormat  = 7 // #RRGGBB
-		shortFormat = 4 // #RGB
-	)
 
 	switch len(hex) {
-	case fullFormat:
+	case 7: // full format: #RRGGBB
 		const offset = 4
-		c.R = hexToByte(hex[1])<<offset + hexToByte(hex[2])
-		c.G = hexToByte(hex[3])<<offset + hexToByte(hex[4])
-		c.B = hexToByte(hex[5])<<offset + hexToByte(hex[6])
-	case shortFormat:
+		return color.RGBA{
+			R: hexToByte(hex[1])<<offset + hexToByte(hex[2]),
+			G: hexToByte(hex[3])<<offset + hexToByte(hex[4]),
+			B: hexToByte(hex[5])<<offset + hexToByte(hex[6]),
+			A: 0xFF,
+		}
+	case 4: // short format: #RGB
 		const offset = 0x11
-		c.R = hexToByte(hex[1]) * offset
-		c.G = hexToByte(hex[2]) * offset
-		c.B = hexToByte(hex[3]) * offset
+		return color.RGBA{
+			R: hexToByte(hex[1]) * offset,
+			G: hexToByte(hex[2]) * offset,
+			B: hexToByte(hex[3]) * offset,
+			A: 0xFF,
+		}
+	default:
+		return color.RGBA{0, 0, 0, 0xFF}
 	}
-
-	return c
 }
 
 func hexToByte(b byte) byte {

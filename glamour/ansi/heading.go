@@ -15,37 +15,29 @@ type HeadingElement struct {
 }
 
 func (e *HeadingElement) Render(w io.Writer, ctx RenderContext) error {
-	bs := ctx.blockStack
 	rules := ctx.options.Styles.Heading
 
 	if e.Level >= 1 && e.Level <= 6 {
-		var styleBlock StyleBlock
-		switch e.Level {
-		case 1:
-			styleBlock = ctx.options.Styles.H1
-		case 2:
-			styleBlock = ctx.options.Styles.H2
-		case 3:
-			styleBlock = ctx.options.Styles.H3
-		case 4:
-			styleBlock = ctx.options.Styles.H4
-		case 5:
-			styleBlock = ctx.options.Styles.H5
-		case 6:
-			styleBlock = ctx.options.Styles.H6
-		}
+		styleBlock := map[int]StyleBlock{
+			1: ctx.options.Styles.H1,
+			2: ctx.options.Styles.H2,
+			3: ctx.options.Styles.H3,
+			4: ctx.options.Styles.H4,
+			5: ctx.options.Styles.H5,
+			6: ctx.options.Styles.H6,
+		}[e.Level]
 		rules = cascadeStyles(true, rules, styleBlock)
 	}
 
+	bs := ctx.blockStack
 	if !e.First {
 		renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, "\n")
 	}
 
-	be := BlockElement{
+	bs.Push(BlockElement{
 		Block: &bytes.Buffer{},
 		Style: cascadeStyle(bs.Current().Style, rules, false),
-	}
-	bs.Push(be)
+	})
 
 	renderText(w, ctx.options.ColorProfile, bs.Parent().Style.StylePrimitive, rules.BlockPrefix)
 	renderText(bs.Current().Block, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.Prefix)
@@ -57,10 +49,11 @@ func (e *HeadingElement) Finish(w io.Writer, ctx RenderContext) error {
 	rules := bs.Current().Style
 
 	var indentation uint
-	var margin uint
 	if rules.Indent != nil {
 		indentation = *rules.Indent
 	}
+
+	var margin uint
 	if rules.Margin != nil {
 		margin = *rules.Margin
 	}
@@ -70,14 +63,12 @@ func (e *HeadingElement) Finish(w io.Writer, ctx RenderContext) error {
 	})
 
 	flow := wordwrap.NewWriter(int(bs.Width(ctx) - indentation - margin*2))
-	_, err := flow.Write(bs.Current().Block.Bytes())
-	if err != nil {
+	if _, err := flow.Write(bs.Current().Block.Bytes()); err != nil {
 		return err
 	}
 	flow.Close()
 
-	_, err = iw.Write(flow.Bytes())
-	if err != nil {
+	if _, err := iw.Write(flow.Bytes()); err != nil {
 		return err
 	}
 

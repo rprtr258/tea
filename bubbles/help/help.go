@@ -89,13 +89,8 @@ func New() Model {
 	}
 }
 
-// NewModel creates a new help view with some useful defaults.
-//
-// Deprecated: use [New] instead.
-var NewModel = New
-
 // Update helps satisfy the Bubble Tea Model interface. It's a no-op.
-func (m *Model) Update(_ tea.Msg) tea.Cmd {
+func (m *Model) Update(_ tea.Msg) []tea.Cmd {
 	return nil
 }
 
@@ -115,10 +110,10 @@ func (m *Model) ShortHelpView(bindings []key.Binding) string {
 		return ""
 	}
 
-	var b strings.Builder
-	var totalWidth int
 	separator := m.Styles.ShortSeparator.Inline(true).Render(m.ShortSeparator)
 
+	var b strings.Builder
+	var totalWidth int
 	for i, kb := range bindings {
 		if !kb.Enabled() {
 			continue
@@ -167,18 +162,13 @@ func (m *Model) FullHelpView(groups [][]key.Binding) string {
 	out := make([]string, 0, len(groups))
 	sep := m.Styles.FullSeparator.Render(m.FullSeparator)
 	sepWidth := lipgloss.Width(sep)
-
 	// Iterate over groups to build columns
 	for i, group := range groups {
 		if group == nil || !shouldRenderColumn(group) {
 			continue
 		}
 
-		var (
-			keys         []string
-			descriptions []string
-		)
-
+		var keys, descriptions []string
 		// Separate keys and descriptions into different slices
 		for _, kb := range group {
 			if !kb.Enabled() {

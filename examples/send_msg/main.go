@@ -6,7 +6,6 @@ package send_msg
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -54,7 +53,7 @@ func newModel() *model {
 }
 
 func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{m.spinner.Tick}
+	return []tea.Cmd{m.spinner.CmdTick}
 }
 
 func (m *model) Update(msg tea.Msg) []tea.Cmd {
@@ -98,14 +97,23 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(appStyle.Render(s))
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), newModel())
+func randomFood() string {
+	food := []string{
+		"an apple", "a pear", "a gherkin", "a party gherkin",
+		"a kohlrabi", "some spaghetti", "tacos", "a currywurst", "some curry",
+		"a sandwich", "some peanut butter", "some cashews", "some ramen",
+	}
+	return food[rand.Intn(len(food))] // nolint:gosec
+}
+
+func Main(ctx context.Context) error {
+	p := tea.NewProgram(ctx, newModel())
 
 	// Simulate activity
 	go func() {
 		for {
 			pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec
-			time.Sleep(pause)
+			<-time.After(pause)
 
 			// Send the Bubble Tea program a message from outside the
 			// tea.Program. This will block until it is ready to receive
@@ -114,16 +122,6 @@ func Main() {
 		}
 	}()
 
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
-}
-
-func randomFood() string {
-	food := []string{
-		"an apple", "a pear", "a gherkin", "a party gherkin",
-		"a kohlrabi", "some spaghetti", "tacos", "a currywurst", "some curry",
-		"a sandwich", "some peanut butter", "some cashews", "some ramen",
-	}
-	return food[rand.Intn(len(food))] // nolint:gosec
+	_, err := p.Run()
+	return err
 }

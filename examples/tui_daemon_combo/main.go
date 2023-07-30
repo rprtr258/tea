@@ -46,7 +46,7 @@ func newModel() *model {
 func (m *model) Init() []tea.Cmd {
 	log.Println("Starting work...")
 	return []tea.Cmd{
-		m.spinner.Tick,
+		m.spinner.CmdTick,
 		runPretendProcess,
 	}
 }
@@ -105,19 +105,18 @@ func randomEmoji() string {
 	return string(emojis[rand.Intn(len(emojis))]) // nolint:gosec
 }
 
-func Main() {
-	var (
-		daemonMode bool
-		showHelp   bool
-	)
-
+func Main(ctx context.Context) error {
+	var daemonMode bool
 	flag.BoolVar(&daemonMode, "d", false, "run as a daemon")
+
+	var showHelp bool
 	flag.BoolVar(&showHelp, "h", false, "show help")
+
 	flag.Parse()
 
 	if showHelp {
 		flag.Usage()
-		return
+		return nil
 	}
 
 	p := tea.NewProgram(context.Background(), newModel())
@@ -129,7 +128,6 @@ func Main() {
 		log.SetOutput(io.Discard)
 	}
 
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("Error starting Bubble Tea program:", err.Error())
-	}
+	_, err := p.Run()
+	return err
 }

@@ -6,7 +6,6 @@ package result
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -70,17 +69,17 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(s.String())
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{})
-
+func Main(ctx context.Context) error {
 	// Run returns the model as a tea.Model.
-	m, err := p.Run()
+	m, err := tea.NewProgram(ctx, &model{}).Run()
 	if err != nil {
-		log.Fatalln("Oh no:", err.Error())
+		return err
 	}
 
 	// Assert the final tea.Model to our local model and print the choice.
 	if m.choice != "" {
 		fmt.Printf("\n---\nYou chose %s!\n", m.choice)
 	}
+
+	return nil
 }

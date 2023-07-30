@@ -3,7 +3,6 @@ package basics
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/rprtr258/tea"
 )
@@ -78,9 +77,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(s)
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), initialModel())
-	if _, err := p.Run(); err != nil {
-		log.Fatalln("Alas, there's been an error:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, initialModel()).Run()
+	return err
 }

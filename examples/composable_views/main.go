@@ -3,7 +3,6 @@ package composable_views
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -76,7 +75,7 @@ func newModel(timeout time.Duration) *mainModel {
 
 func (m *mainModel) Init() []tea.Cmd {
 	// start the timer and spinner on program start
-	return append(m.timer.Init(), m.spinner.Tick)
+	return append(m.timer.Init(), m.spinner.CmdTick)
 }
 
 func (m *mainModel) Update(msg tea.Msg) []tea.Cmd {
@@ -99,7 +98,7 @@ func (m *mainModel) Update(msg tea.Msg) []tea.Cmd {
 			} else {
 				m.Next()
 				m.resetSpinner()
-				cmds = append(cmds, m.spinner.Tick)
+				cmds = append(cmds, m.spinner.CmdTick)
 			}
 		}
 		switch m.state {
@@ -150,10 +149,7 @@ func (m *mainModel) resetSpinner() {
 	m.spinner.Spinner = spinners[m.index]
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), newModel(defaultTime))
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, newModel(defaultTime)).Run()
+	return err
 }

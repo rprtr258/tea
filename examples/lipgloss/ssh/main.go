@@ -10,6 +10,7 @@ package ssh
 // For details on wish see: https://github.com/charmbracelet/wish/
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -126,7 +127,7 @@ func handler(next ssh.Handler) ssh.Handler {
 
 		// Initialize new renderer for the client.
 		renderer := lipgloss.NewRenderer(sess)
-		renderer.SetOutput(clientOutput)
+		renderer.Output = clientOutput
 
 		// Initialize new styles against the renderer.
 		styles := makeStyles(renderer)
@@ -161,9 +162,11 @@ func handler(next ssh.Handler) ssh.Handler {
 			styles.gray,
 		)
 
-		fmt.Fprintf(&str, "%s %t %s\n\n", styles.bold.Copy().UnsetString().Render("Has dark background?"),
+		fmt.Fprintf(&str, "%s %t %s\n\n",
+			styles.bold.Copy().UnsetString().Render("Has dark background?"),
 			renderer.HasDarkBackground(),
-			renderer.Output().BackgroundColor())
+			renderer.Output.BackgroundColor(),
+		)
 
 		block := renderer.Place(width,
 			lipgloss.Height(str.String()), lipgloss.Center, lipgloss.Center, str.String(),
@@ -178,7 +181,7 @@ func handler(next ssh.Handler) ssh.Handler {
 	}
 }
 
-func Main() {
+func Main(context.Context) error {
 	port := 3456
 	s, err := wish.NewServer(
 		wish.WithAddress(fmt.Sprintf(":%d", port)),
@@ -186,9 +189,10 @@ func Main() {
 		wish.WithMiddleware(handler, lm.Middleware()),
 	)
 	if err != nil {
-		log.Fatalln(err.Error())
+		return err
 	}
+
 	log.Printf("SSH server listening on port %d", port)
 	log.Printf("To connect from your local machine run: ssh localhost -p %d", port)
-	log.Fatalln(s.ListenAndServe().Error())
+	return s.ListenAndServe()
 }

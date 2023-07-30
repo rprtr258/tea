@@ -87,6 +87,13 @@ var (
 		Frames: []string{"", ".", "..", "..."},
 		FPS:    time.Second / 3, //nolint:gomnd
 	}
+	Circle = Spinner{
+		Frames: []string{
+			"⠈⠁", "⠈⠑", "⠈⠱", "⠈⡱", "⢀⡱", "⢄⡱", "⢄⡱", "⢆⡱",
+			"⢎⡱", "⢎⡰", "⢎⡠", "⢎⡀", "⢎⠁", "⠎⠁", "⠊⠁",
+		},
+		FPS: 100 * time.Millisecond,
+	}
 )
 
 // Model contains the state for the spinner. Use New to create new models
@@ -125,11 +132,6 @@ func New(opts ...Option) Model {
 
 	return m
 }
-
-// NewModel returns a model with default values.
-//
-// Deprecated: use [New] instead.
-var NewModel = New
 
 // MsgTick indicates that the timer has ticked and we should render a frame.
 type MsgTick struct {
@@ -176,9 +178,9 @@ func (m *Model) View() string {
 	return m.Style.Render(m.Spinner.Frames[m.frame])
 }
 
-// Tick is the command used to advance the spinner one frame. Use this command
+// CmdTick is the command used to advance the spinner one frame. Use this command
 // to effectively start the spinner.
-func (m *Model) Tick() tea.Msg {
+func (m *Model) CmdTick() tea.Msg {
 	return MsgTick{
 		// The time at which the tick occurred.
 		Time: time.Now(),
@@ -200,14 +202,6 @@ func (m *Model) tick(id, tag int) tea.Cmd {
 			tag:  tag,
 		}
 	})
-}
-
-// Tick is the command used to advance the spinner one frame. Use this command
-// to effectively start the spinner.
-//
-// Deprecated: Use [Model.Tick] instead.
-func Tick() tea.Msg {
-	return MsgTick{Time: time.Now()}
 }
 
 // Option is used to set options in New. For example:

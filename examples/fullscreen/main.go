@@ -6,7 +6,6 @@ package fullscreen
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -49,10 +48,11 @@ func tick() tea.Cmd {
 	})
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	m := model(5)
-	p := tea.NewProgram(context.Background(), &m).WithAltScreen()
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+	_, err := tea.
+		NewProgram(ctx, &m).
+		WithAltScreen().
+		Run()
+	return err
 }

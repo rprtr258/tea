@@ -267,8 +267,8 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 			case <-p.ctx.Done():
 				return
 
-			case cmd := <-cmds:
-				if cmd == nil {
+			case cmds := <-cmds:
+				if cmds == nil {
 					continue
 				}
 
@@ -278,8 +278,9 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 				// possible to cancel them so we'll have to leak the goroutine
 				// until Cmd returns.
 				go func() {
-					for _, c := range cmd {
-						p.Send(c()) // this can be long.
+					for _, cmd := range cmds {
+						msg := cmd()
+						p.Send(msg) // this can be long.
 					}
 				}()
 			}
@@ -342,14 +343,6 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 			case msgExec:
 				// NB: this blocks.
 				p.exec(msg.cmd, msg.fn)
-
-			case msgSequence:
-				go func() {
-					// Execute commands one at a time, in order.
-					for _, cmd := range msg {
-						p.Send(cmd())
-					}
-				}()
 			}
 
 			p.renderer.handleMessages(msg)
@@ -510,25 +503,6 @@ func (p *Program[M]) Run() (M, error) {
 	p.shutdown(killed)
 
 	return model, err
-}
-
-// StartReturningModel initializes the program and runs its event loops,
-// blocking until it gets terminated by either [Program.Quit], [Program.Kill],
-// or its signal handler. Returns the final model.
-//
-// Deprecated: please use [Program.Run] instead.
-func (p *Program[M]) StartReturningModel() (M, error) {
-	return p.Run()
-}
-
-// Start initializes the program and runs its event loops, blocking until it
-// gets terminated by either [Program.Quit], [Program.Kill], or its signal
-// handler.
-//
-// Deprecated: please use [Program.Run] instead.
-func (p *Program[M]) Start() error {
-	_, err := p.Run()
-	return err
 }
 
 // Send sends a message to the main update function, effectively allowing

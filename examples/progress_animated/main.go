@@ -9,7 +9,6 @@ package progress_animated
 
 import (
 	"context"
-	"log"
 	"strings"
 	"time"
 
@@ -79,12 +78,11 @@ func tickCmd() tea.Cmd {
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
 
-func Main() {
+func Main(ctx context.Context) error {
 	m := &model{
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
 
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("Oh no!", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, m).Run()
+	return err
 }

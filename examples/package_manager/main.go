@@ -3,7 +3,6 @@ package package_manager
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -45,7 +44,7 @@ func newModel() *model {
 }
 
 func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{downloadAndInstall(m.packages[m.index]), m.spinner.Tick}
+	return []tea.Cmd{downloadAndInstall(m.packages[m.index]), m.spinner.CmdTick}
 }
 
 func (m *model) Update(msg tea.Msg) []tea.Cmd {
@@ -123,8 +122,7 @@ func max(a, b int) int {
 	return b
 }
 
-func Main() {
-	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, newModel()).Run()
+	return err
 }

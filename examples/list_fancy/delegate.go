@@ -6,13 +6,13 @@ import (
 	"github.com/rprtr258/tea/bubbles/list"
 )
 
-func newItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
-	d := list.NewDefaultDelegate()
+func newItemDelegate[I list.DefaultItem](keys *delegateKeyMap) list.DefaultDelegate[I] {
+	d := list.NewDefaultDelegate[I]()
 
-	d.UpdateFunc = func(msg tea.Msg, m *list.Model) tea.Cmd {
+	d.UpdateFunc = func(msg tea.Msg, m *list.Model[I]) []tea.Cmd {
 		var title string
 
-		if i, ok := m.SelectedItem().(item); ok {
+		if i, ok := m.SelectedItem(); ok {
 			title = i.Title()
 		} else {
 			return nil
@@ -22,7 +22,7 @@ func newItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 		case tea.MsgKey:
 			switch {
 			case key.Matches(msg, keys.choose):
-				return m.NewStatusMessage(statusMessageStyle("You chose " + title))
+				return []tea.Cmd{m.NewStatusMessage(statusMessageStyle("You chose " + title))}
 
 			case key.Matches(msg, keys.remove):
 				index := m.Index()
@@ -30,7 +30,7 @@ func newItemDelegate(keys *delegateKeyMap) list.DefaultDelegate {
 				if len(m.Items()) == 0 {
 					keys.remove.SetEnabled(false)
 				}
-				return m.NewStatusMessage(statusMessageStyle("Deleted " + title))
+				return []tea.Cmd{m.NewStatusMessage(statusMessageStyle("Deleted " + title))}
 			}
 		}
 

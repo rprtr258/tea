@@ -87,8 +87,8 @@ func (m *Model) Start() []tea.Cmd {
 	}
 }
 
-// Stop stops the stopwatch.
-func (m *Model) Stop() tea.Cmd {
+// CmdStop stops the stopwatch.
+func (m *Model) CmdStop() tea.Cmd {
 	return func() tea.Msg {
 		return MsgStartStop{ID: m.id, running: false}
 	}
@@ -97,13 +97,13 @@ func (m *Model) Stop() tea.Cmd {
 // Toggle stops the stopwatch if it is running and starts it if it is stopped.
 func (m *Model) Toggle() []tea.Cmd {
 	if m.Running() {
-		return []tea.Cmd{m.Stop()}
+		return []tea.Cmd{m.CmdStop()}
 	}
 	return m.Start()
 }
 
-// Reset resets the stopwatch to 0.
-func (m *Model) Reset() tea.Cmd {
+// CmdReset resets the stopwatch to 0.
+func (m *Model) CmdReset() tea.Cmd {
 	return func() tea.Msg {
 		return MsgReset{ID: m.id}
 	}

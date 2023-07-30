@@ -2,7 +2,6 @@ package exec
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/exec"
 
@@ -65,8 +64,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("Press 'e' to open your EDITOR.\nPress 'a' to toggle the altscreen\nPress 'q' to quit.\n")
 }
 
-func Main() {
-	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{}).Run()
+	return err
 }

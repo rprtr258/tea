@@ -95,7 +95,8 @@ func TestTeaWithFilter(t *testing.T) {
 			}
 		}()
 
-		assert.NoError(t, p.Start())
+		_, err := p.Run()
+		assert.NoError(t, err)
 		assert.Equal(t, preventCount, shutdowns)
 	}
 }
@@ -170,40 +171,6 @@ func TestMsgBatch(t *testing.T) {
 	_, err := p.Run()
 	assert.NoError(t, err)
 	assert.Equal(t, int32(2), m.counter.Load())
-}
-
-func TestMsgSequence(t *testing.T) {
-	var buf bytes.Buffer
-	var in bytes.Buffer
-
-	inc := func() Msg {
-		return msgIncrement{}
-	}
-
-	m := &testModel{}
-	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
-	go p.Send(msgSequence{inc, inc, Quit})
-
-	_, err := p.Run()
-	assert.NoError(t, err)
-	assert.Equal(t, int32(2), m.counter.Load())
-}
-
-func TestMsgSequenceWithMsgBatch(t *testing.T) {
-	var buf bytes.Buffer
-	var in bytes.Buffer
-
-	inc := func() Msg {
-		return msgIncrement{}
-	}
-
-	m := &testModel{}
-	p := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf)
-	go p.Send(msgSequence{inc, inc, inc, Quit})
-
-	_, err := p.Run()
-	assert.NoError(t, err)
-	assert.Equal(t, int32(3), m.counter.Load())
 }
 
 func TestTeaSend(t *testing.T) {

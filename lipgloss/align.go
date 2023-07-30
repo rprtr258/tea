@@ -12,8 +12,8 @@ import (
 // use that to style the spaces added.
 func alignTextHorizontal(str string, pos Position, width int, style *termenv.Style) string {
 	lines, widestLine := getLines(str)
-	var b strings.Builder
 
+	var sb strings.Builder
 	for i, l := range lines {
 		lineWidth := ansi.PrintableRuneWidth(l)
 
@@ -49,13 +49,13 @@ func alignTextHorizontal(str string, pos Position, width int, style *termenv.Sty
 			}
 		}
 
-		b.WriteString(l)
+		sb.WriteString(l)
 		if i < len(lines)-1 {
-			b.WriteRune('\n')
+			sb.WriteRune('\n')
 		}
 	}
 
-	return b.String()
+	return sb.String()
 }
 
 func alignTextVertical(str string, pos Position, height int, _ *termenv.Style) string {

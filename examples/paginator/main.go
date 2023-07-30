@@ -6,7 +6,6 @@ package paginator
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/rprtr258/tea/bubbles/paginator"
@@ -67,9 +66,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(b.String())
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), newModel())
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, newModel()).Run()
+	return err
 }

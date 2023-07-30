@@ -2,7 +2,6 @@ package split_editors
 
 import (
 	"context"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
@@ -194,8 +193,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(lipgloss.JoinHorizontal(lipgloss.Top, views...) + "\n\n" + help)
 }
 
-func Main() {
-	if _, err := tea.NewProgram(context.Background(), newModel()).WithAltScreen().Run(); err != nil {
-		log.Fatalln("Error while running program:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, newModel()).WithAltScreen().Run()
+	return err
 }

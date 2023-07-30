@@ -93,18 +93,25 @@ func doWaitFor(r io.Reader, condition func(bts []byte) bool, options ...WaitForO
 		opt(&wf)
 	}
 
-	var b bytes.Buffer
-	start := time.Now()
-	for time.Since(start) <= wf.Duration {
-		if _, err := io.ReadAll(io.TeeReader(r, &b)); err != nil {
-			return fmt.Errorf("WaitFor: %w", err)
+	ticker := time.NewTicker(wf.CheckInterval)
+	defer ticker.Stop()
+
+	var sb bytes.Buffer
+	timeoutCh := time.After(wf.Duration)
+	for {
+		select {
+		case <-timeoutCh:
+			return fmt.Errorf("WaitFor: condition not met after %s", wf.Duration)
+		case <-ticker.C:
+			if _, err := io.ReadAll(io.TeeReader(r, &sb)); err != nil {
+				return fmt.Errorf("WaitFor: %w", err)
+			}
+
+			if condition(sb.Bytes()) {
+				return nil
+			}
 		}
-		if condition(b.Bytes()) {
-			return nil
-		}
-		time.Sleep(wf.CheckInterval)
 	}
-	return fmt.Errorf("WaitFor: condition not met after %s", wf.Duration)
 }
 
 // TestModel is a model that is being tested.

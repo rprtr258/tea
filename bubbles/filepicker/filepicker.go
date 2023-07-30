@@ -202,7 +202,7 @@ func (m *Model) popView() (int, int, int) {
 	return m.selectedStack.Pop(), m.minStack.Pop(), m.maxStack.Pop()
 }
 
-func (m *Model) readDir(path string, showHidden bool) tea.Cmd {
+func (m *Model) cmdReadDir(path string, showHidden bool) tea.Cmd {
 	return func() tea.Msg {
 		dirEntries, err := os.ReadDir(path)
 		if err != nil {
@@ -234,11 +234,11 @@ func (m *Model) readDir(path string, showHidden bool) tea.Cmd {
 
 // Init initializes the file picker model.
 func (m *Model) Init() tea.Cmd {
-	return m.readDir(m.CurrentDirectory, m.ShowHidden)
+	return m.cmdReadDir(m.CurrentDirectory, m.ShowHidden)
 }
 
 // Update handles user interactions within the file picker model.
-func (m *Model) Update(msg tea.Msg) tea.Cmd {
+func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case msgReadDir:
 		if msg.id != m.id {
@@ -312,7 +312,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 				m.min = 0
 				m.max = m.Height - 1
 			}
-			return m.readDir(m.CurrentDirectory, m.ShowHidden)
+			return []tea.Cmd{m.cmdReadDir(m.CurrentDirectory, m.ShowHidden)}
 		case key.Matches(msg, m.KeyMap.Open):
 			if len(m.files) == 0 {
 				break
@@ -353,7 +353,7 @@ func (m *Model) Update(msg tea.Msg) tea.Cmd {
 			m.selected = 0
 			m.min = 0
 			m.max = m.Height - 1
-			return m.readDir(m.CurrentDirectory, m.ShowHidden)
+			return []tea.Cmd{m.cmdReadDir(m.CurrentDirectory, m.ShowHidden)}
 		}
 	}
 	return nil
@@ -364,8 +364,8 @@ func (m *Model) View() string {
 	if len(m.files) == 0 {
 		return m.Styles.EmptyDirectory.String()
 	}
-	var s strings.Builder
 
+	var s strings.Builder
 	for i, f := range m.files {
 		if i < m.min || i > m.max {
 			continue

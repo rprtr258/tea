@@ -36,9 +36,9 @@ type Item interface {
 //
 // Note that if the delegate also implements help.KeyMap delegate-related
 // help items will be added to the help view.
-type ItemDelegate interface {
+type ItemDelegate[I Item] interface {
 	// Render renders the item's view.
-	Render(w io.Writer, m *Model, index int, item Item)
+	Render(w io.Writer, m *Model[I], index int, item I)
 
 	// Height is the height of the list item.
 	Height() int
@@ -50,18 +50,18 @@ type ItemDelegate interface {
 	// loop will pass through here except when the user is setting a filter.
 	// Use this method to perform item-level updates appropriate to this
 	// delegate.
-	Update(msg tea.Msg, m *Model) tea.Cmd
+	Update(msg tea.Msg, m *Model[I]) []tea.Cmd
 }
 
-type filteredItem struct {
-	item    Item  // item matched
+type filteredItem[I Item] struct {
+	item    I     // item matched
 	matches []int // rune indices of matched items
 }
 
-type filteredItems []filteredItem
+type filteredItems[I Item] []filteredItem[I]
 
-func (f filteredItems) items() []Item {
-	agg := make([]Item, len(f))
+func (f filteredItems[I]) items() []I {
+	agg := make([]I, len(f))
 	for i, v := range f {
 		agg[i] = v.item
 	}
@@ -70,7 +70,7 @@ func (f filteredItems) items() []Item {
 
 // MsgFilterMatches contains data about items matched during filtering. The
 // message should be routed to Update for processing.
-type MsgFilterMatches []filteredItem
+type MsgFilterMatches[I Item] []filteredItem[I]
 
 // FilterFunc takes a term and a list of strings to search through
 // (defined by Item#FilterValue).
@@ -136,7 +136,7 @@ func (f FilterState) String() string {
 }
 
 // Model contains the state of this component.
-type Model struct {
+type Model[I Item] struct {
 	showTitle        bool
 	showFilter       bool
 	showStatusBar    bool
@@ -185,37 +185,31 @@ type Model struct {
 	statusMessageTimer *time.Timer
 
 	// The master set of items we're working with.
-	items []Item
+	items []I
 
 	// Filtered items we're currently displaying. Filtering, toggles and so on
 	// will alter this slice so we can show what is relevant. For that reason,
 	// this field should be considered ephemeral.
-	filteredItems filteredItems
+	filteredItems filteredItems[I]
 
-	delegate ItemDelegate
+	delegate ItemDelegate[I]
 }
 
 // New returns a new model with sensible defaults.
-func New(items []Item, delegate ItemDelegate, width, height int) Model {
-	styles := DefaultStyles()
-
-	sp := spinner.New()
-	sp.Spinner = spinner.Line
-	sp.Style = styles.Spinner
-
+func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I] {
 	filterInput := textinput.New()
 	filterInput.Prompt = "Filter: "
-	filterInput.PromptStyle = styles.FilterPrompt
-	filterInput.Cursor.Style = styles.FilterCursor
+	filterInput.PromptStyle = DefaultStyle.FilterPrompt
+	filterInput.Cursor.Style = DefaultStyle.FilterCursor
 	filterInput.CharLimit = 64
 	filterInput.Focus()
 
 	p := paginator.New()
 	p.Type = paginator.Dots
-	p.ActiveDot = styles.ActivePaginationDot.String()
-	p.InactiveDot = styles.InactivePaginationDot.String()
+	p.ActiveDot = DefaultStyle.ActivePaginationDot.String()
+	p.InactiveDot = DefaultStyle.InactivePaginationDot.String()
 
-	m := Model{
+	m := Model[I]{
 		showTitle:             true,
 		showFilter:            true,
 		showStatusBar:         true,
@@ -226,7 +220,7 @@ func New(items []Item, delegate ItemDelegate, width, height int) Model {
 		filteringEnabled:      true,
 		KeyMap:                DefaultKeyMap(),
 		Filter:                DefaultFilter,
-		Styles:                styles,
+		Styles:                DefaultStyle,
 		Title:                 "List",
 		FilterInput:           filterInput,
 		StatusMessageLifetime: time.Second,
@@ -236,8 +230,11 @@ func New(items []Item, delegate ItemDelegate, width, height int) Model {
 		delegate:  delegate,
 		items:     items,
 		Paginator: p,
-		spinner:   sp,
-		Help:      help.New(),
+		spinner: spinner.New(
+			spinner.WithSpinner(spinner.Line),
+			spinner.WithStyle(DefaultStyle.Spinner),
+		),
+		Help: help.New(),
 	}
 
 	m.updatePagination()
@@ -245,14 +242,9 @@ func New(items []Item, delegate ItemDelegate, width, height int) Model {
 	return m
 }
 
-// NewModel returns a new model with sensible defaults.
-//
-// Deprecated: use [New] instead.
-var NewModel = New
-
 // SetFilteringEnabled enables or disables filtering. Note that this is different
 // from ShowFilter, which merely hides or shows the input view.
-func (m *Model) SetFilteringEnabled(v bool) {
+func (m *Model[I]) SetFilteringEnabled(v bool) {
 	m.filteringEnabled = v
 	if !v {
 		m.resetFiltering()
@@ -261,18 +253,18 @@ func (m *Model) SetFilteringEnabled(v bool) {
 }
 
 // FilteringEnabled returns whether or not filtering is enabled.
-func (m *Model) FilteringEnabled() bool {
+func (m *Model[I]) FilteringEnabled() bool {
 	return m.filteringEnabled
 }
 
 // SetShowTitle shows or hides the title bar.
-func (m *Model) SetShowTitle(v bool) {
+func (m *Model[I]) SetShowTitle(v bool) {
 	m.showTitle = v
 	m.updatePagination()
 }
 
 // ShowTitle returns whether or not the title bar is set to be rendered.
-func (m *Model) ShowTitle() bool {
+func (m *Model[I]) ShowTitle() bool {
 	return m.showTitle
 }
 
@@ -282,7 +274,7 @@ func (m *Model) ShowTitle() bool {
 // re-implement filtering from scratch.
 //
 // To disable filtering entirely use EnableFiltering.
-func (m *Model) SetShowFilter(v bool) {
+func (m *Model[I]) SetShowFilter(v bool) {
 	m.showFilter = v
 	m.updatePagination()
 }
@@ -291,64 +283,64 @@ func (m *Model) SetShowFilter(v bool) {
 // that this is separate from FilteringEnabled, so filtering can be hidden yet
 // still invoked. This allows you to render filtering differently without
 // having to re-implement it from scratch.
-func (m *Model) ShowFilter() bool {
+func (m *Model[I]) ShowFilter() bool {
 	return m.showFilter
 }
 
 // SetShowStatusBar shows or hides the view that displays metadata about the
 // list, such as item counts.
-func (m *Model) SetShowStatusBar(v bool) {
+func (m *Model[I]) SetShowStatusBar(v bool) {
 	m.showStatusBar = v
 	m.updatePagination()
 }
 
 // ShowStatusBar returns whether or not the status bar is set to be rendered.
-func (m *Model) ShowStatusBar() bool {
+func (m *Model[I]) ShowStatusBar() bool {
 	return m.showStatusBar
 }
 
 // SetStatusBarItemName defines a replacement for the item's identifier.
 // Defaults to item/items.
-func (m *Model) SetStatusBarItemName(singular, plural string) {
+func (m *Model[I]) SetStatusBarItemName(singular, plural string) {
 	m.itemNameSingular = singular
 	m.itemNamePlural = plural
 }
 
 // StatusBarItemName returns singular and plural status bar item names.
-func (m *Model) StatusBarItemName() (string, string) {
+func (m *Model[I]) StatusBarItemName() (string, string) {
 	return m.itemNameSingular, m.itemNamePlural
 }
 
 // SetShowPagination hides or shows the paginator. Note that pagination will
 // still be active, it simply won't be displayed.
-func (m *Model) SetShowPagination(v bool) {
+func (m *Model[I]) SetShowPagination(v bool) {
 	m.showPagination = v
 	m.updatePagination()
 }
 
 // ShowPagination returns whether the pagination is visible.
-func (m *Model) ShowPagination() bool {
+func (m *Model[I]) ShowPagination() bool {
 	return m.showPagination
 }
 
 // SetShowHelp shows or hides the help view.
-func (m *Model) SetShowHelp(v bool) {
+func (m *Model[I]) SetShowHelp(v bool) {
 	m.showHelp = v
 	m.updatePagination()
 }
 
 // ShowHelp returns whether or not the help is set to be rendered.
-func (m *Model) ShowHelp() bool {
+func (m *Model[I]) ShowHelp() bool {
 	return m.showHelp
 }
 
 // Items returns the items in the list.
-func (m *Model) Items() []Item {
+func (m *Model[I]) Items() []I {
 	return m.items
 }
 
 // SetItems sets the items available in the list. This returns a command.
-func (m *Model) SetItems(items []Item) tea.Cmd {
+func (m *Model[I]) SetItems(items []I) tea.Cmd {
 	m.items = items
 
 	var cmd tea.Cmd
@@ -363,28 +355,28 @@ func (m *Model) SetItems(items []Item) tea.Cmd {
 }
 
 // Select selects the given index of the list and goes to its respective page.
-func (m *Model) Select(index int) {
+func (m *Model[I]) Select(index int) {
 	m.Paginator.Page = index / m.Paginator.PerPage
 	m.cursor = index % m.Paginator.PerPage
 }
 
 // ResetSelected resets the selected item to the first item in the first page of the list.
-func (m *Model) ResetSelected() {
+func (m *Model[I]) ResetSelected() {
 	m.Select(0)
 }
 
 // ResetFilter resets the current filtering state.
-func (m *Model) ResetFilter() {
+func (m *Model[I]) ResetFilter() {
 	m.resetFiltering()
 }
 
 // SetItem replaces an item at the given index. This returns a command.
-func (m *Model) SetItem(index int, item Item) tea.Cmd {
-	var cmd tea.Cmd
+func (m *Model[I]) SetItem(index int, item I) []tea.Cmd {
 	m.items[index] = item
 
+	var cmd []tea.Cmd
 	if m.filterState != Unfiltered {
-		cmd = filterItems(*m)
+		cmd = append(cmd, filterItems(*m))
 	}
 
 	m.updatePagination()
@@ -393,12 +385,12 @@ func (m *Model) SetItem(index int, item Item) tea.Cmd {
 
 // InsertItem inserts an item at the given index. If the index is out of the upper bound,
 // the item will be appended. This returns a command.
-func (m *Model) InsertItem(index int, item Item) tea.Cmd {
-	var cmd tea.Cmd
+func (m *Model[I]) InsertItem(index int, item I) []tea.Cmd {
 	m.items = insertItemIntoSlice(m.items, item, index)
 
+	var cmd []tea.Cmd
 	if m.filterState != Unfiltered {
-		cmd = filterItems(*m)
+		cmd = append(cmd, filterItems(*m))
 	}
 
 	m.updatePagination()
@@ -409,10 +401,10 @@ func (m *Model) InsertItem(index int, item Item) tea.Cmd {
 // RemoveItem removes an item at the given index. If the index is out of bounds
 // this will be a no-op. O(n) complexity, which probably won't matter in the
 // case of a TUI.
-func (m *Model) RemoveItem(index int) {
+func (m *Model[I]) RemoveItem(index int) {
 	m.items = removeItemFromSlice(m.items, index)
 	if m.filterState != Unfiltered {
-		m.filteredItems = removeFilterMatchFromSlice(m.filteredItems, index)
+		m.filteredItems = removeItemFromSlice(m.filteredItems, index)
 		if len(m.filteredItems) == 0 {
 			m.resetFiltering()
 		}
@@ -421,36 +413,38 @@ func (m *Model) RemoveItem(index int) {
 }
 
 // SetDelegate sets the item delegate.
-func (m *Model) SetDelegate(d ItemDelegate) {
+func (m *Model[I]) SetDelegate(d ItemDelegate[I]) {
 	m.delegate = d
 	m.updatePagination()
 }
 
 // VisibleItems returns the total items available to be shown.
-func (m *Model) VisibleItems() []Item {
+func (m *Model[I]) VisibleItems() []I {
 	if m.filterState != Unfiltered {
 		return m.filteredItems.items()
 	}
 	return m.items
 }
 
-// SelectedItem returns the current selected item in the list.
-func (m *Model) SelectedItem() Item {
+// SelectedItem returns the current selected item in the list and true if it
+// exists. False otherwise.
+func (m *Model[I]) SelectedItem() (I, bool) {
 	i := m.Index()
 
 	items := m.VisibleItems()
-	if i < 0 || len(items) == 0 || len(items) <= i {
-		return nil
+	if i < 0 || i >= len(items) {
+		var i I
+		return i, false
 	}
 
-	return items[i]
+	return items[i], true
 }
 
 // MatchesForItem returns rune positions matched by the current filter, if any.
 // Use this to style runes matched by the active filter.
 //
 // See DefaultItemView for a usage example.
-func (m *Model) MatchesForItem(index int) []int {
+func (m *Model[I]) MatchesForItem(index int) []int {
 	if m.filteredItems == nil || index >= len(m.filteredItems) {
 		return nil
 	}
@@ -459,18 +453,18 @@ func (m *Model) MatchesForItem(index int) []int {
 
 // Index returns the index of the currently selected item as it appears in the
 // entire slice of items.
-func (m *Model) Index() int {
+func (m *Model[I]) Index() int {
 	return m.Paginator.Page*m.Paginator.PerPage + m.cursor
 }
 
 // Cursor returns the index of the cursor on the current page.
-func (m *Model) Cursor() int {
+func (m *Model[I]) Cursor() int {
 	return m.cursor
 }
 
 // CursorUp moves the cursor up. This can also move the state to the previous
 // page.
-func (m *Model) CursorUp() {
+func (m *Model[I]) CursorUp() {
 	m.cursor--
 
 	// If we're at the start, stop
@@ -498,7 +492,7 @@ func (m *Model) CursorUp() {
 
 // CursorDown moves the cursor down. This can also advance the state to the
 // next page.
-func (m *Model) CursorDown() {
+func (m *Model[I]) CursorDown() {
 	itemsOnPage := m.Paginator.ItemsOnPage(len(m.VisibleItems()))
 
 	m.cursor++
@@ -533,22 +527,22 @@ func (m *Model) CursorDown() {
 }
 
 // PrevPage moves to the previous page, if available.
-func (m *Model) PrevPage() {
+func (m *Model[I]) PrevPage() {
 	m.Paginator.PrevPage()
 }
 
 // NextPage moves to the next page, if available.
-func (m *Model) NextPage() {
+func (m *Model[I]) NextPage() {
 	m.Paginator.NextPage()
 }
 
 // FilterState returns the current filter state.
-func (m *Model) FilterState() FilterState {
+func (m *Model[I]) FilterState() FilterState {
 	return m.filterState
 }
 
 // FilterValue returns the current value of the filter.
-func (m *Model) FilterValue() string {
+func (m *Model[I]) FilterValue() string {
 	return m.FilterInput.Value()
 }
 
@@ -559,7 +553,7 @@ func (m *Model) FilterValue() string {
 //
 // It's included here because it's a common thing to check for when
 // implementing this component.
-func (m *Model) SettingFilter() bool {
+func (m *Model[I]) SettingFilter() bool {
 	return m.filterState == Filtering
 }
 
@@ -567,48 +561,49 @@ func (m *Model) SettingFilter() bool {
 // It's purely a convenience method for the following:
 //
 //	m.FilterState() == FilterApplied
-func (m *Model) IsFiltered() bool {
+func (m *Model[I]) IsFiltered() bool {
 	return m.filterState == FilterApplied
 }
 
 // Width returns the current width setting.
-func (m *Model) Width() int {
+func (m *Model[I]) Width() int {
 	return m.width
 }
 
 // Height returns the current height setting.
-func (m *Model) Height() int {
+func (m *Model[I]) Height() int {
 	return m.height
 }
 
 // SetSpinner allows to set the spinner style.
-func (m *Model) SetSpinner(spinner spinner.Spinner) {
+func (m *Model[I]) SetSpinner(spinner spinner.Spinner) {
 	m.spinner.Spinner = spinner
 }
 
 // ToggleSpinner toggles the spinner. Note that this also returns a command.
-func (m *Model) ToggleSpinner() tea.Cmd {
+func (m *Model[I]) ToggleSpinner() []tea.Cmd {
 	if !m.showSpinner {
-		return m.StartSpinner()
+		return []tea.Cmd{m.StartSpinner()}
 	}
+
 	m.StopSpinner()
 	return nil
 }
 
 // StartSpinner starts the spinner. Note that this returns a command.
-func (m *Model) StartSpinner() tea.Cmd {
+func (m *Model[I]) StartSpinner() tea.Cmd {
 	m.showSpinner = true
-	return m.spinner.Tick
+	return m.spinner.CmdTick
 }
 
 // StopSpinner stops the spinner.
-func (m *Model) StopSpinner() {
+func (m *Model[I]) StopSpinner() {
 	m.showSpinner = false
 }
 
 // DisableQuitKeybindings is a helper for disabling the keybindings used for quitting,
 // in case you want to handle this elsewhere in your application.
-func (m *Model) DisableQuitKeybindings() {
+func (m *Model[I]) DisableQuitKeybindings() {
 	m.disableQuitKeybindings = true
 	m.KeyMap.Quit.SetEnabled(false)
 	m.KeyMap.ForceQuit.SetEnabled(false)
@@ -616,7 +611,7 @@ func (m *Model) DisableQuitKeybindings() {
 
 // NewStatusMessage sets a new status message, which will show for a limited
 // amount of time. Note that this also returns a command.
-func (m *Model) NewStatusMessage(s string) tea.Cmd {
+func (m *Model[I]) NewStatusMessage(s string) tea.Cmd {
 	m.statusMessage = s
 	if m.statusMessageTimer != nil {
 		m.statusMessageTimer.Stop()
@@ -632,21 +627,21 @@ func (m *Model) NewStatusMessage(s string) tea.Cmd {
 }
 
 // SetSize sets the width and height of this component.
-func (m *Model) SetSize(width, height int) {
+func (m *Model[I]) SetSize(width, height int) {
 	m.setSize(width, height)
 }
 
 // SetWidth sets the width of this component.
-func (m *Model) SetWidth(v int) {
+func (m *Model[I]) SetWidth(v int) {
 	m.setSize(v, m.height)
 }
 
 // SetHeight sets the height of this component.
-func (m *Model) SetHeight(v int) {
+func (m *Model[I]) SetHeight(v int) {
 	m.setSize(m.width, v)
 }
 
-func (m *Model) setSize(width, height int) {
+func (m *Model[I]) setSize(width, height int) {
 	promptWidth := lipgloss.Width(m.Styles.Title.Render(m.FilterInput.Prompt))
 
 	m.width = width
@@ -656,7 +651,7 @@ func (m *Model) setSize(width, height int) {
 	m.updatePagination()
 }
 
-func (m *Model) resetFiltering() {
+func (m *Model[I]) resetFiltering() {
 	if m.filterState == Unfiltered {
 		return
 	}
@@ -668,10 +663,10 @@ func (m *Model) resetFiltering() {
 	m.updateKeybindings()
 }
 
-func (m *Model) itemsAsFilterItems() filteredItems {
-	fi := make([]filteredItem, len(m.items))
+func (m *Model[I]) itemsAsFilterItems() filteredItems[I] {
+	fi := make([]filteredItem[I], len(m.items))
 	for i, item := range m.items {
-		fi[i] = filteredItem{
+		fi[i] = filteredItem[I]{
 			item: item,
 		}
 	}
@@ -679,7 +674,7 @@ func (m *Model) itemsAsFilterItems() filteredItems {
 }
 
 // Set keybindings according to the filter state.
-func (m *Model) updateKeybindings() {
+func (m *Model[I]) updateKeybindings() {
 	switch m.filterState {
 	case Filtering:
 		m.KeyMap.CursorUp.SetEnabled(false)
@@ -726,7 +721,7 @@ func (m *Model) updateKeybindings() {
 }
 
 // Update pagination according to the amount of items for the current state.
-func (m *Model) updatePagination() {
+func (m *Model[I]) updatePagination() {
 	index := m.Index()
 	availHeight := m.height
 
@@ -761,7 +756,7 @@ func (m *Model) updatePagination() {
 	}
 }
 
-func (m *Model) hideStatusMessage() {
+func (m *Model[I]) hideStatusMessage() {
 	m.statusMessage = ""
 	if m.statusMessageTimer != nil {
 		m.statusMessageTimer.Stop()
@@ -769,7 +764,7 @@ func (m *Model) hideStatusMessage() {
 }
 
 // Update is the Bubble Tea update loop.
-func (m *Model) Update(msg tea.Msg) []tea.Cmd {
+func (m *Model[I]) Update(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
@@ -778,8 +773,8 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			return []tea.Cmd{tea.Quit}
 		}
 
-	case MsgFilterMatches:
-		m.filteredItems = filteredItems(msg)
+	case MsgFilterMatches[I]:
+		m.filteredItems = filteredItems[I](msg)
 		return nil
 
 	case spinner.MsgTick:
@@ -793,17 +788,14 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	}
 
 	if m.filterState == Filtering {
-		cmds = append(cmds, m.handleFiltering(msg)...)
-	} else {
-		cmds = append(cmds, m.handleBrowsing(msg)...)
+		return append(cmds, m.handleFiltering(msg)...)
 	}
 
-	return cmds
+	return append(cmds, m.handleBrowsing(msg)...)
 }
 
 // Updates for when a user is browsing the list.
-func (m *Model) handleBrowsing(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
+func (m *Model[I]) handleBrowsing(msg tea.Msg) []tea.Cmd {
 	numItems := len(m.VisibleItems())
 
 	switch msg := msg.(type) { //nolint:gocritic
@@ -859,8 +851,7 @@ func (m *Model) handleBrowsing(msg tea.Msg) []tea.Cmd {
 		}
 	}
 
-	cmd := m.delegate.Update(msg, m)
-	cmds = append(cmds, cmd)
+	cmds := m.delegate.Update(msg, m)
 
 	// Keep the index in bounds when paginating
 	itemsOnPage := m.Paginator.ItemsOnPage(len(m.VisibleItems()))
@@ -872,7 +863,7 @@ func (m *Model) handleBrowsing(msg tea.Msg) []tea.Cmd {
 }
 
 // Updates for when a user is in the filter editing interface.
-func (m *Model) handleFiltering(msg tea.Msg) []tea.Cmd {
+func (m *Model[I]) handleFiltering(msg tea.Msg) []tea.Cmd {
 	var cmds []tea.Cmd
 
 	// Handle keys
@@ -928,7 +919,7 @@ func (m *Model) handleFiltering(msg tea.Msg) []tea.Cmd {
 
 // ShortHelp returns bindings to show in the abbreviated help view. It's part
 // of the help.KeyMap interface.
-func (m *Model) ShortHelp() []key.Binding {
+func (m *Model[I]) ShortHelp() []key.Binding {
 	kb := []key.Binding{
 		m.KeyMap.CursorUp,
 		m.KeyMap.CursorDown,
@@ -963,7 +954,7 @@ func (m *Model) ShortHelp() []key.Binding {
 
 // FullHelp returns bindings to show the full help view. It's part of the
 // help.KeyMap interface.
-func (m *Model) FullHelp() [][]key.Binding {
+func (m *Model[I]) FullHelp() [][]key.Binding {
 	kb := [][]key.Binding{{
 		m.KeyMap.CursorUp,
 		m.KeyMap.CursorDown,
@@ -1003,11 +994,9 @@ func (m *Model) FullHelp() [][]key.Binding {
 }
 
 // View renders the component.
-func (m *Model) View() string {
-	var (
-		sections    []string
-		availHeight = m.height
-	)
+func (m *Model[I]) View() string {
+	var sections []string
+	availHeight := m.height
 
 	if m.showTitle || (m.showFilter && m.filteringEnabled) {
 		v := m.titleView()
@@ -1047,19 +1036,17 @@ func (m *Model) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left, sections...)
 }
 
-func (m *Model) titleView() string {
-	var (
-		view          string
-		titleBarStyle = m.Styles.TitleBar.Copy()
+func (m *Model[I]) titleView() string {
+	titleBarStyle := m.Styles.TitleBar.Copy()
 
-		// We need to account for the size of the spinner, even if we don't
-		// render it, to reserve some space for it should we turn it on later.
-		spinnerView    = m.spinnerView()
-		spinnerWidth   = lipgloss.Width(spinnerView)
-		spinnerLeftGap = " "
-		spinnerOnLeft  = titleBarStyle.GetPaddingLeft() >= spinnerWidth+lipgloss.Width(spinnerLeftGap) && m.showSpinner
-	)
+	// We need to account for the size of the spinner, even if we don't
+	// render it, to reserve some space for it should we turn it on later.
+	spinnerView := m.spinnerView()
+	spinnerWidth := lipgloss.Width(spinnerView)
+	spinnerLeftGap := " "
+	spinnerOnLeft := titleBarStyle.GetPaddingLeft() >= spinnerWidth+lipgloss.Width(spinnerLeftGap) && m.showSpinner
 
+	var view string
 	// If the filter's showing, draw that. Otherwise draw the title.
 	if m.showFilter && m.filterState == Filtering {
 		view += m.FilterInput.View()
@@ -1092,17 +1079,16 @@ func (m *Model) titleView() string {
 	if len(view) > 0 {
 		return titleBarStyle.Render(view)
 	}
+
 	return view
 }
 
-func (m *Model) statusView() string {
+func (m *Model[I]) statusView() string {
 	visibleItems := len(m.VisibleItems())
 
-	var itemName string
+	itemName := m.itemNameSingular
 	if visibleItems != 1 {
 		itemName = m.itemNamePlural
-	} else {
-		itemName = m.itemNameSingular
 	}
 
 	itemsDisplay := fmt.Sprintf("%d %s", visibleItems, itemName)
@@ -1111,10 +1097,9 @@ func (m *Model) statusView() string {
 	switch {
 	case m.filterState == Filtering:
 		// Filter results
+		status = itemsDisplay
 		if visibleItems == 0 {
 			status = m.Styles.StatusEmpty.Render("Nothing matched")
-		} else {
-			status = itemsDisplay
 		}
 	case len(m.items) == 0:
 		// Not filtering: no items.
@@ -1126,15 +1111,14 @@ func (m *Model) statusView() string {
 		if filtered {
 			f := strings.TrimSpace(m.FilterInput.Value())
 			f = truncate.StringWithTail(f, 10, "…")
-			status += fmt.Sprintf("“%s” ", f)
+			status = fmt.Sprintf("“%s” ", f)
 		}
 
 		status += itemsDisplay
 	}
 
 	totalItems := len(m.items)
-	numFiltered := totalItems - visibleItems
-	if numFiltered > 0 {
+	if numFiltered := totalItems - visibleItems; numFiltered > 0 {
 		status += m.Styles.DividerDot.String()
 		status += m.Styles.StatusBarFilterCount.Render(fmt.Sprintf("%d filtered", numFiltered))
 	}
@@ -1142,7 +1126,7 @@ func (m *Model) statusView() string {
 	return m.Styles.StatusBar.Render(status)
 }
 
-func (m *Model) paginationView() string {
+func (m *Model[I]) paginationView() string {
 	if m.Paginator.TotalPages < 2 { //nolint:gomnd
 		return ""
 	}
@@ -1164,19 +1148,19 @@ func (m *Model) paginationView() string {
 	return style.Render(s)
 }
 
-func (m *Model) populatedView() string {
+func (m *Model[I]) populatedView() string {
 	items := m.VisibleItems()
-
-	var b strings.Builder
 
 	// Empty states
 	if len(items) == 0 {
 		if m.filterState == Filtering {
 			return ""
 		}
+
 		return m.Styles.NoItems.Render("No " + m.itemNamePlural + ".")
 	}
 
+	var b strings.Builder
 	if len(items) > 0 {
 		start, end := m.Paginator.GetSliceBounds(len(items))
 		docs := items[start:end]
@@ -1204,18 +1188,18 @@ func (m *Model) populatedView() string {
 	return b.String()
 }
 
-func (m *Model) helpView() string {
+func (m *Model[I]) helpView() string {
 	return m.Styles.HelpStyle.Render(m.Help.View(m))
 }
 
-func (m *Model) spinnerView() string {
+func (m *Model[I]) spinnerView() string {
 	return m.spinner.View()
 }
 
-func filterItems(m Model) tea.Cmd {
+func filterItems[I Item](m Model[I]) tea.Cmd {
 	return func() tea.Msg {
 		if m.FilterInput.Value() == "" || m.filterState == Unfiltered {
-			return MsgFilterMatches(m.itemsAsFilterItems()) // return nothing
+			return MsgFilterMatches[I](m.itemsAsFilterItems()) // return nothing
 		}
 
 		targets := []string{}
@@ -1225,21 +1209,21 @@ func filterItems(m Model) tea.Cmd {
 			targets = append(targets, t.FilterValue())
 		}
 
-		filterMatches := []filteredItem{}
+		filterMatches := []filteredItem[I]{}
 		for _, r := range m.Filter(m.FilterInput.Value(), targets) {
-			filterMatches = append(filterMatches, filteredItem{
+			filterMatches = append(filterMatches, filteredItem[I]{
 				item:    items[r.Index],
 				matches: r.MatchedIndexes,
 			})
 		}
 
-		return MsgFilterMatches(filterMatches)
+		return MsgFilterMatches[I](filterMatches)
 	}
 }
 
-func insertItemIntoSlice(items []Item, item Item, index int) []Item {
+func insertItemIntoSlice[I Item](items []I, item I, index int) []I {
 	if items == nil {
-		return []Item{item}
+		return []I{item}
 	}
 	if index >= len(items) {
 		return append(items, item)
@@ -1247,28 +1231,20 @@ func insertItemIntoSlice(items []Item, item Item, index int) []Item {
 
 	index = max(0, index)
 
-	items = append(items, nil)
-	copy(items[index+1:], items[index:])
-	items[index] = item
+	items = append(items, item)
+	for i := len(items) - 1; i > index; i-- {
+		items[i], items[i-1] = items[i-1], items[i]
+	}
 	return items
 }
 
 // Remove an item from a slice of items at the given index. This runs in O(n).
-func removeItemFromSlice(i []Item, index int) []Item {
+func removeItemFromSlice[I any](i []I, index int) []I {
 	if index >= len(i) {
 		return i // noop
 	}
-	copy(i[index:], i[index+1:])
-	i[len(i)-1] = nil
-	return i[:len(i)-1]
-}
 
-func removeFilterMatchFromSlice(i []filteredItem, index int) []filteredItem {
-	if index >= len(i) {
-		return i // noop
-	}
 	copy(i[index:], i[index+1:])
-	i[len(i)-1] = filteredItem{}
 	return i[:len(i)-1]
 }
 

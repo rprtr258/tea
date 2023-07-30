@@ -3,7 +3,6 @@ package spinners
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
@@ -22,6 +21,7 @@ var (
 		spinner.Globe,
 		spinner.Moon,
 		spinner.Monkey,
+		spinner.Circle,
 	}
 
 	textStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Render
@@ -35,7 +35,7 @@ type model struct {
 }
 
 func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{m.spinner.Tick}
+	return []tea.Cmd{m.spinner.CmdTick}
 }
 
 func (m *model) Update(msg tea.Msg) []tea.Cmd {
@@ -50,14 +50,14 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 				m.index = len(spinners) - 1
 			}
 			m.resetSpinner()
-			return []tea.Cmd{m.spinner.Tick}
+			return []tea.Cmd{m.spinner.CmdTick}
 		case "l", "right":
 			m.index++
 			if m.index >= len(spinners) {
 				m.index = 0
 			}
 			m.resetSpinner()
-			return []tea.Cmd{m.spinner.Tick}
+			return []tea.Cmd{m.spinner.CmdTick}
 		default:
 			return nil
 		}
@@ -69,28 +69,31 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 func (m *model) resetSpinner() {
-	m.spinner = spinner.New()
-	m.spinner.Style = spinnerStyle
-	m.spinner.Spinner = spinners[m.index]
+	m.spinner = spinner.New(
+		spinner.WithSpinner(spinners[m.index]),
+		spinner.WithStyle(spinnerStyle),
+	)
 }
 
 func (m *model) View(r tea.Renderer) {
 	var gap string
-	switch m.index {
-	case 1:
-		gap = ""
-	default:
+	if m.index != 1 {
 		gap = " "
 	}
 
-	r.Write(fmt.Sprintf("\n %s%s%s\n\n%s", m.spinner.View(), gap, textStyle("Spinning..."), helpStyle("h/l, ←/→: change spinner • q: exit\n")))
+	r.Write(fmt.Sprintf(
+		"\n %s%s%s\n\n%s",
+		m.spinner.View(),
+		gap,
+		textStyle("Spinning..."),
+		helpStyle("h/l, ←/→: change spinner • q: exit\n"),
+	))
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	m := &model{}
 	m.resetSpinner()
 
-	if _, err := tea.NewProgram(context.Background(), m).Run(); err != nil {
-		log.Fatalln("could not run program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, m).Run()
+	return err
 }

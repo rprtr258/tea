@@ -5,7 +5,6 @@ package http
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -74,9 +73,7 @@ func checkServer() tea.Msg {
 	return msgStatus(res.StatusCode)
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{})
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{}).Run()
+	return err
 }

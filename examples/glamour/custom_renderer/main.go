@@ -1,12 +1,13 @@
 package custom_renderer
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/rprtr258/tea/glamour"
 )
 
-func Main() {
+func Main(context.Context) error {
 	in := `# Custom Renderer
 
 Word-wrapping will occur when lines exceed the limit of 40 characters.
@@ -17,6 +18,11 @@ Word-wrapping will occur when lines exceed the limit of 40 characters.
 		glamour.WithWordWrap(40),
 	)
 
-	out, _ := r.Render(in)
+	out, err := r.Render(in)
+	if err != nil {
+		return err
+	}
+
 	fmt.Print(out)
+	return nil
 }

@@ -6,6 +6,7 @@ package paginator
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/key"
@@ -52,17 +53,6 @@ type Model struct {
 
 	// KeyMap encodes the keybindings recognized by the widget.
 	KeyMap KeyMap
-
-	// Deprecated: customize [KeyMap] instead.
-	UsePgUpPgDownKeys bool
-	// Deprecated: customize [KeyMap] instead.
-	UseLeftRightKeys bool
-	// Deprecated: customize [KeyMap] instead.
-	UseUpDownKeys bool
-	// Deprecated: customize [KeyMap] instead.
-	UseHLKeys bool
-	// Deprecated: customize [KeyMap] instead.
-	UseJKKeys bool
 }
 
 // SetTotalPages is a helper function for calculating the total number of pages
@@ -139,11 +129,6 @@ func New() Model {
 	}
 }
 
-// NewModel creates a new model with defaults.
-//
-// Deprecated: use [New] instead.
-var NewModel = New
-
 // Update is the Tea update function which binds keystrokes to pagination.
 func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) { //nolint:gocritic
@@ -170,15 +155,16 @@ func (m *Model) View() string {
 }
 
 func (m *Model) dotsView() string {
-	var s string
+	var sb strings.Builder
 	for i := 0; i < m.TotalPages; i++ {
 		if i == m.Page {
-			s += m.ActiveDot
+			sb.WriteString(m.ActiveDot)
 			continue
 		}
-		s += m.InactiveDot
+
+		sb.WriteString(m.InactiveDot)
 	}
-	return s
+	return sb.String()
 }
 
 func (m *Model) arabicView() string {

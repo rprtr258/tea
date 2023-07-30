@@ -28,18 +28,19 @@ type TableCellElement struct {
 }
 
 func (e *TableElement) Render(w io.Writer, ctx RenderContext) error {
-	bs := ctx.blockStack
+	rules := ctx.options.Styles.Table
 
 	var indentation uint
-	var margin uint
-	rules := ctx.options.Styles.Table
 	if rules.Indent != nil {
 		indentation = *rules.Indent
 	}
+
+	var margin uint
 	if rules.Margin != nil {
 		margin = *rules.Margin
 	}
 
+	bs := ctx.blockStack
 	iw := indent.NewWriterPipe(w, indentation+margin, func(wr io.Writer) {
 		renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, " ")
 	})
@@ -50,6 +51,7 @@ func (e *TableElement) Render(w io.Writer, ctx RenderContext) error {
 	renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.BlockPrefix)
 	renderText(ctx.table.styleWriter, ctx.options.ColorProfile, style, rules.Prefix)
 	ctx.table.writer = tablewriter.NewWriter(ctx.table.styleWriter)
+
 	return nil
 }
 

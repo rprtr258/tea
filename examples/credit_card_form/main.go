@@ -3,7 +3,6 @@ package credit_card_form
 import (
 	"context"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -185,10 +184,7 @@ func (m *model) prevInput() {
 	}
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), initialModel())
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, initialModel()).Run()
+	return err
 }

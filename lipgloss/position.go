@@ -34,7 +34,7 @@ const (
 // Place places a string or text block vertically in an unstyled box of a given
 // width or height.
 func Place(width, height int, hPos, vPos Position, str string, opts ...WhitespaceOption) string {
-	return renderer.Place(width, height, hPos, vPos, str, opts...)
+	return _renderer.Place(width, height, hPos, vPos, str, opts...)
 }
 
 // Place places a string or text block vertically in an unstyled box of a given
@@ -47,7 +47,7 @@ func (r *Renderer) Place(width, height int, hPos, vPos Position, str string, opt
 // block of a given width. If the given width is shorter than the max width of
 // the string (measured by its longest line) this will be a noop.
 func PlaceHorizontal(width int, pos Position, str string, opts ...WhitespaceOption) string {
-	return renderer.PlaceHorizontal(width, pos, str, opts...)
+	return _renderer.PlaceHorizontal(width, pos, str, opts...)
 }
 
 // PlaceHorizontal places a string or text block horizontally in an unstyled
@@ -63,45 +63,43 @@ func (r *Renderer) PlaceHorizontal(width int, pos Position, str string, opts ...
 
 	ws := newWhitespace(r, opts...)
 
-	var b strings.Builder
-	for i, l := range lines {
+	var sb strings.Builder
+	for i, line := range lines {
 		// Is this line shorter than the longest line?
-		short := max(0, contentWidth-ansi.PrintableRuneWidth(l))
+		short := max(0, contentWidth-ansi.PrintableRuneWidth(line))
+		totalGap := gap + short
 
 		switch pos {
 		case Left:
-			b.WriteString(l)
-			b.WriteString(ws.render(gap + short))
-
+			sb.WriteString(line)
+			sb.WriteString(ws.render(totalGap))
 		case Right:
-			b.WriteString(ws.render(gap + short))
-			b.WriteString(l)
-
+			sb.WriteString(ws.render(totalGap))
+			sb.WriteString(line)
 		default: // somewhere in the middle
-			totalGap := gap + short
-
 			split := int(math.Round(float64(totalGap) * pos.value()))
 			left := totalGap - split
-			right := totalGap - left
+			sb.WriteString(ws.render(left))
 
-			b.WriteString(ws.render(left))
-			b.WriteString(l)
-			b.WriteString(ws.render(right))
+			sb.WriteString(line)
+
+			right := totalGap - left
+			sb.WriteString(ws.render(right))
 		}
 
 		if i < len(lines)-1 {
-			b.WriteRune('\n')
+			sb.WriteRune('\n')
 		}
 	}
 
-	return b.String()
+	return sb.String()
 }
 
 // PlaceVertical places a string or text block vertically in an unstyled block
 // of a given height. If the given height is shorter than the height of the
 // string (measured by its newlines) then this will be a noop.
 func PlaceVertical(height int, pos Position, str string, opts ...WhitespaceOption) string {
-	return renderer.PlaceVertical(height, pos, str, opts...)
+	return _renderer.PlaceVertical(height, pos, str, opts...)
 }
 
 // PlaceVertical places a string or text block vertically in an unstyled block

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -638,6 +639,7 @@ type msgPrintLine struct {
 // If the altscreen is active no output will be printed.
 func Println(args ...any) Cmd {
 	return func() Msg {
+		log.Println(args...)
 		return msgPrintLine{
 			messageBody: fmt.Sprint(args...),
 		}
@@ -652,10 +654,11 @@ func Println(args ...any) Cmd {
 // its own line.
 //
 // If the altscreen is active no output will be printed.
-func Printf(template string, args ...any) Cmd {
+func Printf(format string, args ...any) Cmd {
 	return func() Msg {
+		log.Printf(format, args...)
 		return msgPrintLine{
-			messageBody: fmt.Sprintf(template, args...),
+			messageBody: fmt.Sprintf(format, args...),
 		}
 	}
 }

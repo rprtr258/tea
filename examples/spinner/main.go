@@ -6,7 +6,6 @@ package spinner
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
@@ -26,7 +25,7 @@ func initialModel() *model {
 }
 
 func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{m.spinner.Tick}
+	return []tea.Cmd{m.spinner.CmdTick}
 }
 
 func (m *model) Update(msg tea.Msg) []tea.Cmd {
@@ -54,9 +53,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(str)
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), initialModel())
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, initialModel()).Run()
+	return err
 }

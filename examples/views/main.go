@@ -84,9 +84,9 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	// Hand off the message and model to the appropriate update function for the
 	// appropriate view based on the current state.
 	if !m.Chosen {
-		return []tea.Cmd{updateChoices(msg, m)}
+		return updateChoices(msg, m)
 	}
-	return []tea.Cmd{updateChosen(msg, m)}
+	return updateChosen(msg, m)
 }
 
 // The main view, which just calls the appropriate sub-view
@@ -108,7 +108,7 @@ func (m *model) View(r tea.Renderer) {
 // Sub-update functions
 
 // Update loop for the first view where you're choosing a task.
-func updateChoices(msg tea.Msg, m *model) tea.Cmd {
+func updateChoices(msg tea.Msg, m *model) []tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -124,23 +124,23 @@ func updateChoices(msg tea.Msg, m *model) tea.Cmd {
 			}
 		case "enter":
 			m.Chosen = true
-			return frame()
+			return []tea.Cmd{frame()}
 		}
 
 	case msgTick:
 		if m.Ticks == 0 {
 			m.Quitting = true
-			return tea.Quit
+			return []tea.Cmd{tea.Quit}
 		}
 		m.Ticks--
-		return tick()
+		return []tea.Cmd{tick()}
 	}
 
 	return nil
 }
 
 // Update loop for the second view after a choice has been made
-func updateChosen(msg tea.Msg, m *model) tea.Cmd {
+func updateChosen(msg tea.Msg, m *model) []tea.Cmd {
 	switch msg.(type) {
 	case msgFrame:
 		if !m.Loaded {
@@ -150,19 +150,20 @@ func updateChosen(msg tea.Msg, m *model) tea.Cmd {
 				m.Progress = 1
 				m.Loaded = true
 				m.Ticks = 3
-				return tick()
+				return []tea.Cmd{tick()}
 			}
-			return frame()
+			return []tea.Cmd{frame()}
 		}
 
 	case msgTick:
 		if m.Loaded {
 			if m.Ticks == 0 {
 				m.Quitting = true
-				return tea.Quit
+				return []tea.Cmd{tea.Quit}
 			}
+
 			m.Ticks--
-			return tick()
+			return []tea.Cmd{tick()}
 		}
 	}
 
@@ -275,9 +276,7 @@ func colorFloatToHex(f float64) string {
 	return s
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), &model{0, false, 10, 0, 0, false, false})
-	if _, err := p.Run(); err != nil {
-		fmt.Println("could not start program:", err)
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{0, false, 10, 0, 0, false, false}).Run()
+	return err
 }

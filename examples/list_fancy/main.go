@@ -2,7 +2,6 @@ package list_fancy
 
 import (
 	"context"
-	"log"
 	"math/rand"
 	"time"
 
@@ -73,7 +72,7 @@ func newListKeyMap() *listKeyMap {
 }
 
 type model struct {
-	list          list.Model
+	list          list.Model[item]
 	itemGenerator *randomItemGenerator
 	keys          *listKeyMap
 	delegateKeys  *delegateKeyMap
@@ -88,14 +87,14 @@ func newModel() *model {
 
 	// Make initial list of items
 	const numItems = 24
-	items := make([]list.Item, numItems)
+	items := make([]item, numItems)
 	for i := 0; i < numItems; i++ {
 		items[i] = itemGenerator.next()
 	}
 
 	// Setup list
-	delegate := newItemDelegate(delegateKeys)
-	groceryList := list.New(items, delegate, 0, 0)
+	delegate := newItemDelegate[item](delegateKeys)
+	groceryList := list.New[item](items, delegate, 0, 0)
 	groceryList.Title = "Groceries"
 	groceryList.Styles.Title = titleStyle
 	groceryList.AdditionalFullHelpKeys = func() []key.Binding {
@@ -137,7 +136,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 
 		switch {
 		case key.Matches(msg, m.keys.toggleSpinner):
-			return []tea.Cmd{m.list.ToggleSpinner()}
+			return m.list.ToggleSpinner()
 		case key.Matches(msg, m.keys.toggleTitleBar):
 			v := !m.list.ShowTitle()
 			m.list.SetShowTitle(v)
@@ -162,7 +161,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			newItem := m.itemGenerator.next()
 			insCmd := m.list.InsertItem(0, newItem)
 			statusCmd := m.list.NewStatusMessage(statusMessageStyle("Added " + newItem.Title()))
-			return []tea.Cmd{insCmd, statusCmd}
+			return append(insCmd, statusCmd)
 		}
 	}
 
@@ -174,10 +173,9 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(appStyle.Render(m.list.View()))
 }
 
-func Main() {
-	rand.Seed(time.Now().UTC().UnixNano())
+func Main(ctx context.Context) error {
+	rand.Seed(time.Now().UnixNano())
 
-	if _, err := tea.NewProgram(context.Background(), newModel()).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, newModel()).Run()
+	return err
 }

@@ -2,7 +2,6 @@ package table
 
 import (
 	"context"
-	"log"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/table"
@@ -44,7 +43,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(baseStyle.Render(m.table.View()) + "\n")
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	columns := []table.Column{
 		{Title: "Rank", Width: 4},
 		{Title: "City", Width: 10},
@@ -174,7 +173,6 @@ func Main() {
 		Bold(false)
 	t.SetStyles(s)
 
-	if _, err := tea.NewProgram(context.Background(), &model{t}).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, &model{t}).Run()
+	return err
 }

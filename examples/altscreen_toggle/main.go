@@ -3,7 +3,6 @@ package altscreen_toggle
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/muesli/termenv"
 	"github.com/rprtr258/tea"
@@ -66,8 +65,7 @@ func (m *model) View(r tea.Renderer) {
 	r.Write(fmt.Sprintf("\n\n  You're in %s\n\n\n%s", keyword(mode), help("  space: switch modes • q: exit\n")))
 }
 
-func Main() {
-	if _, err := tea.NewProgram(context.Background(), &model{}).Run(); err != nil {
-		log.Fatalln("Error running program:", err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, &model{}).Run()
+	return err
 }

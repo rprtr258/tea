@@ -18,7 +18,6 @@ package progress_static
 
 import (
 	"context"
-	"log"
 	"strings"
 	"time"
 
@@ -83,10 +82,9 @@ func tickCmd() tea.Cmd {
 	})
 }
 
-func Main() {
+func Main(ctx context.Context) error {
 	prog := progress.New(progress.WithScaledGradient("#FF7CCB", "#FDFF8C"))
 
-	if _, err := tea.NewProgram(context.Background(), &model{progress: prog}).Run(); err != nil {
-		log.Fatalln("Oh no!", err.Error())
-	}
+	_, err := tea.NewProgram(ctx, &model{progress: prog}).Run()
+	return err
 }

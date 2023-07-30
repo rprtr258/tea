@@ -12,8 +12,8 @@ import (
 func TestStyleRender(t *testing.T) {
 	t.Parallel()
 
-	renderer.SetColorProfile(termenv.TrueColor)
-	renderer.SetHasDarkBackground(true)
+	_renderer.SetColorProfile(termenv.TrueColor)
+	_renderer.SetHasDarkBackground(true)
 
 	for i, test := range []struct {
 		style    Style

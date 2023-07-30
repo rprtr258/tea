@@ -6,7 +6,6 @@ package chat
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -87,10 +86,7 @@ func (m *model) View(r tea.Renderer) {
 	) + "\n\n")
 }
 
-func Main() {
-	p := tea.NewProgram(context.Background(), initialModel())
-
-	if _, err := p.Run(); err != nil {
-		log.Fatalln(err.Error())
-	}
+func Main(ctx context.Context) error {
+	_, err := tea.NewProgram(ctx, initialModel()).Run()
+	return err
 }

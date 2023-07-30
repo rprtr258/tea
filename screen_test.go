@@ -8,10 +8,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type initCmdModel struct {
+	initCmds []Cmd
+}
+
+func (m *initCmdModel) Init() []Cmd {
+	return m.initCmds
+}
+
+func (m *initCmdModel) Update(msg Msg) []Cmd {
+	switch msg.(type) { //nolint:gocritic
+	case MsgKey:
+		return []Cmd{Quit}
+	}
+
+	return nil
+}
+
+func (m *initCmdModel) View(r Renderer) {
+	r.Write("success\n")
+}
+
 //nolint:lll
 func TestMsgClear(t *testing.T) {
 	for name, test := range map[string]struct {
-		cmds     msgSequence
+		cmds     []Cmd
 		expected string
 	}{
 		"clear_screen": {
@@ -47,14 +68,13 @@ func TestMsgClear(t *testing.T) {
 			expected: "\x1b[?25l\x1b[?25l\x1b[?25hsuccess\r\n\x1b[0D\x1b[2K\x1b[?25h\x1b[?1002l\x1b[?1003l",
 		},
 	} {
+		test := test
 		t.Run(name, func(t *testing.T) {
-			var (
-				in  bytes.Buffer
-				out bytes.Buffer
-			)
-			p := NewProgram(context.Background(), &testModel{}).WithInput(&in).WithOutput(&out)
-
-			go p.Send(append(test.cmds, Quit))
+			var in bytes.Buffer
+			var out bytes.Buffer
+			p := NewProgram(context.Background(), &initCmdModel{append(test.cmds, Quit)}).
+				WithInput(&in).
+				WithOutput(&out)
 
 			_, err := p.Run()
 			assert.NoError(t, err)
