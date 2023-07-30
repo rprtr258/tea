@@ -46,7 +46,7 @@ func newModel() *model {
 func (m *model) Init() []tea.Cmd {
 	log.Println("Starting work...")
 	return []tea.Cmd{
-		m.spinner.Tick,
+		m.spinner.CmdTick,
 		runPretendProcess,
 	}
 }

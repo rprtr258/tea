@@ -45,7 +45,7 @@ func newModel() *model {
 }
 
 func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{downloadAndInstall(m.packages[m.index]), m.spinner.Tick}
+	return []tea.Cmd{downloadAndInstall(m.packages[m.index]), m.spinner.CmdTick}
 }
 
 func (m *model) Update(msg tea.Msg) []tea.Cmd {

@@ -513,25 +513,6 @@ func (p *Program[M]) Run() (M, error) {
 	return model, err
 }
 
-// StartReturningModel initializes the program and runs its event loops,
-// blocking until it gets terminated by either [Program.Quit], [Program.Kill],
-// or its signal handler. Returns the final model.
-//
-// Deprecated: please use [Program.Run] instead.
-func (p *Program[M]) StartReturningModel() (M, error) {
-	return p.Run()
-}
-
-// Start initializes the program and runs its event loops, blocking until it
-// gets terminated by either [Program.Quit], [Program.Kill], or its signal
-// handler.
-//
-// Deprecated: please use [Program.Run] instead.
-func (p *Program[M]) Start() error {
-	_, err := p.Run()
-	return err
-}
-
 // Send sends a message to the main update function, effectively allowing
 // messages to be injected from outside the program for interoperability
 // purposes.

@@ -5,6 +5,7 @@ import (
 )
 
 // msgSequence is used internally to run the given commands in order.
+// TODO: remove?
 type msgSequence []Cmd
 
 // Sequence runs the given commands one at a time, in order. Contrast this with
@@ -61,12 +62,10 @@ func Sequence(cmds ...Cmd) Cmd {
 //	}
 //
 // Every is analogous to Tick in the Elm Architecture.
-func Every(duration time.Duration, fn func(time.Time) Msg) Cmd {
+func Every(d time.Duration, fn func(time.Time) Msg) Cmd {
 	return func() Msg {
-		n := time.Now()
-		d := n.Truncate(duration).Add(duration).Sub(n)
-		t := time.NewTimer(d)
-		return fn(<-t.C)
+		now := time.Now()
+		return fn(<-time.After(d - now.Sub(now.Truncate(d))))
 	}
 }
 
@@ -110,35 +109,6 @@ func Every(duration time.Duration, fn func(time.Time) Msg) Cmd {
 //	}
 func Tick(d time.Duration, fn func(time.Time) Msg) Cmd {
 	return func() Msg {
-		t := time.NewTimer(d)
-		return fn(<-t.C)
-	}
-}
-
-// Sequentially produces a command that sequentially executes the given
-// commands.
-// The Msg returned is the first non-nil message returned by a Cmd.
-//
-//	func saveStateCmd() Msg {
-//	   if err := save(); err != nil {
-//	       return msgErr(err)
-//	   }
-//	   return nil
-//	}
-//
-//	cmd := Sequentially(saveStateCmd, Quit)
-//
-// Deprecated: use Sequence instead.
-func Sequentially(cmds ...Cmd) Cmd {
-	return func() Msg {
-		for _, cmd := range cmds {
-			if cmd == nil {
-				continue
-			}
-			if msg := cmd(); msg != nil {
-				return msg
-			}
-		}
-		return nil
+		return fn(<-time.After(d))
 	}
 }

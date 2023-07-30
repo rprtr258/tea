@@ -54,7 +54,7 @@ func newModel() *model {
 }
 
 func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{m.spinner.Tick}
+	return []tea.Cmd{m.spinner.CmdTick}
 }
 
 func (m *model) Update(msg tea.Msg) []tea.Cmd {

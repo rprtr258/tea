@@ -76,7 +76,7 @@ func newModel(timeout time.Duration) *mainModel {
 
 func (m *mainModel) Init() []tea.Cmd {
 	// start the timer and spinner on program start
-	return append(m.timer.Init(), m.spinner.Tick)
+	return append(m.timer.Init(), m.spinner.CmdTick)
 }
 
 func (m *mainModel) Update(msg tea.Msg) []tea.Cmd {
@@ -99,7 +99,7 @@ func (m *mainModel) Update(msg tea.Msg) []tea.Cmd {
 			} else {
 				m.Next()
 				m.resetSpinner()
-				cmds = append(cmds, m.spinner.Tick)
+				cmds = append(cmds, m.spinner.CmdTick)
 			}
 		}
 		switch m.state {

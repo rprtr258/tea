@@ -95,7 +95,8 @@ func TestTeaWithFilter(t *testing.T) {
 			}
 		}()
 
-		assert.NoError(t, p.Start())
+		_, err := p.Run()
+		assert.NoError(t, err)
 		assert.Equal(t, preventCount, shutdowns)
 	}
 }

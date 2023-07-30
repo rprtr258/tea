@@ -47,7 +47,7 @@ type model struct {
 
 func (m *model) Init() []tea.Cmd {
 	return []tea.Cmd{
-		m.spinner.Tick,
+		m.spinner.CmdTick,
 		listenForActivity(m.sub), // generate activity
 		waitForActivity(m.sub),   // wait for activity
 	}
