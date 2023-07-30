@@ -1,6 +1,3 @@
-.DS_Store
-.envrc
-.idea/
-coverage.txt
+.vscode/
 ssh_example
 ssh_example.pub
