@@ -80,7 +80,7 @@ type rules map[propKey]interface{}
 // in case the underlying implementation changes. It takes an optional string
 // value to be set as the underlying string value for this style.
 func NewStyle() Style {
-	return renderer.NewStyle()
+	return _renderer.NewStyle()
 }
 
 // NewStyle returns a new, empty Style. While it's syntactic sugar for the
@@ -173,17 +173,13 @@ func (s Style) Inherit(i Style) Style {
 // Render applies the defined style formatting to a given string.
 func (s Style) Render(strs ...string) string {
 	if s.r == nil {
-		s.r = renderer
+		s.r = _renderer
 	}
 	if s.value != "" {
 		strs = append([]string{s.value}, strs...)
 	}
 
 	var (
-		str = joinString(strs...)
-
-		teSpace = s.r.ColorProfile().String()
-
 		bold          = s.getAsBool(boldKey, false)
 		italic        = s.getAsBool(italicKey, false)
 		underline     = s.getAsBool(underlineKey, false)
@@ -212,14 +208,9 @@ func (s Style) Render(strs ...string) string {
 
 		underlineSpaces     = underline && s.getAsBool(underlineSpacesKey, true)
 		strikethroughSpaces = strikethrough && s.getAsBool(strikethroughSpacesKey, true)
-
-		// Do we need to style whitespace (padding and space outside
-		// paragraphs) separately?
-		styleWhitespace = reverse
-
-		// Do we need to style spaces separately?
-		useSpaceStyler = underlineSpaces || strikethroughSpaces
 	)
+
+	str := joinString(strs...)
 
 	if len(s.rules) == 0 {
 		return str
@@ -229,7 +220,6 @@ func (s Style) Render(strs ...string) string {
 	// no-op on non-Windows systems and on Windows runs only once.
 	enableLegacyWindowsANSI()
 
-	teWhitespace := s.r.ColorProfile().String()
 	te := s.r.ColorProfile().String()
 	if bold {
 		te = te.Bold()
@@ -240,6 +230,7 @@ func (s Style) Render(strs ...string) string {
 	if underline {
 		te = te.Underline()
 	}
+	teWhitespace := s.r.ColorProfile().String()
 	if reverse {
 		teWhitespace = teWhitespace.Reverse()
 		te = te.Reverse()
@@ -251,6 +242,14 @@ func (s Style) Render(strs ...string) string {
 		te = te.Faint()
 	}
 
+	// Do we need to style spaces separately?
+	useSpaceStyler := underlineSpaces || strikethroughSpaces
+
+	// Do we need to style whitespace (padding and space outside
+	// paragraphs) separately?
+	styleWhitespace := reverse
+
+	teSpace := s.r.ColorProfile().String()
 	if fg != noColor {
 		te = te.Foreground(fg.color(s.r))
 		if styleWhitespace {
@@ -299,28 +298,30 @@ func (s Style) Render(strs ...string) string {
 
 	// Render core text
 	{
-		var b strings.Builder
+		var sb strings.Builder
 
-		l := strings.Split(str, "\n")
-		for i := range l {
+		lines := strings.Split(str, "\n")
+		for i, line := range lines {
 			if useSpaceStyler {
 				// Look for spaces and apply a different styler
-				for _, r := range l[i] {
+				for _, r := range line {
+					runeStyle := te
 					if unicode.IsSpace(r) {
-						b.WriteString(teSpace.Styled(string(r)))
-						continue
+						runeStyle = teSpace
 					}
-					b.WriteString(te.Styled(string(r)))
+
+					sb.WriteString(runeStyle.Styled(string(r)))
 				}
 			} else {
-				b.WriteString(te.Styled(l[i]))
+				sb.WriteString(te.Styled(line))
 			}
-			if i != len(l)-1 {
-				b.WriteRune('\n')
+
+			if i != len(lines)-1 {
+				sb.WriteRune('\n')
 			}
 		}
 
-		str = b.String()
+		str = sb.String()
 	}
 
 	// Padding
@@ -330,6 +331,7 @@ func (s Style) Render(strs ...string) string {
 			if colorWhitespace || styleWhitespace {
 				st = &teWhitespace
 			}
+
 			str = padLeft(str, leftPadding, st)
 		}
 
@@ -338,6 +340,7 @@ func (s Style) Render(strs ...string) string {
 			if colorWhitespace || styleWhitespace {
 				st = &teWhitespace
 			}
+
 			str = padRight(str, rightPadding, st)
 		}
 
@@ -366,6 +369,7 @@ func (s Style) Render(strs ...string) string {
 			if colorWhitespace || styleWhitespace {
 				st = &teWhitespace
 			}
+
 			str = alignTextHorizontal(str, horizontalAlign, width, st)
 		}
 	}
@@ -375,44 +379,44 @@ func (s Style) Render(strs ...string) string {
 		str = s.applyMargins(str, inline)
 	}
 
-	// Truncate according to MaxWidth
-	if maxWidth > 0 {
-		lines := strings.Split(str, "\n")
-
-		for i := range lines {
-			lines[i] = truncate.String(lines[i], uint(maxWidth))
-		}
-
-		str = strings.Join(lines, "\n")
-	}
-
 	// Truncate according to MaxHeight
 	if maxHeight > 0 {
 		lines := strings.Split(str, "\n")
 		str = strings.Join(lines[:min(maxHeight, len(lines))], "\n")
 	}
 
+	// Truncate according to MaxWidth
+	if maxWidth > 0 {
+		lines := strings.Split(str, "\n")
+		for i, line := range lines {
+			lines[i] = truncate.String(line, uint(maxWidth))
+		}
+
+		str = strings.Join(lines, "\n")
+	}
+
 	return str
 }
 
 func (s Style) applyMargins(str string, inline bool) string {
-	var (
-		topMargin    = s.getAsInt(marginTopKey)
-		rightMargin  = s.getAsInt(marginRightKey)
-		bottomMargin = s.getAsInt(marginBottomKey)
-		leftMargin   = s.getAsInt(marginLeftKey)
-
-		styler termenv.Style
-	)
-
-	bgc := s.getAsColor(marginBackgroundKey)
-	if bgc != noColor {
+	var styler termenv.Style
+	if bgc := s.getAsColor(marginBackgroundKey); bgc != noColor {
 		styler = styler.Background(bgc.color(s.r))
 	}
+
+	var (
+		leftMargin  = s.getAsInt(marginLeftKey)
+		rightMargin = s.getAsInt(marginRightKey)
+	)
 
 	// Add left and right margin
 	str = padLeft(str, leftMargin, &styler)
 	str = padRight(str, rightMargin, &styler)
+
+	var (
+		topMargin    = s.getAsInt(marginTopKey)
+		bottomMargin = s.getAsInt(marginBottomKey)
+	)
 
 	// Top/bottom margin
 	if !inline {
@@ -422,6 +426,7 @@ func (s Style) applyMargins(str string, inline bool) string {
 		if topMargin > 0 {
 			str = styler.Styled(strings.Repeat(spaces+"\n", topMargin)) + str
 		}
+
 		if bottomMargin > 0 {
 			str += styler.Styled(strings.Repeat("\n"+spaces, bottomMargin))
 		}
@@ -441,18 +446,18 @@ func padLeft(str string, n int, style *termenv.Style) string {
 		sp = style.Styled(sp)
 	}
 
-	b := strings.Builder{}
-	l := strings.Split(str, "\n")
+	lines := strings.Split(str, "\n")
 
-	for i := range l {
-		b.WriteString(sp)
-		b.WriteString(l[i])
-		if i != len(l)-1 {
-			b.WriteRune('\n')
+	var sb strings.Builder
+	for i, line := range lines {
+		sb.WriteString(sp)
+		sb.WriteString(line)
+		if i != len(lines)-1 {
+			sb.WriteRune('\n')
 		}
 	}
 
-	return b.String()
+	return sb.String()
 }
 
 // Apply right padding.
@@ -466,18 +471,18 @@ func padRight(str string, n int, style *termenv.Style) string {
 		sp = style.Styled(sp)
 	}
 
-	b := strings.Builder{}
-	l := strings.Split(str, "\n")
+	lines := strings.Split(str, "\n")
 
-	for i := range l {
-		b.WriteString(l[i])
-		b.WriteString(sp)
-		if i != len(l)-1 {
-			b.WriteRune('\n')
+	var sb strings.Builder
+	for i, line := range lines {
+		sb.WriteString(line)
+		sb.WriteString(sp)
+		if i != len(lines)-1 {
+			sb.WriteRune('\n')
 		}
 	}
 
-	return b.String()
+	return sb.String()
 }
 
 func max(a, b int) int {

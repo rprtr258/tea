@@ -34,31 +34,27 @@ type DefaultItemStyles struct {
 // NewDefaultItemStyles returns style definitions for a default item. See
 // DefaultItemView for when these come into play.
 func NewDefaultItemStyles() DefaultItemStyles {
-	var s DefaultItemStyles
-	s.NormalTitle = lipgloss.NewStyle().
-		Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}).
-		Padding(0, 0, 0, 2)
-
+	s := DefaultItemStyles{
+		NormalTitle: lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}).
+			Padding(0, 0, 0, 2),
+		SelectedTitle: lipgloss.NewStyle().
+			Border(lipgloss.NormalBorder(), false, false, false, true).
+			BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
+			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}).
+			Padding(0, 0, 0, 1),
+		DimmedTitle: lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}).
+			Padding(0, 0, 0, 2),
+		FilterMatch: lipgloss.NewStyle().
+			Underline(true),
+	}
 	s.NormalDesc = s.NormalTitle.Copy().
 		Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"})
-
-	s.SelectedTitle = lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder(), false, false, false, true).
-		BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
-		Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}).
-		Padding(0, 0, 0, 1)
-
 	s.SelectedDesc = s.SelectedTitle.Copy().
 		Foreground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"})
-
-	s.DimmedTitle = lipgloss.NewStyle().
-		Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}).
-		Padding(0, 0, 0, 2)
-
 	s.DimmedDesc = s.DimmedTitle.Copy().
 		Foreground(lipgloss.AdaptiveColor{Light: "#C2B8C2", Dark: "#4D4D4D"})
-
-	s.FilterMatch = lipgloss.NewStyle().Underline(true)
 
 	return s
 }
@@ -162,11 +158,9 @@ func (d DefaultDelegate[I]) Render(w io.Writer, m *Model[I], index int, item I) 
 	}
 
 	// Conditions
-	var (
-		isSelected  = index == m.Index()
-		emptyFilter = m.FilterState() == Filtering && m.FilterValue() == ""
-		isFiltered  = m.FilterState() == Filtering || m.FilterState() == FilterApplied
-	)
+	isSelected := index == m.Index()
+	emptyFilter := m.FilterState() == Filtering && m.FilterValue() == ""
+	isFiltered := m.FilterState() == Filtering || m.FilterState() == FilterApplied
 
 	var matchedRunes []int
 	if isFiltered && index < len(m.filteredItems) {
@@ -202,7 +196,8 @@ func (d DefaultDelegate[I]) Render(w io.Writer, m *Model[I], index int, item I) 
 		fmt.Fprintf(w, "%s\n%s", title, desc)
 		return
 	}
-	fmt.Fprintf(w, "%s", title)
+
+	fmt.Fprint(w, title)
 }
 
 // ShortHelp returns the delegate's short help.

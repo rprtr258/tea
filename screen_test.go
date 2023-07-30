@@ -48,10 +48,8 @@ func TestMsgClear(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			var (
-				in  bytes.Buffer
-				out bytes.Buffer
-			)
+			var in bytes.Buffer
+			var out bytes.Buffer
 			p := NewProgram(context.Background(), &testModel{}).WithInput(&in).WithOutput(&out)
 
 			go p.Send(append(test.cmds, Quit))

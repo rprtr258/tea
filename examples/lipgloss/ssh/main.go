@@ -126,7 +126,7 @@ func handler(next ssh.Handler) ssh.Handler {
 
 		// Initialize new renderer for the client.
 		renderer := lipgloss.NewRenderer(sess)
-		renderer.SetOutput(clientOutput)
+		renderer.Output = clientOutput
 
 		// Initialize new styles against the renderer.
 		styles := makeStyles(renderer)
@@ -161,9 +161,11 @@ func handler(next ssh.Handler) ssh.Handler {
 			styles.gray,
 		)
 
-		fmt.Fprintf(&str, "%s %t %s\n\n", styles.bold.Copy().UnsetString().Render("Has dark background?"),
+		fmt.Fprintf(&str, "%s %t %s\n\n",
+			styles.bold.Copy().UnsetString().Render("Has dark background?"),
 			renderer.HasDarkBackground(),
-			renderer.Output().BackgroundColor())
+			renderer.Output.BackgroundColor(),
+		)
 
 		block := renderer.Place(width,
 			lipgloss.Height(str.String()), lipgloss.Center, lipgloss.Center, str.String(),

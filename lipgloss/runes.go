@@ -2,6 +2,7 @@ package lipgloss
 
 import (
 	"strings"
+	"unicode/utf8"
 )
 
 // StyleRunes apply a given style to runes at the given indices in the string.
@@ -14,29 +15,28 @@ func StyleRunes(str string, indices []int, matched, unmatched Style) string {
 		m[i] = struct{}{}
 	}
 
-	var (
-		out   strings.Builder
-		group strings.Builder
-		style Style
-		runes = []rune(str)
-	)
+	runeCount := utf8.RuneCountInString(str)
 
-	for i, r := range runes {
+	i := 0
+	var out, group strings.Builder
+	for _, r := range str {
 		group.WriteRune(r)
 
 		_, matches := m[i]
 		_, nextMatches := m[i+1]
 
-		if matches != nextMatches || i == len(runes)-1 {
+		if matches != nextMatches || i == runeCount-1 {
 			// Flush
+			style := unmatched
 			if matches {
 				style = matched
-			} else {
-				style = unmatched
 			}
+
 			out.WriteString(style.Render(group.String()))
 			group.Reset()
 		}
+
+		i++
 	}
 
 	return out.String()

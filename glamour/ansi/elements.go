@@ -93,8 +93,7 @@ func (r *Renderer) NewElement(node ast.Node, source []byte) Element {
 	case ast.KindList:
 		s := ctx.options.Styles.List.StyleBlock
 		if s.Indent == nil {
-			var i uint
-			s.Indent = &i
+			s.Indent = new(uint)
 		}
 		n := node.Parent()
 		for n != nil {
@@ -119,14 +118,12 @@ func (r *Renderer) NewElement(node ast.Node, source []byte) Element {
 		}
 
 	case ast.KindListItem:
-		var l uint
-		var e uint
-		l = 1
-		n := node
-		for n.PreviousSibling() != nil && (n.PreviousSibling().Kind() == ast.KindListItem) {
+		l := uint(1)
+		for n := node; n.PreviousSibling() != nil && n.PreviousSibling().Kind() == ast.KindListItem; n = n.PreviousSibling() {
 			l++
-			n = n.PreviousSibling()
 		}
+
+		var e uint
 		if node.Parent().(*ast.List).IsOrdered() {
 			e = l
 			if node.Parent().(*ast.List).Start != 1 {
@@ -135,7 +132,7 @@ func (r *Renderer) NewElement(node ast.Node, source []byte) Element {
 		}
 
 		post := "\n"
-		if (node.LastChild() != nil && node.LastChild().Kind() == ast.KindList) ||
+		if node.LastChild() != nil && node.LastChild().Kind() == ast.KindList ||
 			node.NextSibling() == nil {
 			post = ""
 		}
@@ -396,19 +393,19 @@ func (r *Renderer) NewElement(node ast.Node, source []byte) Element {
 }
 
 func textFromChildren(node ast.Node, source []byte) string {
-	var s string
+	var sb strings.Builder
 	for c := node.FirstChild(); c != nil; c = c.NextSibling() {
 		if c.Kind() == ast.KindText {
 			cn := c.(*ast.Text)
-			s += string(cn.Segment.Value(source))
+			sb.Write(cn.Segment.Value(source))
 
 			if cn.HardLineBreak() || (cn.SoftLineBreak()) {
-				s += "\n"
+				sb.WriteRune('\n')
 			}
 		} else {
-			s += string(c.Text(source))
+			sb.Write(c.Text(source))
 		}
 	}
 
-	return s
+	return sb.String()
 }

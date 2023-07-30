@@ -190,11 +190,6 @@ func New(opts ...Option) Model {
 	return m
 }
 
-// NewModel returns a model with default values.
-//
-// Deprecated: use [New] instead.
-var NewModel = New
-
 // Init exists to satisfy the tea.Model interface.
 func (m *Model) Init() tea.Cmd {
 	return nil
@@ -288,14 +283,12 @@ func (m *Model) nextFrame() tea.Cmd {
 }
 
 func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
-	var (
-		tw = max(0, m.Width-textWidth)                // total width
-		fw = int(math.Round((float64(tw) * percent))) // filled width
-		p  float64
-	)
+	tw := max(0, m.Width-textWidth)                // total width
+	fw := int(math.Round((float64(tw) * percent))) // filled width
 
 	fw = max(0, min(tw, fw))
 
+	var p float64
 	if m.useRamp {
 		// Gradient fill
 		for i := 0; i < fw; i++ {

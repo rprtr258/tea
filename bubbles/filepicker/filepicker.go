@@ -364,8 +364,8 @@ func (m *Model) View() string {
 	if len(m.files) == 0 {
 		return m.Styles.EmptyDirectory.String()
 	}
-	var s strings.Builder
 
+	var s strings.Builder
 	for i, f := range m.files {
 		if i < m.min || i > m.max {
 			continue

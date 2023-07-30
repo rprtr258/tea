@@ -69,7 +69,6 @@ var mouseEventTypes = map[MouseEventType]string{
 // See: http://www.xfree86.org/current/ctlseqs.html#Mouse%20Tracking
 func parseX10MouseEvent(buf []byte) MouseEvent {
 	v := buf[3:6]
-	var m MouseEvent
 	const byteOffset = 32
 	e := v[0] - byteOffset
 
@@ -91,6 +90,7 @@ func parseX10MouseEvent(buf []byte) MouseEvent {
 		bitsWheelDown = 0b0000_0001
 	)
 
+	var m MouseEvent
 	if e&bitWheel != 0 {
 		// Check the low two bits.
 		switch e & bitsMask {

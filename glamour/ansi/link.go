@@ -14,16 +14,14 @@ type LinkElement struct {
 }
 
 func (e *LinkElement) Render(w io.Writer, ctx RenderContext) error {
-	var textRendered bool
-	if len(e.Text) > 0 && e.Text != e.URL {
-		textRendered = true
-
+	textRendered := len(e.Text) > 0 && e.Text != e.URL
+	if textRendered {
 		el := &BaseElement{
 			Token: e.Text,
 			Style: ctx.options.Styles.LinkText,
 		}
-		err := el.Render(w, ctx)
-		if err != nil {
+
+		if err := el.Render(w, ctx); err != nil {
 			return err
 		}
 	}
@@ -52,8 +50,7 @@ func (e *LinkElement) Render(w io.Writer, ctx RenderContext) error {
 		}
 	*/
 
-	u, err := url.Parse(e.URL)
-	if err == nil &&
+	if u, err := url.Parse(e.URL); err == nil &&
 		"#"+u.Fragment != e.URL { // if the URL only consists of an anchor, ignore it
 		pre := " "
 		style := ctx.options.Styles.Link
@@ -68,8 +65,8 @@ func (e *LinkElement) Render(w io.Writer, ctx RenderContext) error {
 			Prefix: pre,
 			Style:  style,
 		}
-		err := el.Render(w, ctx)
-		if err != nil {
+
+		if err := el.Render(w, ctx); err != nil {
 			return err
 		}
 	}

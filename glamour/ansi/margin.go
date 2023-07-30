@@ -18,16 +18,6 @@ type MarginWriter struct {
 // NewMarginWriter returns a new MarginWriter.
 func NewMarginWriter(ctx RenderContext, w io.Writer, rules StyleBlock) *MarginWriter {
 	bs := ctx.blockStack
-
-	var indentation uint
-	var margin uint
-	if rules.Indent != nil {
-		indentation = *rules.Indent
-	}
-	if rules.Margin != nil {
-		margin = *rules.Margin
-	}
-
 	pw := padding.NewWriterPipe(w, bs.Width(ctx), func(wr io.Writer) {
 		renderText(w, ctx.options.ColorProfile, rules.StylePrimitive, " ")
 	})
@@ -36,14 +26,23 @@ func NewMarginWriter(ctx RenderContext, w io.Writer, rules StyleBlock) *MarginWr
 	if rules.IndentToken != nil {
 		ic = *rules.IndentToken
 	}
-	iw := indent.NewWriterPipe(pw, indentation+margin, func(wr io.Writer) {
-		renderText(w, ctx.options.ColorProfile, bs.Parent().Style.StylePrimitive, ic)
-	})
+
+	var indentation uint
+	if rules.Indent != nil {
+		indentation = *rules.Indent
+	}
+
+	var margin uint
+	if rules.Margin != nil {
+		margin = *rules.Margin
+	}
 
 	return &MarginWriter{
 		w:  w,
 		pw: pw,
-		iw: iw,
+		iw: indent.NewWriterPipe(pw, indentation+margin, func(wr io.Writer) {
+			renderText(w, ctx.options.ColorProfile, bs.Parent().Style.StylePrimitive, ic)
+		}),
 	}
 }
 

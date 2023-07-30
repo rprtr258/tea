@@ -33,23 +33,18 @@ func JoinHorizontal(pos Position, strs ...string) string {
 		return strs[0]
 	}
 
-	var (
-		// Groups of strings broken into multiple lines
-		blocks = make([][]string, len(strs))
+	// Groups of strings broken into multiple lines
+	blocks := make([][]string, len(strs))
 
-		// Max line widths for the above text blocks
-		maxWidths = make([]int, len(strs))
+	// Max line widths for the above text blocks
+	maxWidths := make([]int, len(strs))
 
-		// Height of the tallest block
-		maxHeight int
-	)
-
+	// Height of the tallest block
+	var maxHeight int
 	// Break text blocks into lines and get max widths for each text block
 	for i, str := range strs {
 		blocks[i], maxWidths[i] = getLines(str)
-		if len(blocks[i]) > maxHeight {
-			maxHeight = len(blocks[i])
-		}
+		maxHeight = max(maxHeight, len(blocks[i]))
 	}
 
 	// Add extra lines to make each side the same height
@@ -117,40 +112,36 @@ func JoinVertical(pos Position, strs ...string) string {
 	if len(strs) == 0 {
 		return ""
 	}
+
 	if len(strs) == 1 {
 		return strs[0]
 	}
 
-	var (
-		blocks   = make([][]string, len(strs))
-		maxWidth int
-	)
-
+	blocks := make([][]string, len(strs))
+	var maxWidth int
 	for i := range strs {
 		var w int
 		blocks[i], w = getLines(strs[i])
-		if w > maxWidth {
-			maxWidth = w
-		}
+		maxWidth = max(maxWidth, w)
 	}
 
-	var b strings.Builder
+	var sb strings.Builder
 	for i, block := range blocks {
 		for j, line := range block {
 			w := maxWidth - ansi.PrintableRuneWidth(line)
 
 			switch pos {
 			case Left:
-				b.WriteString(line)
-				b.WriteString(strings.Repeat(" ", w))
+				sb.WriteString(line)
+				sb.WriteString(strings.Repeat(" ", w))
 
 			case Right:
-				b.WriteString(strings.Repeat(" ", w))
-				b.WriteString(line)
+				sb.WriteString(strings.Repeat(" ", w))
+				sb.WriteString(line)
 
 			default: // Somewhere in the middle
 				if w < 1 {
-					b.WriteString(line)
+					sb.WriteString(line)
 					break
 				}
 
@@ -158,18 +149,18 @@ func JoinVertical(pos Position, strs ...string) string {
 				right := w - split
 				left := w - right
 
-				b.WriteString(strings.Repeat(" ", left))
-				b.WriteString(line)
-				b.WriteString(strings.Repeat(" ", right))
+				sb.WriteString(strings.Repeat(" ", left))
+				sb.WriteString(line)
+				sb.WriteString(strings.Repeat(" ", right))
 			}
 
 			// Write a newline as long as we're not on the last line of the
 			// last block.
 			if !(i == len(blocks)-1 && j == len(block)-1) {
-				b.WriteRune('\n')
+				sb.WriteRune('\n')
 			}
 		}
 	}
 
-	return b.String()
+	return sb.String()
 }

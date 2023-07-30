@@ -6,6 +6,7 @@ package paginator
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/key"
@@ -170,15 +171,16 @@ func (m *Model) View() string {
 }
 
 func (m *Model) dotsView() string {
-	var s string
+	var sb strings.Builder
 	for i := 0; i < m.TotalPages; i++ {
 		if i == m.Page {
-			s += m.ActiveDot
+			sb.WriteString(m.ActiveDot)
 			continue
 		}
-		s += m.InactiveDot
+
+		sb.WriteString(m.InactiveDot)
 	}
-	return s
+	return sb.String()
 }
 
 func (m *Model) arabicView() string {

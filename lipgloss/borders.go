@@ -52,10 +52,7 @@ func (b Border) GetLeftSize() int {
 func getBorderEdgeMaxWidth(borderParts ...string) int {
 	maxWidth := 0
 	for _, piece := range borderParts {
-		w := maxRuneWidth(piece)
-		if w > maxWidth {
-			maxWidth = w
-		}
+		maxWidth = max(maxWidth, maxRuneWidth(piece))
 	}
 	return maxWidth
 }
@@ -266,24 +263,18 @@ func (s Style) applyBorder(str string) string {
 	// Figure out which corners we should actually be using based on which
 	// sides are set to show.
 	if hasTop {
-		switch {
-		case !hasLeft && !hasRight:
+		if !hasLeft {
 			border.TopLeft = ""
-			border.TopRight = ""
-		case !hasLeft:
-			border.TopLeft = ""
-		case !hasRight:
+		}
+		if !hasRight {
 			border.TopRight = ""
 		}
 	}
 	if hasBottom {
-		switch {
-		case !hasLeft && !hasRight:
+		if !hasLeft {
 			border.BottomLeft = ""
-			border.BottomRight = ""
-		case !hasLeft:
-			border.BottomLeft = ""
-		case !hasRight:
+		}
+		if !hasRight {
 			border.BottomRight = ""
 		}
 	}

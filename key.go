@@ -549,8 +549,7 @@ func readInputs(ctx context.Context, msgs chan<- Msg, input io.Reader) error {
 		}
 		b := buf[:numBytes]
 
-		var i, w int
-		for i, w = 0, 0; i < len(b); i += w {
+		for i, w := 0, 0; i < len(b); i += w {
 			var msg Msg
 			w, msg = detectOneMsg(b[i:])
 			select {

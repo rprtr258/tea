@@ -133,11 +133,6 @@ func New(opts ...Option) Model {
 	return m
 }
 
-// NewModel returns a model with default values.
-//
-// Deprecated: use [New] instead.
-var NewModel = New
-
 // MsgTick indicates that the timer has ticked and we should render a frame.
 type MsgTick struct {
 	Time time.Time

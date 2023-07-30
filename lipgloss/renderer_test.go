@@ -26,5 +26,5 @@ func TestRendererWithOutput(t *testing.T) {
 
 	r := NewRenderer(f)
 	r.SetColorProfile(termenv.TrueColor)
-	assert.Equal(t, termenv.TrueColor, r.output.Profile)
+	assert.Equal(t, termenv.TrueColor, r.Output.Profile)
 }

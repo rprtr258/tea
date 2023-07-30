@@ -140,7 +140,6 @@ type StyleConfig struct {
 
 func cascadeStyles(toBlock bool, s ...StyleBlock) StyleBlock {
 	var r StyleBlock
-
 	for _, v := range s {
 		r = cascadeStyle(r, v, toBlock)
 	}

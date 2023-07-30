@@ -12,8 +12,6 @@ type TerminalColor interface {
 	RGBA() (r, g, b, a uint32)
 }
 
-var noColor = NoColor{}
-
 // NoColor is used to specify the absence of color styling. When this is active
 // foreground colors will be rendered with the terminal's default text color,
 // and background colors will not be drawn at all.
@@ -22,6 +20,8 @@ var noColor = NoColor{}
 //
 //	var style = someStyle.Copy().Background(lipgloss.NoColor{})
 type NoColor struct{}
+
+var noColor = NoColor{}
 
 func (NoColor) color(*Renderer) termenv.Color {
 	return termenv.NoColor{}
@@ -55,7 +55,7 @@ func (c Color) color(r *Renderer) termenv.Color {
 //
 // Deprecated.
 func (c Color) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(c.color(renderer)).RGBA()
+	return termenv.ConvertToRGB(c.color(_renderer)).RGBA()
 }
 
 // ANSIColor is a color specified by an ANSI color value. It's merely syntactic
@@ -110,7 +110,7 @@ func (ac AdaptiveColor) color(r *Renderer) termenv.Color {
 //
 // Deprecated.
 func (ac AdaptiveColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(ac.color(renderer)).RGBA()
+	return termenv.ConvertToRGB(ac.color(_renderer)).RGBA()
 }
 
 // CompleteColor specifies exact values for truecolor, ANSI256, and ANSI color
@@ -143,7 +143,7 @@ func (c CompleteColor) color(r *Renderer) termenv.Color {
 //
 // Deprecated.
 func (c CompleteColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(c.color(renderer)).RGBA()
+	return termenv.ConvertToRGB(c.color(_renderer)).RGBA()
 }
 
 // CompleteAdaptiveColor specifies exact values for truecolor, ANSI256, and ANSI color
@@ -168,5 +168,5 @@ func (cac CompleteAdaptiveColor) color(r *Renderer) termenv.Color {
 //
 // Deprecated.
 func (cac CompleteAdaptiveColor) RGBA() (r, g, b, a uint32) { //nolint:nonamedreturns
-	return termenv.ConvertToRGB(cac.color(renderer)).RGBA()
+	return termenv.ConvertToRGB(cac.color(_renderer)).RGBA()
 }

@@ -995,10 +995,8 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 
 // View renders the component.
 func (m *Model[I]) View() string {
-	var (
-		sections    []string
-		availHeight = m.height
-	)
+	var sections []string
+	availHeight := m.height
 
 	if m.showTitle || (m.showFilter && m.filteringEnabled) {
 		v := m.titleView()
@@ -1039,18 +1037,16 @@ func (m *Model[I]) View() string {
 }
 
 func (m *Model[I]) titleView() string {
-	var (
-		view          string
-		titleBarStyle = m.Styles.TitleBar.Copy()
+	titleBarStyle := m.Styles.TitleBar.Copy()
 
-		// We need to account for the size of the spinner, even if we don't
-		// render it, to reserve some space for it should we turn it on later.
-		spinnerView    = m.spinnerView()
-		spinnerWidth   = lipgloss.Width(spinnerView)
-		spinnerLeftGap = " "
-		spinnerOnLeft  = titleBarStyle.GetPaddingLeft() >= spinnerWidth+lipgloss.Width(spinnerLeftGap) && m.showSpinner
-	)
+	// We need to account for the size of the spinner, even if we don't
+	// render it, to reserve some space for it should we turn it on later.
+	spinnerView := m.spinnerView()
+	spinnerWidth := lipgloss.Width(spinnerView)
+	spinnerLeftGap := " "
+	spinnerOnLeft := titleBarStyle.GetPaddingLeft() >= spinnerWidth+lipgloss.Width(spinnerLeftGap) && m.showSpinner
 
+	var view string
 	// If the filter's showing, draw that. Otherwise draw the title.
 	if m.showFilter && m.filterState == Filtering {
 		view += m.FilterInput.View()
@@ -1083,17 +1079,16 @@ func (m *Model[I]) titleView() string {
 	if len(view) > 0 {
 		return titleBarStyle.Render(view)
 	}
+
 	return view
 }
 
 func (m *Model[I]) statusView() string {
 	visibleItems := len(m.VisibleItems())
 
-	var itemName string
+	itemName := m.itemNameSingular
 	if visibleItems != 1 {
 		itemName = m.itemNamePlural
-	} else {
-		itemName = m.itemNameSingular
 	}
 
 	itemsDisplay := fmt.Sprintf("%d %s", visibleItems, itemName)
@@ -1102,10 +1097,9 @@ func (m *Model[I]) statusView() string {
 	switch {
 	case m.filterState == Filtering:
 		// Filter results
+		status = itemsDisplay
 		if visibleItems == 0 {
 			status = m.Styles.StatusEmpty.Render("Nothing matched")
-		} else {
-			status = itemsDisplay
 		}
 	case len(m.items) == 0:
 		// Not filtering: no items.
@@ -1117,15 +1111,14 @@ func (m *Model[I]) statusView() string {
 		if filtered {
 			f := strings.TrimSpace(m.FilterInput.Value())
 			f = truncate.StringWithTail(f, 10, "…")
-			status += fmt.Sprintf("“%s” ", f)
+			status = fmt.Sprintf("“%s” ", f)
 		}
 
 		status += itemsDisplay
 	}
 
 	totalItems := len(m.items)
-	numFiltered := totalItems - visibleItems
-	if numFiltered > 0 {
+	if numFiltered := totalItems - visibleItems; numFiltered > 0 {
 		status += m.Styles.DividerDot.String()
 		status += m.Styles.StatusBarFilterCount.Render(fmt.Sprintf("%d filtered", numFiltered))
 	}
@@ -1158,16 +1151,16 @@ func (m *Model[I]) paginationView() string {
 func (m *Model[I]) populatedView() string {
 	items := m.VisibleItems()
 
-	var b strings.Builder
-
 	// Empty states
 	if len(items) == 0 {
 		if m.filterState == Filtering {
 			return ""
 		}
+
 		return m.Styles.NoItems.Render("No " + m.itemNamePlural + ".")
 	}
 
+	var b strings.Builder
 	if len(items) > 0 {
 		start, end := m.Paginator.GetSliceBounds(len(items))
 		docs := items[start:end]
