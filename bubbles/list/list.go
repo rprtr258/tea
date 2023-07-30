@@ -429,16 +429,18 @@ func (m *Model[I]) VisibleItems() []I {
 	return m.items
 }
 
-// SelectedItem returns the current selected item in the list.
-func (m *Model[I]) SelectedItem() Item {
+// SelectedItem returns the current selected item in the list and true if it
+// exists. False otherwise.
+func (m *Model[I]) SelectedItem() (I, bool) {
 	i := m.Index()
 
 	items := m.VisibleItems()
-	if i < 0 || len(items) == 0 || len(items) <= i {
-		return nil
+	if i < 0 || i >= len(items) {
+		var i I
+		return i, false
 	}
 
-	return items[i]
+	return items[i], true
 }
 
 // MatchesForItem returns rune positions matched by the current filter, if any.

@@ -65,7 +65,7 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			m.quitting = true
 			return []tea.Cmd{tea.Quit}
 		case "enter":
-			i, ok := m.list.SelectedItem().(item)
+			i, ok := m.list.SelectedItem()
 			if ok {
 				m.choice = string(i)
 			}
