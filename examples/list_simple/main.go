@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"strings"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/list"
@@ -35,14 +34,14 @@ func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return 
 func (d itemDelegate) Render(w io.Writer, m *list.Model[item], index int, i item) {
 	str := fmt.Sprintf("%d. %s", index+1, i)
 
-	fn := itemStyle.Render
+	var res string
 	if index == m.Index() {
-		fn = func(s ...string) string {
-			return selectedItemStyle.Render("> " + strings.Join(s, " "))
-		}
+		res = selectedItemStyle.Render("> " + str)
+	} else {
+		res = itemStyle.Render(str)
 	}
 
-	fmt.Fprint(w, fn(str))
+	fmt.Fprint(w, res)
 }
 
 type model struct {
@@ -60,13 +59,11 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	case tea.MsgWindowSize:
 		m.list.SetWidth(msg.Width)
 		return nil
-
 	case tea.MsgKey:
-		switch keypress := msg.String(); keypress {
+		switch msg.String() {
 		case "ctrl+c":
 			m.quitting = true
 			return []tea.Cmd{tea.Quit}
-
 		case "enter":
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
@@ -95,16 +92,16 @@ func (m *model) View(r tea.Renderer) {
 
 func Main() {
 	items := []item{
-		item("Ramen"),
-		item("Tomato Soup"),
-		item("Hamburgers"),
-		item("Cheeseburgers"),
-		item("Currywurst"),
-		item("Okonomiyaki"),
-		item("Pasta"),
-		item("Fillet Mignon"),
-		item("Caviar"),
-		item("Just Wine"),
+		"Ramen",
+		"Tomato Soup",
+		"Hamburgers",
+		"Cheeseburgers",
+		"Currywurst",
+		"Okonomiyaki",
+		"Pasta",
+		"Fillet Mignon",
+		"Caviar",
+		"Just Wine",
 	}
 
 	const defaultWidth = 20
