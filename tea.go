@@ -267,8 +267,8 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 			case <-p.ctx.Done():
 				return
 
-			case cmd := <-cmds:
-				if cmd == nil {
+			case cmds := <-cmds:
+				if cmds == nil {
 					continue
 				}
 
@@ -278,8 +278,9 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 				// possible to cancel them so we'll have to leak the goroutine
 				// until Cmd returns.
 				go func() {
-					for _, c := range cmd {
-						p.Send(c()) // this can be long.
+					for _, cmd := range cmds {
+						msg := cmd()
+						p.Send(msg) // this can be long.
 					}
 				}()
 			}

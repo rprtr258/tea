@@ -50,7 +50,7 @@ type ItemDelegate interface {
 	// loop will pass through here except when the user is setting a filter.
 	// Use this method to perform item-level updates appropriate to this
 	// delegate.
-	Update(msg tea.Msg, m *Model) tea.Cmd
+	Update(msg tea.Msg, m *Model) []tea.Cmd
 }
 
 type filteredItem struct {
@@ -793,17 +793,14 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	}
 
 	if m.filterState == Filtering {
-		cmds = append(cmds, m.handleFiltering(msg)...)
-	} else {
-		cmds = append(cmds, m.handleBrowsing(msg)...)
+		return append(cmds, m.handleFiltering(msg)...)
 	}
 
-	return cmds
+	return append(cmds, m.handleBrowsing(msg)...)
 }
 
 // Updates for when a user is browsing the list.
 func (m *Model) handleBrowsing(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
 	numItems := len(m.VisibleItems())
 
 	switch msg := msg.(type) { //nolint:gocritic
@@ -859,8 +856,7 @@ func (m *Model) handleBrowsing(msg tea.Msg) []tea.Cmd {
 		}
 	}
 
-	cmd := m.delegate.Update(msg, m)
-	cmds = append(cmds, cmd)
+	cmds := m.delegate.Update(msg, m)
 
 	// Keep the index in bounds when paginating
 	itemsOnPage := m.Paginator.ItemsOnPage(len(m.VisibleItems()))

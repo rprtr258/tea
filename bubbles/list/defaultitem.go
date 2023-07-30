@@ -86,7 +86,7 @@ type DefaultItem interface {
 type DefaultDelegate struct {
 	ShowDescription bool
 	Styles          DefaultItemStyles
-	UpdateFunc      func(tea.Msg, *Model) tea.Cmd
+	UpdateFunc      func(tea.Msg, *Model) []tea.Cmd
 	ShortHelpFunc   func() []key.Binding
 	FullHelpFunc    func() [][]key.Binding
 	height          int
@@ -129,7 +129,7 @@ func (d DefaultDelegate) Spacing() int {
 }
 
 // Update checks whether the delegate's UpdateFunc is set and calls it.
-func (d DefaultDelegate) Update(msg tea.Msg, m *Model) tea.Cmd {
+func (d DefaultDelegate) Update(msg tea.Msg, m *Model) []tea.Cmd {
 	if d.UpdateFunc == nil {
 		return nil
 	}
