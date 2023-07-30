@@ -39,13 +39,11 @@ type Styles struct {
 	DividerDot            lipgloss.Style
 }
 
-// DefaultStyles returns a set of default style definitions for this list
-// component.
-func DefaultStyles() Styles {
-	verySubduedColor := lipgloss.AdaptiveColor{Light: "#DDDADA", Dark: "#3C3C3C"}
-	subduedColor := lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"}
-
-	return Styles{
+var (
+	verySubduedColor = lipgloss.AdaptiveColor{Light: "#DDDADA", Dark: "#3C3C3C"}
+	subduedColor     = lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"}
+	// DefaultStyle is a set of default style definitions for list component.
+	DefaultStyle = Styles{
 		TitleBar: lipgloss.NewStyle().
 			Padding(0, 0, 1, 2),
 		Title: lipgloss.NewStyle().
@@ -87,4 +85,4 @@ func DefaultStyles() Styles {
 			Foreground(verySubduedColor).
 			SetString(" " + bullet + " "),
 	}
-}
+)

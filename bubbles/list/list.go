@@ -197,19 +197,17 @@ type Model[I Item] struct {
 
 // New returns a new model with sensible defaults.
 func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I] {
-	styles := DefaultStyles()
-
 	filterInput := textinput.New()
 	filterInput.Prompt = "Filter: "
-	filterInput.PromptStyle = styles.FilterPrompt
-	filterInput.Cursor.Style = styles.FilterCursor
+	filterInput.PromptStyle = DefaultStyle.FilterPrompt
+	filterInput.Cursor.Style = DefaultStyle.FilterCursor
 	filterInput.CharLimit = 64
 	filterInput.Focus()
 
 	p := paginator.New()
 	p.Type = paginator.Dots
-	p.ActiveDot = styles.ActivePaginationDot.String()
-	p.InactiveDot = styles.InactivePaginationDot.String()
+	p.ActiveDot = DefaultStyle.ActivePaginationDot.String()
+	p.InactiveDot = DefaultStyle.InactivePaginationDot.String()
 
 	m := Model[I]{
 		showTitle:             true,
@@ -222,7 +220,7 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 		filteringEnabled:      true,
 		KeyMap:                DefaultKeyMap(),
 		Filter:                DefaultFilter,
-		Styles:                styles,
+		Styles:                DefaultStyle,
 		Title:                 "List",
 		FilterInput:           filterInput,
 		StatusMessageLifetime: time.Second,
@@ -234,7 +232,7 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 		Paginator: p,
 		spinner: spinner.New(
 			spinner.WithSpinner(spinner.Line),
-			spinner.WithStyle(styles.Spinner),
+			spinner.WithStyle(DefaultStyle.Spinner),
 		),
 		Help: help.New(),
 	}
