@@ -74,20 +74,20 @@ func JoinHorizontal(pos Position, strs ...string) string {
 	}
 
 	// Merge lines
-	var b strings.Builder
+	var sb strings.Builder
 	for i := range blocks[0] { // remember, all blocks have the same number of members now
 		for j, block := range blocks {
-			b.WriteString(block[i])
+			sb.WriteString(block[i])
 
 			// Also make lines the same length
-			b.WriteString(strings.Repeat(" ", maxWidths[j]-ansi.PrintableRuneWidth(block[i])))
+			sb.WriteString(strings.Repeat(" ", maxWidths[j]-ansi.PrintableRuneWidth(block[i])))
 		}
 		if i < len(blocks[0])-1 {
-			b.WriteRune('\n')
+			sb.WriteRune('\n')
 		}
 	}
 
-	return b.String()
+	return sb.String()
 }
 
 // JoinVertical is a utility function for vertically joining two potentially

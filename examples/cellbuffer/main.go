@@ -115,14 +115,14 @@ func (c cellbuffer) ready() bool {
 }
 
 func (c cellbuffer) String() string {
-	var b strings.Builder
+	var sb strings.Builder
 	for i := 0; i < len(c.cells); i++ {
 		if i > 0 && i%c.stride == 0 && i < len(c.cells)-1 {
-			b.WriteRune('\n')
+			sb.WriteRune('\n')
 		}
-		b.WriteString(c.cells[i])
+		sb.WriteString(c.cells[i])
 	}
-	return b.String()
+	return sb.String()
 }
 
 type msgFrame struct{}

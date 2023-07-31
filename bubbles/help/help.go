@@ -112,7 +112,7 @@ func (m *Model) ShortHelpView(bindings []key.Binding) string {
 
 	separator := m.Styles.ShortSeparator.Inline(true).Render(m.ShortSeparator)
 
-	var b strings.Builder
+	var sb strings.Builder
 	var totalWidth int
 	for i, kb := range bindings {
 		if !kb.Enabled() {
@@ -138,17 +138,17 @@ func (m *Model) ShortHelpView(bindings []key.Binding) string {
 			tailWidth := lipgloss.Width(tail)
 
 			if totalWidth+tailWidth < m.Width {
-				b.WriteString(tail)
+				sb.WriteString(tail)
 			}
 
 			break
 		}
 
 		totalWidth += w
-		b.WriteString(str)
+		sb.WriteString(str)
 	}
 
-	return b.String()
+	return sb.String()
 }
 
 // FullHelpView renders help columns from a slice of key binding slices. Each

@@ -1160,15 +1160,15 @@ func (m *Model[I]) populatedView() string {
 		return m.Styles.NoItems.Render("No " + m.itemNamePlural + ".")
 	}
 
-	var b strings.Builder
+	var sb strings.Builder
 	if len(items) > 0 {
 		start, end := m.Paginator.GetSliceBounds(len(items))
 		docs := items[start:end]
 
 		for i, item := range docs {
-			m.delegate.Render(&b, m, i+start, item)
+			m.delegate.Render(&sb, m, i+start, item)
 			if i != len(docs)-1 {
-				fmt.Fprint(&b, strings.Repeat("\n", m.delegate.Spacing()+1))
+				fmt.Fprint(&sb, strings.Repeat("\n", m.delegate.Spacing()+1))
 			}
 		}
 	}
@@ -1182,10 +1182,10 @@ func (m *Model[I]) populatedView() string {
 		if len(items) == 0 {
 			n -= m.delegate.Height() - 1
 		}
-		fmt.Fprint(&b, strings.Repeat("\n", n))
+		fmt.Fprint(&sb, strings.Repeat("\n", n))
 	}
 
-	return b.String()
+	return sb.String()
 }
 
 func (m *Model[I]) helpView() string {

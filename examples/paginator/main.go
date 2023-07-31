@@ -55,15 +55,15 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 func (m *model) View(r tea.Renderer) {
-	var b strings.Builder
-	b.WriteString("\n  Paginator Example\n\n")
+	var sb strings.Builder
+	sb.WriteString("\n  Paginator Example\n\n")
 	start, end := m.paginator.GetSliceBounds(len(m.items))
 	for _, item := range m.items[start:end] {
-		b.WriteString("  • " + item + "\n\n")
+		sb.WriteString("  • " + item + "\n\n")
 	}
-	b.WriteString("  " + m.paginator.View())
-	b.WriteString("\n\n  h/l ←/→ page • q: quit\n")
-	r.Write(b.String())
+	sb.WriteString("  " + m.paginator.View())
+	sb.WriteString("\n\n  h/l ←/→ page • q: quit\n")
+	r.Write(sb.String())
 }
 
 func Main(ctx context.Context) error {

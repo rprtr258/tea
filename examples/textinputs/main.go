@@ -146,12 +146,12 @@ func (m *model) updateInputs(msg tea.Msg) []tea.Cmd {
 }
 
 func (m *model) View(r tea.Renderer) {
-	var b strings.Builder
+	var sb strings.Builder
 
 	for i := range m.inputs {
-		b.WriteString(m.inputs[i].View())
+		sb.WriteString(m.inputs[i].View())
 		if i < len(m.inputs)-1 {
-			b.WriteRune('\n')
+			sb.WriteRune('\n')
 		}
 	}
 
@@ -159,13 +159,13 @@ func (m *model) View(r tea.Renderer) {
 	if m.focusIndex == len(m.inputs) {
 		button = &focusedButton
 	}
-	fmt.Fprintf(&b, "\n\n%s\n\n", *button)
+	fmt.Fprintf(&sb, "\n\n%s\n\n", *button)
 
-	b.WriteString(helpStyle.Render("cursor mode is "))
-	b.WriteString(cursorModeHelpStyle.Render(m.cursorMode.String()))
-	b.WriteString(helpStyle.Render(" (ctrl+r to change style)"))
+	sb.WriteString(helpStyle.Render("cursor mode is "))
+	sb.WriteString(cursorModeHelpStyle.Render(m.cursorMode.String()))
+	sb.WriteString(helpStyle.Render(" (ctrl+r to change style)"))
 
-	r.Write(b.String())
+	r.Write(sb.String())
 }
 
 func Main(ctx context.Context) error {
