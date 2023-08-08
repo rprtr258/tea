@@ -24,8 +24,8 @@ type keymap struct {
 	quit  key.Binding
 }
 
-func (m *model) Init() []tea.Cmd {
-	return m.stopwatch.Init()
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(m.stopwatch.Init()...)
 }
 
 func (m *model) View(r tea.Renderer) {
@@ -49,22 +49,23 @@ func (m *model) helpView() string {
 	})
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		case key.Matches(msg, m.keymap.reset):
-			return []tea.Cmd{m.stopwatch.CmdReset()}
+			f(m.stopwatch.CmdReset())
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
 			m.keymap.stop.SetEnabled(!m.stopwatch.Running())
 			m.keymap.start.SetEnabled(m.stopwatch.Running())
-			return m.stopwatch.Toggle()
+			f(m.stopwatch.Toggle()...)
 		}
 	}
-	return m.stopwatch.Update(msg)
+
+	f(m.stopwatch.Update(msg)...)
 }
 
 func Main(ctx context.Context) error {

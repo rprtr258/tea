@@ -24,42 +24,39 @@ const (
 
 type msgTick time.Time
 
+var cmdTick = tea.Tick(time.Second*1, func(t time.Time) tea.Msg {
+	return msgTick(t)
+})
+
 type model struct {
 	progress progress.Model
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{tickCmd()}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(cmdTick)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return []tea.Cmd{tea.Quit}
-
+		f(tea.Quit)
 	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
-		return nil
-
 	case msgTick:
 		if m.progress.Percent() == 1.0 {
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 
 		// Note that you can also use progress.Model.SetPercent to set the
 		// percentage value explicitly, too.
-		cmd := m.progress.IncrPercent(0.25)
-		return []tea.Cmd{tickCmd(), cmd}
-
+		f(cmdTick, m.progress.IncrPercent(0.25))
 	// MsgFrame is sent when the progress bar wants to animate itself
 	case progress.MsgFrame:
-		return m.progress.Update(msg)
-
-	default:
-		return nil
+		f(m.progress.Update(msg)...)
 	}
 }
 
@@ -68,12 +65,6 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" +
 		pad + m.progress.View() + "\n\n" +
 		pad + helpStyle("Press any key to quit"))
-}
-
-func tickCmd() tea.Cmd {
-	return tea.Tick(time.Second*1, func(t time.Time) tea.Msg {
-		return msgTick(t)
-	})
 }
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render

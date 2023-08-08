@@ -24,23 +24,20 @@ func initialModel() *model {
 	return &model{spinner: s}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{m.spinner.CmdTick}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(m.spinner.CmdTick)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
 			m.quitting = true
-			return []tea.Cmd{tea.Quit}
-		default:
-			return nil
+			f(tea.Quit)
 		}
-
 	default:
-		return m.spinner.Update(msg)
+		f(m.spinner.Update(msg)...)
 	}
 }
 

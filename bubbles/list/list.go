@@ -346,7 +346,7 @@ func (m *Model[I]) SetItems(items []I) tea.Cmd {
 	var cmd tea.Cmd
 	if m.filterState != Unfiltered {
 		m.filteredItems = nil
-		cmd = filterItems(*m)
+		cmd = cmdFilterItems(*m)
 	}
 
 	m.updatePagination()
@@ -376,7 +376,7 @@ func (m *Model[I]) SetItem(index int, item I) []tea.Cmd {
 
 	var cmd []tea.Cmd
 	if m.filterState != Unfiltered {
-		cmd = append(cmd, filterItems(*m))
+		cmd = append(cmd, cmdFilterItems(*m))
 	}
 
 	m.updatePagination()
@@ -390,7 +390,7 @@ func (m *Model[I]) InsertItem(index int, item I) []tea.Cmd {
 
 	var cmd []tea.Cmd
 	if m.filterState != Unfiltered {
-		cmd = append(cmd, filterItems(*m))
+		cmd = append(cmd, cmdFilterItems(*m))
 	}
 
 	m.updatePagination()
@@ -611,7 +611,7 @@ func (m *Model[I]) DisableQuitKeybindings() {
 
 // NewStatusMessage sets a new status message, which will show for a limited
 // amount of time. Note that this also returns a command.
-func (m *Model[I]) NewStatusMessage(s string) tea.Cmd {
+func (m *Model[I]) CmdNewStatusMessage(s string) tea.Cmd {
 	m.statusMessage = s
 	if m.statusMessageTimer != nil {
 		m.statusMessageTimer.Stop()
@@ -843,9 +843,7 @@ func (m *Model[I]) handleBrowsing(msg tea.Msg) []tea.Cmd {
 			m.updateKeybindings()
 			return []tea.Cmd{textinput.Blink}
 
-		case key.Matches(msg, m.KeyMap.ShowFullHelp):
-			fallthrough
-		case key.Matches(msg, m.KeyMap.CloseFullHelp):
+		case key.Matches(msg, m.KeyMap.ShowFullHelp) || key.Matches(msg, m.KeyMap.CloseFullHelp):
 			m.Help.ShowAll = !m.Help.ShowAll
 			m.updatePagination()
 		}
@@ -907,7 +905,7 @@ func (m *Model[I]) handleFiltering(msg tea.Msg) []tea.Cmd {
 
 	// If the filtering input has changed, request updated filtering
 	if filterChanged {
-		cmds = append(cmds, filterItems(*m))
+		cmds = append(cmds, cmdFilterItems(*m))
 		m.KeyMap.AcceptWhileFiltering.SetEnabled(m.FilterInput.Value() != "")
 	}
 
@@ -1196,7 +1194,7 @@ func (m *Model[I]) spinnerView() string {
 	return m.spinner.View()
 }
 
-func filterItems[I Item](m Model[I]) tea.Cmd {
+func cmdFilterItems[I Item](m Model[I]) tea.Cmd {
 	return func() tea.Msg {
 		if m.FilterInput.Value() == "" || m.filterState == Unfiltered {
 			return MsgFilterMatches[I](m.itemsAsFilterItems()) // return nothing

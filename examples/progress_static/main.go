@@ -35,37 +35,36 @@ var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
 
 type msgTick time.Time
 
+var cmdTick = tea.Tick(time.Second, func(t time.Time) tea.Msg {
+	return msgTick(t)
+})
+
 type model struct {
 	percent  float64
 	progress progress.Model
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{tickCmd()}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(cmdTick)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return []tea.Cmd{tea.Quit}
-
+		f(tea.Quit)
 	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
-		return nil
-
 	case msgTick:
 		m.percent += 0.25
 		if m.percent > 1.0 {
 			m.percent = 1.0
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
-		return []tea.Cmd{tickCmd()}
-
-	default:
-		return nil
+		f(cmdTick)
 	}
 }
 
@@ -74,12 +73,6 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" +
 		pad + m.progress.ViewAs(m.percent) + "\n\n" +
 		pad + helpStyle("Press any key to quit"))
-}
-
-func tickCmd() tea.Cmd {
-	return tea.Tick(time.Second, func(t time.Time) tea.Msg {
-		return msgTick(t)
-	})
 }
 
 func Main(ctx context.Context) error {

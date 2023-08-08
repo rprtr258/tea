@@ -66,27 +66,29 @@ type model struct {
 	Quitting bool
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{tick()}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(tick())
 }
 
 // Main update function.
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	// Make sure these keys always quit
 	if msg, ok := msg.(tea.MsgKey); ok {
 		k := msg.String()
 		if k == "q" || k == "esc" || k == "ctrl+c" {
 			m.Quitting = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		}
 	}
 
 	// Hand off the message and model to the appropriate update function for the
 	// appropriate view based on the current state.
 	if !m.Chosen {
-		return updateChoices(msg, m)
+		m.updateChoices(msg, f)
+		return
 	}
-	return updateChosen(msg, m)
+
+	m.updateChosen(msg, f)
 }
 
 // The main view, which just calls the appropriate sub-view
@@ -108,7 +110,7 @@ func (m *model) View(r tea.Renderer) {
 // Sub-update functions
 
 // Update loop for the first view where you're choosing a task.
-func updateChoices(msg tea.Msg, m *model) []tea.Cmd {
+func (m *model) updateChoices(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -124,23 +126,22 @@ func updateChoices(msg tea.Msg, m *model) []tea.Cmd {
 			}
 		case "enter":
 			m.Chosen = true
-			return []tea.Cmd{frame()}
+			f(frame())
 		}
 
 	case msgTick:
 		if m.Ticks == 0 {
 			m.Quitting = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 		m.Ticks--
-		return []tea.Cmd{tick()}
+		f(tick())
 	}
-
-	return nil
 }
 
 // Update loop for the second view after a choice has been made
-func updateChosen(msg tea.Msg, m *model) []tea.Cmd {
+func (m *model) updateChosen(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg.(type) {
 	case msgFrame:
 		if !m.Loaded {
@@ -150,24 +151,24 @@ func updateChosen(msg tea.Msg, m *model) []tea.Cmd {
 				m.Progress = 1
 				m.Loaded = true
 				m.Ticks = 3
-				return []tea.Cmd{tick()}
+				f(tick())
+				return
 			}
-			return []tea.Cmd{frame()}
-		}
 
+			f(frame())
+		}
 	case msgTick:
 		if m.Loaded {
 			if m.Ticks == 0 {
 				m.Quitting = true
-				return []tea.Cmd{tea.Quit}
+				f(tea.Quit)
+				return
 			}
 
 			m.Ticks--
-			return []tea.Cmd{tick()}
+			f(tick())
 		}
 	}
-
-	return nil
 }
 
 // Sub-views

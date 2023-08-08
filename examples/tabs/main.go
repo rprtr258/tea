@@ -14,26 +14,20 @@ type model struct {
 	activeTab  int
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch keypress := msg.String(); keypress {
 		case "ctrl+c", "q":
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		case "right", "l", "n", "tab":
 			m.activeTab = min(m.activeTab+1, len(m.Tabs)-1)
-			return nil
 		case "left", "h", "p", "shift+tab":
 			m.activeTab = max(m.activeTab-1, 0)
-			return nil
 		}
 	}
-
-	return nil
 }
 
 func tabBorderWithBottom(left, middle, right string) lipgloss.Border {

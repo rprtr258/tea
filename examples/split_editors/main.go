@@ -109,13 +109,11 @@ func newModel() *model {
 	return m
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{textarea.Blink}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(textarea.Blink)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
-
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch {
@@ -123,23 +121,22 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			for i := range m.inputs {
 				m.inputs[i].Blur()
 			}
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		case key.Matches(msg, m.keymap.next):
 			m.inputs[m.focus].Blur()
 			m.focus++
 			if m.focus > len(m.inputs)-1 {
 				m.focus = 0
 			}
-			cmd := m.inputs[m.focus].Focus()
-			cmds = append(cmds, cmd...)
+			f(m.inputs[m.focus].Focus()...)
 		case key.Matches(msg, m.keymap.prev):
 			m.inputs[m.focus].Blur()
 			m.focus--
 			if m.focus < 0 {
 				m.focus = len(m.inputs) - 1
 			}
-			cmd := m.inputs[m.focus].Focus()
-			cmds = append(cmds, cmd...)
+			f(m.inputs[m.focus].Focus()...)
 		case key.Matches(msg, m.keymap.add):
 			m.inputs = append(m.inputs, newTextarea())
 		case key.Matches(msg, m.keymap.remove):
@@ -158,10 +155,8 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 
 	// Update all textareas
 	for i := range m.inputs {
-		cmds = append(cmds, m.inputs[i].Update(msg)...)
+		f(m.inputs[i].Update(msg)...)
 	}
-
-	return cmds
 }
 
 func (m *model) sizeInputs() {

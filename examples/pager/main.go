@@ -42,17 +42,14 @@ type model struct {
 	viewport viewport.Model
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
-
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if k := msg.String(); k == "ctrl+c" || k == "q" || k == "esc" {
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 
 	case tea.MsgWindowSize:
@@ -87,12 +84,12 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			// initialize the viewport and when the window is resized.
 			//
 			// This is needed for high-performance rendering only.
-			cmds = append(cmds, viewport.Sync(m.viewport)...)
+			f(viewport.Sync(m.viewport)...)
 		}
 	}
 
 	// Handle keyboard and mouse events in the viewport
-	return append(cmds, m.viewport.Update(msg)...)
+	f(m.viewport.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {
@@ -130,7 +127,7 @@ func Main(ctx context.Context) error {
 		return fmt.Errorf("load file: %w", err)
 	}
 
-	_, err = tea.NewProgram(context.Background(), &model{content: string(content)}).
+	_, err = tea.NewProgram(ctx, &model{content: string(content)}).
 		WithAltScreen().       // use the full size of the terminal in its "alternate screen buffer"
 		WithMouseCellMotion(). // turn on mouse support so we can track the mouse wheel
 		Run()

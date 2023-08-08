@@ -64,29 +64,27 @@ func initialModel() *model {
 	return m
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{textinput.Blink}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(textinput.Blink)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "esc":
-			return []tea.Cmd{tea.Quit}
-
+			f(tea.Quit)
+			return
 		// Change cursor mode
 		case "ctrl+r":
 			m.cursorMode++
 			if m.cursorMode > cursor.CursorHide {
 				m.cursorMode = cursor.CursorBlink
 			}
-			cmds := []tea.Cmd{}
 			for i := range m.inputs {
-				cmds = append(cmds, m.inputs[i].Cursor.SetMode(m.cursorMode)...)
+				f(m.inputs[i].Cursor.SetMode(m.cursorMode)...)
 			}
-			return cmds
-
+			return
 		// Set focus to next input
 		case "tab", "shift+tab", "enter", "up", "down":
 			s := msg.String()
@@ -94,7 +92,8 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			// Did the user press enter while the submit button was focused?
 			// If so, exit.
 			if s == "enter" && m.focusIndex == len(m.inputs) {
-				return []tea.Cmd{tea.Quit}
+				f(tea.Quit)
+				return
 			}
 
 			// Cycle indexes
@@ -110,11 +109,10 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 				m.focusIndex = len(m.inputs)
 			}
 
-			var cmds []tea.Cmd
 			for i := 0; i <= len(m.inputs)-1; i++ {
 				if i == m.focusIndex {
 					// Set focused state
-					cmds = append(cmds, m.inputs[i].Focus()...)
+					f(m.inputs[i].Focus()...)
 					m.inputs[i].PromptStyle = focusedStyle
 					m.inputs[i].TextStyle = focusedStyle
 					continue
@@ -125,12 +123,12 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 				m.inputs[i].TextStyle = noStyle
 			}
 
-			return cmds
+			return
 		}
 	}
 
 	// Handle character input and blinking
-	return m.updateInputs(msg)
+	f(m.updateInputs(msg)...)
 }
 
 func (m *model) updateInputs(msg tea.Msg) []tea.Cmd {

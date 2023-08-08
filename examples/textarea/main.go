@@ -27,13 +27,11 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{textarea.Blink}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(textarea.Blink)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
-
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.Type {
@@ -42,15 +40,15 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 				m.textarea.Blur()
 			}
 		case tea.KeyCtrlC:
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		default:
 			if !m.textarea.Focused() {
-				cmds = append(cmds, m.textarea.Focus()...)
+				f(m.textarea.Focus()...)
 			}
 		}
 	}
 
-	return append(cmds, m.textarea.Update(msg)...)
+	f(m.textarea.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {

@@ -116,13 +116,11 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{tea.EnterAltScreen}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(tea.EnterAltScreen)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
-
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		h, v := appStyle.GetFrameSize()
@@ -136,37 +134,34 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 
 		switch {
 		case key.Matches(msg, m.keys.toggleSpinner):
-			return m.list.ToggleSpinner()
+			f(m.list.ToggleSpinner()...)
+			return
 		case key.Matches(msg, m.keys.toggleTitleBar):
 			v := !m.list.ShowTitle()
 			m.list.SetShowTitle(v)
 			m.list.SetShowFilter(v)
 			m.list.SetFilteringEnabled(v)
-			return nil
-
+			return
 		case key.Matches(msg, m.keys.toggleStatusBar):
 			m.list.SetShowStatusBar(!m.list.ShowStatusBar())
-			return nil
-
+			return
 		case key.Matches(msg, m.keys.togglePagination):
 			m.list.SetShowPagination(!m.list.ShowPagination())
-			return nil
-
+			return
 		case key.Matches(msg, m.keys.toggleHelpMenu):
 			m.list.SetShowHelp(!m.list.ShowHelp())
-			return nil
-
+			return
 		case key.Matches(msg, m.keys.insertItem):
 			m.delegateKeys.remove.SetEnabled(true)
 			newItem := m.itemGenerator.next()
-			insCmd := m.list.InsertItem(0, newItem)
-			statusCmd := m.list.NewStatusMessage(statusMessageStyle("Added " + newItem.Title()))
-			return append(insCmd, statusCmd)
+			f(m.list.InsertItem(0, newItem)...)
+			f(m.list.CmdNewStatusMessage(statusMessageStyle("Added " + newItem.Title())))
+			return
 		}
 	}
 
 	// This will also call our delegate's update function.
-	return append(cmds, m.list.Update(msg)...)
+	f(m.list.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {

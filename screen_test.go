@@ -3,26 +3,21 @@ package tea
 import (
 	"bytes"
 	"context"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-type initCmdModel struct {
-	initCmds []Cmd
-}
+type initCmdModel struct{}
 
-func (m *initCmdModel) Init() []Cmd {
-	return m.initCmds
-}
+func (m *initCmdModel) Init(func(...Cmd)) {}
 
-func (m *initCmdModel) Update(msg Msg) []Cmd {
+func (m *initCmdModel) Update(msg Msg, f func(...Cmd)) {
 	switch msg.(type) { //nolint:gocritic
 	case MsgKey:
-		return []Cmd{Quit}
+		f(Quit)
 	}
-
-	return nil
 }
 
 func (m *initCmdModel) View(r Renderer) {
@@ -72,12 +67,21 @@ func TestMsgClear(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			var in bytes.Buffer
 			var out bytes.Buffer
-			p := NewProgram(context.Background(), &initCmdModel{append(test.cmds, Quit)}).
+			p := NewProgram(context.Background(), &initCmdModel{}).
 				WithInput(&in).
 				WithOutput(&out)
-
+			var wg sync.WaitGroup
+			wg.Add(1)
+			go func() {
+				for _, cmd := range test.cmds {
+					p.Send(cmd())
+				}
+				p.Send(Quit())
+				wg.Done()
+			}()
 			_, err := p.Run()
 			assert.NoError(t, err)
+			wg.Wait()
 
 			assert.Equal(t, test.expected, out.String())
 		})

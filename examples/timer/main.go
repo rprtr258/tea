@@ -26,38 +26,32 @@ type keymap struct {
 	quit  key.Binding
 }
 
-func (m *model) Init() []tea.Cmd {
-	return m.timer.Init()
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(m.timer.Init()...)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case timer.MsgTick:
-		return m.timer.Update(msg)
-
+		f(m.timer.Update(msg)...)
 	case timer.MsgStartStop:
-		cmd := m.timer.Update(msg)
+		f(m.timer.Update(msg)...)
 		m.keymap.stop.SetEnabled(m.timer.Running())
 		m.keymap.start.SetEnabled(!m.timer.Running())
-		return cmd
-
 	case timer.MsgTimeout:
 		m.quitting = true
-		return []tea.Cmd{tea.Quit}
-
+		f(tea.Quit)
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		case key.Matches(msg, m.keymap.reset):
 			m.timer.Timeout = timeout
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
-			return []tea.Cmd{m.timer.CmdToggle()}
+			f(m.timer.CmdToggle())
 		}
 	}
-
-	return nil
 }
 
 func (m *model) helpView() string {

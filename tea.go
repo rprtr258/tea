@@ -36,11 +36,11 @@ type Msg any
 // Model contains the program's state as well as its core functions.
 type Model interface {
 	// Init is the first function that will be called. It returns list of initial commands.
-	Init() []Cmd
+	Init(func(...Cmd))
 
 	// Update is called when a message is received. Use it to inspect messages
 	// and, in response, update the model and/or send a command.
-	Update(Msg) []Cmd
+	Update(Msg, func(...Cmd))
 
 	// View renders the program's UI. The view is rendered after every Update.
 	View(Renderer)
@@ -268,21 +268,17 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 				return
 
 			case cmds := <-cmds:
-				if cmds == nil {
-					continue
-				}
-
 				// Don't wait on these goroutines, otherwise the shutdown
 				// latency would get too large as a Cmd can run for some time
 				// (e.g. tick commands that sleep for half a second). It's not
 				// possible to cancel them so we'll have to leak the goroutine
 				// until Cmd returns.
-				go func() {
-					for _, cmd := range cmds {
+				for _, cmd := range cmds {
+					go func(cmd Cmd) {
 						msg := cmd()
 						p.Send(msg) // this can be long.
-					}
-				}()
+					}(cmd)
+				}
 			}
 		}
 	}()
@@ -347,7 +343,9 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 
 			p.renderer.handleMessages(msg)
 
-			cmds <- model.Update(msg) // run update, process command (if any)
+			model.Update(msg, func(c ...Cmd) {
+				cmds <- c
+			}) // run update, process command (if any)
 			model.View(p.renderer)
 		}
 	}
@@ -441,7 +439,11 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Initialize the program.
 	model := p.initialModel
-	if initCmds := model.Init(); len(initCmds) > 0 {
+	var initCmds []Cmd
+	model.Init(func(cmds ...Cmd) {
+		initCmds = cmds
+	})
+	if len(initCmds) > 0 {
 		ch := make(chan struct{})
 		myHandlers.add(ch)
 
@@ -594,9 +596,7 @@ func (p *Program[M]) RestoreTerminal() error {
 		// entering alt screen already causes a repaint.
 		go p.Send(msgRepaint{})
 	}
-	if p.renderer != nil {
-		p.renderer.start()
-	}
+	p.renderer.start()
 
 	// If the output is a terminal, it may have been resized while another
 	// process was at the foreground, in which case we may not have received
