@@ -85,21 +85,17 @@ func newExample() (*model, error) {
 	}, nil
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		default:
-			return m.viewport.Update(msg)
+			f(m.viewport.Update(msg)...)
 		}
-	default:
-		return nil
 	}
 }
 

@@ -43,29 +43,27 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
+func (m *model) Init(f func(...tea.Cmd)) {
 	log.Println("Starting work...")
-	return []tea.Cmd{
+	f(
 		m.spinner.CmdTick,
 		runPretendProcess,
-	}
+	)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return []tea.Cmd{tea.Quit}
+		f(tea.Quit)
 	case spinner.MsgTick:
-		return m.spinner.Update(msg)
+		f(m.spinner.Update(msg)...)
 	case msgProcessFinished:
 		d := time.Duration(msg)
 		res := result{emoji: randomEmoji(), duration: d}
 		log.Printf("%s Job finished in %s", res.emoji, res.duration)
 		m.results = append(m.results[1:], res)
-		return []tea.Cmd{runPretendProcess}
-	default:
-		return nil
+		f(runPretendProcess)
 	}
 }
 
@@ -119,7 +117,7 @@ func Main(ctx context.Context) error {
 		return nil
 	}
 
-	p := tea.NewProgram(context.Background(), newModel())
+	p := tea.NewProgram(ctx, newModel())
 	if daemonMode || !isatty.IsTerminal(os.Stdout.Fd()) {
 		// If we're in daemon mode don't render the TUI
 		p = p.WithoutRenderer()

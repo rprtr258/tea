@@ -27,23 +27,24 @@ func clearErrorAfter(t time.Duration) tea.Cmd {
 	})
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{m.filepicker.Init()}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(m.filepicker.Init())
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 	case msgClearError:
 		m.err = nil
 	}
 
-	cmd := m.filepicker.Update(msg)
+	f(m.filepicker.Update(msg)...)
 
 	// Did the user select a file?
 	if didSelect, path := m.filepicker.DidSelectFile(msg); didSelect {
@@ -57,10 +58,8 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 		// Let's clear the selectedFile and display an error.
 		m.err = errors.New(path + " is not valid.")
 		m.selectedFile = ""
-		return append(cmd, clearErrorAfter(2*time.Second))
+		f(clearErrorAfter(2 * time.Second))
 	}
-
-	return cmd
 }
 
 func (m *model) View(r tea.Renderer) {
@@ -90,6 +89,7 @@ func Main(ctx context.Context) error {
 	m := &model{
 		filepicker: fp,
 	}
+
 	mm, err := tea.NewProgram(ctx, m).WithOutput(os.Stderr).Run()
 	if err != nil {
 		return err

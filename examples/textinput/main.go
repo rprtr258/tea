@@ -27,20 +27,21 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{textinput.Blink}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(textinput.Blink)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 	}
 
-	return m.textInput.Update(msg)
+	f(m.textInput.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {

@@ -15,27 +15,25 @@ type model int
 
 type msgTick time.Time
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{tick(), tea.EnterAltScreen}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(tick(), tea.EnterAltScreen)
 }
 
-func (m *model) Update(message tea.Msg) []tea.Cmd {
+func (m *model) Update(message tea.Msg, f func(...tea.Cmd)) {
 	switch msg := message.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		}
-
 	case msgTick:
 		*m--
 		if *m <= 0 {
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
-		return []tea.Cmd{tick()}
+		f(tick())
 	}
-
-	return nil
 }
 
 func (m *model) View(r tea.Renderer) {

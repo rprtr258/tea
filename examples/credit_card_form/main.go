@@ -114,23 +114,23 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{textinput.Blink}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(textinput.Blink)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd = make([]tea.Cmd, 0, len(m.inputs))
-
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.focused == len(m.inputs)-1 {
-				return []tea.Cmd{tea.Quit}
+				f(tea.Quit)
+				return
 			}
 			m.nextInput()
 		case tea.KeyCtrlC, tea.KeyEsc:
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		case tea.KeyShiftTab, tea.KeyCtrlP:
 			m.prevInput()
 		case tea.KeyTab, tea.KeyCtrlN:
@@ -143,9 +143,8 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 	}
 
 	for i := range m.inputs {
-		cmds = append(cmds, m.inputs[i].Update(msg)...)
+		f(m.inputs[i].Update(msg)...)
 	}
-	return cmds
 }
 
 func (m *model) View(r tea.Renderer) {

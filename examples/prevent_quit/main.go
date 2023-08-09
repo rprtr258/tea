@@ -54,20 +54,20 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{textarea.Blink}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(textarea.Blink)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	if m.quitting {
-		return m.updatePromptView(msg)
+		m.updatePromptView(msg, f)
+		return
 	}
 
-	return m.updateTextView(msg)
+	m.updateTextView(msg, f)
 }
 
-func (m *model) updateTextView(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
+func (m *model) updateTextView(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.saveText = ""
@@ -77,32 +77,32 @@ func (m *model) updateTextView(msg tea.Msg) []tea.Cmd {
 			m.hasChanges = false
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		case msg.Type == tea.KeyRunes:
 			m.saveText = ""
 			m.hasChanges = true
 			fallthrough
 		default:
 			if !m.textarea.Focused() {
-				cmds = append(cmds, m.textarea.Focus()...)
+				f(m.textarea.Focus()...)
 			}
 		}
 	}
-	return append(cmds, m.textarea.Update(msg)...)
+	f(m.textarea.Update(msg)...)
 }
 
-func (m *model) updatePromptView(msg tea.Msg) []tea.Cmd {
+func (m *model) updatePromptView(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		// For simplicity's sake, we'll treat any key besides "y" as "no"
 		if key.Matches(msg, m.keymap.quit) || msg.String() == "y" {
 			m.hasChanges = false
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 		m.quitting = false
 	}
-
-	return nil
 }
 
 func (m *model) View(r tea.Renderer) {

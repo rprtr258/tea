@@ -10,22 +10,21 @@ import (
 
 type model struct{}
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(
 		tea.Println("A"),
 		tea.Println("B"),
 		tea.Println("C"),
 		tea.Println("Z"),
 		tea.Quit,
-	}
+	)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg.(type) {
 	case tea.MsgKey:
-		return []tea.Cmd{tea.Quit}
+		f(tea.Quit)
 	}
-	return nil
 }
 
 func (m *model) View(r tea.Renderer) {}

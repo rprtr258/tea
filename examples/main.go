@@ -160,30 +160,30 @@ type model struct {
 	quitting bool
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.list.SetWidth(msg.Width)
-		return nil
+		return
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		case "enter":
 			i, ok := m.list.SelectedItem()
 			if ok {
 				m.choice = i
 			}
-			return []tea.Cmd{tea.ExitAltScreen, tea.ClearScreen, tea.Quit}
+			f(tea.ExitAltScreen, tea.ClearScreen, tea.Quit)
+			return
 		}
 	}
 
-	return m.list.Update(msg)
+	f(m.list.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {

@@ -34,37 +34,33 @@ type model struct {
 	spinner spinner.Model
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{m.spinner.CmdTick}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(m.spinner.CmdTick)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		case "h", "left":
 			m.index--
 			if m.index < 0 {
 				m.index = len(spinners) - 1
 			}
 			m.resetSpinner()
-			return []tea.Cmd{m.spinner.CmdTick}
+			f(m.spinner.CmdTick)
 		case "l", "right":
 			m.index++
 			if m.index >= len(spinners) {
 				m.index = 0
 			}
 			m.resetSpinner()
-			return []tea.Cmd{m.spinner.CmdTick}
-		default:
-			return nil
+			f(m.spinner.CmdTick)
 		}
 	case spinner.MsgTick:
-		return m.spinner.Update(msg)
-	default:
-		return nil
+		f(m.spinner.Update(msg)...)
 	}
 }
 

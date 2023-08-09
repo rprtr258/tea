@@ -21,7 +21,7 @@ type msgResponse struct{}
 // In this case, we'll send events on the channel at a random interval between
 // 100 to 1000 milliseconds. As a command, Bubble Tea will run this
 // asynchronously.
-func listenForActivity(sub chan struct{}) tea.Cmd {
+func cmdListenForActivity(sub chan struct{}) tea.Cmd {
 	return func() tea.Msg {
 		for {
 			time.Sleep(time.Millisecond * time.Duration(rand.Int63n(900)+100)) // nolint:gosec
@@ -31,7 +31,7 @@ func listenForActivity(sub chan struct{}) tea.Cmd {
 }
 
 // A command that waits for the activity on a channel.
-func waitForActivity(sub chan struct{}) tea.Cmd {
+func cmdWaitForActivity(sub chan struct{}) tea.Cmd {
 	return func() tea.Msg {
 		return msgResponse(<-sub)
 	}
@@ -44,26 +44,24 @@ type model struct {
 	quitting  bool
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(
 		m.spinner.CmdTick,
-		listenForActivity(m.sub), // generate activity
-		waitForActivity(m.sub),   // wait for activity
-	}
+		cmdWaitForActivity(m.sub),   // wait for activity
+		cmdListenForActivity(m.sub), // generate activity
+	)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		return []tea.Cmd{tea.Quit}
+		f(tea.Quit)
 	case msgResponse:
-		m.responses++                            // record external activity
-		return []tea.Cmd{waitForActivity(m.sub)} // wait for next event
+		m.responses++                // record external activity
+		f(cmdWaitForActivity(m.sub)) // wait for next event
 	case spinner.MsgTick:
-		return m.spinner.Update(msg)
-	default:
-		return nil
+		f(m.spinner.Update(msg)...)
 	}
 }
 

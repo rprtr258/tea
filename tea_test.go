@@ -17,20 +17,15 @@ type testModel struct {
 	counter    atomic.Int32
 }
 
-func (m *testModel) Init() []Cmd {
-	return nil
-}
+func (m *testModel) Init(func(...Cmd)) {}
 
-func (m *testModel) Update(msg Msg) []Cmd {
+func (m *testModel) Update(msg Msg, f func(...Cmd)) {
 	switch msg.(type) {
 	case msgIncrement:
 		m.counter.Add(1)
-
 	case MsgKey:
-		return []Cmd{Quit}
+		f(Quit)
 	}
-
-	return nil
 }
 
 func (m *testModel) View(r Renderer) {

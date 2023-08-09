@@ -22,7 +22,7 @@ func newItemDelegate[I list.DefaultItem](keys *delegateKeyMap) list.DefaultDeleg
 		case tea.MsgKey:
 			switch {
 			case key.Matches(msg, keys.choose):
-				return []tea.Cmd{m.NewStatusMessage(statusMessageStyle("You chose " + title))}
+				return []tea.Cmd{m.CmdNewStatusMessage(statusMessageStyle("You chose " + title))}
 
 			case key.Matches(msg, keys.remove):
 				index := m.Index()
@@ -30,7 +30,7 @@ func newItemDelegate[I list.DefaultItem](keys *delegateKeyMap) list.DefaultDeleg
 				if len(m.Items()) == 0 {
 					keys.remove.SetEnabled(false)
 				}
-				return []tea.Cmd{m.NewStatusMessage(statusMessageStyle("Deleted " + title))}
+				return []tea.Cmd{m.CmdNewStatusMessage(statusMessageStyle("Deleted " + title))}
 			}
 		}
 

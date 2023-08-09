@@ -43,41 +43,48 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{downloadAndInstall(m.packages[m.index]), m.spinner.CmdTick}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(
+		downloadAndInstall(m.packages[m.index]),
+		m.spinner.CmdTick,
+	)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.width, m.height = msg.Width, msg.Height
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 	case msgInstalledPkg:
 		if m.index >= len(m.packages)-1 {
 			// Everything's been installed. We're done!
 			m.done = true
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 
 		// Update progress bar
 		progressCmd := m.progress.SetPercent(float64(m.index) / float64(len(m.packages)-1))
 
 		m.index++
-		return []tea.Cmd{
+		f(
 			progressCmd,
 			tea.Printf("%s %s", checkMark, m.packages[m.index]), // print success message above our program
 			downloadAndInstall(m.packages[m.index]),             // download the next package
-		}
+		)
+		return
 	case spinner.MsgTick:
-		return m.spinner.Update(msg)
+		f(m.spinner.Update(msg)...)
+		return
 	case progress.MsgFrame:
-		return m.progress.Update(msg)
+		f(m.progress.Update(msg)...)
+		return
 	}
-	return nil
 }
 
 func (m *model) View(r tea.Renderer) {

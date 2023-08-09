@@ -22,22 +22,21 @@ type model struct {
 	list list.Model[item]
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if msg.String() == "ctrl+c" {
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 	case tea.MsgWindowSize:
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 	}
 
-	return m.list.Update(msg)
+	f(m.list.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {
@@ -77,7 +76,7 @@ func Main(ctx context.Context) error {
 	m.list.Title = "My Fave Things"
 
 	_, err := tea.
-		NewProgram(context.Background(), m).
+		NewProgram(ctx, m).
 		WithAltScreen().
 		Run()
 	return err

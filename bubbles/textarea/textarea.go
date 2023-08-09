@@ -1018,7 +1018,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	cmd := m.Cursor.Update(msg)
 	if (newRow != oldRow || newCol != oldCol) && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
-		cmd = m.Cursor.BlinkCmd()
+		cmd = m.Cursor.CmdBlink()
 	}
 	cmds = append(cmds, cmd...)
 

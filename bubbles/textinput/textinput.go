@@ -580,7 +580,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	cmds := m.Cursor.Update(msg)
 	if oldPos != m.pos && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
-		cmds = append(cmds, m.Cursor.BlinkCmd()...)
+		cmds = append(cmds, m.Cursor.CmdBlink()...)
 	}
 
 	m.handleOverflow()

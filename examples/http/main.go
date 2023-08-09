@@ -23,30 +23,22 @@ type (
 	msgErr    struct{ err error }
 )
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{checkServer}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(checkServer)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
-			return []tea.Cmd{tea.Quit}
-		default:
-			return nil
+			f(tea.Quit)
 		}
-
 	case msgStatus:
 		m.status = int(msg)
-		return []tea.Cmd{tea.Quit}
-
+		f(tea.Quit)
 	case msgErr:
 		m.err = msg.err
-		return nil
-
-	default:
-		return nil
 	}
 }
 

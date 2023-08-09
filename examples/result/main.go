@@ -18,28 +18,23 @@ type model struct {
 	choice string
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			return []tea.Cmd{tea.Quit}
-
+			f(tea.Quit)
 		case "enter":
 			// Send the choice on the channel and exit.
 			m.choice = choices[m.cursor]
-			return []tea.Cmd{tea.Quit}
-
+			f(tea.Quit)
 		case "down", "j":
 			m.cursor++
 			if m.cursor >= len(choices) {
 				m.cursor = 0
 			}
-
 		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
@@ -47,8 +42,6 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			}
 		}
 	}
-
-	return nil
 }
 
 func (m *model) View(r tea.Renderer) {

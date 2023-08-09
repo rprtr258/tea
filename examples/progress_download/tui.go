@@ -33,42 +33,29 @@ type model struct {
 	err      error
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return []tea.Cmd{tea.Quit}
-
+		f(tea.Quit)
 	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
 			m.progress.Width = maxWidth
 		}
-		return nil
-
 	case msgProgressErr:
 		m.err = msg.err
-		return []tea.Cmd{tea.Quit}
-
+		f(tea.Quit)
 	case msgProgress:
-		var cmds []tea.Cmd
-
 		if msg >= 1.0 {
-			cmds = append(cmds, finalPause(), tea.Quit)
+			f(finalPause(), tea.Quit)
 		}
 
-		cmds = append(cmds, m.progress.SetPercent(float64(msg)))
-		return cmds
-
+		f(m.progress.SetPercent(float64(msg)))
 	// MsgFrame is sent when the progress bar wants to animate itself
 	case progress.MsgFrame:
-		return m.progress.Update(msg)
-
-	default:
-		return nil
+		f(m.progress.Update(msg)...)
 	}
 }
 

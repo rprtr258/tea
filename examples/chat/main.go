@@ -53,20 +53,18 @@ Type a message and press Enter to send.`)
 	}
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{textarea.Blink}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(textarea.Blink)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
-	tiCmd := m.textarea.Update(msg)
-	vpCmd := m.viewport.Update(msg)
-
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			fmt.Println(m.textarea.Value())
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		case tea.KeyEnter:
 			m.messages = append(m.messages, m.senderStyle.Render("You: ")+m.textarea.Value())
 			m.viewport.SetContent(strings.Join(m.messages, "\n"))
@@ -75,7 +73,8 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 		}
 	}
 
-	return append(tiCmd, vpCmd...)
+	f(m.textarea.Update(msg)...)
+	f(m.viewport.Update(msg)...)
 }
 
 func (m *model) View(r tea.Renderer) {

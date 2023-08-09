@@ -127,11 +127,9 @@ func (c cellbuffer) String() string {
 
 type msgFrame struct{}
 
-func animate() tea.Cmd {
-	return tea.Tick(time.Second/fps, func(_ time.Time) tea.Msg {
-		return msgFrame{}
-	})
-}
+var animate = tea.Tick(time.Second/fps, func(_ time.Time) tea.Msg {
+	return msgFrame{}
+})
 
 type model struct {
 	cells                cellbuffer
@@ -141,39 +139,35 @@ type model struct {
 	xVelocity, yVelocity float64
 }
 
-func (m *model) Init() []tea.Cmd {
-	return []tea.Cmd{animate()}
+func (m *model) Init(f func(...tea.Cmd)) {
+	f(animate)
 }
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		return []tea.Cmd{tea.Quit}
+		f(tea.Quit)
 	case tea.MsgWindowSize:
 		if !m.cells.ready() {
 			m.targetX, m.targetY = float64(msg.Width)/2, float64(msg.Height)/2
 		}
 		m.cells.init(msg.Width, msg.Height)
-		return nil
 	case tea.MsgMouse:
 		if !m.cells.ready() {
-			return nil
+			return
 		}
 		m.targetX, m.targetY = float64(msg.X), float64(msg.Y)
-		return nil
 
 	case msgFrame:
 		if !m.cells.ready() {
-			return nil
+			return
 		}
 
 		m.cells.wipe()
 		m.x, m.xVelocity = m.spring.Update(m.x, m.xVelocity, m.targetX)
 		m.y, m.yVelocity = m.spring.Update(m.y, m.yVelocity, m.targetY)
 		drawEllipse(&m.cells, m.x, m.y, 16, 8)
-		return []tea.Cmd{animate()}
-	default:
-		return nil
+		f(animate)
 	}
 }
 

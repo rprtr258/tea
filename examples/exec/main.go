@@ -26,11 +26,9 @@ type model struct {
 	err             error
 }
 
-func (m *model) Init() []tea.Cmd {
-	return nil
-}
+func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg) []tea.Cmd {
+func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
@@ -40,19 +38,18 @@ func (m *model) Update(msg tea.Msg) []tea.Cmd {
 			if !m.altscreenActive {
 				cmd = tea.ExitAltScreen
 			}
-			return []tea.Cmd{cmd}
+			f(cmd)
 		case "e":
-			return []tea.Cmd{openEditor()}
+			f(openEditor())
 		case "ctrl+c", "q":
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		}
 	case msgEditorFinished:
 		if msg.err != nil {
 			m.err = msg.err
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
 		}
 	}
-	return nil
 }
 
 func (m *model) View(r tea.Renderer) {

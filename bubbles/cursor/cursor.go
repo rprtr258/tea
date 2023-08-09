@@ -86,7 +86,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			return nil
 		}
 
-		return m.BlinkCmd()
+		return m.CmdBlink()
 	case MsgBlink:
 		// We're choosy about whether to accept blinkMsgs so that our cursor
 		// only exactly when it should.
@@ -103,7 +103,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 
 		if m.mode == CursorBlink {
 			m.Blink = !m.Blink
-			return m.BlinkCmd()
+			return m.CmdBlink()
 		}
 
 		return nil
@@ -130,7 +130,7 @@ func (m *Model) SetMode(mode Mode) []tea.Cmd {
 }
 
 // BlinkCmd is a command used to manage cursor blinking.
-func (m *Model) BlinkCmd() []tea.Cmd {
+func (m *Model) CmdBlink() []tea.Cmd {
 	if m.mode != CursorBlink {
 		return nil
 	}
@@ -156,7 +156,7 @@ func (m *Model) Focus() []tea.Cmd {
 	m.Blink = m.mode == CursorHide // show the cursor unless we've explicitly hidden it
 
 	if m.mode == CursorBlink && m.focus {
-		return m.BlinkCmd()
+		return m.CmdBlink()
 	}
 	return nil
 }
