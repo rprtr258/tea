@@ -79,10 +79,6 @@ func (i inputType) String() string {
 // The options here are treated as bits.
 type startupOptions byte
 
-func (s startupOptions) has(option startupOptions) bool {
-	return s&option != 0
-}
-
 const (
 	withAltScreen startupOptions = 1 << iota
 	withMouseCellMotion
@@ -97,13 +93,17 @@ const (
 	withoutCatchPanics
 )
 
+func (s startupOptions) has(option startupOptions) bool {
+	return s&option != 0
+}
+
 // handlers manages series of channels returned by various processes. It allows
 // us to wait for those processes to terminate before exiting the program.
-type handlers []chan struct{}
+type handlers []<-chan struct{}
 
 // Adds a channel to the list of handlers. We wait for all handlers to terminate
 // gracefully on shutdown.
-func (h *handlers) add(ch chan struct{}) {
+func (h *handlers) add(ch <-chan struct{}) {
 	*h = append(*h, ch)
 }
 
@@ -112,7 +112,7 @@ func (h handlers) shutdown() {
 	var wg sync.WaitGroup
 	for _, ch := range h {
 		wg.Add(1)
-		go func(ch chan struct{}) {
+		go func(ch <-chan struct{}) {
 			<-ch
 			wg.Done()
 		}(ch)
@@ -179,26 +179,23 @@ func Quit() Msg {
 
 // NewProgram creates a new Program.
 func NewProgram[M Model](ctx context.Context, model M) *Program[M] {
-	p := &Program[M]{
-		initialModel: model,
-		msgs:         make(chan Msg),
-		ctx:          ctx,
-	}
-
 	// Initialize context and teardown channel.
-	p.ctx, p.cancel = context.WithCancel(p.ctx)
+	ctx, cancel := context.WithCancel(ctx)
 
-	// if no output was set, set it to stdout
-	if p.output == nil {
-		p.output = termenv.DefaultOutput()
+	output := termenv.DefaultOutput()
+	// cache detected color values
+	termenv.WithColorCache(true)(output)
 
-		// cache detected color values
-		termenv.WithColorCache(true)(p.output)
+	restoreOutput, _ := termenv.EnableVirtualTerminalProcessing(output)
+
+	return &Program[M]{
+		initialModel:  model,
+		msgs:          make(chan Msg),
+		output:        output,
+		ctx:           ctx,
+		cancel:        cancel,
+		restoreOutput: restoreOutput,
 	}
-
-	p.restoreOutput, _ = termenv.EnableVirtualTerminalProcessing(p.output)
-
-	return p
 }
 
 func (p *Program[M]) handleSignals() chan struct{} {
@@ -321,20 +318,20 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 				p.renderer.exitAltScreen()
 
 			case msgEnableMouseCellMotion:
-				p.renderer.enableMouseCellMotion()
+				p.renderer.setMouseCellMotion(true)
 
 			case msgEnableMouseAllMotion:
-				p.renderer.enableMouseAllMotion()
+				p.renderer.setMouseAllMotion(true)
 
 			case msgDisableMouse:
-				p.renderer.disableMouseCellMotion()
-				p.renderer.disableMouseAllMotion()
+				p.renderer.setMouseCellMotion(false)
+				p.renderer.setMouseAllMotion(false)
 
 			case msgShowCursor:
-				p.renderer.showCursor()
+				p.renderer.setCursor(true)
 
 			case msgHideCursor:
-				p.renderer.hideCursor()
+				p.renderer.setCursor(false)
 
 			case msgExec:
 				// NB: this blocks.
@@ -432,9 +429,9 @@ func (p *Program[M]) Run() (M, error) {
 		p.renderer.enterAltScreen()
 	}
 	if p.startupOptions&withMouseCellMotion != 0 {
-		p.renderer.enableMouseCellMotion()
+		p.renderer.setMouseCellMotion(true)
 	} else if p.startupOptions&withMouseAllMotion != 0 {
-		p.renderer.enableMouseAllMotion()
+		p.renderer.setMouseAllMotion(true)
 	}
 
 	// Initialize the program.
@@ -605,28 +602,4 @@ func (p *Program[M]) RestoreTerminal() error {
 	go p.checkResize()
 
 	return nil
-}
-
-// Println prints above the Program. This output is unmanaged by the program
-// and will persist across renders by the Program.
-//
-// If the altscreen is active no output will be printed.
-func (p *Program[M]) Println(args ...any) {
-	p.msgs <- msgPrintLine{
-		messageBody: fmt.Sprint(args...),
-	}
-}
-
-// Printf prints above the Program. It takes a format template followed by
-// values similar to fmt.Printf. This output is unmanaged by the program and
-// will persist across renders by the Program.
-//
-// Unlike fmt.Printf (but similar to log.Printf) the message will be print on
-// its own line.
-//
-// If the altscreen is active no output will be printed.
-func (p *Program[M]) Printf(format string, args ...any) {
-	p.msgs <- msgPrintLine{
-		messageBody: fmt.Sprintf(format, args...),
-	}
 }

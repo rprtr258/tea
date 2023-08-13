@@ -11,10 +11,7 @@ func (nilRenderer) clearScreen()            {}
 func (nilRenderer) altScreen() bool         { return false }
 func (nilRenderer) enterAltScreen()         {}
 func (nilRenderer) exitAltScreen()          {}
-func (nilRenderer) showCursor()             {}
-func (nilRenderer) hideCursor()             {}
-func (nilRenderer) enableMouseCellMotion()  {}
-func (nilRenderer) disableMouseCellMotion() {}
-func (nilRenderer) enableMouseAllMotion()   {}
-func (nilRenderer) disableMouseAllMotion()  {}
+func (nilRenderer) setCursor(bool)          {}
+func (nilRenderer) setMouseCellMotion(bool) {}
+func (nilRenderer) setMouseAllMotion(bool)  {}
 func (nilRenderer) handleMessages(Msg)      {}

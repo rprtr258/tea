@@ -5,3 +5,8 @@ test:
 .PHONY: fmt
 fmt:
 	@gofumpt -l -w .
+
+.PHONY: run-examples
+run-examples:
+	@go run examples/main.go
+

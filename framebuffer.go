@@ -11,14 +11,18 @@ func ctrlSeq(code string) string {
 	return termenv.CSI + code + "m"
 }
 
-// FrameBuffer is a view of the terminal to render to
-type FrameBuffer struct {
+type screen struct {
 	B []rune
 	// OPTIMIZE: store ranges of colors instead of color for every pixel
-	backgrounds []string
-	foregrounds []string
-	Height      int
-	Width       int
+	backgrounds, foregrounds []string
+	Height, Width            int
+}
+
+// FrameBuffer is a view of the terminal to render to
+type FrameBuffer struct {
+	screen
+	ViewHeight, ViewWidth int
+	Y, X                  int
 }
 
 // NewFramebuffer creates a new Framebuffer
@@ -28,31 +32,17 @@ func NewFramebuffer(height, width int) FrameBuffer {
 		buf[i] = ' '
 	}
 	return FrameBuffer{
-		B:           buf,
-		Height:      height,
-		Width:       width,
-		backgrounds: make([]string, height*width),
-		foregrounds: make([]string, height*width),
-	}
-}
-
-// Set writes a rune to the framebuffer to the given position.
-// 0 <= y < height, 0 <= x < width
-func (fb FrameBuffer) Set(y, x int, c rune) {
-	fb.B[y*fb.Width+x] = c
-}
-
-// Background colors y'th row bacground to given color from x1 to x2
-func (fb FrameBuffer) Background(y, x1, x2 int, background termenv.Color) {
-	for x := x1; x < x2; x++ {
-		fb.backgrounds[y*fb.Width+x] = background.Sequence(true)
-	}
-}
-
-// Background colors y'th row foreground to given color from x1 to x2
-func (fb FrameBuffer) Foreground(y, x1, x2 int, foreground termenv.Color) {
-	for x := x1; x < x2; x++ {
-		fb.foregrounds[y*fb.Width+x] = foreground.Sequence(false)
+		screen: screen{
+			B:           buf,
+			backgrounds: make([]string, height*width),
+			foregrounds: make([]string, height*width),
+			Height:      height,
+			Width:       width,
+		},
+		ViewHeight: height,
+		ViewWidth:  width,
+		Y:          0,
+		X:          0,
 	}
 }
 
@@ -85,23 +75,14 @@ func (fb FrameBuffer) Render() string {
 	return strings.Join(rows, "\n")
 }
 
-// Viewbox is rectangular view to terminal frame part
-type Viewbox struct {
-	FB     FrameBuffer
-	Y      int
-	X      int
-	Height int
-	Width  int
-}
-
 // Row returns view to current viewbox's row
-func (vb Viewbox) Row(y int) Viewbox {
-	return Viewbox{
-		Y:      y + vb.Y,
-		X:      vb.X,
-		Height: 1,
-		Width:  vb.Width,
-		FB:     vb.FB,
+func (fb FrameBuffer) Row(y int) FrameBuffer {
+	return FrameBuffer{
+		screen:     fb.screen,
+		ViewHeight: 1,
+		ViewWidth:  fb.Width,
+		Y:          y + fb.Y,
+		X:          fb.X,
 	}
 }
 
@@ -112,30 +93,34 @@ type PaddingOptions struct {
 
 // Padding returns view to current viewbox inner with given paddings and size
 // 0 <= top <= bottom < height, 0 <= left <= right < width
-func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
-	return Viewbox{
-		Y:      vb.Y + opt.Top,
-		X:      vb.X + opt.Left,
-		Height: vb.Height - opt.Top - opt.Bottom,
-		Width:  vb.Width - opt.Left - opt.Right,
-		FB:     vb.FB,
+func (fb FrameBuffer) Padding(opt PaddingOptions) FrameBuffer {
+	return FrameBuffer{
+		screen:     fb.screen,
+		ViewHeight: fb.ViewHeight - opt.Top - opt.Bottom,
+		ViewWidth:  fb.ViewWidth - opt.Left - opt.Right,
+		Y:          fb.Y + opt.Top,
+		X:          fb.X + opt.Left,
 	}
 }
 
 // Set writes a rune to the framebuffer in position relative to viewbox
 // 0 <= y < height, 0 <= x < width
-func (vb Viewbox) Set(y, x int, c rune) {
-	vb.FB.Set(vb.Y+y, vb.X+x, c)
+func (fb FrameBuffer) Set(y, x int, c rune) {
+	fb.B[(fb.Y+y)*fb.Width+fb.X+x] = c
 }
 
 // Background colors y'th row bacground to given color from x1 to x2 with
 // coordinates relative to viewbox
-func (vb Viewbox) Background(y, x1, x2 int, background termenv.Color) {
-	vb.FB.Background(y+vb.Y, x1+vb.X, x2+vb.X, background)
+func (fb FrameBuffer) Background(y, x1, x2 int, background termenv.Color) {
+	for x := x1 + fb.X; x < x2+fb.X; x++ {
+		fb.backgrounds[(y+fb.Y)*fb.Width+x] = background.Sequence(true)
+	}
 }
 
 // Background colors y'th row foreground to given color from x1 to x2 with
 // coordinates relative to viewbox
-func (vb Viewbox) Foreground(y, x1, x2 int, foreground termenv.Color) {
-	vb.FB.Foreground(y+vb.Y, x1+vb.X, x2+vb.X, foreground)
+func (fb FrameBuffer) Foreground(y, x1, x2 int, foreground termenv.Color) {
+	for x := x1 + fb.X; x < x2+fb.X; x++ {
+		fb.foregrounds[(y+fb.Y)*fb.Width+x] = foreground.Sequence(false)
+	}
 }

@@ -26,7 +26,7 @@ func (p *Program[M]) initTerminal() error {
 		}
 	}
 
-	p.renderer.hideCursor()
+	p.renderer.setCursor(false)
 	return nil
 }
 
@@ -34,9 +34,9 @@ func (p *Program[M]) initTerminal() error {
 // Bubble Tea program.
 func (p *Program[M]) restoreTerminalState() error {
 	if p.renderer != nil {
-		p.renderer.showCursor()
-		p.renderer.disableMouseCellMotion()
-		p.renderer.disableMouseAllMotion()
+		p.renderer.setCursor(true)
+		p.renderer.setMouseCellMotion(false)
+		p.renderer.setMouseAllMotion(false)
 
 		if p.renderer.altScreen() {
 			p.renderer.exitAltScreen()

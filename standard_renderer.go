@@ -355,48 +355,38 @@ func (r *standardRenderer) exitAltScreen() {
 	r.repaint()
 }
 
-func (r *standardRenderer) showCursor() {
+func (r *standardRenderer) setCursor(show bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	r.cursorHidden = false
-	r.out.ShowCursor()
+	r.cursorHidden = !show
+	if r.cursorHidden {
+		r.out.HideCursor()
+	} else {
+		r.out.ShowCursor()
+	}
 }
 
-func (r *standardRenderer) hideCursor() {
+func (r *standardRenderer) setMouseCellMotion(enabled bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	r.cursorHidden = true
-	r.out.HideCursor()
+	if enabled {
+		r.out.EnableMouseCellMotion()
+	} else {
+		r.out.DisableMouseCellMotion()
+	}
 }
 
-func (r *standardRenderer) enableMouseCellMotion() {
+func (r *standardRenderer) setMouseAllMotion(enabled bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	r.out.EnableMouseCellMotion()
-}
-
-func (r *standardRenderer) disableMouseCellMotion() {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.out.DisableMouseCellMotion()
-}
-
-func (r *standardRenderer) enableMouseAllMotion() {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.out.EnableMouseAllMotion()
-}
-
-func (r *standardRenderer) disableMouseAllMotion() {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.out.DisableMouseAllMotion()
+	if enabled {
+		r.out.EnableMouseAllMotion()
+	} else {
+		r.out.DisableMouseAllMotion()
+	}
 }
 
 // setIgnoredLines specifies lines not to be touched by the standard Bubble Tea
