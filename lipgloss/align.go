@@ -10,7 +10,7 @@ import (
 // Perform text alignment. If the string is multi-lined, we also make all lines
 // the same width by padding them with spaces. If a termenv style is passed,
 // use that to style the spaces added.
-func alignTextHorizontal(str string, pos Position, width int, style *termenv.Style) string {
+func alignTextHorizontal(str string, pos Position, width int, style termenv.Style) string {
 	lines := strings.Split(str, "\n")
 	widestLine := getWidestWidth(lines)
 
@@ -24,30 +24,17 @@ func alignTextHorizontal(str string, pos Position, width int, style *termenv.Sty
 		if shortAmount > 0 {
 			switch pos {
 			case Right:
-				s := strings.Repeat(" ", shortAmount)
-				if style != nil {
-					s = style.Styled(s)
-				}
-
-				line = s + line
+				line = style.Styled(strings.Repeat(" ", shortAmount)) + line
 			case Center:
 				left := shortAmount / 2
 				right := left + shortAmount%2 // note that we put the remainder on the right
 
-				leftSpaces := strings.Repeat(" ", left)
-				rightSpaces := strings.Repeat(" ", right)
-				if style != nil {
-					leftSpaces = style.Styled(leftSpaces)
-					rightSpaces = style.Styled(rightSpaces)
-				}
+				leftSpaces := style.Styled(strings.Repeat(" ", left))
+				rightSpaces := style.Styled(strings.Repeat(" ", right))
 
 				line = leftSpaces + line + rightSpaces
 			default: // Left
-				s := strings.Repeat(" ", shortAmount)
-				if style != nil {
-					s = style.Styled(s)
-				}
-				line += s
+				line += style.Styled(strings.Repeat(" ", shortAmount))
 			}
 		}
 

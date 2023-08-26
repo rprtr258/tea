@@ -366,9 +366,9 @@ func (s Style) Render(strs ...string) string {
 		numLines := strings.Count(str, "\n")
 
 		if !(numLines == 0 && width == 0) {
-			var st *termenv.Style
+			st := termenv.Ascii.String()
 			if colorWhitespace || styleWhitespace {
-				st = &teWhitespace
+				st = teWhitespace
 			}
 
 			str = alignTextHorizontal(str, horizontalAlign, width, st)
