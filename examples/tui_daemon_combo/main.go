@@ -19,8 +19,8 @@ import (
 )
 
 var (
-	helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
-	emojis    = []rune("🍦🧋🍡🤠👾😭🦊🐯🦆🥨🎏🍔🍒🍥🎮📦🦁🐶🐸🍕🥐🧲🚒🥇🏆🌽")
+	_helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
+	_emojis    = []rune("🍦🧋🍡🤠👾😭🦊🐯🦆🥨🎏🍔🍒🍥🎮📦🦁🐶🐸🍕🥐🧲🚒🥇🏆🌽")
 )
 
 type result struct {
@@ -54,19 +54,23 @@ func (m *model) Init(f func(...tea.Cmd)) {
 	)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func randomEmoji() rune {
+	return _emojis[rand.Intn(len(_emojis))] //nolint:gosec // not needed
+}
+
+func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		f(tea.Quit)
+		yield(tea.Quit)
 	case spinner.MsgTick:
-		f(m.spinner.Update(msg)...)
+		yield(m.spinner.Update(msg)...)
 	case msgProcessFinished:
 		d := time.Duration(msg)
 		res := result{emoji: randomEmoji(), duration: d}
 		log.Printf("%c Job finished in %s", res.emoji, res.duration)
 		m.results = append(m.results[1:], res)
-		f(runPretendProcess)
+		yield(runPretendProcess)
 	}
 }
 
@@ -82,7 +86,7 @@ func (m *model) View(r tea.Renderer) {
 		}
 	}
 
-	s += helpStyle("\nPress any key to exit\n")
+	s += _helpStyle("\nPress any key to exit\n")
 
 	if m.quitting {
 		s += "\n"
@@ -96,13 +100,9 @@ type msgProcessFinished time.Duration
 
 // pretendProcess simulates a long-running process.
 func runPretendProcess() tea.Msg {
-	pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec
+	pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec // not needed
 	time.Sleep(pause)
 	return msgProcessFinished(pause)
-}
-
-func randomEmoji() rune {
-	return emojis[rand.Intn(len(emojis))]
 }
 
 func Main(ctx context.Context) error {
