@@ -36,13 +36,13 @@ var extSequences = func() map[string]Key {
 // seqLengths is the sizes of valid sequences, starting with the
 // largest size.
 var seqLengths = func() []int {
-	sizes := map[int]struct{}{}
+	seen := map[int]struct{}{}
+	lsizes := make([]int, 0, len(seen))
 	for seq := range extSequences {
-		sizes[len(seq)] = struct{}{}
-	}
-	lsizes := make([]int, 0, len(sizes))
-	for sz := range sizes {
-		lsizes = append(lsizes, sz)
+		if _, ok := seen[len(seq)]; !ok {
+			seen[len(seq)] = struct{}{}
+			lsizes = append(lsizes, len(seq))
+		}
 	}
 	slices.SortFunc(lsizes, func(i, j int) int { return j - i })
 	return lsizes
