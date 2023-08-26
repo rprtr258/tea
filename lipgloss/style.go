@@ -85,7 +85,10 @@ func NewStyle() Style {
 // in case the underlying implementation changes. It takes an optional string
 // value to be set as the underlying string value for this style.
 func (r *Renderer) NewStyle() Style {
-	return Style{r: r}
+	return Style{
+		r:     r,
+		rules: map[propKey]any{},
+	}
 }
 
 // Style contains a set of rules that comprise a style as a whole.
@@ -126,7 +129,6 @@ func (s Style) String() string {
 // Copy returns a copy of this style, including any underlying string values.
 func (s Style) Copy() Style {
 	o := NewStyle()
-	o.init()
 	for k, v := range s.rules {
 		o.rules[k] = v
 	}
@@ -141,8 +143,6 @@ func (s Style) Copy() Style {
 //
 // Margins, padding, and underlying string values are not inherited.
 func (s Style) Inherit(i Style) Style {
-	s.init()
-
 	for k, v := range i.rules {
 		switch k {
 		case marginTopKey, marginRightKey, marginBottomKey, marginLeftKey:
