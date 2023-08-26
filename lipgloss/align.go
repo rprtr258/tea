@@ -15,8 +15,8 @@ func alignTextHorizontal(str string, pos Position, width int, style *termenv.Sty
 	widestLine := getWidestWidth(lines)
 
 	var sb strings.Builder
-	for i, l := range lines {
-		lineWidth := ansi.PrintableRuneWidth(l)
+	for i, line := range lines {
+		lineWidth := ansi.PrintableRuneWidth(line)
 
 		shortAmount := widestLine - lineWidth                // difference from the widest line
 		shortAmount += max(0, width-(shortAmount+lineWidth)) // difference from the total width, if set
@@ -28,34 +28,34 @@ func alignTextHorizontal(str string, pos Position, width int, style *termenv.Sty
 				if style != nil {
 					s = style.Styled(s)
 				}
-				l = s + l
+
+				line = s + line
 			case Center:
 				left := shortAmount / 2
 				right := left + shortAmount%2 // note that we put the remainder on the right
 
 				leftSpaces := strings.Repeat(" ", left)
 				rightSpaces := strings.Repeat(" ", right)
-
 				if style != nil {
 					leftSpaces = style.Styled(leftSpaces)
 					rightSpaces = style.Styled(rightSpaces)
 				}
-				l = leftSpaces + l + rightSpaces
+
+				line = leftSpaces + line + rightSpaces
 			default: // Left
 				s := strings.Repeat(" ", shortAmount)
 				if style != nil {
 					s = style.Styled(s)
 				}
-				l += s
+				line += s
 			}
 		}
 
-		sb.WriteString(l)
+		sb.WriteString(line)
 		if i < len(lines)-1 {
 			sb.WriteRune('\n')
 		}
 	}
-
 	return sb.String()
 }
 

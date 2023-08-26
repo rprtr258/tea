@@ -414,22 +414,19 @@ func (s Style) applyMargins(str string, inline bool) string {
 	str = padLeft(str, leftMargin, &styler)
 	str = padRight(str, rightMargin, &styler)
 
-	var (
-		topMargin    = s.getAsInt(marginTopKey)
-		bottomMargin = s.getAsInt(marginBottomKey)
-	)
+	if inline {
+		return str
+	}
 
 	// Top/bottom margin
-	if !inline {
-		spaces := strings.Repeat(" ", getWidestWidth(strings.Split(str, "\n")))
+	spaces := strings.Repeat(" ", getWidestWidth(strings.Split(str, "\n")))
 
-		if topMargin > 0 {
-			str = styler.Styled(strings.Repeat(spaces+"\n", topMargin)) + str
-		}
+	if topMargin := s.getAsInt(marginTopKey); topMargin > 0 {
+		str = styler.Styled(strings.Repeat(spaces+"\n", topMargin)) + str
+	}
 
-		if bottomMargin > 0 {
-			str += styler.Styled(strings.Repeat("\n"+spaces, bottomMargin))
-		}
+	if bottomMargin := s.getAsInt(marginBottomKey); bottomMargin > 0 {
+		str += styler.Styled(strings.Repeat("\n"+spaces, bottomMargin))
 	}
 
 	return str
