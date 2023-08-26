@@ -17,13 +17,13 @@ import (
 )
 
 const (
-	minHeight        = 1
-	minWidth         = 2
-	defaultHeight    = 6
-	defaultWidth     = 40
-	defaultCharLimit = 400
-	defaultMaxHeight = 99
-	defaultMaxWidth  = 500
+	_minHeight        = 1
+	minWidth          = 2
+	defaultHeight     = 6
+	defaultWidth      = 40
+	_defaultCharLimit = 400
+	_defaultMaxHeight = 99
+	_defaultMaxWidth  = 500
 )
 
 // Internal messages for clipboard operations.
@@ -88,6 +88,29 @@ var DefaultKeyMap = KeyMap{
 
 	TransposeCharacterBackward: key.NewBinding(key.WithKeys("ctrl+t")),
 }
+
+var (
+	_styleFocusedDefault = Style{
+		Base:             lipgloss.NewStyle(),
+		CursorLine:       lipgloss.NewStyle().Background(lipgloss.AdaptiveColor{Light: "255", Dark: "0"}),
+		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "240"}),
+		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "254", Dark: "0"}),
+		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
+		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
+		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.Color("7")),
+		Text:             lipgloss.NewStyle(),
+	}
+	_styleBlurredDefault = Style{
+		Base:             lipgloss.NewStyle(),
+		CursorLine:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "7"}),
+		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
+		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "254", Dark: "0"}),
+		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
+		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
+		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.Color("7")),
+		Text:             lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "7"}),
+	}
+)
 
 // LineInfo is a helper for keeping track of line information regarding
 // soft-wrapped lines.
@@ -235,22 +258,20 @@ func New() Model {
 	vp.KeyMap = viewport.KeyMap{}
 	cur := cursor.New()
 
-	focusedStyle, blurredStyle := DefaultStyles()
-
 	m := Model{
-		CharLimit:            defaultCharLimit,
-		MaxHeight:            defaultMaxHeight,
-		MaxWidth:             defaultMaxWidth,
+		CharLimit:            _defaultCharLimit,
+		MaxHeight:            _defaultMaxHeight,
+		MaxWidth:             _defaultMaxWidth,
 		Prompt:               lipgloss.ThickBorder().Left + " ",
-		style:                &blurredStyle,
-		FocusedStyle:         focusedStyle,
-		BlurredStyle:         blurredStyle,
+		style:                &_styleBlurredDefault,
+		FocusedStyle:         _styleFocusedDefault,
+		BlurredStyle:         _styleBlurredDefault,
 		EndOfBufferCharacter: '~',
 		ShowLineNumbers:      true,
 		Cursor:               cur,
 		KeyMap:               DefaultKeyMap,
 
-		value:            make([][]rune, minHeight, defaultMaxHeight),
+		value:            make([][]rune, _minHeight, _defaultMaxHeight),
 		focus:            false,
 		col:              0,
 		row:              0,
@@ -263,33 +284,6 @@ func New() Model {
 	m.SetWidth(defaultWidth)
 
 	return m
-}
-
-// DefaultStyles returns the default styles for focused and blurred states for
-// the textarea.
-func DefaultStyles() (Style, Style) {
-	focused := Style{
-		Base:             lipgloss.NewStyle(),
-		CursorLine:       lipgloss.NewStyle().Background(lipgloss.AdaptiveColor{Light: "255", Dark: "0"}),
-		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "240"}),
-		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "254", Dark: "0"}),
-		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
-		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
-		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.Color("7")),
-		Text:             lipgloss.NewStyle(),
-	}
-	blurred := Style{
-		Base:             lipgloss.NewStyle(),
-		CursorLine:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "7"}),
-		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
-		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "254", Dark: "0"}),
-		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
-		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
-		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.Color("7")),
-		Text:             lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "7"}),
-	}
-
-	return focused, blurred
 }
 
 // SetValue sets the value of the text input.
@@ -545,9 +539,9 @@ func (m *Model) Blur() {
 func (m *Model) Reset() {
 	startCap := m.MaxHeight
 	if startCap <= 0 {
-		startCap = defaultMaxHeight
+		startCap = _defaultMaxHeight
 	}
-	m.value = make([][]rune, minHeight, startCap)
+	m.value = make([][]rune, _minHeight, startCap)
 	m.col = 0
 	m.row = 0
 	m.viewport.GotoTop()
@@ -892,11 +886,11 @@ func (m *Model) Height() int {
 // SetHeight sets the height of the textarea.
 func (m *Model) SetHeight(h int) {
 	if m.MaxHeight > 0 {
-		m.height = clamp(h, minHeight, m.MaxHeight)
-		m.viewport.Height = clamp(h, minHeight, m.MaxHeight)
+		m.height = clamp(h, _minHeight, m.MaxHeight)
+		m.viewport.Height = clamp(h, _minHeight, m.MaxHeight)
 	} else {
-		m.height = max(h, minHeight)
-		m.viewport.Height = max(h, minHeight)
+		m.height = max(h, _minHeight)
+		m.viewport.Height = max(h, _minHeight)
 	}
 }
 
@@ -1032,18 +1026,18 @@ func (m *Model) View() string {
 	if m.Value() == "" && m.row == 0 && m.col == 0 && m.Placeholder != "" {
 		return m.placeholderView()
 	}
+
 	m.Cursor.TextStyle = m.style.CursorLine
 
-	var s strings.Builder
-	var style lipgloss.Style
 	lineInfo := m.LineInfo()
 
 	var newLines int
-
+	var s strings.Builder
 	displayLine := 0
 	for l, line := range m.value {
 		wrappedLines := wrap(line, m.width)
 
+		var style lipgloss.Style
 		if m.row == l {
 			style = m.style.CursorLine
 		} else {
@@ -1332,5 +1326,5 @@ func clamp(v, low, high int) int {
 	if high < low {
 		low, high = high, low
 	}
-	return min(high, max(low, v))
+	return min(high, max(v, low))
 }
