@@ -1,8 +1,6 @@
 package lipgloss
 
 import (
-	"strings"
-
 	"github.com/muesli/reflow/ansi"
 )
 
@@ -459,14 +457,11 @@ func (s Style) getBorderStyle() Border {
 	return noBorder
 }
 
-// Split a string into lines, additionally returning the size of the widest
-// line.
-func getLines(s string) ([]string, int) { //nolint:nonamedreturns
-	lines := strings.Split(s, "\n")
+// getWidestWidth returns size of the widest line
+func getWidestWidth(lines []string) int {
 	widest := 0
 	for _, l := range lines {
-		w := ansi.PrintableRuneWidth(l)
-		widest = max(widest, w)
+		widest = max(widest, ansi.PrintableRuneWidth(l))
 	}
-	return lines, widest
+	return widest
 }

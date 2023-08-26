@@ -232,7 +232,8 @@ func (s Style) applyBorder(str string) string {
 		return str
 	}
 
-	lines, width := getLines(str)
+	lines := strings.Split(str, "\n")
+	width := getWidestWidth(lines)
 
 	if hasLeft {
 		if border.Left == "" {

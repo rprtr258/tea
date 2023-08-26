@@ -54,7 +54,8 @@ func PlaceHorizontal(width int, pos Position, str string, opts ...WhitespaceOpti
 // block of a given width. If the given width is shorter than the max width of
 // the string (measured by its longest line) this will be a noöp.
 func (r *Renderer) PlaceHorizontal(width int, pos Position, str string, opts ...WhitespaceOption) string {
-	lines, contentWidth := getLines(str)
+	lines := strings.Split(str, "\n")
+	contentWidth := getWidestWidth(lines)
 	gap := width - contentWidth
 
 	if gap <= 0 {
@@ -115,7 +116,7 @@ func (r *Renderer) PlaceVertical(height int, pos Position, str string, opts ...W
 
 	ws := newWhitespace(r, opts...)
 
-	_, width := getLines(str)
+	width := getWidestWidth(strings.Split(str, "\n"))
 	emptyLine := ws.render(width)
 	b := strings.Builder{}
 

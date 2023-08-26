@@ -11,7 +11,8 @@ import (
 // the same width by padding them with spaces. If a termenv style is passed,
 // use that to style the spaces added.
 func alignTextHorizontal(str string, pos Position, width int, style *termenv.Style) string {
-	lines, widestLine := getLines(str)
+	lines := strings.Split(str, "\n")
+	widestLine := getWidestWidth(lines)
 
 	var sb strings.Builder
 	for i, l := range lines {

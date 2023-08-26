@@ -421,8 +421,7 @@ func (s Style) applyMargins(str string, inline bool) string {
 
 	// Top/bottom margin
 	if !inline {
-		_, width := getLines(str)
-		spaces := strings.Repeat(" ", width)
+		spaces := strings.Repeat(" ", getWidestWidth(strings.Split(str, "\n")))
 
 		if topMargin > 0 {
 			str = styler.Styled(strings.Repeat(spaces+"\n", topMargin)) + str

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/ansi"
+	"github.com/rprtr258/fun"
 )
 
 // JoinHorizontal is a utility function for horizontally joining two
@@ -34,17 +35,19 @@ func JoinHorizontal(pos Position, strs ...string) string {
 	}
 
 	// Groups of strings broken into multiple lines
-	blocks := make([][]string, len(strs))
+	blocks := fun.Map[[]string](
+		strs,
+		func(str string) []string {
+			return strings.Split(str, "\n")
+		})
 
 	// Max line widths for the above text blocks
-	maxWidths := make([]int, len(strs))
+	maxWidths := fun.Map[int](blocks, getWidestWidth)
 
 	// Height of the tallest block
 	var maxHeight int
-	// Break text blocks into lines and get max widths for each text block
-	for i, str := range strs {
-		blocks[i], maxWidths[i] = getLines(str)
-		maxHeight = max(maxHeight, len(blocks[i]))
+	for _, block := range blocks {
+		maxHeight = max(maxHeight, len(block))
 	}
 
 	// Add extra lines to make each side the same height
@@ -112,17 +115,19 @@ func JoinVertical(pos Position, strs ...string) string {
 	if len(strs) == 0 {
 		return ""
 	}
-
 	if len(strs) == 1 {
 		return strs[0]
 	}
 
-	blocks := make([][]string, len(strs))
+	blocks := fun.Map[[]string](
+		strs,
+		func(str string) []string {
+			return strings.Split(str, "\n")
+		})
+
 	var maxWidth int
 	for i := range strs {
-		var w int
-		blocks[i], w = getLines(strs[i])
-		maxWidth = max(maxWidth, w)
+		maxWidth = max(maxWidth, getWidestWidth(blocks[i]))
 	}
 
 	var sb strings.Builder
