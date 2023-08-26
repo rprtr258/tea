@@ -885,12 +885,11 @@ func (m *Model) Height() int {
 
 // SetHeight sets the height of the textarea.
 func (m *Model) SetHeight(h int) {
+	m.height = max(h, _minHeight)
+	m.viewport.Height = max(h, _minHeight)
 	if m.MaxHeight > 0 {
-		m.height = clamp(h, _minHeight, m.MaxHeight)
-		m.viewport.Height = clamp(h, _minHeight, m.MaxHeight)
-	} else {
-		m.height = max(h, _minHeight)
-		m.viewport.Height = max(h, _minHeight)
+		m.height = min(h, m.MaxHeight)
+		m.viewport.Height = min(h, m.MaxHeight)
 	}
 }
 
@@ -1326,5 +1325,5 @@ func clamp(v, low, high int) int {
 	if high < low {
 		low, high = high, low
 	}
-	return min(high, max(v, low))
+	return min(max(v, low), high)
 }

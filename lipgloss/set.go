@@ -26,14 +26,14 @@ func (s *Style) set(key propKey, value interface{}) {
 
 // Bold sets a bold formatting rule.
 func (s Style) Bold(v bool) Style {
-	s.set(boldKey, v)
+	s.set(_boldKey, v)
 	return s
 }
 
 // Italic sets an italic formatting rule. In some terminal emulators this will
 // render with "reverse" coloring if not italic font variant is available.
 func (s Style) Italic(v bool) Style {
-	s.set(italicKey, v)
+	s.set(_italicKey, v)
 	return s
 }
 
@@ -41,7 +41,7 @@ func (s Style) Italic(v bool) Style {
 // whitespace like margins and padding. To change this behavior set
 // UnderlineSpaces.
 func (s Style) Underline(v bool) Style {
-	s.set(underlineKey, v)
+	s.set(_underlineKey, v)
 	return s
 }
 
@@ -49,13 +49,13 @@ func (s Style) Underline(v bool) Style {
 // drawn on whitespace like margins and padding. To change this behavior set
 // StrikethroughSpaces.
 func (s Style) Strikethrough(v bool) Style {
-	s.set(strikethroughKey, v)
+	s.set(_strikethroughKey, v)
 	return s
 }
 
 // Reverse sets a rule for inverting foreground and background colors.
 func (s Style) Reverse(v bool) Style {
-	s.set(reverseKey, v)
+	s.set(_reverseKey, v)
 	return s
 }
 
@@ -470,7 +470,7 @@ func (s Style) BorderLeftBackground(c TerminalColor) Style {
 //	fmt.Println(userStyle.Inline(true).Render(userInput))
 func (s Style) Inline(v bool) Style {
 	o := s.Copy()
-	o.set(inlineKey, v)
+	o.set(_inlineKey, v)
 	return o
 }
 
@@ -488,7 +488,7 @@ func (s Style) Inline(v bool) Style {
 //	fmt.Println(userStyle.MaxWidth(16).Render(userInput))
 func (s Style) MaxWidth(n int) Style {
 	o := s.Copy()
-	o.set(maxWidthKey, n)
+	o.set(_maxWidthKey, n)
 	return o
 }
 
@@ -500,7 +500,7 @@ func (s Style) MaxWidth(n int) Style {
 // not mutate the style and instead return a copy.
 func (s Style) MaxHeight(n int) Style {
 	o := s.Copy()
-	o.set(maxHeightKey, n)
+	o.set(_maxHeightKey, n)
 	return o
 }
 
@@ -508,7 +508,7 @@ func (s Style) MaxHeight(n int) Style {
 // default, this is true. Spaces can also be underlined without underlining the
 // text itself.
 func (s Style) UnderlineSpaces(v bool) Style {
-	s.set(underlineSpacesKey, v)
+	s.set(_underlineSpacesKey, v)
 	return s
 }
 
@@ -516,7 +516,7 @@ func (s Style) UnderlineSpaces(v bool) Style {
 // between words. By default, this is true. Spaces can also be struck without
 // underlining the text itself.
 func (s Style) StrikethroughSpaces(v bool) Style {
-	s.set(strikethroughSpacesKey, v)
+	s.set(_strikethroughSpacesKey, v)
 	return s
 }
 

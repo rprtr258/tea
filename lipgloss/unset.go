@@ -2,31 +2,31 @@ package lipgloss
 
 // UnsetBold removes the bold style rule, if set.
 func (s Style) UnsetBold() Style {
-	delete(s.rules, boldKey)
+	delete(s.rules, _boldKey)
 	return s
 }
 
 // UnsetItalic removes the italic style rule, if set.
 func (s Style) UnsetItalic() Style {
-	delete(s.rules, italicKey)
+	delete(s.rules, _italicKey)
 	return s
 }
 
 // UnsetUnderline removes the underline style rule, if set.
 func (s Style) UnsetUnderline() Style {
-	delete(s.rules, underlineKey)
+	delete(s.rules, _underlineKey)
 	return s
 }
 
 // UnsetStrikethrough removes the strikethrough style rule, if set.
 func (s Style) UnsetStrikethrough() Style {
-	delete(s.rules, strikethroughKey)
+	delete(s.rules, _strikethroughKey)
 	return s
 }
 
 // UnsetReverse removes the reverse style rule, if set.
 func (s Style) UnsetReverse() Style {
-	delete(s.rules, reverseKey)
+	delete(s.rules, _reverseKey)
 	return s
 }
 
@@ -271,31 +271,31 @@ func (s Style) UnsetBorderLeftBackground() Style {
 
 // UnsetInline removes the inline style rule, if set.
 func (s Style) UnsetInline() Style {
-	delete(s.rules, inlineKey)
+	delete(s.rules, _inlineKey)
 	return s
 }
 
 // UnsetMaxWidth removes the max width style rule, if set.
 func (s Style) UnsetMaxWidth() Style {
-	delete(s.rules, maxWidthKey)
+	delete(s.rules, _maxWidthKey)
 	return s
 }
 
 // UnsetMaxHeight removes the max height style rule, if set.
 func (s Style) UnsetMaxHeight() Style {
-	delete(s.rules, maxHeightKey)
+	delete(s.rules, _maxHeightKey)
 	return s
 }
 
 // UnsetUnderlineSpaces removes the value set by UnderlineSpaces.
 func (s Style) UnsetUnderlineSpaces() Style {
-	delete(s.rules, underlineSpacesKey)
+	delete(s.rules, _underlineSpacesKey)
 	return s
 }
 
 // UnsetStrikethroughSpaces removes the value set by StrikethroughSpaces.
 func (s Style) UnsetStrikethroughSpaces() Style {
-	delete(s.rules, strikethroughSpacesKey)
+	delete(s.rules, _strikethroughSpacesKey)
 	return s
 }
 

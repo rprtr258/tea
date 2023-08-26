@@ -15,11 +15,11 @@ type propKey int
 
 // Available properties.
 const (
-	boldKey propKey = iota
-	italicKey
-	underlineKey
-	strikethroughKey
-	reverseKey
+	_boldKey propKey = iota
+	_italicKey
+	_underlineKey
+	_strikethroughKey
+	_reverseKey
 	blinkKey
 	faintKey
 	foregroundKey
@@ -65,14 +65,15 @@ const (
 	borderBottomBackgroundKey
 	borderLeftBackgroundKey
 
-	inlineKey
-	maxWidthKey
-	maxHeightKey
-	underlineSpacesKey
-	strikethroughSpacesKey
+	_inlineKey
+	_maxWidthKey
+	_maxHeightKey
+	_underlineSpacesKey
+	_strikethroughSpacesKey
 )
 
 // A set of properties.
+// TODO: remove
 type rules map[propKey]interface{}
 
 // NewStyle returns a new, empty Style. While it's syntactic sugar for the
@@ -88,8 +89,7 @@ func NewStyle() Style {
 // in case the underlying implementation changes. It takes an optional string
 // value to be set as the underlying string value for this style.
 func (r *Renderer) NewStyle() Style {
-	s := Style{r: r}
-	return s
+	return Style{r: r}
 }
 
 // Style contains a set of rules that comprise a style as a whole.
@@ -162,9 +162,10 @@ func (s Style) Inherit(i Style) Style {
 			}
 		}
 
-		if _, exists := s.rules[k]; exists {
+		if _, ok := s.rules[k]; ok {
 			continue
 		}
+
 		s.rules[k] = v
 	}
 	return s
@@ -180,11 +181,11 @@ func (s Style) Render(strs ...string) string {
 	}
 
 	var (
-		bold          = s.getAsBool(boldKey, false)
-		italic        = s.getAsBool(italicKey, false)
-		underline     = s.getAsBool(underlineKey, false)
-		strikethrough = s.getAsBool(strikethroughKey, false)
-		reverse       = s.getAsBool(reverseKey, false)
+		bold          = s.getAsBool(_boldKey, false)
+		italic        = s.getAsBool(_italicKey, false)
+		underline     = s.getAsBool(_underlineKey, false)
+		strikethrough = s.getAsBool(_strikethroughKey, false)
+		reverse       = s.getAsBool(_reverseKey, false)
 		blink         = s.getAsBool(blinkKey, false)
 		faint         = s.getAsBool(faintKey, false)
 
@@ -202,12 +203,12 @@ func (s Style) Render(strs ...string) string {
 		leftPadding   = s.getAsInt(paddingLeftKey)
 
 		colorWhitespace = s.getAsBool(colorWhitespaceKey, true)
-		inline          = s.getAsBool(inlineKey, false)
-		maxWidth        = s.getAsInt(maxWidthKey)
-		maxHeight       = s.getAsInt(maxHeightKey)
+		inline          = s.getAsBool(_inlineKey, false)
+		maxWidth        = s.getAsInt(_maxWidthKey)
+		maxHeight       = s.getAsInt(_maxHeightKey)
 
-		underlineSpaces     = underline && s.getAsBool(underlineSpacesKey, true)
-		strikethroughSpaces = strikethrough && s.getAsBool(strikethroughSpacesKey, true)
+		underlineSpaces     = underline && s.getAsBool(_underlineSpacesKey, true)
+		strikethroughSpaces = strikethrough && s.getAsBool(_strikethroughSpacesKey, true)
 	)
 
 	str := joinString(strs...)

@@ -8,31 +8,31 @@ import (
 
 // GetBold returns the style's bold value. If no value is set false is returned.
 func (s Style) GetBold() bool {
-	return s.getAsBool(boldKey, false)
+	return s.getAsBool(_boldKey, false)
 }
 
 // GetItalic returns the style's italic value. If no value is set false is
 // returned.
 func (s Style) GetItalic() bool {
-	return s.getAsBool(italicKey, false)
+	return s.getAsBool(_italicKey, false)
 }
 
 // GetUnderline returns the style's underline value. If no value is set false is
 // returned.
 func (s Style) GetUnderline() bool {
-	return s.getAsBool(underlineKey, false)
+	return s.getAsBool(_underlineKey, false)
 }
 
 // GetStrikethrough returns the style's strikethrough value. If no value is set false
 // is returned.
 func (s Style) GetStrikethrough() bool {
-	return s.getAsBool(strikethroughKey, false)
+	return s.getAsBool(_strikethroughKey, false)
 }
 
 // GetReverse returns the style's reverse value. If no value is set false is
 // returned.
 func (s Style) GetReverse() bool {
-	return s.getAsBool(reverseKey, false)
+	return s.getAsBool(_reverseKey, false)
 }
 
 // GetBlink returns the style's blink value. If no value is set false is
@@ -347,31 +347,31 @@ func (s Style) GetVerticalBorderSize() int {
 // GetInline returns the style's inline setting. If no value is set false is
 // returned.
 func (s Style) GetInline() bool {
-	return s.getAsBool(inlineKey, false)
+	return s.getAsBool(_inlineKey, false)
 }
 
 // GetMaxWidth returns the style's max width setting. If no value is set 0 is
 // returned.
 func (s Style) GetMaxWidth() int {
-	return s.getAsInt(maxWidthKey)
+	return s.getAsInt(_maxWidthKey)
 }
 
 // GetMaxHeight returns the style's max height setting. If no value is set 0 is
 // returned.
 func (s Style) GetMaxHeight() int {
-	return s.getAsInt(maxHeightKey)
+	return s.getAsInt(_maxHeightKey)
 }
 
 // GetUnderlineSpaces returns whether or not the style is set to underline
 // spaces. If not value is set false is returned.
 func (s Style) GetUnderlineSpaces() bool {
-	return s.getAsBool(underlineSpacesKey, false)
+	return s.getAsBool(_underlineSpacesKey, false)
 }
 
 // GetStrikethroughSpaces returns whether or not the style is set to strikethrough
 // spaces. If not value is set false is returned.
 func (s Style) GetStrikethroughSpaces() bool {
-	return s.getAsBool(strikethroughSpacesKey, false)
+	return s.getAsBool(_strikethroughSpacesKey, false)
 }
 
 // GetHorizontalFrameSize returns the sum of the style's horizontal margins, padding
