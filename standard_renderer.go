@@ -388,7 +388,7 @@ func (r *standardRenderer) setMouseAllMotion(enabled bool) {
 
 // setIgnoredLines specifies lines not to be touched by the standard Bubble Tea
 // renderer.
-func (r *standardRenderer) setIgnoredLines(from int, to int) {
+func (r *standardRenderer) setIgnoredLines(from, to int) {
 	// Lock if we're going to be clearing some lines since we don't want
 	// anything jacking our cursor.
 	if r.linesRendered > 0 {
@@ -551,7 +551,7 @@ type msgSyncScrollArea struct {
 // should also be called on resize (MsgWindowSize).
 //
 // For high-performance, scroll-based rendering only.
-func SyncScrollArea(lines []string, topBoundary int, bottomBoundary int) Cmd {
+func SyncScrollArea(lines []string, topBoundary, bottomBoundary int) Cmd {
 	return func() Msg {
 		return msgSyncScrollArea{
 			lines:          lines,

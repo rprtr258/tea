@@ -520,7 +520,7 @@ func genRandomData(logfn func(int64), length int) randTest {
 
 // genRandomDataWithSeed generates a randomized test with a fixed seed.
 func genRandomDataWithSeed(s int64, length int) randTest {
-	r := rand.New(rand.NewSource(s)) //nolint:gosec
+	r := rand.New(rand.NewSource(s))
 
 	// allseqs contains all the sequences, in sorted order. We sort
 	// to make the test deterministic (when the seed is also fixed).

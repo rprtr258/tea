@@ -51,18 +51,18 @@ var _seqLengths = func() []int {
 
 // detectSequence uses a longest prefix match over the input
 // sequence and a hash map.
-func detectSequence(input []byte) (hasSeq bool, width int, msg Msg) { //nolint:nonamedreturns
+func detectSequence(input []byte) (hasSeq bool, width int, msg Msg) { //nolint:nonamedreturns // too many returns
 	seqs := _extSequences
 	for _, sz := range _seqLengths {
 		if sz > len(input) {
 			continue
 		}
-		prefix := input[:sz]
-		key, ok := seqs[string(prefix)]
-		if ok {
+
+		if key, ok := seqs[string(input[:sz])]; ok {
 			return true, sz, MsgKey(key)
 		}
 	}
+
 	// Is this an unknown CSI sequence?
 	if loc := unknownCSIRe.FindIndex(input); loc != nil {
 		return true, loc[1], msgUnknownCSISequence(input[:loc[1]])

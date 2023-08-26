@@ -63,18 +63,18 @@ type Key struct {
 //	fmt.Println(k)
 //	// Output: enter
 func (k Key) String() string {
-	str := ""
+	prefix := ""
 	if k.Alt {
-		str += "alt+" //nolint:goconst
+		prefix = "alt+" //nolint:goconst // not needed
 	}
+
 	if k.Type == KeyRunes {
-		str += string(k.Runes)
-		return str
+		return prefix + string(k.Runes)
 	} else if s, ok := keyNames[k.Type]; ok {
-		str += s
-		return str
+		return prefix + s
+	} else {
+		return ""
 	}
-	return ""
 }
 
 // KeyType indicates the key pressed, such as KeyEnter or KeyBreak or KeyCtrlC.
@@ -185,7 +185,7 @@ const (
 
 // Other keys.
 const (
-	KeyRunes KeyType = -(iota + 1)
+	KeyRunes KeyType = -iota - 1
 	KeyUp
 	KeyDown
 	KeyRight

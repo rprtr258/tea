@@ -130,7 +130,7 @@ type Program[M Model] struct {
 
 	inputType inputType
 
-	ctx    context.Context //nolint:containedctx
+	ctx    context.Context //nolint:containedctx // TODO: remove
 	cancel context.CancelFunc
 
 	msgs     chan Msg
@@ -159,7 +159,7 @@ type Program[M Model] struct {
 	// Lint ignore note: the linter will find false positive on unix systems
 	// as this value only comes into play on Windows, hence the ignore comment
 	// below.
-	windowsStdin *os.File //nolint:golint,structcheck,unused
+	windowsStdin *os.File //nolint:golint,structcheck,unused // uuh
 
 	filter func(M, Msg) Msg
 
@@ -381,18 +381,18 @@ func (p *Program[M]) Run() (M, error) {
 		if err != nil {
 			return p.initialModel, err
 		}
-		defer f.Close() //nolint:errcheck
-		p.input = f
+		defer f.Close() //nolint:errcheck // uuh
 
+		p.input = f
 	case ttyInput:
 		// Open a new TTY, by request
 		f, err := openInputTTY()
 		if err != nil {
 			return p.initialModel, err
 		}
-		defer f.Close() //nolint:errcheck
-		p.input = f
+		defer f.Close() //nolint:errcheck // uuh
 
+		p.input = f
 	case customInput:
 		// (There is nothing extra to do.)
 	}

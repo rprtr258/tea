@@ -14,8 +14,7 @@ type initCmdModel struct{}
 func (m *initCmdModel) Init(func(...Cmd)) {}
 
 func (m *initCmdModel) Update(msg Msg, f func(...Cmd)) {
-	switch msg.(type) { //nolint:gocritic
-	case MsgKey:
+	if _, ok := msg.(MsgKey); ok {
 		f(Quit)
 	}
 }
@@ -24,7 +23,7 @@ func (m *initCmdModel) View(r Renderer) {
 	r.Write("success\n")
 }
 
-//nolint:lll
+//nolint:lll // uuh
 func TestMsgClear(t *testing.T) {
 	for name, test := range map[string]struct {
 		cmds     []Cmd

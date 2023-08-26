@@ -19,7 +19,7 @@ import (
 //			log.Fatalln("fatal:", err.Error())
 //	  }
 //	  defer f.Close()
-func LogToFile(path string, prefix string) (*os.File, error) {
+func LogToFile(path, prefix string) (*os.File, error) {
 	return LogToFileWith(path, prefix, log.Default())
 }
 
@@ -31,12 +31,12 @@ type LogOptionsSetter interface {
 }
 
 // LogToFileWith does allows to call LogToFile with a custom LogOptionsSetter.
-func LogToFileWith(path string, prefix string, log LogOptionsSetter) (*os.File, error) {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o600) //nolint:gomnd
+func LogToFileWith(path, prefix string, logger LogOptionsSetter) (*os.File, error) {
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o600)
 	if err != nil {
 		return nil, fmt.Errorf("error opening file for logging: %w", err)
 	}
-	log.SetOutput(f)
+	logger.SetOutput(f)
 
 	// Add a space after the prefix if a prefix is being specified and it
 	// doesn't already have a trailing space.
@@ -46,7 +46,7 @@ func LogToFileWith(path string, prefix string, log LogOptionsSetter) (*os.File, 
 			prefix += " "
 		}
 	}
-	log.SetPrefix(prefix)
+	logger.SetPrefix(prefix)
 
 	return f, nil
 }

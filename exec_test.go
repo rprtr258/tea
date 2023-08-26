@@ -24,8 +24,7 @@ func (m *testExecModel) Init(f func(...Cmd)) {
 }
 
 func (m *testExecModel) Update(msg Msg, f func(...Cmd)) {
-	switch msg := msg.(type) { //nolint:gocritic
-	case msgExecFinished:
+	if msg, ok := msg.(msgExecFinished); ok {
 		m.err = msg.err
 		f(Quit)
 	}

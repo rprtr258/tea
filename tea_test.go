@@ -156,7 +156,7 @@ func TestMsgBatch(t *testing.T) {
 
 		for {
 			time.Sleep(time.Millisecond)
-			if m.counter.Load() >= 2 { //nolint:lostcancel
+			if m.counter.Load() >= 2 {
 				p.Quit()
 				return
 			}

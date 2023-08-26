@@ -1,7 +1,7 @@
 package tea
 
 // Renderer is the interface for Bubble Tea renderers.
-type Renderer interface { //nolint:interfacebloat
+type Renderer interface { //nolint:interfacebloat // TODO: remove after monomorphization
 	// Write a frame to the renderer. The renderer can write this data to
 	// output at its discretion.
 	Write(string)
