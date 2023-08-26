@@ -63,7 +63,7 @@ type seqTest struct {
 // detectSequence() function.
 func buildBaseSeqTests() []seqTest {
 	tests := []seqTest{}
-	for seq, key := range sequences {
+	for seq, key := range _sequences {
 		key := key
 		tests = append(tests, seqTest{[]byte(seq), MsgKey(key)})
 		if !key.Alt {
@@ -72,8 +72,8 @@ func buildBaseSeqTests() []seqTest {
 		}
 	}
 	// Add all the control characters.
-	for i := keyNUL + 1; i <= keyDEL; i++ {
-		if i == keyESC {
+	for i := _keyNUL + 1; i <= _keyDEL; i++ {
+		if i == _keyESC {
 			// Not handled in detectSequence(), so not part of the base test
 			// suite.
 			continue
@@ -82,8 +82,8 @@ func buildBaseSeqTests() []seqTest {
 			seqTest{[]byte{byte(i)}, MsgKey{Type: i}},
 			seqTest{[]byte{'\x1b', byte(i)}, MsgKey{Type: i, Alt: true}},
 		)
-		if i == keyUS {
-			i = keyDEL - 1
+		if i == _keyUS {
+			i = _keyDEL - 1
 		}
 	}
 
@@ -140,8 +140,8 @@ func TestDetectOneMsg(t *testing.T) {
 		seqTest{[]byte{'\x1b'}, MsgKey{Type: KeyEscape}},
 		seqTest{[]byte{byte(keySOH)}, MsgKey{Type: KeyCtrlA}},
 		seqTest{[]byte{'\x1b', byte(keySOH)}, MsgKey{Type: KeyCtrlA, Alt: true}},
-		seqTest{[]byte{byte(keyNUL)}, MsgKey{Type: KeyCtrlAt}},
-		seqTest{[]byte{'\x1b', byte(keyNUL)}, MsgKey{Type: KeyCtrlAt, Alt: true}},
+		seqTest{[]byte{byte(_keyNUL)}, MsgKey{Type: KeyCtrlAt}},
+		seqTest{[]byte{'\x1b', byte(_keyNUL)}, MsgKey{Type: KeyCtrlAt, Alt: true}},
 		// Invalid characters.
 		seqTest{[]byte{'\x80'}, msgUnknownInputByte(0x80)},
 	)
@@ -527,7 +527,7 @@ func genRandomDataWithSeed(s int64, length int) randTest {
 		seq  string
 		name string
 	}
-	allseqs := lo.MapToSlice(sequences, func(seq string, key Key) seqpair {
+	allseqs := lo.MapToSlice(_sequences, func(seq string, key Key) seqpair {
 		return seqpair{seq, key.String()}
 	})
 	sort.Slice(allseqs, func(i, j int) bool {

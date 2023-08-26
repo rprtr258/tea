@@ -2,14 +2,18 @@ package tea
 
 import "slices"
 
-// extSequences is used by the map-based algorithm below. It contains
+// _extSequences is used by the map-based algorithm below. It contains
 // the sequences plus their alternatives with an escape character
 // prefixed, plus the control chars, plus the space.
 // It does not contain the NUL character, which is handled specially
 // by detectOneMsg.
-var extSequences = func() map[string]Key {
-	s := map[string]Key{}
-	for seq, key := range sequences {
+var _extSequences = func() map[string]Key {
+	s := map[string]Key{
+		" ":        {Type: KeySpace, Runes: spaceRunes},
+		"\x1b ":    {Type: KeySpace, Alt: true, Runes: spaceRunes},
+		"\x1b\x1b": {Type: KeyEscape, Alt: true},
+	}
+	for seq, key := range _sequences {
 		key := key
 		s[seq] = key
 		if !key.Alt {
@@ -17,28 +21,25 @@ var extSequences = func() map[string]Key {
 			s["\x1b"+seq] = key
 		}
 	}
-	for i := keyNUL + 1; i <= keyDEL; i++ {
-		if i == keyESC {
+	for i := _keyNUL + 1; i <= _keyDEL; i++ {
+		if i == _keyESC {
 			continue
 		}
 		s[string([]byte{byte(i)})] = Key{Type: i}
 		s[string([]byte{'\x1b', byte(i)})] = Key{Type: i, Alt: true}
-		if i == keyUS {
-			i = keyDEL - 1
+		if i == _keyUS {
+			i = _keyDEL - 1
 		}
 	}
-	s[" "] = Key{Type: KeySpace, Runes: spaceRunes}
-	s["\x1b "] = Key{Type: KeySpace, Alt: true, Runes: spaceRunes}
-	s["\x1b\x1b"] = Key{Type: KeyEscape, Alt: true}
 	return s
 }()
 
-// seqLengths is the sizes of valid sequences, starting with the
+// _seqLengths is the sizes of valid sequences, starting with the
 // largest size.
-var seqLengths = func() []int {
+var _seqLengths = func() []int {
 	seen := map[int]struct{}{}
 	lsizes := make([]int, 0, len(seen))
-	for seq := range extSequences {
+	for seq := range _extSequences {
 		if _, ok := seen[len(seq)]; !ok {
 			seen[len(seq)] = struct{}{}
 			lsizes = append(lsizes, len(seq))
@@ -51,8 +52,8 @@ var seqLengths = func() []int {
 // detectSequence uses a longest prefix match over the input
 // sequence and a hash map.
 func detectSequence(input []byte) (hasSeq bool, width int, msg Msg) { //nolint:nonamedreturns
-	seqs := extSequences
-	for _, sz := range seqLengths {
+	seqs := _extSequences
+	for _, sz := range _seqLengths {
 		if sz > len(input) {
 			continue
 		}
