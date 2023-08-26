@@ -1,12 +1,13 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"sort"
+	"slices"
 
 	"github.com/samber/lo"
 	"github.com/urfave/cli/v2"
@@ -204,8 +205,8 @@ func runExamplesList(ctx context.Context, title string, examples examples) error
 			}
 		},
 	)
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].name < items[j].name
+	slices.SortFunc(items, func(i, j item) int {
+		return cmp.Compare(i.name, j.name)
 	})
 
 	const (

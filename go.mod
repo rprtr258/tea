@@ -23,6 +23,7 @@ require (
 	github.com/muesli/reflow v0.3.0
 	github.com/muesli/termenv v0.15.2
 	github.com/olekukonko/tablewriter v0.0.5
+	github.com/rprtr258/fun v0.0.5
 	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f
 	github.com/samber/lo v1.38.1
 	github.com/stretchr/testify v1.8.4

@@ -2,6 +2,7 @@ package tea
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"errors"
 	"flag"
@@ -9,7 +10,7 @@ import (
 	"io"
 	"math/rand"
 	"runtime"
-	"sort"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -530,8 +531,8 @@ func genRandomDataWithSeed(s int64, length int) randTest {
 	allseqs := lo.MapToSlice(_sequences, func(seq string, key Key) seqpair {
 		return seqpair{seq, key.String()}
 	})
-	sort.Slice(allseqs, func(i, j int) bool {
-		return allseqs[i].seq < allseqs[j].seq
+	slices.SortFunc(allseqs, func(i, j seqpair) int {
+		return cmp.Compare(i.seq, j.seq)
 	})
 
 	// res contains the computed test.

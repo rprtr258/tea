@@ -6,7 +6,7 @@ package list
 import (
 	"fmt"
 	"io"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -14,6 +14,7 @@ import (
 	"github.com/muesli/reflow/truncate"
 	"github.com/sahilm/fuzzy"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
 	"github.com/rprtr258/tea/bubbles/key"
@@ -89,15 +90,17 @@ type Rank struct {
 // This is set by default.
 func DefaultFilter(term string, targets []string) []Rank {
 	ranks := fuzzy.Find(term, targets)
-	sort.Stable(ranks)
-	result := make([]Rank, len(ranks))
-	for i, r := range ranks {
-		result[i] = Rank{
-			Index:          r.Index,
-			MatchedIndexes: r.MatchedIndexes,
-		}
-	}
-	return result
+	slices.SortStableFunc(ranks, func(i, j fuzzy.Match) int {
+		return j.Score - i.Score
+	})
+	return fun.Map[Rank](
+		ranks,
+		func(r fuzzy.Match) Rank {
+			return Rank{
+				Index:          r.Index,
+				MatchedIndexes: r.MatchedIndexes,
+			}
+		})
 }
 
 // UnsortedFilter uses the sahilm/fuzzy to filter through the list. It does not

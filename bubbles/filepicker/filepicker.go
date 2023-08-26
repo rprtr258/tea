@@ -1,10 +1,12 @@
 package filepicker
 
 import (
+	"cmp"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 	"sync"
 
@@ -210,11 +212,15 @@ func (m *Model) cmdReadDir(path string, showHidden bool) tea.Cmd {
 			return msgError{err}
 		}
 
-		sort.Slice(dirEntries, func(i, j int) bool {
-			if dirEntries[i].IsDir() == dirEntries[j].IsDir() {
-				return dirEntries[i].Name() < dirEntries[j].Name()
+		slices.SortFunc(dirEntries, func(i, j fs.DirEntry) int {
+			switch {
+			case i.IsDir() == j.IsDir():
+				return cmp.Compare(i.Name(), j.Name())
+			case i.IsDir():
+				return -1
+			default:
+				return 1
 			}
-			return dirEntries[i].IsDir()
 		})
 
 		if showHidden {
