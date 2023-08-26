@@ -328,18 +328,18 @@ func (s Style) Render(strs ...string) string {
 	// Padding
 	if !inline {
 		if leftPadding > 0 {
-			var st *termenv.Style
+			st := termenv.Style{}
 			if colorWhitespace || styleWhitespace {
-				st = &teWhitespace
+				st = teWhitespace
 			}
 
 			str = padLeft(str, leftPadding, st)
 		}
 
 		if rightPadding > 0 {
-			var st *termenv.Style
+			st := termenv.Style{}
 			if colorWhitespace || styleWhitespace {
-				st = &teWhitespace
+				st = teWhitespace
 			}
 
 			str = padRight(str, rightPadding, st)
@@ -366,7 +366,7 @@ func (s Style) Render(strs ...string) string {
 		numLines := strings.Count(str, "\n")
 
 		if !(numLines == 0 && width == 0) {
-			st := termenv.Ascii.String()
+			st := termenv.Style{}
 			if colorWhitespace || styleWhitespace {
 				st = teWhitespace
 			}
@@ -411,8 +411,8 @@ func (s Style) applyMargins(str string, inline bool) string {
 	)
 
 	// Add left and right margin
-	str = padLeft(str, leftMargin, &styler)
-	str = padRight(str, rightMargin, &styler)
+	str = padLeft(str, leftMargin, styler)
+	str = padRight(str, rightMargin, styler)
 
 	if inline {
 		return str
@@ -433,15 +433,12 @@ func (s Style) applyMargins(str string, inline bool) string {
 }
 
 // Apply left padding.
-func padLeft(str string, n int, style *termenv.Style) string {
+func padLeft(str string, n int, style termenv.Style) string {
 	if n == 0 {
 		return str
 	}
 
-	sp := strings.Repeat(" ", n)
-	if style != nil {
-		sp = style.Styled(sp)
-	}
+	sp := style.Styled(strings.Repeat(" ", n))
 
 	lines := strings.Split(str, "\n")
 
@@ -458,15 +455,12 @@ func padLeft(str string, n int, style *termenv.Style) string {
 }
 
 // Apply right padding.
-func padRight(str string, n int, style *termenv.Style) string {
+func padRight(str string, n int, style termenv.Style) string {
 	if n == 0 || str == "" {
 		return str
 	}
 
-	sp := strings.Repeat(" ", n)
-	if style != nil {
-		sp = style.Styled(sp)
-	}
+	sp := style.Styled(strings.Repeat(" ", n))
 
 	lines := strings.Split(str, "\n")
 
