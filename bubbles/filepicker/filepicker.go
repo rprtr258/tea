@@ -170,25 +170,26 @@ type Model struct {
 }
 
 type stack struct {
-	Push   func(int)
-	Pop    func() int
-	Length func() int
+	data []int
+}
+
+func (s *stack) Push(i int) {
+	s.data = append(s.data, i)
+}
+
+func (s *stack) Pop() int {
+	res := s.data[len(s.data)-1]
+	s.data = s.data[:len(s.data)-1]
+	return res
+}
+
+func (s stack) Length() int {
+	return len(s.data)
 }
 
 func newStack() stack {
-	slice := make([]int, 0)
 	return stack{
-		Push: func(i int) {
-			slice = append(slice, i)
-		},
-		Pop: func() int {
-			res := slice[len(slice)-1]
-			slice = slice[:len(slice)-1]
-			return res
-		},
-		Length: func() int {
-			return len(slice)
-		},
+		data: make([]int, 0),
 	}
 }
 

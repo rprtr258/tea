@@ -32,7 +32,7 @@ type standardRenderer struct {
 
 	buf                bytes.Buffer
 	queuedMessageLines []string
-	framerate          time.Duration
+	frameDuration      time.Duration
 	ticker             *time.Ticker
 	done               chan struct{}
 	lastRender         string
@@ -59,14 +59,13 @@ type standardRenderer struct {
 func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) Renderer {
 	if fps < 1 {
 		fps = defaultFPS
-	} else if fps > maxFPS {
-		fps = maxFPS
 	}
+	fps = min(fps, maxFPS)
 	r := &standardRenderer{
 		out:                out,
 		mu:                 &sync.Mutex{},
 		done:               make(chan struct{}),
-		framerate:          time.Second / time.Duration(fps),
+		frameDuration:      time.Second / time.Duration(fps),
 		useANSICompressor:  useANSICompressor,
 		queuedMessageLines: []string{},
 	}
@@ -79,11 +78,11 @@ func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) Renderer 
 // start starts the renderer.
 func (r *standardRenderer) start() {
 	if r.ticker == nil {
-		r.ticker = time.NewTicker(r.framerate)
+		r.ticker = time.NewTicker(r.frameDuration)
 	} else {
 		// If the ticker already exists, it has been stopped and we need to
 		// reset it.
-		r.ticker.Reset(r.framerate)
+		r.ticker.Reset(r.frameDuration)
 	}
 
 	// Since the renderer can be restarted after a stop, we need to reset
