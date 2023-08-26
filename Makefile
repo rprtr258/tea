@@ -1,6 +1,7 @@
 .PHONY: test
 test:
-	@go run gotest.tools/gotestsum@latest --format dots-v2
+	# @go run gotest.tools/gotestsum@latest --format dots-v2
+	@gotestsum --format dots-v2
 
 .PHONY: fmt
 fmt:

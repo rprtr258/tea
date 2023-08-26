@@ -18,10 +18,9 @@ func alignTextHorizontal(str string, pos Position, width int, style termenv.Styl
 	for i, line := range lines {
 		lineWidth := ansi.PrintableRuneWidth(line)
 
-		shortAmount := widestLine - lineWidth                // difference from the widest line
-		shortAmount += max(0, width-(shortAmount+lineWidth)) // difference from the total width, if set
-
-		if shortAmount > 0 {
+		// difference from the widest line plus
+		// difference from the total width, if set
+		if shortAmount := widestLine - lineWidth + max(0, width-widestLine); shortAmount > 0 {
 			switch pos {
 			case Right:
 				line = style.Styled(strings.Repeat(" ", shortAmount)) + line
@@ -46,7 +45,7 @@ func alignTextHorizontal(str string, pos Position, width int, style termenv.Styl
 	return sb.String()
 }
 
-func alignTextVertical(str string, pos Position, height int, _ *termenv.Style) string {
+func alignTextVertical(str string, pos Position, height int) string {
 	strHeight := strings.Count(str, "\n") + 1
 	if height < strHeight {
 		return str
@@ -65,6 +64,7 @@ func alignTextVertical(str string, pos Position, height int, _ *termenv.Style) s
 		return strings.Repeat("\n", topPadding) + str + strings.Repeat("\n", bottomPadding)
 	case Bottom:
 		return strings.Repeat("\n", height-strHeight) + str
+	default:
+		return str
 	}
-	return str
 }

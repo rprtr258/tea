@@ -37,7 +37,7 @@ func TestAlignTextVertical(t *testing.T) {
 		{str: "Foo\nBar\nBaz", pos: Center, height: 10, want: "\n\n\nFoo\nBar\nBaz\n\n\n\n"},
 	} {
 		t.Run(fmt.Sprintf("str=%q pos=%v height=%d", test.str, test.pos, test.height), func(t *testing.T) {
-			assert.Equal(t, test.want, alignTextVertical(test.str, test.pos, test.height, nil))
+			assert.Equal(t, test.want, alignTextVertical(test.str, test.pos, test.height))
 		})
 	}
 }

@@ -356,7 +356,7 @@ func (s Style) Render(strs ...string) string {
 
 	// Height
 	if height > 0 {
-		str = alignTextVertical(str, verticalAlign, height, nil)
+		str = alignTextVertical(str, verticalAlign, height)
 	}
 
 	// Set alignment. This will also pad short lines with spaces so that all
