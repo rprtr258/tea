@@ -74,7 +74,7 @@ const (
 
 // A set of properties.
 // TODO: remove
-type rules map[propKey]interface{}
+type rules map[propKey]any
 
 // NewStyle returns a new, empty Style. While it's syntactic sugar for the
 // Style{} primitive, it's recommended to use this function for creating styles
@@ -95,7 +95,7 @@ func (r *Renderer) NewStyle() Style {
 // Style contains a set of rules that comprise a style as a whole.
 type Style struct {
 	r     *Renderer
-	rules map[propKey]interface{}
+	rules map[propKey]any
 	value string
 }
 

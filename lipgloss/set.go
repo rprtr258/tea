@@ -9,7 +9,7 @@ func (s *Style) init() {
 }
 
 // Set a value on the underlying rules map.
-func (s *Style) set(key propKey, value interface{}) {
+func (s *Style) set(key propKey, value any) {
 	s.init()
 
 	switch v := value.(type) {

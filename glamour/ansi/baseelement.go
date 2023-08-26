@@ -20,7 +20,7 @@ type BaseElement struct {
 func formatToken(format string, token string) (string, error) {
 	var b bytes.Buffer
 
-	v := make(map[string]interface{})
+	v := make(map[string]any)
 	v["text"] = token
 
 	tmpl, err := template.New(format).Funcs(TemplateFuncMap).Parse(format)
