@@ -397,6 +397,6 @@ func getFirstRuneAsString(str string) string {
 	if str == "" {
 		return str
 	}
-	r := []rune(str)
-	return string(r[0])
+
+	return string([]rune(str)[0])
 }

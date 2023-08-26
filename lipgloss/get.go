@@ -451,23 +451,22 @@ func (s Style) getBorderStyle() Border {
 	if !ok {
 		return noBorder
 	}
+
 	if b, ok := v.(Border); ok {
 		return b
 	}
+
 	return noBorder
 }
 
 // Split a string into lines, additionally returning the size of the widest
 // line.
-func getLines(s string) (lines []string, widest int) { //nolint:nonamedreturns
-	lines = strings.Split(s, "\n")
-
+func getLines(s string) ([]string, int) { //nolint:nonamedreturns
+	lines := strings.Split(s, "\n")
+	widest := 0
 	for _, l := range lines {
 		w := ansi.PrintableRuneWidth(l)
-		if widest < w {
-			widest = w
-		}
+		widest = max(widest, w)
 	}
-
 	return lines, widest
 }

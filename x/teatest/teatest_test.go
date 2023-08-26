@@ -16,14 +16,14 @@ func TestRequireEqualOutputUpdate(t *testing.T) {
 }
 
 func TestWaitForErrorReader(t *testing.T) {
-	err := doWaitFor(iotest.ErrReader(fmt.Errorf("fake")), func(bts []byte) bool {
+	err := doWaitFor(iotest.ErrReader(fmt.Errorf("fake")), func([]byte) bool {
 		return true
 	}, WithDuration(time.Millisecond), WithCheckInterval(10*time.Microsecond))
 	assert.EqualError(t, err, "WaitFor: fake")
 }
 
 func TestWaitForTimeout(t *testing.T) {
-	err := doWaitFor(strings.NewReader("nope"), func(bts []byte) bool {
+	err := doWaitFor(strings.NewReader("nope"), func([]byte) bool {
 		return false
 	}, WithDuration(time.Millisecond), WithCheckInterval(10*time.Microsecond))
 	assert.EqualError(t, err, "WaitFor: condition not met after 1ms")
