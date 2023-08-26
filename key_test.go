@@ -16,7 +16,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/samber/lo"
+	"github.com/rprtr258/fun"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -528,7 +528,7 @@ func genRandomDataWithSeed(s int64, length int) randTest {
 		seq  string
 		name string
 	}
-	allseqs := lo.MapToSlice(_sequences, func(seq string, key Key) seqpair {
+	allseqs := fun.MapToSlice(_sequences, func(seq string, key Key) seqpair {
 		return seqpair{seq, key.String()}
 	})
 	slices.SortFunc(allseqs, func(i, j seqpair) int {

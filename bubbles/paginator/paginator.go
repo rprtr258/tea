@@ -88,9 +88,9 @@ func (m *Model) ItemsOnPage(totalItems int) int {
 //	bunchOfStuff := []stuff{...}
 //	start, end := model.GetSliceBounds(len(bunchOfStuff))
 //	sliceToRender := bunchOfStuff[start:end]
-func (m *Model) GetSliceBounds(length int) (start int, end int) { //nolint:nonamedreturns
-	start = m.Page * m.PerPage
-	end = min(m.Page*m.PerPage+m.PerPage, length)
+func (m *Model) GetSliceBounds(length int) (int, int) {
+	start := m.Page * m.PerPage
+	end := min(start+m.PerPage, length)
 	return start, end
 }
 

@@ -18,11 +18,14 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
+var (
+	helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
+	emojis    = []rune("🍦🧋🍡🤠👾😭🦊🐯🦆🥨🎏🍔🍒🍥🎮📦🦁🐶🐸🍕🥐🧲🚒🥇🏆🌽")
+)
 
 type result struct {
 	duration time.Duration
-	emoji    string
+	emoji    rune
 }
 
 type model struct {
@@ -61,7 +64,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	case msgProcessFinished:
 		d := time.Duration(msg)
 		res := result{emoji: randomEmoji(), duration: d}
-		log.Printf("%s Job finished in %s", res.emoji, res.duration)
+		log.Printf("%c Job finished in %s", res.emoji, res.duration)
 		m.results = append(m.results[1:], res)
 		f(runPretendProcess)
 	}
@@ -75,7 +78,7 @@ func (m *model) View(r tea.Renderer) {
 		if res.duration == 0 {
 			s += "........................\n"
 		} else {
-			s += fmt.Sprintf("%s Job finished in %s\n", res.emoji, res.duration)
+			s += fmt.Sprintf("%c Job finished in %s\n", res.emoji, res.duration)
 		}
 	}
 
@@ -98,9 +101,8 @@ func runPretendProcess() tea.Msg {
 	return msgProcessFinished(pause)
 }
 
-func randomEmoji() string {
-	emojis := []rune("🍦🧋🍡🤠👾😭🦊🐯🦆🥨🎏🍔🍒🍥🎮📦🦁🐶🐸🍕🥐🧲🚒🥇🏆🌽")
-	return string(emojis[rand.Intn(len(emojis))]) // nolint:gosec
+func randomEmoji() rune {
+	return emojis[rand.Intn(len(emojis))]
 }
 
 func Main(ctx context.Context) error {

@@ -8,18 +8,19 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rprtr258/tea/bubbles/paginator"
-	"github.com/rprtr258/tea/lipgloss"
-	"github.com/samber/lo"
+	"github.com/rprtr258/fun/iter"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/paginator"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 func newModel() *model {
-	uuh := [100]struct{}{}
-	items := lo.Map(uuh[:], func(_ struct{}, i int) string {
-		return fmt.Sprintf("Item %d", i)
-	})
+	items := iter.Map(
+		iter.FromRange(0, 100, 1),
+		func(i int) string {
+			return fmt.Sprintf("Item %d", i)
+		}).ToSlice()
 
 	p := paginator.New()
 	p.Type = paginator.Dots

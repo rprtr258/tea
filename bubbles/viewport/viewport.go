@@ -93,7 +93,7 @@ func (m *Model) ScrollPercent() float64 {
 	}
 
 	v := float64(m.YOffset) / float64(len(m.lines)-1-m.Height)
-	return max(0, min(1, v))
+	return max(min(v, 1), 0)
 }
 
 // SetContent set the pager's text content. For high performance rendering the
