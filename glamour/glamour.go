@@ -246,8 +246,8 @@ func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 
 func getEnvironmentStyle() string {
 	glamourStyle := os.Getenv("GLAMOUR_STYLE")
-	if len(glamourStyle) == 0 {
-		glamourStyle = AutoStyle
+	if glamourStyle == "" {
+		return AutoStyle
 	}
 
 	return glamourStyle
@@ -258,6 +258,7 @@ func getDefaultStyle(style string) (*ansi.StyleConfig, error) {
 		if termenv.HasDarkBackground() {
 			return &DarkStyleConfig, nil
 		}
+
 		return &LightStyleConfig, nil
 	}
 
@@ -265,5 +266,6 @@ func getDefaultStyle(style string) (*ansi.StyleConfig, error) {
 	if !ok {
 		return nil, fmt.Errorf("%s: style not found", style)
 	}
+
 	return styles, nil
 }
