@@ -126,8 +126,8 @@ func JoinVertical(pos Position, strs ...string) string {
 		})
 
 	var maxWidth int
-	for i := range strs {
-		maxWidth = max(maxWidth, getWidestWidth(blocks[i]))
+	for _, block := range blocks {
+		maxWidth = max(maxWidth, getWidestWidth(block))
 	}
 
 	var sb strings.Builder
@@ -159,9 +159,8 @@ func JoinVertical(pos Position, strs ...string) string {
 				sb.WriteString(strings.Repeat(" ", right))
 			}
 
-			// Write a newline as long as we're not on the last line of the
-			// last block.
-			if !(i == len(blocks)-1 && j == len(block)-1) {
+			// Write a newline as long as we're not on the last line of the last block.
+			if i != len(blocks)-1 || j != len(block)-1 {
 				sb.WriteRune('\n')
 			}
 		}
