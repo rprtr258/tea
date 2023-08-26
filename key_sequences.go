@@ -1,6 +1,6 @@
 package tea
 
-import "sort"
+import "slices"
 
 // extSequences is used by the map-based algorithm below. It contains
 // the sequences plus their alternatives with an escape character
@@ -44,7 +44,7 @@ var seqLengths = func() []int {
 	for sz := range sizes {
 		lsizes = append(lsizes, sz)
 	}
-	sort.Slice(lsizes, func(i, j int) bool { return lsizes[i] > lsizes[j] })
+	slices.SortFunc(lsizes, func(i, j int) int { return j - i })
 	return lsizes
 }()
 
