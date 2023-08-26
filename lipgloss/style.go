@@ -72,10 +72,6 @@ const (
 	_strikethroughSpacesKey
 )
 
-// A set of properties.
-// TODO: remove
-type rules map[propKey]any
-
 // NewStyle returns a new, empty Style. While it's syntactic sugar for the
 // Style{} primitive, it's recommended to use this function for creating styles
 // in case the underlying implementation changes. It takes an optional string

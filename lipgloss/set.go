@@ -4,7 +4,7 @@ package lipgloss
 // out, so we can call it in a lazy way.
 func (s *Style) init() {
 	if s.rules == nil {
-		s.rules = make(rules)
+		s.rules = map[propKey]any{}
 	}
 }
 
