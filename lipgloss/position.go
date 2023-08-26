@@ -19,7 +19,7 @@ import (
 type Position float64
 
 func (p Position) value() float64 {
-	return math.Min(1, math.Max(0, float64(p)))
+	return min(1, max(0, float64(p)))
 }
 
 // Position aliases.

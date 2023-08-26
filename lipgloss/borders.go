@@ -388,10 +388,7 @@ func (s Style) styleBorder(border string, fg, bg TerminalColor) string {
 func maxRuneWidth(str string) int {
 	width := 0
 	for _, r := range str {
-		w := runewidth.RuneWidth(r)
-		if w > width {
-			width = w
-		}
+		width = max(width, runewidth.RuneWidth(r))
 	}
 	return width
 }

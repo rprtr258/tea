@@ -194,13 +194,6 @@ func (m *model) View(r tea.Renderer) {
 	r.Write("\n" + m.list.View())
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func runExamplesList(ctx context.Context, title string, examples examples) error {
 	items := lo.MapToSlice(
 		examples,

@@ -122,13 +122,6 @@ func downloadAndInstall(pkg string) tea.Cmd {
 	})
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func Main(ctx context.Context) error {
 	_, err := tea.NewProgram(ctx, newModel()).Run()
 	return err

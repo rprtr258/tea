@@ -240,7 +240,7 @@ func (m *Model) Percent() float64 {
 //
 // If you're rendering with ViewAs you won't need this.
 func (m *Model) SetPercent(p float64) tea.Cmd {
-	m.targetPercent = math.Max(0, math.Min(1, p))
+	m.targetPercent = max(0, min(1, p))
 	m.tag++
 	return m.nextFrame()
 }
@@ -326,10 +326,10 @@ func (m *Model) percentageView(percent float64) string {
 	if !m.ShowPercentage {
 		return ""
 	}
-	percent = math.Max(0, math.Min(1, percent))
+
+	percent = max(0, min(1, percent))
 	percentage := fmt.Sprintf(m.PercentFormat, percent*100) //nolint:gomnd
-	percentage = m.PercentageStyle.Inline(true).Render(percentage)
-	return percentage
+	return m.PercentageStyle.Inline(true).Render(percentage)
 }
 
 func (m *Model) setRamp(colorA, colorB string, scaled bool) {
@@ -349,22 +349,8 @@ func (m *Model) color(c string) termenv.Color {
 	return m.colorProfile.Color(c)
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 // IsAnimating returns false if the progress bar reached equilibrium and is no longer animating.
 func (m *Model) IsAnimating() bool {
 	dist := math.Abs(m.percentShown - m.targetPercent)
-	return !(dist < 0.001 && m.velocity < 0.01)
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+	return dist >= 0.001 || m.velocity >= 0.01
 }

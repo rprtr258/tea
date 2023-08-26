@@ -484,17 +484,3 @@ func padRight(str string, n int, style *termenv.Style) string {
 
 	return sb.String()
 }
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}

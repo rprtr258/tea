@@ -215,13 +215,6 @@ func colorGrid(xSteps, ySteps int) [][]string {
 	return grid
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func Main(context.Context) error {
 	physicalWidth, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	doc := strings.Builder{}

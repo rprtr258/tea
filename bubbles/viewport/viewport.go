@@ -1,7 +1,6 @@
 package viewport
 
 import (
-	"math"
 	"strings"
 
 	"github.com/rprtr258/tea"
@@ -92,11 +91,9 @@ func (m *Model) ScrollPercent() float64 {
 	if m.Height >= len(m.lines) {
 		return 1.0
 	}
-	y := float64(m.YOffset)
-	h := float64(m.Height)
-	t := float64(len(m.lines) - 1)
-	v := y / (t - h)
-	return math.Max(0.0, math.Min(1.0, v))
+
+	v := float64(m.YOffset) / float64(len(m.lines)-1-m.Height)
+	return max(0, min(1, v))
 }
 
 // SetContent set the pager's text content. For high performance rendering the
@@ -383,18 +380,4 @@ func clamp(v, low, high int) int {
 		low, high = high, low
 	}
 	return min(high, max(low, v))
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }

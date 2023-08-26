@@ -263,28 +263,19 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			m.min = len(m.files) - m.Height
 			m.max = len(m.files) - 1
 		case key.Matches(msg, m.KeyMap.Down):
-			m.selected++
-			if m.selected >= len(m.files) {
-				m.selected = len(m.files) - 1
-			}
+			m.selected = min(m.selected+1, len(m.files)-1)
 			if m.selected > m.max {
 				m.min++
 				m.max++
 			}
 		case key.Matches(msg, m.KeyMap.Up):
-			m.selected--
-			if m.selected < 0 {
-				m.selected = 0
-			}
+			m.selected = max(m.selected-1, 0)
 			if m.selected < m.min {
 				m.min--
 				m.max--
 			}
 		case key.Matches(msg, m.KeyMap.PageDown):
-			m.selected += m.Height
-			if m.selected >= len(m.files) {
-				m.selected = len(m.files) - 1
-			}
+			m.selected = min(m.selected+m.Height, len(m.files)-1)
 			m.min += m.Height
 			m.max += m.Height
 
@@ -293,10 +284,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 				m.min = m.max - m.Height
 			}
 		case key.Matches(msg, m.KeyMap.PageUp):
-			m.selected -= m.Height
-			if m.selected < 0 {
-				m.selected = 0
-			}
+			m.selected = max(m.selected-m.Height, 0)
 			m.min -= m.Height
 			m.max -= m.Height
 
@@ -385,7 +373,10 @@ func (m *Model) View() string {
 		disabled := !m.canSelect(name) && !f.IsDir()
 
 		if m.selected == i {
-			selected := fmt.Sprintf(" %s %"+fmt.Sprint(m.Styles.FileSize.GetWidth())+"s %s", info.Mode().String(), size, name)
+			selected := fmt.Sprintf(
+				" %s %"+fmt.Sprint(m.Styles.FileSize.GetWidth())+"s %s",
+				info.Mode().String(), size, name,
+			)
 			if isSymlink {
 				selected = fmt.Sprintf("%s → %s", selected, symlinkPath)
 			}
@@ -460,30 +451,29 @@ func (m *Model) didSelectFile(msg tea.Msg) (bool, string) {
 		if err != nil {
 			return false, ""
 		}
-		isSymlink := info.Mode()&os.ModeSymlink != 0
-		isDir := f.IsDir()
 
-		if isSymlink {
+		isDir := f.IsDir()
+		if info.Mode()&os.ModeSymlink != 0 { // is symlink
 			symlinkPath, _ := filepath.EvalSymlinks(filepath.Join(m.CurrentDirectory, f.Name()))
 			info, err := os.Stat(symlinkPath)
 			if err != nil {
-				break
+				return false, ""
 			}
 			if info.IsDir() {
 				isDir = true
 			}
 		}
 
-		if (!isDir && m.FileAllowed) || (isDir && m.DirAllowed) && m.Path != "" {
+		if !isDir && m.FileAllowed || isDir && m.DirAllowed && m.Path != "" {
 			return true, m.Path
 		}
 
 		// If the msg was not a MsgKey, then the file could not have been selected this iteration.
 		// Only a MsgKey can select a file.
+		return false, ""
 	default:
 		return false, ""
 	}
-	return false, ""
 }
 
 func (m *Model) canSelect(file string) bool {
@@ -496,5 +486,6 @@ func (m *Model) canSelect(file string) bool {
 			return true
 		}
 	}
+
 	return false
 }
