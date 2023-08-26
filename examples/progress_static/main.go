@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lucasb-eyer/go-colorful"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/progress"
 	"github.com/rprtr258/tea/lipgloss"
@@ -76,7 +77,9 @@ func (m *model) View(r tea.Renderer) {
 }
 
 func Main(ctx context.Context) error {
-	prog := progress.New(progress.WithScaledGradient("#FF7CCB", "#FDFF8C"))
+	colorA, _ := colorful.Hex("#FF7CCB")
+	colorB, _ := colorful.Hex("#FDFF8C")
+	prog := progress.New(progress.WithScaledGradient(colorA, colorB))
 
 	_, err := tea.NewProgram(ctx, &model{progress: prog}).Run()
 	return err

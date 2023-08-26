@@ -1223,6 +1223,7 @@ func insertItemIntoSlice[I Item](items []I, item I, index int) []I {
 	if items == nil {
 		return []I{item}
 	}
+
 	if index >= len(items) {
 		return append(items, item)
 	}

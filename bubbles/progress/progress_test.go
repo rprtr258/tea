@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/termenv"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,8 +14,10 @@ const (
 )
 
 func TestGradient(t *testing.T) {
-	colA := "#FF0000"
-	colB := "#00FF00"
+	colAHex := "#FF0000"
+	colA, _ := colorful.Hex(colAHex)
+	colBHex := "#00FF00"
+	colB, _ := colorful.Hex(colBHex)
 
 	for name, opts := range map[string][]Option{
 		"progress bar with gradient": {
@@ -33,10 +36,10 @@ func TestGradient(t *testing.T) {
 
 			// build the expected colors by colorizing an empty string and then cutting off the following reset sequence
 			sb := strings.Builder{}
-			sb.WriteString(termenv.String("").Foreground(p.color(colA)).String())
+			sb.WriteString(termenv.String("").Foreground(termenv.RGBColor(colAHex)).String())
 			expFirst := strings.Split(sb.String(), AnsiReset)[0]
 			sb.Reset()
-			sb.WriteString(termenv.String("").Foreground(p.color(colB)).String())
+			sb.WriteString(termenv.String("").Foreground(termenv.RGBColor(colBHex)).String())
 			expLast := strings.Split(sb.String(), AnsiReset)[0]
 
 			for _, width := range []int{3, 5, 50} {

@@ -41,18 +41,23 @@ const (
 // Option is used to set options in New. For example:
 //
 //	    progress := New(
-//		       WithRamp("#ff0000", "#0000ff"),
+//		       WithRamp("#ff0000", "#0000ff"), // TODO: update color example
 //		       WithoutPercentage(),
 //	    )
 type Option func(*Model)
 
+var (
+	_defaultColorA, _ = colorful.Hex("#5A56E0")
+	_defaultColorB, _ = colorful.Hex("#EE6FF8")
+)
+
 // WithDefaultGradient sets a gradient fill with default colors.
 func WithDefaultGradient() Option {
-	return WithGradient("#5A56E0", "#EE6FF8")
+	return WithGradient(_defaultColorA, _defaultColorB)
 }
 
 // WithGradient sets a gradient fill blending between two colors.
-func WithGradient(colorA, colorB string) Option {
+func WithGradient(colorA, colorB colorful.Color) Option {
 	return func(m *Model) {
 		m.setRamp(colorA, colorB, false)
 	}
@@ -61,12 +66,12 @@ func WithGradient(colorA, colorB string) Option {
 // WithDefaultScaledGradient sets a gradient with default colors, and scales the
 // gradient to fit the filled portion of the ramp.
 func WithDefaultScaledGradient() Option {
-	return WithScaledGradient("#5A56E0", "#EE6FF8")
+	return WithScaledGradient(_defaultColorA, _defaultColorB)
 }
 
 // WithScaledGradient scales the gradient to fit the width of the filled portion of
 // the progress bar.
-func WithScaledGradient(colorA, colorB string) Option {
+func WithScaledGradient(colorA, colorB colorful.Color) Option {
 	return func(m *Model) {
 		m.setRamp(colorA, colorB, true)
 	}
@@ -283,15 +288,15 @@ func (m *Model) nextFrame() tea.Cmd {
 }
 
 func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
-	tw := max(0, m.Width-textWidth)                // total width
-	fw := int(math.Round((float64(tw) * percent))) // filled width
+	tw := max(0, m.Width-textWidth)              // total width
+	fw := int(math.Round(float64(tw) * percent)) // filled width
 
 	fw = max(0, min(tw, fw))
 
-	var p float64
 	if m.useRamp {
 		// Gradient fill
 		for i := 0; i < fw; i++ {
+			var p float64
 			switch {
 			case fw == 1:
 				// this is up for debate: in a gradient of width=1, should the
@@ -303,12 +308,12 @@ func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
 			default:
 				p = float64(i) / float64(tw-1)
 			}
+
 			c := m.rampColorA.BlendLuv(m.rampColorB, p).Hex()
 			b.WriteString(termenv.
 				String(string(m.Full)).
 				Foreground(m.color(c)).
-				String(),
-			)
+				String())
 		}
 	} else {
 		// Solid fill
@@ -332,17 +337,16 @@ func (m *Model) percentageView(percent float64) string {
 	return m.PercentageStyle.Inline(true).Render(percentage)
 }
 
-func (m *Model) setRamp(colorA, colorB string, scaled bool) {
-	// In the event of an error colors here will default to black. For
-	// usability's sake, and because such an error is only cosmetic, we're
-	// ignoring the error.
-	a, _ := colorful.Hex(colorA)
-	b, _ := colorful.Hex(colorB)
-
+func (m *Model) setRamp(colorA, colorB colorful.Color, scaled bool) {
+	// // In the event of an error colors here will default to black. For
+	// // usability's sake, and because such an error is only cosmetic, we're
+	// // ignoring the error.
+	// a, _ :=
+	// b, _ := colorful.Hex(colorB)
 	m.useRamp = true
 	m.scaleRamp = scaled
-	m.rampColorA = a
-	m.rampColorB = b
+	m.rampColorA = colorA
+	m.rampColorB = colorB
 }
 
 func (m *Model) color(c string) termenv.Color {
