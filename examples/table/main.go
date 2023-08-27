@@ -9,7 +9,7 @@ import (
 )
 
 var baseStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
+	BorderStyle(lipgloss.NormalBorder).
 	BorderForeground(lipgloss.Color("240"))
 
 type model struct {
@@ -163,7 +163,7 @@ func Main(ctx context.Context) error {
 
 	s := table.DefaultStyles()
 	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
+		BorderStyle(lipgloss.NormalBorder).
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true).
 		Bold(false)

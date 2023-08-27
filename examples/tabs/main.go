@@ -55,7 +55,7 @@ var (
 			BorderForeground(highlightColor).
 			Padding(2, 0).
 			Align(lipgloss.Center).
-			Border(lipgloss.NormalBorder()).
+			Border(lipgloss.NormalBorder).
 			UnsetBorderTop()
 )
 

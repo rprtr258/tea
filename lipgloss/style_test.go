@@ -291,7 +291,7 @@ func TestStyleUnset(t *testing.T) {
 	assert.Equal(t, 0, s.GetPaddingLeft())
 
 	// border
-	s = NewStyle().Border(normalBorder, true, true, true, true)
+	s = NewStyle().Border(NormalBorder, true, true, true, true)
 	assert.True(t, s.GetBorderTop())
 	s.UnsetBorderTop()
 	assert.False(t, s.GetBorderTop())

@@ -89,7 +89,7 @@ var (
 	descStyle = lipgloss.NewStyle().MarginTop(1)
 
 	infoStyle = lipgloss.NewStyle().
-			BorderStyle(lipgloss.NormalBorder()).
+			BorderStyle(lipgloss.NormalBorder).
 			BorderTop(true).
 			BorderForeground(subtle)
 
@@ -119,14 +119,14 @@ var (
 	// List.
 
 	list = lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder(), false, true, false, false).
+		Border(lipgloss.NormalBorder, false, true, false, false).
 		BorderForeground(subtle).
 		MarginRight(2).
 		Height(8).
 		Width(columnWidth + 1)
 
 	listHeader = lipgloss.NewStyle().
-			BorderStyle(lipgloss.NormalBorder()).
+			BorderStyle(lipgloss.NormalBorder).
 			BorderBottom(true).
 			BorderForeground(subtle).
 			MarginRight(2).

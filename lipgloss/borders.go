@@ -8,8 +8,7 @@ import (
 	"github.com/muesli/termenv"
 )
 
-// Border contains a series of values which comprise the various parts of a
-// border.
+// Border contains a series of values which comprise the various parts of a border.
 type Border struct {
 	Top         string
 	Bottom      string
@@ -60,7 +59,8 @@ func getBorderEdgeMaxWidth(borderParts ...string) int {
 var (
 	noBorder = Border{}
 
-	normalBorder = Border{
+	// NormalBorder is a standard-type border with a normal weight and 90 degree corners.
+	NormalBorder = Border{
 		Top:         "─",
 		Bottom:      "─",
 		Left:        "│",
@@ -83,7 +83,8 @@ var (
 		BottomRight: "╯",
 	}
 
-	blockBorder = Border{
+	// BlockBorder is a border that takes the whole block.
+	BlockBorder = Border{
 		Top:         "█",
 		Bottom:      "█",
 		Left:        "█",
@@ -94,7 +95,8 @@ var (
 		BottomRight: "█",
 	}
 
-	outerHalfBlockBorder = Border{
+	// OuterHalfBlockBorder is a half-block border that sits outside the frame.
+	OuterHalfBlockBorder = Border{
 		Top:         "▀",
 		Bottom:      "▄",
 		Left:        "▌",
@@ -105,7 +107,8 @@ var (
 		BottomRight: "▟",
 	}
 
-	innerHalfBlockBorder = Border{
+	// InnerHalfBlockBorder is a half-block border that sits inside the frame.
+	InnerHalfBlockBorder = Border{
 		Top:         "▄",
 		Bottom:      "▀",
 		Left:        "▐",
@@ -116,7 +119,8 @@ var (
 		BottomRight: "▘",
 	}
 
-	thickBorder = Border{
+	// ThickBorder is a border that's thicker than the one returned by NormalBorder.
+	ThickBorder = Border{
 		Top:         "━",
 		Bottom:      "━",
 		Left:        "┃",
@@ -127,7 +131,8 @@ var (
 		BottomRight: "┛",
 	}
 
-	doubleBorder = Border{
+	// DoubleBorder is a border comprised of two thin strokes.
+	DoubleBorder = Border{
 		Top:         "═",
 		Bottom:      "═",
 		Left:        "║",
@@ -138,7 +143,11 @@ var (
 		BottomRight: "╝",
 	}
 
-	hiddenBorder = Border{
+	// HiddenBorder is a border that renders as a series of single-cell
+	// spaces. It's useful for cases when you want to remove a standard border but
+	// maintain layout positioning. This said, you can still apply a background
+	// color to a hidden border.
+	HiddenBorder = Border{
 		Top:         " ",
 		Bottom:      " ",
 		Left:        " ",
@@ -149,46 +158,6 @@ var (
 		BottomRight: " ",
 	}
 )
-
-// NormalBorder returns a standard-type border with a normal weight and 90
-// degree corners.
-func NormalBorder() Border {
-	return normalBorder
-}
-
-// BlockBorder returns a border that takes the whole block.
-func BlockBorder() Border {
-	return blockBorder
-}
-
-// OuterHalfBlockBorder returns a half-block border that sits outside the frame.
-func OuterHalfBlockBorder() Border {
-	return outerHalfBlockBorder
-}
-
-// InnerHalfBlockBorder returns a half-block border that sits inside the frame.
-func InnerHalfBlockBorder() Border {
-	return innerHalfBlockBorder
-}
-
-// ThickBorder returns a border that's thicker than the one returned by
-// NormalBorder.
-func ThickBorder() Border {
-	return thickBorder
-}
-
-// DoubleBorder returns a border comprised of two thin strokes.
-func DoubleBorder() Border {
-	return doubleBorder
-}
-
-// HiddenBorder returns a border that renders as a series of single-cell
-// spaces. It's useful for cases when you want to remove a standard border but
-// maintain layout positioning. This said, you can still apply a background
-// color to a hidden border.
-func HiddenBorder() Border {
-	return hiddenBorder
-}
 
 func (s Style) applyBorder(str string) string {
 	var (
@@ -216,7 +185,7 @@ func (s Style) applyBorder(str string) string {
 
 	// If a border is set and no sides have been specifically turned on or off
 	// render borders on all sides.
-	if border != noBorder && !(topSet || rightSet || bottomSet || leftSet) {
+	if border != noBorder && !topSet && !rightSet && !bottomSet && !leftSet {
 		hasTop = true
 		hasRight = true
 		hasBottom = true
@@ -224,7 +193,7 @@ func (s Style) applyBorder(str string) string {
 	}
 
 	// If no border is set or all borders are been disabled, abort.
-	if border == noBorder || (!hasTop && !hasRight && !hasBottom && !hasLeft) {
+	if border == noBorder || !hasTop && !hasRight && !hasBottom && !hasLeft {
 		return str
 	}
 
@@ -293,11 +262,10 @@ func (s Style) applyBorder(str string) string {
 	}
 
 	leftRunes := []rune(border.Left)
-	leftIndex := 0
-
 	rightRunes := []rune(border.Right)
-	rightIndex := 0
 
+	leftIndex := 0
+	rightIndex := 0
 	// Render sides
 	for i, l := range lines {
 		if hasLeft {
@@ -324,8 +292,9 @@ func (s Style) applyBorder(str string) string {
 
 	// Render bottom
 	if hasBottom {
-		bottom := renderHorizontalEdge(border.BottomLeft, border.Bottom, border.BottomRight, width)
-		bottom = s.styleBorder(bottom, bottomFG, bottomBG)
+		bottom := s.styleBorder(
+			renderHorizontalEdge(border.BottomLeft, border.Bottom, border.BottomRight, width),
+			bottomFG, bottomBG)
 		out.WriteRune('\n')
 		out.WriteString(bottom)
 	}

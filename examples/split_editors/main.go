@@ -38,7 +38,7 @@ var (
 				BorderForeground(lipgloss.Color("238"))
 
 	blurredBorderStyle = lipgloss.NewStyle().
-				Border(lipgloss.HiddenBorder())
+				Border(lipgloss.HiddenBorder)
 )
 
 type keymap = struct {

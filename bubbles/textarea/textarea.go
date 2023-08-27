@@ -262,7 +262,7 @@ func New() Model {
 		CharLimit:            _defaultCharLimit,
 		MaxHeight:            _defaultMaxHeight,
 		MaxWidth:             _defaultMaxWidth,
-		Prompt:               lipgloss.ThickBorder().Left + " ",
+		Prompt:               lipgloss.ThickBorder.Left + " ",
 		style:                &_styleBlurredDefault,
 		FocusedStyle:         _styleFocusedDefault,
 		BlurredStyle:         _styleBlurredDefault,
