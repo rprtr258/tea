@@ -4,7 +4,6 @@ package prevent_quit
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
@@ -108,8 +107,11 @@ func (m *model) updatePromptView(msg tea.Msg, f func(...tea.Cmd)) {
 func (m *model) View(r tea.Renderer) {
 	if m.quitting {
 		if m.hasChanges {
-			text := lipgloss.JoinHorizontal(lipgloss.Top, "You have unsaved changes. Quit without saving?", choiceStyle.Render("[yn]"))
-			r.Write(quitViewStyle.Render(text))
+			r.Write(quitViewStyle.Render(lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				"You have unsaved changes. Quit without saving?",
+				choiceStyle.Render("[yn]"),
+			)))
 			return
 		}
 
@@ -117,17 +119,16 @@ func (m *model) View(r tea.Renderer) {
 		return
 	}
 
-	helpView := m.help.ShortHelpView([]key.Binding{
+	r.Write("\nType some important things.\n\n")
+	r.Write(m.textarea.View())
+	r.Write("\n\n ")
+	r.Write(saveTextStyle.Render(m.saveText))
+	r.Write("\n ")
+	r.Write(m.help.ShortHelpView([]key.Binding{
 		m.keymap.save,
 		m.keymap.quit,
-	})
-
-	r.Write(fmt.Sprintf(
-		"\nType some important things.\n\n%s\n\n %s\n %s",
-		m.textarea.View(),
-		saveTextStyle.Render(m.saveText),
-		helpView,
-	) + "\n\n")
+	}))
+	r.Write("\n\n")
 }
 
 func Main(ctx context.Context) error {

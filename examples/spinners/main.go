@@ -2,7 +2,6 @@ package spinners
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
@@ -72,18 +71,14 @@ func (m *model) resetSpinner() {
 }
 
 func (m *model) View(r tea.Renderer) {
-	var gap string
+	r.Write("\n ")
+	r.Write(m.spinner.View())
 	if m.index != 1 {
-		gap = " "
+		r.Write(" ")
 	}
-
-	r.Write(fmt.Sprintf(
-		"\n %s%s%s\n\n%s",
-		m.spinner.View(),
-		gap,
-		textStyle("Spinning..."),
-		helpStyle("h/l, ←/→: change spinner • q: exit\n"),
-	))
+	r.Write(textStyle("Spinning..."))
+	r.Write("\n\n")
+	r.Write(helpStyle("h/l, ←/→: change spinner • q: exit\n"))
 }
 
 func Main(ctx context.Context) error {

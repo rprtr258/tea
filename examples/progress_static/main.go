@@ -72,9 +72,12 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 func (m *model) View(r tea.Renderer) {
 	pad := strings.Repeat(" ", padding)
-	r.Write("\n" +
-		pad + m.progress.ViewAs(m.percent) + "\n\n" +
-		pad + helpStyle("Press any key to quit"))
+	r.Write("\n")
+	r.Write(pad)
+	r.Write(m.progress.ViewAs(m.percent))
+	r.Write("\n\n")
+	r.Write(pad)
+	r.Write(helpStyle("Press any key to quit"))
 }
 
 func Main(ctx context.Context) error {

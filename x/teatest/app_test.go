@@ -54,7 +54,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 // View returns a string based on data in the model. That string which will be
 // rendered to the terminal.
 func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf("Hi. This program will exit in %d seconds. To quit sooner press any key.\n", *m))
+	r.Write("Hi. This program will exit in ")
+	r.Write(fmt.Sprint(*m))
+	r.Write(" seconds. To quit sooner press any key.\n")
 }
 
 func TestApp(t *testing.T) {

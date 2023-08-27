@@ -67,7 +67,8 @@ func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) Renderer 
 		out: fun.IF(
 			useANSICompressor,
 			termenv.NewOutput(&compressor.Writer{Forward: out}),
-			out),
+			out,
+		),
 		mu:                 &sync.Mutex{},
 		done:               make(chan struct{}),
 		frameDuration:      time.Second / time.Duration(fps),

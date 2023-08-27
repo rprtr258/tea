@@ -61,12 +61,17 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 func (m *model) View(r tea.Renderer) {
 	if m.err != nil {
-		r.Write("Error downloading: " + m.err.Error() + "\n")
+		r.Write("Error downloading: ")
+		r.Write(m.err.Error())
+		r.Write("\n")
 		return
 	}
 
 	pad := strings.Repeat(" ", padding)
-	r.Write("\n" +
-		pad + m.progress.View() + "\n\n" +
-		pad + helpStyle("Press any key to quit"))
+	r.Write("\n")
+	r.Write(pad)
+	r.Write(m.progress.View())
+	r.Write("\n\n")
+	r.Write(pad)
+	r.Write(helpStyle("Press any key to quit"))
 }

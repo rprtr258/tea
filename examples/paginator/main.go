@@ -6,7 +6,6 @@ package paginator
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/rprtr258/fun/iter"
 
@@ -55,15 +54,16 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	var sb strings.Builder
-	sb.WriteString("\n  Paginator Example\n\n")
+	r.Write("\n  Paginator Example\n\n")
 	start, end := m.paginator.GetSliceBounds(len(m.items))
 	for _, item := range m.items[start:end] {
-		sb.WriteString("  • " + item + "\n\n")
+		r.Write("  • ")
+		r.Write(item)
+		r.Write("\n\n")
 	}
-	sb.WriteString("  " + m.paginator.View())
-	sb.WriteString("\n\n  h/l ←/→ page • q: quit\n")
-	r.Write(sb.String())
+	r.Write("  ")
+	r.Write(m.paginator.View())
+	r.Write("\n\n  h/l ←/→ page • q: quit\n")
 }
 
 func Main(ctx context.Context) error {

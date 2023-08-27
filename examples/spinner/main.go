@@ -5,7 +5,6 @@ package spinner
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
@@ -42,12 +41,12 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
+	r.Write("\n\n   ")
+	r.Write(m.spinner.View())
+	r.Write(" Loading forever...press q to quit\n\n")
 	if m.quitting {
-		str += "\n"
+		r.Write("\n")
 	}
-
-	r.Write(str)
 }
 
 func Main(ctx context.Context) error {

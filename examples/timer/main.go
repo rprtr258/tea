@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
 	"github.com/rprtr258/tea/bubbles/key"
@@ -64,20 +65,20 @@ func (m *model) helpView() string {
 }
 
 func (m *model) View(r tea.Renderer) {
-	// For a more detailed timer view you could read m.timer.Timeout to get
-	// the remaining time as a time.Duration and skip calling m.timer.View()
-	// entirely.
-	s := m.timer.View()
-
-	if m.timer.Timedout() {
-		s = "All done!"
-	}
-	s += "\n"
+	// For a more detailed timer view you could read m.timer.Timeout to get the
+	// remaining time as a time.Duration and skip calling m.timer.View() entirely.
 	if !m.quitting {
-		s = "Exiting in " + s
-		s += m.helpView()
+		r.Write("Exiting in ")
 	}
-	r.Write(s)
+	r.Write(fun.IF(
+		m.timer.Timedout(),
+		"All done!",
+		m.timer.View(),
+	))
+	r.Write("\n")
+	if !m.quitting {
+		r.Write(m.helpView())
+	}
 }
 
 func Main(ctx context.Context) error {

@@ -32,12 +32,14 @@ func (m *model) View(r tea.Renderer) {
 	// Note: you could further customize the time output by getting the
 	// duration from m.stopwatch.Elapsed(), which returns a time.Duration, and
 	// skip m.stopwatch.View() altogether.
-	s := m.stopwatch.View() + "\n"
 	if !m.quitting {
-		s = "Elapsed: " + s
-		s += m.helpView()
+		r.Write("Elapsed: ")
 	}
-	r.Write(s)
+	r.Write(m.stopwatch.View())
+	r.Write("\n")
+	if !m.quitting {
+		r.Write(m.helpView())
+	}
 }
 
 func (m *model) helpView() string {

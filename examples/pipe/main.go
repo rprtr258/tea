@@ -9,7 +9,6 @@ import (
 	"bufio"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -54,10 +53,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf(
-		"\nYou piped in: %s\n\nPress ^C to exit",
-		m.userInput.View(),
-	))
+	r.Write("\nYou piped in: ")
+	r.Write(m.userInput.View())
+	r.Write("\n\nPress ^C to exit")
 }
 
 func Main(ctx context.Context) error {

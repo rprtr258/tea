@@ -8,11 +8,13 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/mattn/go-isatty"
 	"github.com/muesli/reflow/indent"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
 	"github.com/rprtr258/tea/lipgloss"
@@ -75,24 +77,26 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	s := "\n" +
-		m.spinner.View() + " Doing some work...\n\n"
+	var sb strings.Builder
+	sb.WriteString("\n")
+	sb.WriteString(m.spinner.View())
+	sb.WriteString(" Doing some work...\n\n")
 
 	for _, res := range m.results {
-		if res.duration == 0 {
-			s += "........................\n"
-		} else {
-			s += fmt.Sprintf("%c Job finished in %s\n", res.emoji, res.duration)
-		}
+		sb.WriteString(fun.IF(
+			res.duration == 0,
+			"........................\n",
+			fmt.Sprintf("%c Job finished in %s\n", res.emoji, res.duration),
+		))
 	}
 
-	s += _helpStyle("\nPress any key to exit\n")
+	sb.WriteString(_helpStyle("\nPress any key to exit\n"))
 
 	if m.quitting {
-		s += "\n"
+		sb.WriteString("\n")
 	}
 
-	r.Write(indent.String(s, 1))
+	r.Write(indent.String(sb.String(), 1))
 }
 
 // msgProcessFinished is sent when a pretend process completes.

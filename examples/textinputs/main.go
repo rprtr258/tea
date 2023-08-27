@@ -6,8 +6,8 @@ package textinputs
 import (
 	"context"
 	"fmt"
-	"strings"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/cursor"
 	"github.com/rprtr258/tea/bubbles/textinput"
@@ -144,26 +144,23 @@ func (m *model) updateInputs(msg tea.Msg) []tea.Cmd {
 }
 
 func (m *model) View(r tea.Renderer) {
-	var sb strings.Builder
-
 	for i := range m.inputs {
-		sb.WriteString(m.inputs[i].View())
+		r.Write(m.inputs[i].View())
 		if i < len(m.inputs)-1 {
-			sb.WriteRune('\n')
+			r.Write("\n")
 		}
 	}
 
-	button := &blurredButton
-	if m.focusIndex == len(m.inputs) {
-		button = &focusedButton
-	}
-	fmt.Fprintf(&sb, "\n\n%s\n\n", *button)
-
-	sb.WriteString(helpStyle.Render("cursor mode is "))
-	sb.WriteString(cursorModeHelpStyle.Render(m.cursorMode.String()))
-	sb.WriteString(helpStyle.Render(" (ctrl+r to change style)"))
-
-	r.Write(sb.String())
+	r.Write("\n\n")
+	r.Write(fun.IF(
+		m.focusIndex == len(m.inputs),
+		focusedButton,
+		blurredButton,
+	))
+	r.Write("\n\n")
+	r.Write(helpStyle.Render("cursor mode is "))
+	r.Write(cursorModeHelpStyle.Render(m.cursorMode.String()))
+	r.Write(helpStyle.Render(" (ctrl+r to change style)"))
 }
 
 func Main(ctx context.Context) error {

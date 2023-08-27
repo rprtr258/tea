@@ -5,7 +5,6 @@ package textinput
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/textinput"
@@ -45,11 +44,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf(
-		"What’s your favorite Pokémon?\n\n%s\n\n%s",
-		m.textInput.View(),
-		"(esc to quit)",
-	) + "\n")
+	r.Write("What’s your favorite Pokémon?\n\n")
+	r.Write(m.textInput.View())
+	r.Write("\n\n(esc to quit)\n")
 }
 
 func Main(ctx context.Context) error {

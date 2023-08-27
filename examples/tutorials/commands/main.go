@@ -53,15 +53,18 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 func (m *model) View(r tea.Renderer) {
 	if m.err != nil {
-		r.Write(fmt.Sprintf("\nWe had some trouble: %v\n\n", m.err))
+		r.Write("\nWe had some trouble: ")
+		r.Write(m.err.Error())
+		r.Write("\n\n")
 		return
 	}
 
-	s := fmt.Sprintf("Checking %s ... ", url)
+	r.Write("\n")
+	r.Write(fmt.Sprintf("Checking %s ... ", url))
 	if m.status > 0 {
-		s += fmt.Sprintf("%d %s!", m.status, http.StatusText(m.status))
+		r.Write(fmt.Sprintf("%d %s!", m.status, http.StatusText(m.status)))
 	}
-	r.Write("\n" + s + "\n\n")
+	r.Write("\n\n")
 }
 
 func Main(ctx context.Context) error {

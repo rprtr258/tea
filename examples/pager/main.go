@@ -98,7 +98,11 @@ func (m *model) View(r tea.Renderer) {
 		return
 	}
 
-	r.Write(fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView()))
+	r.Write(m.headerView())
+	r.Write("\n")
+	r.Write(m.viewport.View())
+	r.Write("\n")
+	r.Write(m.footerView())
 }
 
 func (m *model) headerView() string {

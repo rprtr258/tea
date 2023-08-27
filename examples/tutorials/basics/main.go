@@ -2,8 +2,8 @@ package basics
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 )
 
@@ -52,25 +52,24 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	s := "What should we buy at the market?\n\n"
+	r.Write("What should we buy at the market?\n\n")
 
 	for i, choice := range m.choices {
-		cursor := " "
-		if m.cursor == i {
-			cursor = ">"
-		}
+		r.Write(fun.IF(m.cursor == i, ">", " "))
 
 		checked := " "
 		if _, ok := m.selected[i]; ok {
 			checked = "x"
 		}
+		r.Write(" [")
+		r.Write(checked)
+		r.Write("] ")
 
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+		r.Write(choice)
+		r.Write("\n")
 	}
 
-	s += "\nPress q to quit.\n"
-
-	r.Write(s)
+	r.Write("\nPress q to quit.\n")
 }
 
 func Main(ctx context.Context) error {

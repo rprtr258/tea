@@ -5,7 +5,6 @@ package textarea
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/textarea"
@@ -52,11 +51,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf(
-		"Tell me a story.\n\n%s\n\n%s",
-		m.textarea.View(),
-		"(ctrl+c to quit)",
-	) + "\n\n")
+	r.Write("Tell me a story.\n\n")
+	r.Write(m.textarea.View())
+	r.Write("\n\n(ctrl+c to quit)\n\n")
 }
 
 func Main(ctx context.Context) error {

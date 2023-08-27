@@ -172,20 +172,20 @@ func (m *model) updateKeybindings() {
 }
 
 func (m *model) View(r tea.Renderer) {
-	help := m.help.ShortHelpView([]key.Binding{
+	views := make([]string, len(m.inputs))
+	for i := range m.inputs {
+		views[i] = m.inputs[i].View()
+	}
+
+	r.Write(lipgloss.JoinHorizontal(lipgloss.Top, views...))
+	r.Write("\n\n")
+	r.Write(m.help.ShortHelpView([]key.Binding{
 		m.keymap.next,
 		m.keymap.prev,
 		m.keymap.add,
 		m.keymap.remove,
 		m.keymap.quit,
-	})
-
-	var views []string
-	for i := range m.inputs {
-		views = append(views, m.inputs[i].View())
-	}
-
-	r.Write(lipgloss.JoinHorizontal(lipgloss.Top, views...) + "\n\n" + help)
+	}))
 }
 
 func Main(ctx context.Context) error {

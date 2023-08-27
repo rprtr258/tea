@@ -66,11 +66,14 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	s := fmt.Sprintf("\n %s Events received: %d\n\n Press any key to exit\n", m.spinner.View(), m.responses)
+	r.Write("\n ")
+	r.Write(m.spinner.View())
+	r.Write(" Events received: ")
+	r.Write(fmt.Sprint(m.responses))
+	r.Write("\n\n Press any key to exit\n")
 	if m.quitting {
-		s += "\n"
+		r.Write("\n")
 	}
-	r.Write(s)
 }
 
 func Main(ctx context.Context) error {

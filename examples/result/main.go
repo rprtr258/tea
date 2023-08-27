@@ -6,7 +6,6 @@ package result
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/rprtr258/tea"
 )
@@ -45,21 +44,18 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	s := strings.Builder{}
-	s.WriteString("What kind of Bubble Tea would you like to order?\n\n")
+	r.Write("What kind of Bubble Tea would you like to order?\n\n")
 
 	for i := 0; i < len(choices); i++ {
 		if m.cursor == i {
-			s.WriteString("(•) ")
+			r.Write("(•) ")
 		} else {
-			s.WriteString("( ) ")
+			r.Write("( ) ")
 		}
-		s.WriteString(choices[i])
-		s.WriteString("\n")
+		r.Write(choices[i])
+		r.Write("\n")
 	}
-	s.WriteString("\n(press q to quit)\n")
-
-	r.Write(s.String())
+	r.Write("\n(press q to quit)\n")
 }
 
 func Main(ctx context.Context) error {

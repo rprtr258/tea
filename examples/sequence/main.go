@@ -20,14 +20,14 @@ func (m *model) Init(f func(...tea.Cmd)) {
 	)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (*model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg.(type) {
 	case tea.MsgKey:
 		f(tea.Quit)
 	}
 }
 
-func (m *model) View(r tea.Renderer) {}
+func (*model) View(tea.Renderer) {}
 
 func Main(ctx context.Context) error {
 	_, err := tea.NewProgram(ctx, &model{}).Run()
