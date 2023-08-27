@@ -1,19 +1,20 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 
-	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 func main() {
-	p := tea.NewProgram(initialModel())
+	p := tea.NewProgram(context.Background(), initialModel())
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -74,16 +75,17 @@ func initialModel() model {
 	return model{textInput: ti}
 }
 
-func (m model) Init() tea.Cmd {
-	return tea.Batch(getRepos, textinput.Blink)
+func (m model) Init(yield func(...tea.Cmd)) {
+	yield(getRepos, textinput.Blink)
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	case tea.MsgKey:
 		switch msg.Type {
 		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
-			return m, tea.Quit
+			yield(tea.Quit)
+			return
 		}
 	case gotReposSuccessMsg:
 		var suggestions []string
@@ -93,15 +95,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.textInput.SetSuggestions(suggestions)
 	}
 
-	var cmd tea.Cmd
-	m.textInput, cmd = m.textInput.Update(msg)
-	return m, cmd
+	yield(m.textInput.Update(msg)...)
 }
 
-func (m model) View() string {
-	return fmt.Sprintf(
+func (m model) View(r tea.Renderer) {
+	r.Write(fmt.Sprintf(
 		"What’s your favorite Charm repository?\n\n%s\n\n%s\n",
 		m.textInput.View(),
 		"(tab to complete, ctrl+n/ctrl+p to cycle through suggestions, esc to quit)",
-	)
+	))
 }

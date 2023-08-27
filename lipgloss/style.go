@@ -1,6 +1,7 @@
 package lipgloss
 
 import (
+	"maps"
 	"strings"
 	"unicode"
 
@@ -129,9 +130,7 @@ func (s Style) String() string {
 // Copy returns a copy of this style, including any underlying string values.
 func (s Style) Copy() Style {
 	o := NewStyle()
-	for k, v := range s.rules {
-		o.rules[k] = v
-	}
+	maps.Copy(o.rules, s.rules)
 	o.r = s.r
 	o.value = s.value
 	return o
@@ -177,31 +176,31 @@ func (s Style) Render(strs ...string) string {
 	}
 
 	var (
-		bold          = s.getAsBool(_boldKey, false)
-		italic        = s.getAsBool(_italicKey, false)
-		underline     = s.getAsBool(_underlineKey, false)
-		strikethrough = s.getAsBool(_strikethroughKey, false)
-		reverse       = s.getAsBool(_reverseKey, false)
-		blink         = s.getAsBool(blinkKey, false)
-		faint         = s.getAsBool(faintKey, false)
+		bold          = s.GetBold()
+		italic        = s.GetItalic()
+		underline     = s.GetUnderline()
+		strikethrough = s.GetStrikethrough()
+		reverse       = s.GetReverse()
+		blink         = s.GetBlink()
+		faint         = s.GetFaint()
 
-		fg = s.getAsColor(foregroundKey)
-		bg = s.getAsColor(backgroundKey)
+		fg = s.GetForeground()
+		bg = s.GetBackground()
 
-		width           = s.getAsInt(widthKey)
-		height          = s.getAsInt(heightKey)
-		horizontalAlign = s.getAsPosition(alignHorizontalKey)
-		verticalAlign   = s.getAsPosition(alignVerticalKey)
+		width           = s.GetWidth()
+		height          = s.GetHeight()
+		horizontalAlign = s.GetAlignHorizontal()
+		verticalAlign   = s.GetAlignVertical()
 
-		topPadding    = s.getAsInt(paddingTopKey)
-		rightPadding  = s.getAsInt(paddingRightKey)
-		bottomPadding = s.getAsInt(paddingBottomKey)
-		leftPadding   = s.getAsInt(paddingLeftKey)
+		topPadding    = s.GetPaddingTop()
+		rightPadding  = s.GetPaddingRight()
+		bottomPadding = s.GetPaddingBottom()
+		leftPadding   = s.GetPaddingLeft()
 
 		colorWhitespace = s.getAsBool(colorWhitespaceKey, true)
-		inline          = s.getAsBool(_inlineKey, false)
-		maxWidth        = s.getAsInt(_maxWidthKey)
-		maxHeight       = s.getAsInt(_maxHeightKey)
+		inline          = s.GetInline()
+		maxWidth        = s.GetMaxWidth()
+		maxHeight       = s.GetMaxHeight()
 
 		underlineSpaces     = underline && s.getAsBool(_underlineSpacesKey, true)
 		strikethroughSpaces = strikethrough && s.getAsBool(_strikethroughSpacesKey, true)

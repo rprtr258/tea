@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -210,9 +211,7 @@ func (r *standardRenderer) flush() {
 
 	// Merge the set of lines we're skipping as a rendering optimization with
 	// the set of lines we've explicitly asked the renderer to ignore.
-	for k, v := range r.ignoreLines {
-		skipLines[k] = v
-	}
+	maps.Copy(skipLines, r.ignoreLines)
 
 	// Paint new lines
 	for i := 0; i < len(newLines); i++ {
