@@ -387,8 +387,7 @@ func (r *standardRenderer) setMouseAllMotion(enabled bool) {
 	}
 }
 
-// setIgnoredLines specifies lines not to be touched by the standard Bubble Tea
-// renderer.
+// setIgnoredLines specifies lines not to be touched by the standard Tea renderer.
 func (r *standardRenderer) setIgnoredLines(from, to int) {
 	// Lock if we're going to be clearing some lines since we don't want
 	// anything jacking our cursor.

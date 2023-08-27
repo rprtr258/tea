@@ -48,20 +48,19 @@ func NewFramebuffer(height, width int) FrameBuffer {
 
 // Render framebuffer to string
 func (fb FrameBuffer) Render() string {
-	// OPTIMIZE: strings.Builder
 	var sb strings.Builder
 	bg := ""
 	fg := ""
-	for y := 0; y < fb.Height; y++ {
+	for y := 0; y < fb.Height*fb.Width; y += fb.Width {
 		if y > 0 {
 			sb.WriteRune('\n')
 		}
 
-		fullRow := fb.B[y*fb.Width : (y+1)*fb.Width]
+		fullRow := fb.B[y : y+fb.Width]
 		for x := 0; x < fb.Width; x++ {
-			if fb.backgrounds[y*fb.Width+x] != bg || fb.foregrounds[y*fb.Width+x] != fg {
-				bg = fb.backgrounds[y*fb.Width+x]
-				fg = fb.foregrounds[y*fb.Width+x]
+			if fb.backgrounds[y+x] != bg || fb.foregrounds[y+x] != fg {
+				bg = fb.backgrounds[y+x]
+				fg = fb.foregrounds[y+x]
 				sb.WriteString(ctrlSeq(termenv.ResetSeq) + lo.
 					Switch[bool, string](true).
 					Case(bg == "" && fg == "", "").
