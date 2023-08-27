@@ -62,11 +62,11 @@ type filteredItem[I Item] struct {
 type filteredItems[I Item] []filteredItem[I]
 
 func (f filteredItems[I]) items() []I {
-	agg := make([]I, len(f))
-	for i, v := range f {
-		agg[i] = v.item
-	}
-	return agg
+	return fun.Map[I](
+		f,
+		func(v filteredItem[I]) I {
+			return v.item
+		})
 }
 
 // MsgFilterMatches contains data about items matched during filtering. The
@@ -103,18 +103,16 @@ func DefaultFilter(term string, targets []string) []Rank {
 		})
 }
 
-// UnsortedFilter uses the sahilm/fuzzy to filter through the list. It does not
-// sort the results.
+// UnsortedFilter uses the sahilm/fuzzy to filter through the list. It does not sort the results.
 func UnsortedFilter(term string, targets []string) []Rank {
-	ranks := fuzzy.FindNoSort(term, targets)
-	result := make([]Rank, len(ranks))
-	for i, r := range ranks {
-		result[i] = Rank{
-			Index:          r.Index,
-			MatchedIndexes: r.MatchedIndexes,
-		}
-	}
-	return result
+	return fun.Map[Rank](
+		fuzzy.FindNoSort(term, targets),
+		func(r fuzzy.Match) Rank {
+			return Rank{
+				Index:          r.Index,
+				MatchedIndexes: r.MatchedIndexes,
+			}
+		})
 }
 
 type msgStatusMessageTimeout struct{}
