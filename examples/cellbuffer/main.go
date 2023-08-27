@@ -14,22 +14,22 @@ import (
 )
 
 const (
-	fps       = 60
-	frequency = 7.5
-	damping   = 0.15
-	asterisk  = "*"
+	_fps       = 60
+	_frequency = 7.5
+	_damping   = 0.15
+	_asterisk  = "*"
 )
 
-func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
-	var (
-		dx, dy, d1, d2 float64
-		x              float64
-		y              = ry
-	)
+func sqr(x float64) float64 {
+	return x * x
+}
 
-	d1 = ry*ry - rx*rx*ry + 0.25*rx*rx
-	dx = 2 * ry * ry * x
-	dy = 2 * rx * rx * y
+func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
+	x, y := 0.0, ry
+
+	d1 := sqr(ry) - sqr(rx)*ry + 0.25*sqr(rx)
+	dx := 2 * sqr(ry) * x
+	dy := 2 * sqr(rx) * y
 
 	for dx < dy {
 		cb.set(int(x+xc), int(y+yc))
@@ -38,18 +38,18 @@ func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
 		cb.set(int(-x+xc), int(-y+yc))
 		if d1 < 0 {
 			x++
-			dx = dx + (2 * ry * ry)
-			d1 = d1 + dx + (ry * ry)
+			dx += 2 * sqr(ry)
+			d1 += dx + sqr(ry)
 		} else {
 			x++
 			y--
-			dx = dx + (2 * ry * ry)
-			dy = dy - (2 * rx * rx)
-			d1 = d1 + dx - dy + (ry * ry)
+			dx += 2 * sqr(ry)
+			dy -= 2 * sqr(rx)
+			d1 += dx - dy + sqr(ry)
 		}
 	}
 
-	d2 = ((ry * ry) * ((x + 0.5) * (x + 0.5))) + ((rx * rx) * ((y - 1) * (y - 1))) - (rx * rx * ry * ry)
+	d2 := sqr(ry)*sqr(x+0.5) + sqr(rx)*sqr(y-1) - sqr(rx)*sqr(ry)
 
 	for y >= 0 {
 		cb.set(int(x+xc), int(y+yc))
@@ -58,14 +58,14 @@ func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
 		cb.set(int(-x+xc), int(-y+yc))
 		if d2 > 0 {
 			y--
-			dy = dy - (2 * rx * rx)
-			d2 = d2 + (rx * rx) - dy
+			dy -= 2 * sqr(rx)
+			d2 += sqr(rx) - dy
 		} else {
 			y--
 			x++
-			dx = dx + (2 * ry * ry)
-			dy = dy - (2 * rx * rx)
-			d2 = d2 + dx - dy + (rx * rx)
+			dx += 2 * sqr(ry)
+			dy -= 2 * sqr(rx)
+			d2 += dx - dy + sqr(rx)
 		}
 	}
 }
@@ -79,6 +79,7 @@ func (c *cellbuffer) init(w, h int) {
 	if w == 0 {
 		return
 	}
+
 	c.stride = w
 	c.cells = make([]string, w*h)
 	c.wipe()
@@ -89,7 +90,7 @@ func (c cellbuffer) set(x, y int) {
 	if i > len(c.cells)-1 || x < 0 || y < 0 || x >= c.width() || y >= c.height() {
 		return
 	}
-	c.cells[i] = asterisk
+	c.cells[i] = _asterisk
 }
 
 func (c *cellbuffer) wipe() {
@@ -103,18 +104,14 @@ func (c cellbuffer) width() int {
 }
 
 func (c cellbuffer) height() int {
-	h := len(c.cells) / c.stride
-	if len(c.cells)%c.stride != 0 {
-		h++
-	}
-	return h
+	return (len(c.cells) + c.stride - 1) / c.stride
 }
 
 func (c cellbuffer) ready() bool {
 	return len(c.cells) > 0
 }
 
-func (c cellbuffer) String() string {
+func (c cellbuffer) Render(r tea.Renderer) {
 	var sb strings.Builder
 	for i := 0; i < len(c.cells); i++ {
 		if i > 0 && i%c.stride == 0 && i < len(c.cells)-1 {
@@ -122,12 +119,12 @@ func (c cellbuffer) String() string {
 		}
 		sb.WriteString(c.cells[i])
 	}
-	return sb.String()
+	r.Write(sb.String())
 }
 
 type msgFrame struct{}
 
-var animate = tea.Tick(time.Second/fps, func(_ time.Time) tea.Msg {
+var animate = tea.Tick(time.Second/_fps, func(_ time.Time) tea.Msg {
 	return msgFrame{}
 })
 
@@ -172,13 +169,13 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(m.cells.String())
+	m.cells.Render(r)
 }
 
 func Main(ctx context.Context) error {
 	_, err := tea.
 		NewProgram(ctx, &model{
-			spring: harmonica.NewSpring(harmonica.FPS(fps), frequency, damping),
+			spring: harmonica.NewSpring(harmonica.FPS(_fps), _frequency, _damping),
 		}).
 		WithAltScreen().
 		WithMouseCellMotion().

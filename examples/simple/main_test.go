@@ -46,7 +46,7 @@ func TestAppInteractive(t *testing.T) {
 		teatest.WithInitialTermSize(70, 30),
 	)
 
-	time.Sleep(time.Second + time.Millisecond*200)
+	time.Sleep(time.Second + 200*time.Millisecond)
 	tm.Send("ignored msg")
 
 	assert.Contains(t, string(readBts(t, tm.Output())), "This program will exit in 9 seconds")
