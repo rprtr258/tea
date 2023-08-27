@@ -251,6 +251,10 @@ func (r *standardRenderer) flush() {
 	}
 
 	r.lastRender = r.buf.String()
+	r.reset()
+}
+
+func (r *standardRenderer) reset() {
 	r.buf.Reset()
 }
 
@@ -259,7 +263,6 @@ func (r *standardRenderer) flush() {
 func (r *standardRenderer) Write(s string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.buf.Reset()
 
 	// If an empty string was passed we should clear existing output and
 	// rendering nothing. Rather than introduce additional state to manage

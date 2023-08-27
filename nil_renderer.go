@@ -6,6 +6,7 @@ func (nilRenderer) start()                  {}
 func (nilRenderer) stop()                   {}
 func (nilRenderer) kill()                   {}
 func (nilRenderer) Write(string)            {}
+func (nilRenderer) reset()                  {}
 func (nilRenderer) repaint()                {}
 func (nilRenderer) clearScreen()            {}
 func (nilRenderer) altScreen() bool         { return false }

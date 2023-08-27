@@ -343,6 +343,7 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 			model.Update(msg, func(c ...Cmd) {
 				cmds <- c
 			}) // run update, process command (if any)
+			p.renderer.reset()
 			model.View(p.renderer)
 		}
 	}
@@ -458,6 +459,7 @@ func (p *Program[M]) Run() (M, error) {
 	p.renderer.start()
 
 	// Render the initial view.
+	p.renderer.reset()
 	model.View(p.renderer)
 
 	// Subscribe to user input.
@@ -480,6 +482,7 @@ func (p *Program[M]) Run() (M, error) {
 		err = ErrProgramKilled
 	} else {
 		// Ensure we rendered the final state of the model.
+		p.renderer.reset()
 		model.View(p.renderer)
 	}
 

@@ -5,6 +5,7 @@ type Renderer interface { //nolint:interfacebloat // TODO: remove after monomorp
 	// Write a frame to the renderer. The renderer can write this data to
 	// output at its discretion.
 	Write(string)
+	reset()
 
 	// start the renderer
 	start()
