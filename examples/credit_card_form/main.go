@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	ccn = iota
-	exp
-	cvv
+	_ccn = iota
+	_exp
+	_cvv
 )
 
 const (
@@ -108,9 +108,9 @@ func initialModel() *model {
 
 	return &model{
 		inputs: []textinput.Model{
-			ccn: ccnInput,
-			exp: expInput,
-			cvv: cvvInput,
+			_ccn: ccnInput,
+			_exp: expInput,
+			_cvv: cvvInput,
 		},
 		focused: 0,
 		err:     nil,
@@ -162,18 +162,21 @@ func (m *model) View(r tea.Renderer) {
  %s
 `,
 		inputStyle.Width(30).Render("Card Number"),
-		m.inputs[ccn].View(),
+		m.inputs[_ccn].View(),
 		inputStyle.Width(6).Render("EXP"),
 		inputStyle.Width(6).Render("CVV"),
-		m.inputs[exp].View(),
-		m.inputs[cvv].View(),
+		m.inputs[_exp].View(),
+		m.inputs[_cvv].View(),
 		continueStyle.Render("Continue ->"),
 	) + "\n")
 }
 
 // nextInput focuses the next input field
 func (m *model) nextInput() {
-	m.focused = (m.focused + 1) % len(m.inputs)
+	m.focused++
+	if m.focused >= len(m.inputs)-1 {
+		m.focused = len(m.inputs) - 1
+	}
 }
 
 // prevInput focuses the previous input field
