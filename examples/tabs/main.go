@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/lipgloss"
 )
@@ -41,44 +42,47 @@ func tabBorderWithBottom(left, middle, right string) lipgloss.Border {
 var (
 	inactiveTabBorder = tabBorderWithBottom("┴", "─", "┴")
 	activeTabBorder   = tabBorderWithBottom("┘", " ", "└")
-	docStyle          = lipgloss.NewStyle().Padding(1, 2, 1, 2)
-	highlightColor    = lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}
-	inactiveTabStyle  = lipgloss.NewStyle().Border(inactiveTabBorder, true).BorderForeground(highlightColor).Padding(0, 1)
-	activeTabStyle    = inactiveTabStyle.Copy().Border(activeTabBorder, true)
-	windowStyle       = lipgloss.NewStyle().BorderForeground(highlightColor).Padding(2, 0).Align(lipgloss.Center).Border(lipgloss.NormalBorder()).UnsetBorderTop()
+	docStyle          = lipgloss.NewStyle().
+				Padding(1, 2, 1, 2)
+	highlightColor   = lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}
+	inactiveTabStyle = lipgloss.NewStyle().
+				Border(inactiveTabBorder, true).
+				BorderForeground(highlightColor).
+				Padding(0, 1)
+	activeTabStyle = inactiveTabStyle.Copy().
+			Border(activeTabBorder, true)
+	windowStyle = lipgloss.NewStyle().
+			BorderForeground(highlightColor).
+			Padding(2, 0).
+			Align(lipgloss.Center).
+			Border(lipgloss.NormalBorder()).
+			UnsetBorderTop()
 )
 
 func (m *model) View(r tea.Renderer) {
-	doc := strings.Builder{}
+	renderedTabs := fun.Map[string](
+		m.Tabs,
+		func(t string, i int) string {
+			isActive := i == m.activeTab
+			style := fun.IF(isActive, activeTabStyle, inactiveTabStyle).Copy()
+			border := style.GetBorderStyle()
+			switch {
+			case i == 0: // first
+				border.BottomLeft = fun.IF(isActive, "│", "├")
+			case i == len(m.Tabs)-1: // last
+				border.BottomRight = fun.IF(isActive, "│", "┤")
+			}
+			style = style.Border(border)
+			return style.Render(t)
+		})
 
-	var renderedTabs []string
-
-	for i, t := range m.Tabs {
-		var style lipgloss.Style
-		isFirst, isLast, isActive := i == 0, i == len(m.Tabs)-1, i == m.activeTab
-		if isActive {
-			style = activeTabStyle.Copy()
-		} else {
-			style = inactiveTabStyle.Copy()
-		}
-		border, _, _, _, _ := style.GetBorder()
-		if isFirst && isActive {
-			border.BottomLeft = "│"
-		} else if isFirst && !isActive {
-			border.BottomLeft = "├"
-		} else if isLast && isActive {
-			border.BottomRight = "│"
-		} else if isLast && !isActive {
-			border.BottomRight = "┤"
-		}
-		style = style.Border(border)
-		renderedTabs = append(renderedTabs, style.Render(t))
-	}
-
+	var doc strings.Builder
 	row := lipgloss.JoinHorizontal(lipgloss.Top, renderedTabs...)
 	doc.WriteString(row)
 	doc.WriteString("\n")
-	doc.WriteString(windowStyle.Width((lipgloss.Width(row) - windowStyle.GetHorizontalFrameSize())).Render(m.TabContent[m.activeTab]))
+	doc.WriteString(windowStyle.
+		Width(lipgloss.Width(row) - windowStyle.GetHorizontalFrameSize()).
+		Render(m.TabContent[m.activeTab]))
 	r.Write(docStyle.Render(doc.String()))
 }
 
