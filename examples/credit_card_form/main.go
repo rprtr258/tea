@@ -62,8 +62,8 @@ func expValidator(s string) error {
 	// The 3 character should be a slash (/)
 	// The rest should be numbers
 	e := strings.ReplaceAll(s, "/", "")
-	_, err := strconv.ParseInt(e, 10, 64)
-	if err != nil {
+
+	if _, err := strconv.ParseInt(e, 10, 64); err != nil {
 		return fmt.Errorf("EXP is invalid")
 	}
 
@@ -84,31 +84,34 @@ func cvvValidator(s string) error {
 }
 
 func initialModel() *model {
-	var inputs []textinput.Model = make([]textinput.Model, 3)
-	inputs[ccn] = textinput.New()
-	inputs[ccn].Placeholder = "4505 **** **** 1234"
-	inputs[ccn].Focus()
-	inputs[ccn].CharLimit = 20
-	inputs[ccn].Width = 30
-	inputs[ccn].Prompt = ""
-	inputs[ccn].Validate = ccnValidator
+	ccnInput := textinput.New()
+	ccnInput.Placeholder = "4505 **** **** 1234"
+	ccnInput.Focus()
+	ccnInput.CharLimit = 20
+	ccnInput.Width = 30
+	ccnInput.Prompt = ""
+	ccnInput.Validate = ccnValidator
 
-	inputs[exp] = textinput.New()
-	inputs[exp].Placeholder = "MM/YY "
-	inputs[exp].CharLimit = 5
-	inputs[exp].Width = 5
-	inputs[exp].Prompt = ""
-	inputs[exp].Validate = expValidator
+	expInput := textinput.New()
+	expInput.Placeholder = "MM/YY "
+	expInput.CharLimit = 5
+	expInput.Width = 5
+	expInput.Prompt = ""
+	expInput.Validate = expValidator
 
-	inputs[cvv] = textinput.New()
-	inputs[cvv].Placeholder = "XXX"
-	inputs[cvv].CharLimit = 3
-	inputs[cvv].Width = 5
-	inputs[cvv].Prompt = ""
-	inputs[cvv].Validate = cvvValidator
+	cvvInput := textinput.New()
+	cvvInput.Placeholder = "XXX"
+	cvvInput.CharLimit = 3
+	cvvInput.Width = 5
+	cvvInput.Prompt = ""
+	cvvInput.Validate = cvvValidator
 
 	return &model{
-		inputs:  inputs,
+		inputs: []textinput.Model{
+			ccn: ccnInput,
+			exp: expInput,
+			cvv: cvvInput,
+		},
 		focused: 0,
 		err:     nil,
 	}
@@ -118,18 +121,17 @@ func (m *model) Init(f func(...tea.Cmd)) {
 	f(textinput.Blink)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
-	switch msg := msg.(type) {
-	case tea.MsgKey:
+func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
+	if msg, ok := msg.(tea.MsgKey); ok {
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.focused == len(m.inputs)-1 {
-				f(tea.Quit)
+				yield(tea.Quit)
 				return
 			}
 			m.nextInput()
 		case tea.KeyCtrlC, tea.KeyEsc:
-			f(tea.Quit)
+			yield(tea.Quit)
 			return
 		case tea.KeyShiftTab, tea.KeyCtrlP:
 			m.prevInput()
@@ -143,7 +145,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 
 	for i := range m.inputs {
-		f(m.inputs[i].Update(msg)...)
+		yield(m.inputs[i].Update(msg)...)
 	}
 }
 
