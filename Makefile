@@ -6,6 +6,7 @@ test:
 .PHONY: fmt
 fmt:
 	@gofumpt -l -w .
+	@gci write --skip-generated -s standard -s default -s 'prefix(github.com/rprtr258/tea)' --custom-order .
 
 .PHONY: run-examples
 run-examples:
