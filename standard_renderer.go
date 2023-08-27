@@ -21,6 +21,9 @@ const (
 	maxFPS     = 120
 )
 
+// msgRepaint forces a full repaint.
+type msgRepaint struct{}
+
 // standardRenderer is a framerate-based terminal renderer, updating the view
 // at a given framerate to avoid overloading the terminal emulator.
 //

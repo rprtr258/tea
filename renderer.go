@@ -44,6 +44,3 @@ type Renderer interface { //nolint:interfacebloat // TODO: remove after monomorp
 
 	handleMessages(Msg)
 }
-
-// msgRepaint forces a full repaint.
-type msgRepaint struct{}
