@@ -12,6 +12,7 @@ import (
 	"github.com/muesli/ansi/compressor"
 	"github.com/muesli/reflow/truncate"
 	"github.com/muesli/termenv"
+	"github.com/rprtr258/fun"
 )
 
 const (
@@ -60,22 +61,18 @@ type standardRenderer struct {
 // newRenderer creates a new renderer. Normally you'll want to initialize it
 // with os.Stdout as the first argument.
 func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) Renderer {
-	if fps < 1 {
-		fps = defaultFPS
-	}
-	fps = min(fps, maxFPS)
-	r := &standardRenderer{
-		out:                out,
+	fps = min(fun.IF(fps >= 1, fps, defaultFPS), maxFPS)
+	return &standardRenderer{
+		out: fun.IF(
+			useANSICompressor,
+			termenv.NewOutput(&compressor.Writer{Forward: out}),
+			out),
 		mu:                 &sync.Mutex{},
 		done:               make(chan struct{}),
 		frameDuration:      time.Second / time.Duration(fps),
 		useANSICompressor:  useANSICompressor,
 		queuedMessageLines: []string{},
 	}
-	if r.useANSICompressor {
-		r.out = termenv.NewOutput(&compressor.Writer{Forward: out})
-	}
-	return r
 }
 
 // start starts the renderer.
@@ -169,23 +166,25 @@ func (r *standardRenderer) flush() {
 	}
 
 	numLinesThisFlush := len(newLines)
-	oldLines := strings.Split(r.lastRender, "\n")
-	skipLines := make(map[int]struct{})
-	flushQueuedMessages := len(r.queuedMessageLines) > 0 && !r.altScreenActive
 
 	// Add any queued messages to this render
-	if flushQueuedMessages {
+	if len(r.queuedMessageLines) > 0 && !r.altScreenActive { // flushQueuedMessages
 		newLines = append(r.queuedMessageLines, newLines...)
 		r.queuedMessageLines = []string{}
 	}
 
+	oldLines := strings.Split(r.lastRender, "\n")
+
+	skipLines := make(map[int]struct{})
 	// Clear any lines we painted in the last render.
 	if r.linesRendered > 0 {
 		for i := r.linesRendered - 1; i > 0; i-- {
 			// If the number of lines we want to render hasn't increased and
 			// new line is the same as the old line we can skip rendering for
 			// this line as a performance optimization.
-			if (len(newLines) <= len(oldLines)) && (len(newLines) > i && len(oldLines) > i) && (newLines[i] == oldLines[i]) {
+			if len(newLines) <= len(oldLines) &&
+				len(newLines) > i && len(oldLines) > i &&
+				newLines[i] == oldLines[i] {
 				skipLines[i] = struct{}{}
 			} else if _, exists := r.ignoreLines[i]; !exists {
 				out.ClearLine()
