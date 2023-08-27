@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -68,17 +67,19 @@ func (m *model) View(r tea.Renderer) {
 		return
 	}
 
-	var s strings.Builder
-	s.WriteString("\n  ")
-	if m.err != nil {
-		s.WriteString(m.filepicker.Styles.DisabledFile.Render(m.err.Error()))
-	} else if m.selectedFile == "" {
-		s.WriteString("Pick a file:")
-	} else {
-		s.WriteString("Selected file: " + m.filepicker.Styles.Selected.Render(m.selectedFile))
+	r.Write("\n  ")
+	switch {
+	case m.err != nil:
+		r.Write(m.filepicker.Styles.DisabledFile.Render(m.err.Error()))
+	case m.selectedFile == "":
+		r.Write("Pick a file:")
+	default:
+		r.Write("Selected file: ")
+		r.Write(m.filepicker.Styles.Selected.Render(m.selectedFile))
 	}
-	s.WriteString("\n\n" + m.filepicker.View() + "\n")
-	r.Write(s.String())
+	r.Write("\n\n")
+	r.Write(m.filepicker.View())
+	r.Write("\n")
 }
 
 func Main(ctx context.Context) error {
