@@ -8,6 +8,7 @@ import (
 	"github.com/atotto/clipboard"
 	rw "github.com/mattn/go-runewidth"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/cursor"
 	"github.com/rprtr258/tea/bubbles/key"
@@ -1036,12 +1037,11 @@ func (m *Model) View() string {
 	for l, line := range m.value {
 		wrappedLines := wrap(line, m.width)
 
-		var style lipgloss.Style
-		if m.row == l {
-			style = m.style.CursorLine
-		} else {
-			style = m.style.Text
-		}
+		style := fun.IF(
+			m.row == l,
+			m.style.CursorLine,
+			m.style.Text,
+		)
 
 		for wl, wrappedLine := range wrappedLines {
 			prompt := m.getPromptString(displayLine)
@@ -1051,11 +1051,11 @@ func (m *Model) View() string {
 
 			if m.ShowLineNumbers {
 				if wl == 0 {
-					if m.row == l {
-						s.WriteString(style.Render(m.style.CursorLineNumber.Render(fmt.Sprintf(m.lineNumberFormat, l+1))))
-					} else {
-						s.WriteString(style.Render(m.style.LineNumber.Render(fmt.Sprintf(m.lineNumberFormat, l+1))))
-					}
+					s.WriteString(style.Render(fun.IF(
+						m.row == l,
+						m.style.CursorLineNumber.Render(fmt.Sprintf(m.lineNumberFormat, l+1)),
+						m.style.LineNumber.Render(fmt.Sprintf(m.lineNumberFormat, l+1)),
+					)))
 				} else {
 					s.WriteString(m.style.LineNumber.Render(style.Render("   ")))
 				}
