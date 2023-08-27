@@ -152,10 +152,6 @@ func (r *standardRenderer) flush() {
 		return
 	}
 
-	// Output buffer
-	buf := &bytes.Buffer{}
-	out := termenv.NewOutput(buf)
-
 	newLines := strings.Split(r.buf.String(), "\n")
 
 	// If we know the output's height, we can use it to determine how many
@@ -188,10 +184,10 @@ func (r *standardRenderer) flush() {
 				newLines[i] == oldLines[i] {
 				skipLines[i] = struct{}{}
 			} else if _, exists := r.ignoreLines[i]; !exists {
-				out.ClearLine()
+				r.out.ClearLine()
 			}
 
-			out.CursorUp(1)
+			r.out.CursorUp(1)
 		}
 
 		if _, exists := r.ignoreLines[0]; !exists {
@@ -204,8 +200,8 @@ func (r *standardRenderer) flush() {
 			// standard (whereas others are proprietary to, say, VT100/VT52).
 			// If cursor previous line (ESC[ + <n> + F) were better supported
 			// we could use that above to eliminate this step.
-			out.CursorBack(r.width)
-			out.ClearLine()
+			r.out.CursorBack(r.width)
+			r.out.ClearLine()
 		}
 	}
 
@@ -218,7 +214,7 @@ func (r *standardRenderer) flush() {
 		if _, skip := skipLines[i]; skip {
 			// Unless this is the last line, move the cursor down.
 			if i < len(newLines)-1 {
-				out.CursorDown(1)
+				r.out.CursorDown(1)
 			}
 		} else {
 			line := newLines[i]
@@ -234,10 +230,10 @@ func (r *standardRenderer) flush() {
 				line = truncate.String(line, uint(r.width))
 			}
 
-			_, _ = out.WriteString(line)
+			_, _ = r.out.WriteString(line)
 
 			if i < len(newLines)-1 {
-				_, _ = out.WriteString("\r\n")
+				_, _ = r.out.WriteString("\r\n")
 			}
 		}
 	}
@@ -249,12 +245,11 @@ func (r *standardRenderer) flush() {
 		// This case fixes a bug in macOS terminal. In other terminals the
 		// other case seems to do the job regardless of whether or not we're
 		// using the full terminal window.
-		out.MoveCursor(r.linesRendered, 0)
+		r.out.MoveCursor(r.linesRendered, 0)
 	} else {
-		out.CursorBack(r.width)
+		r.out.CursorBack(r.width)
 	}
 
-	_, _ = r.out.Write(buf.Bytes())
 	r.lastRender = r.buf.String()
 	r.buf.Reset()
 }
