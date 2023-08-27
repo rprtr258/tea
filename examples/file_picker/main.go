@@ -26,24 +26,24 @@ func clearErrorAfter(t time.Duration) tea.Cmd {
 	})
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(m.filepicker.Init())
+func (m *model) Init(yield func(...tea.Cmd)) {
+	m.filepicker.Init(yield)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
-			f(tea.Quit)
+			yield(tea.Quit)
 			return
 		}
 	case msgClearError:
 		m.err = nil
 	}
 
-	f(m.filepicker.Update(msg)...)
+	yield(m.filepicker.Update(msg)...)
 
 	// Did the user select a file?
 	if didSelect, path := m.filepicker.DidSelectFile(msg); didSelect {
@@ -57,7 +57,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		// Let's clear the selectedFile and display an error.
 		m.err = errors.New(path + " is not valid.")
 		m.selectedFile = ""
-		f(clearErrorAfter(2 * time.Second))
+		yield(clearErrorAfter(2 * time.Second))
 	}
 }
 
