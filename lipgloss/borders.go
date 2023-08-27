@@ -71,7 +71,8 @@ var (
 		BottomRight: "┘",
 	}
 
-	roundedBorder = Border{
+	// RoundedBorder is a border with rounded corners.
+	RoundedBorder = Border{
 		Top:         "─",
 		Bottom:      "─",
 		Left:        "│",
@@ -153,11 +154,6 @@ var (
 // degree corners.
 func NormalBorder() Border {
 	return normalBorder
-}
-
-// RoundedBorder returns a border with rounded corners.
-func RoundedBorder() Border {
-	return roundedBorder
 }
 
 // BlockBorder returns a border that takes the whole block.

@@ -34,7 +34,7 @@ var (
 				Foreground(lipgloss.Color("99"))
 
 	focusedBorderStyle = lipgloss.NewStyle().
-				Border(lipgloss.RoundedBorder()).
+				Border(lipgloss.RoundedBorder).
 				BorderForeground(lipgloss.Color("238"))
 
 	blurredBorderStyle = lipgloss.NewStyle().

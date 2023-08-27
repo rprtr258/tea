@@ -31,7 +31,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func tabBorderWithBottom(left, middle, right string) lipgloss.Border {
-	border := lipgloss.RoundedBorder()
+	border := lipgloss.RoundedBorder
 	border.BottomLeft = left
 	border.Bottom = middle
 	border.BottomRight = right
