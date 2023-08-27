@@ -59,12 +59,9 @@ func (m *model) View(r tea.Renderer) {
 
 func TestApp(t *testing.T) {
 	m := model(10)
-	tm := teatest.NewTestModel(t, &m,
+	tm := teatest.NewTestModelFixture(t, &m,
 		teatest.WithInitialTermSize(70, 30),
 	)
-	t.Cleanup(func() {
-		assert.NoError(t, tm.Quit())
-	})
 
 	time.Sleep(time.Second + time.Millisecond*200)
 	tm.Type("I'm typing things, but it'll be ignored by my program")
@@ -84,7 +81,7 @@ func TestApp(t *testing.T) {
 
 func TestAppInteractive(t *testing.T) {
 	m := model(10)
-	tm := teatest.NewTestModel(t, &m, teatest.WithInitialTermSize(70, 30))
+	tm := teatest.NewTestModelFixture(t, &m, teatest.WithInitialTermSize(70, 30))
 
 	time.Sleep(time.Second + time.Millisecond*200)
 	tm.Send("ignored msg")
@@ -99,8 +96,6 @@ func TestAppInteractive(t *testing.T) {
 	tm.Send(tea.MsgKey{
 		Type: tea.KeyEnter,
 	})
-
-	assert.NoError(t, tm.Quit())
 
 	assert.Equal(t, model(7), *tm.FinalModel(t))
 }

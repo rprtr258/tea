@@ -128,8 +128,8 @@ type TestModel[M tea.Model] struct {
 	doneCh chan bool
 }
 
-// NewTestModel makes a new TestModel which can be used for tests.
-func NewTestModel[M tea.Model](t *testing.T, m M, options ...TestOption) *TestModel[M] {
+// NewTestModelFixture makes a new TestModel which can be used for tests.
+func NewTestModelFixture[M tea.Model](t *testing.T, m M, options ...TestOption) *TestModel[M] {
 	tm := &TestModel[M]{
 		in:      bytes.NewBuffer(nil),
 		out:     safe(bytes.NewBuffer(nil)),
@@ -165,6 +165,11 @@ func NewTestModel[M tea.Model](t *testing.T, m M, options ...TestOption) *TestMo
 	if opts.size.Width != 0 {
 		tm.program.Send(opts.size)
 	}
+
+	t.Cleanup(func() {
+		assert.NoError(t, tm.Quit())
+	})
+
 	return tm
 }
 
