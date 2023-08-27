@@ -6,6 +6,7 @@ import (
 
 	"github.com/muesli/termenv"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 )
 
@@ -51,12 +52,11 @@ func (m *model) View(r tea.Renderer) {
 		inlineMode    = " inline mode "
 	)
 
-	var mode string
-	if m.altscreen {
-		mode = altscreenMode
-	} else {
-		mode = inlineMode
-	}
+	mode := fun.IF(
+		m.altscreen,
+		altscreenMode,
+		inlineMode,
+	)
 
 	r.Write(fmt.Sprintf("\n\n  You're in %s\n\n\n%s", keyword(mode), help("  space: switch modes • q: exit\n")))
 }
