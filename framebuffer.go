@@ -49,30 +49,30 @@ func NewFramebuffer(height, width int) FrameBuffer {
 // Render framebuffer to string
 func (fb FrameBuffer) Render() string {
 	// OPTIMIZE: strings.Builder
-	rows := make([]string, fb.Height)
+	var sb strings.Builder
 	bg := ""
 	fg := ""
 	for y := 0; y < fb.Height; y++ {
+		if y > 0 {
+			sb.WriteRune('\n')
+		}
+
 		fullRow := fb.B[y*fb.Width : (y+1)*fb.Width]
-		newRow := ""
 		for x := 0; x < fb.Width; x++ {
-			coloring := ""
 			if fb.backgrounds[y*fb.Width+x] != bg || fb.foregrounds[y*fb.Width+x] != fg {
 				bg = fb.backgrounds[y*fb.Width+x]
 				fg = fb.foregrounds[y*fb.Width+x]
-				coloring = ctrlSeq(termenv.ResetSeq) + lo.
+				sb.WriteString(ctrlSeq(termenv.ResetSeq) + lo.
 					Switch[bool, string](true).
 					Case(bg == "" && fg == "", "").
 					Case(bg == "", ctrlSeq(fg)).
 					Case(fg == "", ctrlSeq(bg)).
-					Default(ctrlSeq(bg+";"+fg))
+					Default(ctrlSeq(bg+";"+fg)))
 			}
-			newRow += coloring + string([]rune{fullRow[x]})
+			sb.WriteRune(fullRow[x])
 		}
-
-		rows[y] = newRow
 	}
-	return strings.Join(rows, "\n")
+	return sb.String()
 }
 
 // Row returns view to current viewbox's row
