@@ -117,8 +117,8 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(textinput.Blink)
+func (m *model) Init(yield func(...tea.Cmd)) {
+	yield(textinput.Blink)
 }
 
 func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
