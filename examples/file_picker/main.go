@@ -78,7 +78,7 @@ func (m *model) View(r tea.Renderer) {
 		r.Write(m.filepicker.Styles.Selected.Render(m.selectedFile))
 	}
 	r.Write("\n\n")
-	r.Write(m.filepicker.View())
+	m.filepicker.View(r)
 	r.Write("\n")
 }
 

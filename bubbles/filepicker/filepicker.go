@@ -355,12 +355,12 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 // View returns the view of the file picker.
-func (m *Model) View() string {
+func (m *Model) View(r tea.Renderer) {
 	if len(m.files) == 0 {
-		return m.Styles.EmptyDirectory.String()
+		r.Write(m.Styles.EmptyDirectory.String())
+		return
 	}
 
-	var s strings.Builder
 	for i, f := range m.files {
 		if i < m.min || i > m.max {
 			continue
@@ -387,11 +387,13 @@ func (m *Model) View() string {
 				selected = fmt.Sprintf("%s → %s", selected, symlinkPath)
 			}
 			if disabled {
-				s.WriteString(m.Styles.DisabledSelected.Render(m.Cursor) + m.Styles.DisabledSelected.Render(selected))
+				r.Write(m.Styles.DisabledSelected.Render(m.Cursor))
+				r.Write(m.Styles.DisabledSelected.Render(selected))
 			} else {
-				s.WriteString(m.Styles.Cursor.Render(m.Cursor) + m.Styles.Selected.Render(selected))
+				r.Write(m.Styles.Cursor.Render(m.Cursor))
+				r.Write(m.Styles.Selected.Render(selected))
 			}
-			s.WriteRune('\n')
+			r.Write("\n")
 			continue
 		}
 
@@ -409,16 +411,14 @@ func (m *Model) View() string {
 		if isSymlink {
 			fileName = fmt.Sprintf("%s → %s", fileName, symlinkPath)
 		}
-		s.WriteString(fmt.Sprintf(
+		r.Write(fmt.Sprintf(
 			"  %s %s %s",
 			m.Styles.Permission.Render(info.Mode().String()),
 			m.Styles.FileSize.Render(size),
 			fileName,
 		))
-		s.WriteRune('\n')
+		r.Write("\n")
 	}
-
-	return s.String()
 }
 
 // DidSelectFile returns whether a user has selected a file (on this msg).
