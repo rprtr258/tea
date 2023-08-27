@@ -99,16 +99,21 @@ func (m *model) View(r tea.Renderer) {
 	pkgCount := fmt.Sprintf(" %*d/%*d", w, m.index, w, n-1)
 
 	spin := m.spinner.View() + " "
+	r.Write(spin)
+
 	prog := m.progress.View()
 	cellsAvail := max(0, m.width-lipgloss.Width(spin+prog+pkgCount))
 
 	pkgName := currentPkgNameStyle.Render(m.packages[m.index])
 	info := lipgloss.NewStyle().MaxWidth(cellsAvail).Render("Installing " + pkgName)
+	r.Write(info)
 
 	cellsRemaining := max(0, m.width-lipgloss.Width(spin+info+prog+pkgCount))
 	gap := strings.Repeat(" ", cellsRemaining)
+	r.Write(gap)
 
-	r.Write(spin + info + gap + prog + pkgCount)
+	r.Write(prog)
+	r.Write(pkgCount)
 }
 
 type msgInstalledPkg string

@@ -6,7 +6,6 @@ package cellbuffer
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/harmonica"
@@ -113,14 +112,12 @@ func (c cellbuffer) ready() bool {
 }
 
 func (c cellbuffer) Render(r tea.Renderer) {
-	var sb strings.Builder
 	for i := 0; i < len(c.cells); i++ {
 		if i > 0 && i%c.stride == 0 && i < len(c.cells)-1 {
-			sb.WriteRune('\n')
+			r.Write("\n")
 		}
-		sb.WriteByte(c.cells[i])
+		r.Write(string(c.cells[i]))
 	}
-	r.Write(sb.String())
 }
 
 type msgFrame struct{}

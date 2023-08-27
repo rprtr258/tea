@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/muesli/termenv"
-
 	"github.com/rprtr258/fun"
+
 	"github.com/rprtr258/tea"
 )
 

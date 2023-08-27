@@ -100,11 +100,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(m.viewport.View() + m.helpView())
-}
-
-func (e *model) helpView() string {
-	return helpStyle("\n  ↑/↓: Navigate • q: Quit\n")
+	r.Write(m.viewport.View())
+	r.Write(helpStyle("\n  ↑/↓: Navigate • q: Quit\n"))
 }
 
 func Main(ctx context.Context) error {

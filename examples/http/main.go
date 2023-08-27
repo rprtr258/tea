@@ -11,7 +11,7 @@ import (
 	"github.com/rprtr258/tea"
 )
 
-const url = "https://charm.sh/"
+const _url = "https://charm.sh/"
 
 type model struct {
 	status int
@@ -43,20 +43,25 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	s := fmt.Sprintf("Checking %s...", url)
+	r.Write("Checking ")
+	r.Write(_url)
+	r.Write("...")
 	if m.err != nil {
-		s += fmt.Sprintf("something went wrong: %s", m.err)
+		r.Write("something went wrong: ")
+		r.Write(m.err.Error())
 	} else if m.status != 0 {
-		s += fmt.Sprintf("%d %s", m.status, http.StatusText(m.status))
+		r.Write(fmt.Sprint(m.status))
+		r.Write(" ")
+		r.Write(http.StatusText(m.status))
 	}
-	r.Write(s + "\n")
+	r.Write("\n")
 }
 
 func checkServer() tea.Msg {
 	c := &http.Client{
 		Timeout: 10 * time.Second,
 	}
-	res, err := c.Get(url)
+	res, err := c.Get(_url)
 	if err != nil {
 		return msgErr{err}
 	}

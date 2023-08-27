@@ -117,15 +117,17 @@ func (m *mainModel) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *mainModel) View(r tea.Renderer) {
-	var s string
 	model := m.currentFocusedModel()
-	if m.state == timerView {
-		s += lipgloss.JoinHorizontal(lipgloss.Top, focusedModelStyle.Render(fmt.Sprintf("%4s", m.timer.View())), modelStyle.Render(m.spinner.View()))
-	} else {
-		s += lipgloss.JoinHorizontal(lipgloss.Top, modelStyle.Render(fmt.Sprintf("%4s", m.timer.View())), focusedModelStyle.Render(m.spinner.View()))
+	aStyle, bStyle := focusedModelStyle, modelStyle
+	if m.state != timerView {
+		aStyle, bStyle = modelStyle, focusedModelStyle
 	}
-	s += helpStyle.Render(fmt.Sprintf("\ntab: focus next • n: new %s • q: exit\n", model))
-	r.Write(s)
+	r.Write(lipgloss.JoinHorizontal(
+		lipgloss.Top,
+		aStyle.Render(fmt.Sprintf("%4s", m.timer.View())),
+		bStyle.Render(m.spinner.View()),
+	))
+	r.Write(helpStyle.Render(fmt.Sprintf("\ntab: focus next • n: new %s • q: exit\n", model)))
 }
 
 func (m mainModel) currentFocusedModel() string {

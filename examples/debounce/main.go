@@ -52,8 +52,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf("Key presses: %d", m.tag) +
-		"\nTo exit press any key, then wait for one second without pressing anything.")
+	r.Write("Key presses: ")
+	r.Write(fmt.Sprint(m.tag))
+	r.Write("\nTo exit press any key, then wait for one second without pressing anything.")
 }
 
 func Main(ctx context.Context) error {

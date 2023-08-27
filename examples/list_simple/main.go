@@ -84,7 +84,8 @@ func (m *model) View(r tea.Renderer) {
 		return
 	}
 
-	r.Write("\n" + m.list.View())
+	r.Write("\n")
+	r.Write(m.list.View())
 }
 
 func Main(ctx context.Context) error {

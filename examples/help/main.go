@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
 	"github.com/rprtr258/tea/bubbles/key"
@@ -115,17 +116,18 @@ func (m *model) View(r tea.Renderer) {
 		return
 	}
 
-	var status string
-	if m.lastKey == "" {
-		status = "Waiting for input..."
-	} else {
-		status = "You chose: " + m.inputStyle.Render(m.lastKey)
-	}
+	status := fun.IF(
+		m.lastKey == "",
+		"Waiting for input...",
+		"You chose: "+m.inputStyle.Render(m.lastKey),
+	)
 
 	helpView := m.help.View(m.keys)
-	height := 8 - strings.Count(status, "\n") - strings.Count(helpView, "\n")
 
-	r.Write("\n" + status + strings.Repeat("\n", height) + helpView)
+	r.Write("\n")
+	r.Write(status)
+	r.Write(strings.Repeat("\n", 8-strings.Count(status, "\n")-strings.Count(helpView, "\n")))
+	r.Write(helpView)
 }
 
 func Main(ctx context.Context) error {

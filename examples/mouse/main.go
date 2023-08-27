@@ -30,14 +30,12 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	s := "Do mouse stuff. When you're done press q to quit.\n\n"
+	r.Write("Do mouse stuff. When you're done press q to quit.\n\n")
 
 	if m.init {
 		e := m.mouseEvent
-		s += fmt.Sprintf("(X: %d, Y: %d) %s", e.X, e.Y, e)
+		r.Write(fmt.Sprintf("(X: %d, Y: %d) %s", e.X, e.Y, e))
 	}
-
-	r.Write(s)
 }
 
 func Main(ctx context.Context) error {

@@ -78,11 +78,10 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf(
-		"%s\n\n%s",
-		m.viewport.View(),
-		m.textarea.View(),
-	) + "\n\n")
+	r.Write(m.viewport.View())
+	r.Write("\n\n")
+	r.Write(m.textarea.View())
+	r.Write("\n\n")
 }
 
 func Main(ctx context.Context) error {

@@ -160,7 +160,8 @@ func (m *model) View(r tea.Renderer) {
  %s  %s
 
  %s
-`,
+
+ `,
 		inputStyle.Width(30).Render("Card Number"),
 		m.inputs[_ccn].View(),
 		inputStyle.Width(6).Render("EXP"),
@@ -168,7 +169,7 @@ func (m *model) View(r tea.Renderer) {
 		m.inputs[_exp].View(),
 		m.inputs[_cvv].View(),
 		continueStyle.Render("Continue ->"),
-	) + "\n")
+	))
 }
 
 // nextInput focuses the next input field
