@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/harmonica"
+
 	"github.com/rprtr258/tea"
 )
 

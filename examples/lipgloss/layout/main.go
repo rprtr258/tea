@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/rprtr258/tea/lipgloss"
 	"golang.org/x/term"
+
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 const (

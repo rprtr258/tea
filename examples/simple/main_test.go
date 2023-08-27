@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/tea/lipgloss"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/lipgloss"
 	"github.com/rprtr258/tea/x/teatest"
 )
 

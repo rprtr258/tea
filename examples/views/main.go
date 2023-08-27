@@ -18,6 +18,7 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/indent"
 	"github.com/muesli/termenv"
+
 	"github.com/rprtr258/tea"
 )
 

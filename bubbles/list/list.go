@@ -12,9 +12,9 @@ import (
 
 	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/reflow/truncate"
+	"github.com/rprtr258/fun"
 	"github.com/sahilm/fuzzy"
 
-	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/help"
 	"github.com/rprtr258/tea/bubbles/key"

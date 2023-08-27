@@ -21,6 +21,7 @@ import (
 	lm "github.com/charmbracelet/wish/logging"
 	"github.com/creack/pty"
 	"github.com/muesli/termenv"
+
 	"github.com/rprtr258/tea/lipgloss"
 )
 
