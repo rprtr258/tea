@@ -136,14 +136,14 @@ type model struct {
 	xVelocity, yVelocity float64
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(animate)
+func (m *model) Init(yield func(...tea.Cmd)) {
+	yield(animate)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		f(tea.Quit)
+		yield(tea.Quit)
 	case tea.MsgWindowSize:
 		if !m.cells.ready() {
 			m.targetX, m.targetY = float64(msg.Width)/2, float64(msg.Height)/2
@@ -153,6 +153,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		if !m.cells.ready() {
 			return
 		}
+
 		m.targetX, m.targetY = float64(msg.X), float64(msg.Y)
 	case msgFrame:
 		if !m.cells.ready() {
@@ -163,7 +164,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		m.x, m.xVelocity = m.spring.Update(m.x, m.xVelocity, m.targetX)
 		m.y, m.yVelocity = m.spring.Update(m.y, m.yVelocity, m.targetY)
 		drawEllipse(&m.cells, m.x, m.y, 16, 8)
-		f(animate)
+		yield(animate)
 	}
 }
 
