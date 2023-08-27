@@ -17,7 +17,7 @@ const (
 	_fps       = 60
 	_frequency = 7.5
 	_damping   = 0.15
-	_asterisk  = "*"
+	_asterisk  = '*'
 )
 
 func sqr(x float64) float64 {
@@ -71,7 +71,7 @@ func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
 }
 
 type cellbuffer struct {
-	cells  []string
+	cells  []byte
 	stride int
 }
 
@@ -81,7 +81,7 @@ func (c *cellbuffer) init(w, h int) {
 	}
 
 	c.stride = w
-	c.cells = make([]string, w*h)
+	c.cells = make([]byte, w*h)
 	c.wipe()
 }
 
@@ -95,7 +95,7 @@ func (c cellbuffer) set(x, y int) {
 
 func (c *cellbuffer) wipe() {
 	for i := range c.cells {
-		c.cells[i] = " "
+		c.cells[i] = ' '
 	}
 }
 
@@ -117,7 +117,7 @@ func (c cellbuffer) Render(r tea.Renderer) {
 		if i > 0 && i%c.stride == 0 && i < len(c.cells)-1 {
 			sb.WriteRune('\n')
 		}
-		sb.WriteString(c.cells[i])
+		sb.WriteByte(c.cells[i])
 	}
 	r.Write(sb.String())
 }
@@ -154,7 +154,6 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			return
 		}
 		m.targetX, m.targetY = float64(msg.X), float64(msg.Y)
-
 	case msgFrame:
 		if !m.cells.ready() {
 			return
