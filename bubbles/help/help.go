@@ -3,6 +3,7 @@ package help
 import (
 	"strings"
 
+	"github.com/muesli/reflow/ansi"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/key"
 	"github.com/rprtr258/tea/lipgloss"
@@ -149,6 +150,11 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 			}
 			keys = append(keys, kb.Help().Key)
 			descriptions = append(descriptions, kb.Help().Desc)
+		}
+
+		maxKeyLength := 0
+		for _, key := range keys {
+			maxKeyLength = max(maxKeyLength, ansi.PrintableRuneWidth(key))
 		}
 
 		col := lipgloss.JoinHorizontal(lipgloss.Top,
