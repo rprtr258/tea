@@ -207,8 +207,8 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 
 	p := paginator.New()
 	p.Type = paginator.Dots
-	p.ActiveDot = DefaultStyle.ActivePaginationDot.String()
-	p.InactiveDot = DefaultStyle.InactivePaginationDot.String()
+	p.ActiveDot = DefaultStyle.ActivePaginationDot.Render(bullet)
+	p.InactiveDot = DefaultStyle.InactivePaginationDot.Render(bullet)
 
 	m := Model[I]{
 		showTitle:             true,
@@ -1118,7 +1118,7 @@ func (m *Model[I]) statusView() string {
 
 	totalItems := len(m.items)
 	if numFiltered := totalItems - visibleItems; numFiltered > 0 {
-		status += m.Styles.DividerDot.String()
+		status += m.Styles.DividerDot.Render(" " + bullet + " ")
 		status += m.Styles.StatusBarFilterCount.Render(fmt.Sprintf("%d filtered", numFiltered))
 	}
 

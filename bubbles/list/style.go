@@ -76,13 +76,10 @@ var (
 		HelpStyle: lipgloss.NewStyle().
 			Padding(1, 0, 0, 2),
 		ActivePaginationDot: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#847A85", Dark: "#979797"}).
-			SetString(bullet),
+			Foreground(lipgloss.AdaptiveColor{Light: "#847A85", Dark: "#979797"}),
 		InactivePaginationDot: lipgloss.NewStyle().
-			Foreground(verySubduedColor).
-			SetString(bullet),
+			Foreground(verySubduedColor),
 		DividerDot: lipgloss.NewStyle().
-			Foreground(verySubduedColor).
-			SetString(" " + bullet + " "),
+			Foreground(verySubduedColor),
 	}
 )

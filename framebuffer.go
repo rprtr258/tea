@@ -1,9 +1,10 @@
 package tea
 
 import (
-	"strings"
+	"bytes"
+	"fmt"
 
-	"github.com/muesli/termenv"
+	// "github.com/muesli/termenv"
 
 	"github.com/rprtr258/tea/lipgloss"
 )
@@ -16,8 +17,8 @@ type framebuffer struct {
 	Height, Width int
 	B             []rune
 	// OPTIMIZE: store ranges of colors instead of color for every pixel
-	backgrounds, foregrounds []string
-	styles                   []lipgloss.Style
+	// backgrounds, foregrounds []string
+	styles []lipgloss.Style
 }
 
 // Viewbox is a view of the terminal to render to
@@ -43,12 +44,12 @@ func NewViewbox(height, width int) Viewbox {
 
 	return Viewbox{
 		fb: framebuffer{
-			Height:      height,
-			Width:       width,
-			B:           buf,
-			backgrounds: make([]string, height*width),
-			foregrounds: make([]string, height*width),
-			styles:      styles,
+			Height: height,
+			Width:  width,
+			B:      buf,
+			// backgrounds: make([]string, height*width),
+			// foregrounds: make([]string, height*width),
+			styles: styles,
 		},
 		Height: height,
 		Width:  width,
@@ -72,8 +73,8 @@ func (vb *Viewbox) Clear() {
 
 // Render framebuffer to string
 // TODO: optimize
-func (vb Viewbox) Render() string {
-	var sb strings.Builder
+func (vb Viewbox) Render() []byte {
+	var sb bytes.Buffer
 	// bg := ""
 	// fg := ""
 	for y := 0; y < vb.fb.Height*vb.fb.Width; y += vb.fb.Width {
@@ -85,7 +86,7 @@ func (vb Viewbox) Render() string {
 		for x := 0; x < vb.fb.Width; x++ {
 			i := y + x
 
-			sb.WriteString(vb.fb.styles[i].SetString(string([]rune{vb.fb.B[i]})).String())
+			sb.WriteString(vb.fb.styles[i].Render(string([]rune{vb.fb.B[i]})))
 
 			// 	if vb.fb.backgrounds[y+x] != bg || vb.fb.foregrounds[y+x] != fg {
 			// 		bg = vb.fb.backgrounds[y+x]
@@ -100,7 +101,7 @@ func (vb Viewbox) Render() string {
 			// 	sb.WriteRune(fullRow[x])
 		}
 	}
-	return sb.String()
+	return sb.Bytes()
 }
 
 // Row returns view to current viewbox's row
@@ -157,7 +158,7 @@ func (vb Viewbox) WriteLine(y, offsetX int, line string) int {
 // WriteText starting from y, x with wrapping, returns end position
 func (vb Viewbox) WriteText(y, x int, text string) (int, int) {
 	for _, c := range text {
-		if c == '\n' {
+		if c == '\n' { // TODO: remove
 			x = 0
 			y++
 			continue
@@ -180,23 +181,27 @@ func (vb Viewbox) Set(y, x int, c rune) {
 		return
 	}
 
+	if c == '\n' {
+		panic(fmt.Sprintf("unexpected newline: %d, %d", y, x))
+	}
+
 	i := (vb.Y+y)*vb.fb.Width + vb.X + x
 	vb.fb.B[i] = c
 	vb.fb.styles[i] = vb.style
 }
 
-// background colors y'th row bacground to given color from x1 to x2 with
-// coordinates relative to viewbox
-func (vb Viewbox) background(y, x1, x2 int, background termenv.Color) {
-	for x := x1 + vb.X; x < x2+vb.X; x++ {
-		vb.fb.backgrounds[(y+vb.Y)*vb.fb.Width+x] = background.Sequence(true)
-	}
-}
+// // background colors y'th row bacground to given color from x1 to x2 with
+// // coordinates relative to viewbox
+// func (vb Viewbox) background(y, x1, x2 int, background termenv.Color) {
+// 	for x := x1 + vb.X; x < x2+vb.X; x++ {
+// 		vb.fb.backgrounds[(y+vb.Y)*vb.fb.Width+x] = background.Sequence(true)
+// 	}
+// }
 
-// Background colors y'th row foreground to given color from x1 to x2 with
-// coordinates relative to viewbox
-func (vb Viewbox) foreground(y, x1, x2 int, foreground termenv.Color) {
-	for x := x1 + vb.X; x < x2+vb.X; x++ {
-		vb.fb.foregrounds[(y+vb.Y)*vb.fb.Width+x] = foreground.Sequence(false)
-	}
-}
+// // Background colors y'th row foreground to given color from x1 to x2 with
+// // coordinates relative to viewbox
+// func (vb Viewbox) foreground(y, x1, x2 int, foreground termenv.Color) {
+// 	for x := x1 + vb.X; x < x2+vb.X; x++ {
+// 		vb.fb.foregrounds[(y+vb.Y)*vb.fb.Width+x] = foreground.Sequence(false)
+// 	}
+// }

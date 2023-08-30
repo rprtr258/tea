@@ -4,7 +4,7 @@ package tea
 type Renderer interface { //nolint:interfacebloat // TODO: remove after monomorphization
 	// Write a frame to the renderer. The renderer can write this data to
 	// output at its discretion.
-	Write(string)
+	Write([]byte)
 	reset()
 
 	// start the renderer

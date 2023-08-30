@@ -261,19 +261,11 @@ func (r *standardRenderer) reset() {
 
 // write writes to the internal buffer. The buffer will be outputted via the
 // ticker which calls flush().
-func (r *standardRenderer) Write(s string) {
+func (r *standardRenderer) Write(s []byte) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// If an empty string was passed we should clear existing output and
-	// rendering nothing. Rather than introduce additional state to manage
-	// this, we render a single space as a simple (albeit less correct)
-	// solution.
-	if s == "" {
-		s = " "
-	}
-
-	_, _ = r.buf.WriteString(s)
+	_, _ = r.buf.Write(s)
 }
 
 func (r *standardRenderer) repaint() {

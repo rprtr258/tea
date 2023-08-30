@@ -119,8 +119,7 @@ func DefaultStylesWithRenderer(r *lipgloss.Renderer) Styles {
 		FileSize:         r.NewStyle().Foreground(lipgloss.Color("240")).Width(fileSizeWidth).Align(lipgloss.Right),
 		EmptyDirectory: r.NewStyle().
 			Foreground(lipgloss.Color("240")).
-			PaddingLeft(paddingLeft).
-			SetString("Bummer. No Files Found."),
+			PaddingLeft(paddingLeft),
 	}
 }
 
@@ -340,7 +339,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 // View returns the view of the file picker.
 func (m *Model) View(vb tea.Viewbox) {
 	if len(m.files) == 0 {
-		vb.WriteLine(0, 0, m.Styles.EmptyDirectory.String())
+		vb.WriteLine(0, 0, m.Styles.EmptyDirectory.Render("Bummer. No Files Found."))
 		return
 	}
 

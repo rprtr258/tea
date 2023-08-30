@@ -1,6 +1,7 @@
 package textarea
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
@@ -13,7 +14,7 @@ func TestNew(t *testing.T) {
 	textarea := newTextArea()
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
-	view := vb.Render()
+	view := string(vb.Render())
 
 	assert.Substringf(t, view, ">", "Text area did not render the prompt")
 	assert.Substringf(t, view, "World!", "Text area did not render the placeholder")
@@ -30,7 +31,7 @@ func TestInput(t *testing.T) {
 
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
-	view := vb.Render()
+	view := string(vb.Render())
 
 	assert.Substringf(t, view, input, "Text area did not render the input")
 	assert.Equalf(t, len(input), textarea.col, "Text area did not move the cursor to the correct position")
@@ -54,7 +55,7 @@ func TestSoftWrap(t *testing.T) {
 
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
-	view := vb.Render()
+	view := string(vb.Render())
 
 	for _, word := range strings.Split(input, " ") {
 		assert.Substringf(t, view, word, "Text area did not render the input")
@@ -86,7 +87,7 @@ func TestCharLimit(t *testing.T) {
 
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
-	view := vb.Render()
+	view := string(vb.Render())
 	assert.Falsef(t, strings.Contains(view, input[1]), "Text area should not include input past the character limit")
 }
 
@@ -106,7 +107,7 @@ func TestVerticalScrolling(t *testing.T) {
 
 	vb := tea.NewViewbox(100, 10)
 	textarea.View(vb)
-	view := strings.Join(strings.Split(vb.Render(), "\n"), "")
+	view := string(bytes.Join(bytes.Split(vb.Render(), []byte("\n")), nil))
 
 	// The view should contain the first "line" of the input.
 	assert.Substringf(t, view, "This is a really", "Text area did not render the input")
@@ -121,7 +122,7 @@ func TestVerticalScrolling(t *testing.T) {
 		textarea.viewport.LineDown(1)
 		vb := tea.NewViewbox(100, 10)
 		textarea.View(vb)
-		view := strings.Join(strings.Split(vb.Render(), "\n"), "")
+		view := string(bytes.Join(bytes.Split(vb.Render(), []byte("\n")), nil))
 		assert.Substringf(t, view, line, "Text area did not render the correct scrolled input")
 	}
 }
@@ -365,7 +366,7 @@ func TestRendersEndOfLineBuffer(t *testing.T) {
 
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
-	view := vb.Render()
+	view := string(vb.Render())
 	assert.Substringf(t, view, "~", "Expected to see a tilde at the end of the line")
 }
 

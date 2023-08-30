@@ -5,7 +5,7 @@ type nilRenderer struct{}
 func (nilRenderer) start()                  {}
 func (nilRenderer) stop()                   {}
 func (nilRenderer) kill()                   {}
-func (nilRenderer) Write(string)            {}
+func (nilRenderer) Write([]byte)            {}
 func (nilRenderer) reset()                  {}
 func (nilRenderer) repaint()                {}
 func (nilRenderer) clearScreen()            {}

@@ -11,7 +11,7 @@ func TestNilRenderer(t *testing.T) {
 	r.start()
 	r.stop()
 	r.kill()
-	r.Write("a")
+	r.Write([]byte("a"))
 	r.repaint()
 	r.enterAltScreen()
 	assert.False(t, r.altScreen())
