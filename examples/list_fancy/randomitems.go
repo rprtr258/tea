@@ -79,6 +79,7 @@ func (r *randomItemGenerator) reset() {
 		"Quince",
 		"Radish",
 		"Ramps",
+		"Snow Peas",
 		"Star Anise",
 		"Sweet Potato",
 		"Tamarind",
@@ -88,13 +89,14 @@ func (r *randomItemGenerator) reset() {
 		"Yams",
 		"Yeast",
 		"Yuzu",
-		"Snow Peas",
 	}
 
 	r.descs = []string{
 		"A little weird",
+		"At last",
 		"Bold flavor",
 		"Can’t get enough",
+		"Delectable",
 		"Delectable",
 		"Expensive",
 		"Expired",
@@ -106,6 +108,7 @@ func (r *randomItemGenerator) reset() {
 		"Looks fresh",
 		"Looks good to me",
 		"Maybe not",
+		"Maybe",
 		"My favorite",
 		"Oh my",
 		"On sale",
@@ -115,17 +118,14 @@ func (r *randomItemGenerator) reset() {
 		"Refreshing",
 		"Salty",
 		"Scrumptious",
-		"Delectable",
 		"Slightly sweet",
 		"Smells great",
+		"Sure, why not?",
 		"Tasty",
 		"Too ripe",
-		"At last",
 		"What?",
 		"Wow",
 		"Yum",
-		"Maybe",
-		"Sure, why not?",
 	}
 
 	r.shuffle.Do(func() {
