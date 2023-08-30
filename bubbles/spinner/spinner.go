@@ -36,7 +36,7 @@ var (
 		FPS:    time.Second / 10, //nolint:gomnd
 	}
 	Dot = Spinner{
-		Frames: []string{"⣾ ", "⣽ ", "⣻ ", "⢿ ", "⡿ ", "⣟ ", "⣯ ", "⣷ "},
+		Frames: []string{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"},
 		FPS:    time.Second / 10, //nolint:gomnd
 	}
 	MiniDot = Spinner{

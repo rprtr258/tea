@@ -10,7 +10,7 @@ import (
 
 var (
 	// Available spinners
-	spinners = []spinner.Spinner{
+	spinners = [...]spinner.Spinner{
 		spinner.Line,
 		spinner.Dot,
 		spinner.MiniDot,
@@ -72,12 +72,8 @@ func (m *model) resetSpinner() {
 
 func (m *model) View(vb tea.Viewbox) {
 	x := vb.WriteLine(0, 1, m.spinner.View())
-	// TODO: ???
-	// if m.index != 1 {
-	// 	r.Write(" ")
-	// }
-	vb.WriteLine(0, x, textStyle("Spinning..."))
-	vb.WriteLine(2, 0, helpStyle("h/l, ←/→: change spinner • q: exit\n"))
+	vb.WriteLine(0, x+1, textStyle("Spinning..."))
+	vb.WriteLine(2, 0, helpStyle("h/l, ←/→: change spinner • q: exit"))
 }
 
 func Main(ctx context.Context) error {
