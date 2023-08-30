@@ -43,12 +43,12 @@ var (
 	subduedColor     = lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"}
 	// DefaultStyle is a set of default style definitions for list component.
 	DefaultStyle = Styles{
-		TitleBar: lipgloss.NewStyle().
-			Padding(0, 0, 1, 2),
+		TitleBar: lipgloss.NewStyle(),
+		// Padding(0, 0, 1, 2),
 		Title: lipgloss.NewStyle().
 			Background(lipgloss.Color("62")).
-			Foreground(lipgloss.Color("230")).
-			Padding(0, 1),
+			Foreground(lipgloss.Color("230")),
+		// Padding(0, 1),
 		Spinner: lipgloss.NewStyle().
 			Foreground(lipgloss.AdaptiveColor{Light: "#8E8E8E", Dark: "#747373"}),
 		FilterPrompt: lipgloss.NewStyle().
@@ -58,8 +58,8 @@ var (
 		DefaultFilterCharacterMatch: lipgloss.NewStyle().
 			Underline(true),
 		StatusBar: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}).
-			Padding(0, 0, 1, 2),
+			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}),
+		// Padding(0, 0, 1, 2),
 		StatusEmpty: lipgloss.NewStyle().
 			Foreground(subduedColor),
 		StatusBarActiveFilter: lipgloss.NewStyle().
@@ -70,8 +70,8 @@ var (
 			Foreground(lipgloss.AdaptiveColor{Light: "#909090", Dark: "#626262"}),
 		ArabicPagination: lipgloss.NewStyle().
 			Foreground(subduedColor),
-		PaginationStyle: lipgloss.NewStyle().
-			PaddingLeft(2), //nolint:gomnd
+		PaginationStyle: lipgloss.NewStyle(),
+		// PaddingLeft(2), //nolint:gomnd
 		ActivePaginationDot: lipgloss.NewStyle().
 			Foreground(lipgloss.AdaptiveColor{Light: "#847A85", Dark: "#979797"}),
 		InactivePaginationDot: lipgloss.NewStyle().

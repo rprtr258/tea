@@ -137,39 +137,39 @@ func (s Style) AlignVertical(p Alignment) Style {
 //
 // With more than four arguments no padding will be added.
 func (s Style) Padding(i ...int) Style { // TODO: remove all padding funcs and props
-	top, right, bottom, left, ok := whichSidesInt(i...)
-	if !ok {
-		return s
-	}
+	// top, right, bottom, left, ok := whichSidesInt(i...)
+	// if !ok {
+	// 	return s
+	// }
 
-	s.set(paddingTopKey, top)
-	s.set(paddingRightKey, right)
-	s.set(paddingBottomKey, bottom)
-	s.set(paddingLeftKey, left)
+	// s.set(paddingTopKey, top)
+	// s.set(paddingRightKey, right)
+	// s.set(paddingBottomKey, bottom)
+	// s.set(paddingLeftKey, left)
 	return s
 }
 
 // PaddingLeft adds padding on the left.
 func (s Style) PaddingLeft(i int) Style {
-	s.set(paddingLeftKey, i)
+	// s.set(paddingLeftKey, i)
 	return s
 }
 
 // PaddingRight adds padding on the right.
 func (s Style) PaddingRight(i int) Style {
-	s.set(paddingRightKey, i)
+	// s.set(paddingRightKey, i)
 	return s
 }
 
 // PaddingTop adds padding to the top of the block.
 func (s Style) PaddingTop(i int) Style {
-	s.set(paddingTopKey, i)
+	// s.set(paddingTopKey, i)
 	return s
 }
 
 // PaddingBottom adds padding to the bottom of the block.
 func (s Style) PaddingBottom(i int) Style {
-	s.set(paddingBottomKey, i)
+	// s.set(paddingBottomKey, i)
 	return s
 }
 
@@ -178,7 +178,7 @@ func (s Style) PaddingBottom(i int) Style {
 // desired and expected behavior, but it can be disabled for certain graphic
 // effects.
 func (s Style) ColorWhitespace(v bool) Style {
-	s.set(colorWhitespaceKey, v)
+	// s.set(colorWhitespaceKey, v)
 	return s
 }
 

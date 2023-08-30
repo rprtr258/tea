@@ -133,7 +133,7 @@ var (
 	_styleTitle        = lipgloss.NewStyle().MarginLeft(2)
 	_styleItem         = lipgloss.NewStyle()
 	_styleItemSelected = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
-	_stylePagination   = list.DefaultStyle.PaginationStyle.PaddingLeft(4)
+	_stylePagination   = list.DefaultStyle.PaginationStyle //.PaddingLeft(4)
 )
 
 type itemDelegate struct{}

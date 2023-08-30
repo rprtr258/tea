@@ -62,10 +62,7 @@ func (m *Model) SetTotalPages(items int) int {
 	if items < 1 {
 		return m.TotalPages
 	}
-	n := items / m.PerPage
-	if items%m.PerPage > 0 {
-		n++
-	}
+	n := (items + m.PerPage - 1) / m.PerPage
 	m.TotalPages = n
 	return n
 }
