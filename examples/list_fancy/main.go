@@ -165,7 +165,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	vb.Styled(appStyle).WriteText(0, 0, m.list.View())
+	m.list.View(vb.Styled(appStyle))
 }
 
 func Main(ctx context.Context) error {

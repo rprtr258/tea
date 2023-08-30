@@ -40,7 +40,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	vb.Styled(docStyle).WriteText(0, 0, m.list.View())
+	m.list.View(vb.Styled(docStyle))
 }
 
 func Main(ctx context.Context) error {

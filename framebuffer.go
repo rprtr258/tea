@@ -157,6 +157,12 @@ func (vb Viewbox) WriteLine(y, offsetX int, line string) int {
 // WriteText starting from y, x with wrapping, returns end position
 func (vb Viewbox) WriteText(y, x int, text string) (int, int) {
 	for _, c := range text {
+		if c == '\n' {
+			x = 0
+			y++
+			continue
+		}
+
 		vb.Set(y, x, c)
 		x++
 		if x >= vb.Width {

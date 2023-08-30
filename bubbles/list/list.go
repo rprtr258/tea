@@ -993,7 +993,7 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 }
 
 // View renders the component.
-func (m *Model[I]) View() string {
+func (m *Model[I]) View(vb tea.Viewbox) {
 	var sections []string
 	availHeight := m.height
 
@@ -1032,7 +1032,7 @@ func (m *Model[I]) View() string {
 		sections = append(sections, help)
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, sections...)
+	vb.WriteText(0, 0, lipgloss.JoinVertical(lipgloss.Left, sections...))
 }
 
 func (m *Model[I]) titleView() string {

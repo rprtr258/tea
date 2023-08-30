@@ -192,7 +192,7 @@ func (m *model) View(vb tea.Viewbox) {
 		return
 	}
 
-	vb.WriteText(1, 0, m.list.View())
+	m.list.View(vb.Padding(tea.PaddingOptions{Top: 1}))
 }
 
 func runExamplesList(ctx context.Context, title string, examples examples) error {
