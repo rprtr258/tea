@@ -79,7 +79,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 func (m *model) View(vb tea.Viewbox) {
 	m.viewport.View(vb)
-	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: 2}))
+	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: m.viewport.Height}))
 }
 
 func Main(ctx context.Context) error {
