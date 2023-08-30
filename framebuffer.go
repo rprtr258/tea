@@ -134,6 +134,50 @@ func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
 	}
 }
 
+func (vb Viewbox) PaddingTop(top int) Viewbox {
+	return Viewbox{
+		fb:     vb.fb,
+		Height: vb.Height - top,
+		Width:  vb.Width,
+		Y:      vb.Y + top,
+		X:      vb.X,
+		style:  vb.style,
+	}
+}
+
+func (vb Viewbox) PaddingLeft(left int) Viewbox {
+	return Viewbox{
+		fb:     vb.fb,
+		Height: vb.Height,
+		Width:  vb.Width - left,
+		Y:      vb.Y,
+		X:      vb.X + left,
+		style:  vb.style,
+	}
+}
+
+func (vb Viewbox) MaxHeight(height int) Viewbox {
+	return Viewbox{
+		fb:     vb.fb,
+		Height: min(vb.Height, height),
+		Width:  vb.Width,
+		Y:      vb.Y,
+		X:      vb.X,
+		style:  vb.style,
+	}
+}
+
+func (vb Viewbox) MaxWidth(width int) Viewbox {
+	return Viewbox{
+		fb:     vb.fb,
+		Height: vb.Height,
+		Width:  min(vb.Width, width),
+		Y:      vb.Y,
+		X:      vb.X,
+		style:  vb.style,
+	}
+}
+
 func (vb Viewbox) Styled(style lipgloss.Style) Viewbox {
 	return Viewbox{
 		fb:     vb.fb,

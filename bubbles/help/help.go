@@ -1,7 +1,7 @@
 package help
 
 import (
-	"strings"
+	"cmp"
 
 	"github.com/muesli/reflow/ansi"
 	"github.com/rprtr258/tea"
@@ -37,9 +37,8 @@ type Styles struct {
 	ShortSeparator lipgloss.Style
 
 	// Styling for the full help
-	FullKey       lipgloss.Style
-	FullDesc      lipgloss.Style
-	FullSeparator lipgloss.Style
+	FullKey  lipgloss.Style
+	FullDesc lipgloss.Style
 }
 
 // Model contains the state of the help view.
@@ -48,7 +47,6 @@ type Model struct {
 	ShowAll bool // if true, render the "full" help menu
 
 	ShortSeparator string
-	FullSeparator  string
 
 	// The symbol we use in the short help when help items have been truncated
 	// due to width. Periods of ellipsis by default.
@@ -76,7 +74,6 @@ func New() Model {
 
 	return Model{
 		ShortSeparator: " • ",
-		FullSeparator:  "    ",
 		Ellipsis:       "…",
 		Styles: Styles{
 			ShortKey:       keyStyle,
@@ -85,7 +82,6 @@ func New() Model {
 			Ellipsis:       sepStyle.Copy(),
 			FullKey:        keyStyle.Copy(),
 			FullDesc:       descStyle.Copy(),
-			FullSeparator:  sepStyle.Copy(),
 		},
 	}
 }
@@ -128,14 +124,17 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 	}
 }
 
+func maxFunc[T any, R cmp.Ordered](slice []T, f func(T) R) R {
+	res := f(slice[0])
+	for _, v := range slice[1:] {
+		res = max(res, f(v))
+	}
+	return res
+}
+
 // FullHelpView renders help columns from a slice of key binding slices. Each
 // top level slice entry renders into a column.
 func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
-	if len(groups) == 0 {
-		return
-	}
-
-	x, y := 0, 0
 	// Iterate over groups to build columns
 	for _, group := range groups {
 		if group == nil || !shouldRenderColumn(group) {
@@ -152,20 +151,17 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 			descriptions = append(descriptions, kb.Help().Desc)
 		}
 
-		maxKeyLength := 0
-		for _, key := range keys {
-			maxKeyLength = max(maxKeyLength, ansi.PrintableRuneWidth(key))
+		maxKeyLength := maxFunc(keys, ansi.PrintableRuneWidth)
+		maxDescLength := maxFunc(descriptions, ansi.PrintableRuneWidth)
+
+		vbKeys := vb.MaxWidth(maxKeyLength)
+		vbDescs := vb.PaddingLeft(maxKeyLength + 1).MaxWidth(maxDescLength)
+		for i, key := range keys {
+			vbKeys.WriteLine(i, 0, key)
+			vbDescs.WriteLine(i, 0, descriptions[i])
 		}
 
-		col := lipgloss.JoinHorizontal(lipgloss.Top,
-			m.Styles.FullKey.Render(strings.Join(keys, "\n")),
-			m.Styles.FullKey.Render(" "),
-			m.Styles.FullDesc.Render(strings.Join(descriptions, "\n")),
-		)
-
-		x, y = vb.WriteText(y, x, col)
-
-		x = vb.Styled(m.Styles.FullSeparator).WriteLine(y, x, m.FullSeparator)
+		vb = vbDescs.PaddingLeft(maxDescLength + 3)
 	}
 }
 
