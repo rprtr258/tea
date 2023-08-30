@@ -109,15 +109,26 @@ func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
 	}
 }
 
+func (vb Viewbox) Styled(style lipgloss.Style) Viewbox {
+	return Viewbox{
+		fb:     vb.fb,
+		Height: vb.Height,
+		Width:  vb.Width,
+		Y:      vb.Y,
+		X:      vb.X,
+		style:  style,
+	}
+}
+
 // Set writes a rune to the framebuffer in position relative to viewbox
 // 0 <= y < height, 0 <= x < width
 func (vb Viewbox) Set(y, x int, c rune) {
 	vb.fb.B[(vb.Y+y)*vb.fb.Width+vb.X+x] = c
 }
 
-// Background colors y'th row bacground to given color from x1 to x2 with
+// background colors y'th row bacground to given color from x1 to x2 with
 // coordinates relative to viewbox
-func (vb Viewbox) Background(y, x1, x2 int, background termenv.Color) {
+func (vb Viewbox) background(y, x1, x2 int, background termenv.Color) {
 	for x := x1 + vb.X; x < x2+vb.X; x++ {
 		vb.fb.backgrounds[(y+vb.Y)*vb.fb.Width+x] = background.Sequence(true)
 	}
@@ -125,7 +136,7 @@ func (vb Viewbox) Background(y, x1, x2 int, background termenv.Color) {
 
 // Background colors y'th row foreground to given color from x1 to x2 with
 // coordinates relative to viewbox
-func (vb Viewbox) Foreground(y, x1, x2 int, foreground termenv.Color) {
+func (vb Viewbox) foreground(y, x1, x2 int, foreground termenv.Color) {
 	for x := x1 + vb.X; x < x2+vb.X; x++ {
 		vb.fb.foregrounds[(y+vb.Y)*vb.fb.Width+x] = foreground.Sequence(false)
 	}
