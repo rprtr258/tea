@@ -37,7 +37,6 @@ func NewDefaultItemStyles() DefaultItemStyles {
 		NormalTitle: lipgloss.NewStyle().
 			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}),
 		SelectedTitle: lipgloss.NewStyle().
-			Border(lipgloss.NormalBorder, false, false, false, true).
 			BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
 			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}),
 		DimmedTitle: lipgloss.NewStyle().
@@ -180,10 +179,12 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 			title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
 		}
 
-		vb.Styled(s.SelectedTitle).WriteLine(0, 0, title)
+		vb.Styled(s.SelectedTitle).WriteLine(0, 0, lipgloss.NormalBorder.Left)
+		vb.Styled(s.SelectedTitle).WriteLine(0, 1, title)
 
 		if d.ShowDescription {
-			vb.Styled(s.SelectedDesc).WriteLine(1, 0, desc)
+			vb.Styled(s.SelectedTitle).WriteLine(1, 0, lipgloss.NormalBorder.Left)
+			vb.Styled(s.SelectedDesc).WriteLine(1, 1, desc)
 		}
 	default:
 		vb = vb.Padding(tea.PaddingOptions{Left: 2})
