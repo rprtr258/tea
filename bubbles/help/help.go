@@ -4,6 +4,7 @@ import (
 	"cmp"
 
 	"github.com/muesli/reflow/ansi"
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/key"
 	"github.com/rprtr258/tea/lipgloss"
@@ -137,7 +138,7 @@ func maxFunc[T any, R cmp.Ordered](slice []T, f func(T) R) R {
 func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 	// Iterate over groups to build columns
 	for _, group := range groups {
-		if group == nil || !shouldRenderColumn(group) {
+		if group == nil || !fun.Any(group, (key.Binding).Enabled) {
 			continue
 		}
 
@@ -163,13 +164,4 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 
 		vb = vbDescs.PaddingLeft(maxDescLength + 3)
 	}
-}
-
-func shouldRenderColumn(b []key.Binding) bool {
-	for _, v := range b {
-		if v.Enabled() {
-			return true
-		}
-	}
-	return false
 }
