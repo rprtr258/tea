@@ -196,7 +196,7 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 			// unmatched := s.NormalTitle.Inline(true)
 			// matched := unmatched.Copy().Inherit(s.FilterMatch)
 			// title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
-			vb.Styled(s.NormalTitle).WriteLine(0, 0, title)
+			vb.WriteLine(0, 0, title)
 		} else {
 			vb.Styled(s.NormalTitle).WriteLine(0, 0, title)
 		}
