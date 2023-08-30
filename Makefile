@@ -8,6 +8,18 @@ fmt:
 	@gofumpt -l -w .
 	@gci write --skip-generated -s standard -s default -s 'prefix(github.com/rprtr258/tea)' --custom-order .
 
+.PHONY: run-tutorials
+run-tutorials:
+	@go run examples/main.go tutorials
+
+.PHONY: run-lipgloss
+run-lipgloss:
+	@go run examples/main.go lipgloss
+
+.PHONY: run-glamour
+run-glamour:
+	@go run examples/main.go glamour
+
 .PHONY: run-examples
 run-examples:
 	@go run examples/main.go
