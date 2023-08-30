@@ -135,9 +135,9 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 	}
 
 	var totalWidth int
-	out := make([]string, 0, len(groups))
 	sep := m.Styles.FullSeparator.Render(m.FullSeparator)
 	sepWidth := lipgloss.Width(sep)
+	x, y := 0, 0
 	// Iterate over groups to build columns
 	for i, group := range groups {
 		if group == nil || !shouldRenderColumn(group) {
@@ -166,7 +166,7 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 			break
 		}
 
-		out = append(out, col)
+		x, y = vb.WriteText(y, x, col)
 
 		// Separator
 		if i < len(group)-1 {
@@ -176,10 +176,8 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 			}
 		}
 
-		out = append(out, sep)
+		x = vb.WriteLine(y, x, sep)
 	}
-
-	vb.WriteText(0, 0, lipgloss.JoinHorizontal(lipgloss.Top, out...))
 }
 
 func shouldRenderColumn(b []key.Binding) bool {
