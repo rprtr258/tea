@@ -186,7 +186,7 @@ func (m *model) View(vb tea.Viewbox) {
 		return
 	}
 
-	m.list.View(vb.Padding(tea.PaddingOptions{Top: 1}))
+	m.list.View(vb)
 }
 
 func runExamplesList(ctx context.Context, title string, examples examples) error {

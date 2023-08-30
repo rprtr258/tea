@@ -994,11 +994,11 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 
 // View renders the component.
 func (m *Model[I]) View(vb tea.Viewbox) {
-	y := 0 // TODO: use m.height ???
+	y := 1 // TODO: use m.height ???
 
 	if m.showTitle || m.showFilter && m.filteringEnabled {
-		y, _ = vb.WriteText(y, 0, m.titleView())
-		y++
+		y, _ = vb.WriteText(y, 2, m.titleView())
+		y += 2
 	}
 
 	if m.showStatusBar {
@@ -1014,12 +1014,12 @@ func (m *Model[I]) View(vb tea.Viewbox) {
 	y += m.Paginator.PerPage * m.delegate.Height()
 
 	if m.showPagination {
-		m.paginationView(vb.Padding(tea.PaddingOptions{Top: y}))
+		m.paginationView(vb.Padding(tea.PaddingOptions{Top: y + 1, Left: 2}))
 		y++
 	}
 
 	if m.showHelp {
-		m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
+		m.helpView(vb.Padding(tea.PaddingOptions{Top: y + 1}))
 	}
 }
 
