@@ -8,9 +8,9 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-func ctrlSeq(code string) string {
-	return termenv.CSI + code + "m"
-}
+// func ctrlSeq(code string) string {
+// 	return termenv.CSI + code + "m"
+// }
 
 type framebuffer struct {
 	Height, Width int
@@ -148,7 +148,7 @@ func (vb Viewbox) Styled(style lipgloss.Style) Viewbox {
 func (vb Viewbox) WriteLine(y, offsetX int, line string) int {
 	x := offsetX
 	for _, c := range line {
-		vb.Set(y, vb.X+x, c)
+		vb.Set(y, x, c)
 		x++
 	}
 	return x
@@ -157,7 +157,7 @@ func (vb Viewbox) WriteLine(y, offsetX int, line string) int {
 // WriteText starting from y, x with wrapping, returns end position
 func (vb Viewbox) WriteText(y, x int, text string) (int, int) {
 	for _, c := range text {
-		vb.Set(vb.Y+y, vb.X+x, c)
+		vb.Set(y, x, c)
 		x++
 		if x >= vb.Width {
 			x = 0
