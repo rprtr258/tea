@@ -13,8 +13,8 @@ import (
 
 	"github.com/mattn/go-isatty"
 	"github.com/muesli/reflow/indent"
-
 	"github.com/rprtr258/fun"
+
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/spinner"
 	"github.com/rprtr258/tea/lipgloss"

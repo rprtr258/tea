@@ -5,6 +5,8 @@ import (
 
 	"github.com/muesli/termenv"
 	"github.com/samber/lo"
+
+	"github.com/rprtr258/tea/lipgloss"
 )
 
 func ctrlSeq(code string) string {
@@ -20,9 +22,11 @@ type framebuffer struct {
 
 // Viewbox is a view of the terminal to render to
 type Viewbox struct {
-	fb            framebuffer
 	Height, Width int
 	Y, X          int
+
+	fb    framebuffer
+	style lipgloss.Style
 }
 
 // NewViewbox creates a new Framebuffer
@@ -43,6 +47,7 @@ func NewViewbox(height, width int) Viewbox {
 		Width:  width,
 		Y:      0,
 		X:      0,
+		style:  lipgloss.NewStyle(),
 	}
 }
 
@@ -82,6 +87,7 @@ func (vb Viewbox) Row(y int) Viewbox {
 		Width:  vb.fb.Width,
 		Y:      y + vb.Y,
 		X:      vb.X,
+		style:  vb.style,
 	}
 }
 
@@ -99,6 +105,7 @@ func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
 		Width:  vb.Width - opt.Left - opt.Right,
 		Y:      vb.Y + opt.Top,
 		X:      vb.X + opt.Left,
+		style:  vb.style,
 	}
 }
 

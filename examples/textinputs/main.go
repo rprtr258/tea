@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/rprtr258/fun"
+
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/cursor"
 	"github.com/rprtr258/tea/bubbles/textinput"
