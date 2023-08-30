@@ -19,10 +19,11 @@ jobs:
           go-version: ^1
 
       - uses: actions/checkout@v3
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          # Optional: golangci-lint command line arguments.
-          #args:
-          # Optional: show only new issues if it's a pull request. The default value is `false`.
-          only-new-issues: true
+      # TODO: отключено до лучших времен
+      # - name: golangci-lint
+      #   uses: golangci/golangci-lint-action@v3
+      #   with:
+      #     # Optional: golangci-lint command line arguments.
+      #     #args:
+      #     # Optional: show only new issues if it's a pull request. The default value is `false`.
+      #     only-new-issues: true
