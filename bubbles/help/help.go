@@ -149,7 +149,7 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 		sb.WriteString(str)
 	}
 
-	vb.WriteText(0, 0, sb.String())
+	vb.WriteLine(0, 0, sb.String())
 }
 
 // FullHelpView renders help columns from a slice of key binding slices. Each

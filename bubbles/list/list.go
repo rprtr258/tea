@@ -1017,8 +1017,7 @@ func (m *Model[I]) View(vb tea.Viewbox) {
 	}
 
 	if m.showHelp {
-		vb.Padding(tea.PaddingOptions{Top: y})
-		m.helpView(vb)
+		m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
 	}
 }
 
