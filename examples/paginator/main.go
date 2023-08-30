@@ -11,7 +11,6 @@ import (
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/paginator"
-	"github.com/rprtr258/tea/lipgloss"
 )
 
 func newModel() *model {
@@ -24,8 +23,8 @@ func newModel() *model {
 	p := paginator.New()
 	p.Type = paginator.Dots
 	p.PerPage = 10
-	p.ActiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "235", Dark: "252"}).Render("•")
-	p.InactiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "250", Dark: "238"}).Render("•")
+	// p.ActiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "235", Dark: "252"}).Render("•")
+	// p.InactiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "250", Dark: "238"}).Render("•")
 	p.SetTotalPages(len(items))
 
 	return &model{

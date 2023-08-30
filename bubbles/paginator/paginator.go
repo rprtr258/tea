@@ -45,9 +45,9 @@ type Model struct {
 	// TotalPages is the total number of pages.
 	TotalPages int
 	// ActiveDot is used to mark the current page under the Dots display type.
-	ActiveDot string
+	ActiveDot rune
 	// InactiveDot is used to mark inactive pages under the Dots display type.
-	InactiveDot string
+	InactiveDot rune
 	// ArabicFormat is the printf-style format to use for the Arabic display type.
 	ArabicFormat string
 
@@ -123,8 +123,8 @@ func New() Model {
 		PerPage:      1,
 		TotalPages:   1,
 		KeyMap:       DefaultKeyMap,
-		ActiveDot:    "•",
-		InactiveDot:  "○",
+		ActiveDot:    '•',
+		InactiveDot:  '○',
 		ArabicFormat: "%d/%d",
 	}
 }
@@ -158,11 +158,11 @@ func (m *Model) dotsView() string {
 	var sb strings.Builder
 	for i := 0; i < m.TotalPages; i++ {
 		if i == m.Page {
-			sb.WriteString(m.ActiveDot)
+			sb.WriteRune(m.ActiveDot)
 			continue
 		}
 
-		sb.WriteString(m.InactiveDot)
+		sb.WriteRune(m.InactiveDot)
 	}
 	return sb.String()
 }

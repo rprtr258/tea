@@ -206,8 +206,8 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 
 	p := paginator.New()
 	p.Type = paginator.Dots
-	p.ActiveDot = DefaultStyle.ActivePaginationDot.Render(bullet)
-	p.InactiveDot = DefaultStyle.InactivePaginationDot.Render(bullet)
+	// p.ActiveDot = DefaultStyle.ActivePaginationDot.Render(bullet)
+	// p.InactiveDot = DefaultStyle.InactivePaginationDot.Render(bullet)
 
 	m := Model[I]{
 		showTitle:             true,
@@ -732,7 +732,9 @@ func (m *Model[I]) updatePagination() {
 		availHeight -= lipgloss.Height(m.statusView())
 	}
 	if m.showPagination {
-		availHeight -= lipgloss.Height(m.paginationView())
+		// TODO: wtf???
+		// availHeight -= lipgloss.Height(m.paginationView())
+		availHeight -= 2
 	}
 	if m.showHelp {
 		// TODO: wtf???
@@ -1013,7 +1015,7 @@ func (m *Model[I]) View(vb tea.Viewbox) {
 	y += m.Paginator.PerPage * m.delegate.Height()
 
 	if m.showPagination {
-		y, _ = vb.WriteText(y, 0, m.paginationView())
+		m.paginationView(vb.Padding(tea.PaddingOptions{Top: y}))
 		y++
 	}
 
@@ -1111,9 +1113,9 @@ func (m *Model[I]) statusView() string {
 	return m.Styles.StatusBar.Render(status)
 }
 
-func (m *Model[I]) paginationView() string {
+func (m *Model[I]) paginationView(vb tea.Viewbox) {
 	if m.Paginator.TotalPages < 2 { //nolint:gomnd
-		return ""
+		return
 	}
 
 	s := m.Paginator.View()
@@ -1130,7 +1132,7 @@ func (m *Model[I]) paginationView() string {
 		style = style.Copy().MarginTop(1)
 	}
 
-	return style.Render(s)
+	vb.Styled(style).WriteText(0, 0, s)
 }
 
 func (m *Model[I]) populatedView(vb tea.Viewbox) {
