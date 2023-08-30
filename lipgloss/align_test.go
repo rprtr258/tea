@@ -10,7 +10,7 @@ import (
 func TestAlignTextVertical(t *testing.T) {
 	for _, test := range []struct {
 		str    string
-		pos    Position
+		pos    Alignment
 		height int
 		want   string
 	}{

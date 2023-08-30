@@ -7,7 +7,7 @@ import (
 	"github.com/muesli/reflow/ansi"
 )
 
-// Position represents a position along a horizontal or vertical axis. It's in
+// Alignment represents a position along a horizontal or vertical axis. It's in
 // situations where an axis is involved, like alignment, joining, placement and
 // so on.
 //
@@ -16,44 +16,44 @@ import (
 //
 // There are constants Top, Bottom, Center, Left and Right in this package that
 // can be used to aid readability.
-type Position float64
+type Alignment float64
 
-func (p Position) value() float64 {
+func (p Alignment) value() float64 {
 	return min(1, max(0, float64(p)))
 }
 
 // Position aliases.
 const (
-	Top    Position = 0.0
-	Bottom Position = 1.0
-	Center Position = 0.5
-	Left   Position = 0.0
-	Right  Position = 1.0
+	Top    Alignment = 0.0
+	Bottom Alignment = 1.0
+	Center Alignment = 0.5
+	Left   Alignment = 0.0
+	Right  Alignment = 1.0
 )
 
 // Place places a string or text block vertically in an unstyled box of a given
 // width or height.
-func Place(width, height int, hPos, vPos Position, str string, opts ...WhitespaceOption) string {
+func Place(width, height int, hPos, vPos Alignment, str string, opts ...WhitespaceOption) string {
 	return _renderer.Place(width, height, hPos, vPos, str, opts...)
 }
 
 // Place places a string or text block vertically in an unstyled box of a given
 // width or height.
-func (r *Renderer) Place(width, height int, hPos, vPos Position, str string, opts ...WhitespaceOption) string {
+func (r *Renderer) Place(width, height int, hPos, vPos Alignment, str string, opts ...WhitespaceOption) string {
 	return r.PlaceVertical(height, vPos, r.PlaceHorizontal(width, hPos, str, opts...), opts...)
 }
 
 // PlaceHorizontal places a string or text block horizontally in an unstyled
 // block of a given width. If the given width is shorter than the max width of
 // the string (measured by its longest line) this will be a noop.
-func PlaceHorizontal(width int, pos Position, str string, opts ...WhitespaceOption) string {
+func PlaceHorizontal(width int, pos Alignment, str string, opts ...WhitespaceOption) string {
 	return _renderer.PlaceHorizontal(width, pos, str, opts...)
 }
 
 // PlaceHorizontal places a string or text block horizontally in an unstyled
 // block of a given width. If the given width is shorter than the max width of
 // the string (measured by its longest line) this will be a noöp.
-func (r *Renderer) PlaceHorizontal(width int, pos Position, str string, opts ...WhitespaceOption) string {
+func (r *Renderer) PlaceHorizontal(width int, pos Alignment, str string, opts ...WhitespaceOption) string {
 	lines := strings.Split(str, "\n")
 	contentWidth := getWidestWidth(lines)
 	gap := width - contentWidth
@@ -99,14 +99,14 @@ func (r *Renderer) PlaceHorizontal(width int, pos Position, str string, opts ...
 // PlaceVertical places a string or text block vertically in an unstyled block
 // of a given height. If the given height is shorter than the height of the
 // string (measured by its newlines) then this will be a noop.
-func PlaceVertical(height int, pos Position, str string, opts ...WhitespaceOption) string {
+func PlaceVertical(height int, pos Alignment, str string, opts ...WhitespaceOption) string {
 	return _renderer.PlaceVertical(height, pos, str, opts...)
 }
 
 // PlaceVertical places a string or text block vertically in an unstyled block
 // of a given height. If the given height is shorter than the height of the
 // string (measured by its newlines) then this will be a noöp.
-func (r *Renderer) PlaceVertical(height int, pos Position, str string, opts ...WhitespaceOption) string {
+func (r *Renderer) PlaceVertical(height int, pos Alignment, str string, opts ...WhitespaceOption) string {
 	contentHeight := strings.Count(str, "\n") + 1
 	gap := height - contentHeight
 

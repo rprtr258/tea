@@ -26,7 +26,7 @@ import (
 //
 //	// Join on the top edge
 //	str := lipgloss.JoinHorizontal(lipgloss.Top, blockA, blockB)
-func JoinHorizontal(pos Position, strs ...string) string { // TODO: instead do viewboxes layouts
+func JoinHorizontal(pos Alignment, strs ...string) string { // TODO: instead do viewboxes layouts
 	if len(strs) == 0 {
 		return ""
 	}
@@ -111,7 +111,7 @@ func JoinHorizontal(pos Position, strs ...string) string { // TODO: instead do v
 //
 //	// Join on the right edge
 //	str := lipgloss.JoinVertical(lipgloss.Right, blockA, blockB)
-func JoinVertical(pos Position, strs ...string) string {
+func JoinVertical(alignment Alignment, strs ...string) string {
 	if len(strs) == 0 {
 		return ""
 	}
@@ -135,7 +135,7 @@ func JoinVertical(pos Position, strs ...string) string {
 		for j, line := range block {
 			w := maxWidth - ansi.PrintableRuneWidth(line)
 
-			switch pos {
+			switch alignment {
 			case Left:
 				sb.WriteString(line)
 				sb.WriteString(strings.Repeat(" ", w))
@@ -150,7 +150,7 @@ func JoinVertical(pos Position, strs ...string) string {
 					break
 				}
 
-				split := int(math.Round(float64(w) * pos.value()))
+				split := int(math.Round(float64(w) * alignment.value()))
 				right := w - split
 				left := w - right
 

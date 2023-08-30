@@ -100,7 +100,7 @@ func (s Style) Height(i int) Style {
 //
 // With two arguments, the value is applied to the vertical and horizontal
 // alignments, in that order.
-func (s Style) Align(p ...Position) Style {
+func (s Style) Align(p ...Alignment) Style {
 	if len(p) > 0 {
 		s.set(alignHorizontalKey, p[0])
 	}
@@ -111,13 +111,13 @@ func (s Style) Align(p ...Position) Style {
 }
 
 // AlignHorizontal sets a horizontal text alignment rule.
-func (s Style) AlignHorizontal(p Position) Style {
+func (s Style) AlignHorizontal(p Alignment) Style {
 	s.set(alignHorizontalKey, p)
 	return s
 }
 
 // AlignVertical sets a vertical text alignment rule.
-func (s Style) AlignVertical(p Position) Style {
+func (s Style) AlignVertical(p Alignment) Style {
 	s.set(alignVerticalKey, p)
 	return s
 }

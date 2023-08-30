@@ -71,9 +71,9 @@ func (s Style) GetHeight() int {
 
 // GetAlign returns the style's implicit horizontal alignment setting.
 // If no alignment is set Position.Left is returned.
-func (s Style) GetAlign() Position {
+func (s Style) GetAlign() Alignment {
 	v := s.getAsPosition(alignHorizontalKey)
-	if v == Position(0) {
+	if v == Alignment(0) {
 		return Left
 	}
 	return v
@@ -81,9 +81,9 @@ func (s Style) GetAlign() Position {
 
 // GetAlignHorizontal returns the style's implicit horizontal alignment setting.
 // If no alignment is set Position.Left is returned.
-func (s Style) GetAlignHorizontal() Position {
+func (s Style) GetAlignHorizontal() Alignment {
 	v := s.getAsPosition(alignHorizontalKey)
-	if v == Position(0) {
+	if v == Alignment(0) {
 		return Left
 	}
 	return v
@@ -91,9 +91,9 @@ func (s Style) GetAlignHorizontal() Position {
 
 // GetAlignVertical returns the style's implicit vertical alignment setting.
 // If no alignment is set Position.Top is returned.
-func (s Style) GetAlignVertical() Position {
+func (s Style) GetAlignVertical() Alignment {
 	v := s.getAsPosition(alignVerticalKey)
-	if v == Position(0) {
+	if v == Alignment(0) {
 		return Top
 	}
 	return v
@@ -433,15 +433,15 @@ func (s Style) getAsInt(k propKey) int {
 	return 0
 }
 
-func (s Style) getAsPosition(k propKey) Position {
+func (s Style) getAsPosition(k propKey) Alignment {
 	v, ok := s.rules[k]
 	if !ok {
-		return Position(0)
+		return Alignment(0)
 	}
-	if p, ok := v.(Position); ok {
+	if p, ok := v.(Alignment); ok {
 		return p
 	}
-	return Position(0)
+	return Alignment(0)
 }
 
 func (s Style) getBorderStyle() Border {
