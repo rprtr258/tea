@@ -82,7 +82,11 @@ func TestMsgClear(t *testing.T) {
 			assert.NoError(t, err)
 			wg.Wait()
 
-			assert.Equal(t, test.expected, out.String())
+			if test.expected != out.String() {
+				// assert.Equal(t, test.expected, out.String())
+				t.Errorf(`expected: %q
+                    got: %q`, test.expected, out.String())
+			}
 		})
 	}
 }
