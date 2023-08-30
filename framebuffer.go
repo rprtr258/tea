@@ -14,10 +14,11 @@ func ctrlSeq(code string) string {
 }
 
 type framebuffer struct {
-	B []rune
+	Height, Width int
+	B             []rune
 	// OPTIMIZE: store ranges of colors instead of color for every pixel
 	backgrounds, foregrounds []string
-	Height, Width            int
+	styles                   []lipgloss.Style
 }
 
 // Viewbox is a view of the terminal to render to
@@ -35,13 +36,20 @@ func NewViewbox(height, width int) Viewbox {
 	for i := range buf {
 		buf[i] = ' '
 	}
+
+	styles := make([]lipgloss.Style, height*width)
+	for i := range buf {
+		styles[i] = lipgloss.NewStyle()
+	}
+
 	return Viewbox{
 		fb: framebuffer{
+			Height:      height,
+			Width:       width,
 			B:           buf,
 			backgrounds: make([]string, height*width),
 			foregrounds: make([]string, height*width),
-			Height:      height,
-			Width:       width,
+			styles:      styles,
 		},
 		Height: height,
 		Width:  width,
