@@ -114,38 +114,18 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 	separator := m.Styles.ShortSeparator.Inline(true).Render(m.ShortSeparator)
 
 	x := 0
-	var totalWidth int
-	for i, kb := range bindings {
+	for _, kb := range bindings {
 		if !kb.Enabled() {
 			continue
 		}
 
-		var sep string
-		if totalWidth > 0 && i < len(bindings) {
-			sep = separator
+		if x > 0 {
+			x = vb.WriteLine(0, x, separator)
 		}
 
-		str := sep +
-			m.Styles.ShortKey.Inline(true).Render(kb.Help().Key) + " " +
-			m.Styles.ShortDesc.Inline(true).Render(kb.Help().Desc)
-
-		w := lipgloss.Width(str)
-
-		// If adding this help item would go over the available width, stop drawing.
-		if m.Width > 0 && totalWidth+w > m.Width {
-			// Although if there's room for an ellipsis, print that.
-			tail := " " + m.Styles.Ellipsis.Inline(true).Render(m.Ellipsis)
-			tailWidth := lipgloss.Width(tail)
-
-			if totalWidth+tailWidth < m.Width {
-				vb.WriteLine(0, x, tail)
-			}
-
-			return
-		}
-
-		totalWidth += w
-		x = vb.WriteLine(0, x, str)
+		x = vb.Styled(m.Styles.ShortKey.Inline(true)).WriteLine(0, x, kb.Help().Key)
+		x++
+		x = vb.Styled(m.Styles.ShortDesc.Inline(true)).WriteLine(0, x, kb.Help().Desc)
 	}
 }
 

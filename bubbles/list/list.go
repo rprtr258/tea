@@ -738,7 +738,7 @@ func (m *Model[I]) updatePagination() {
 	if m.showHelp {
 		// TODO: wtf???
 		// availHeight -= lipgloss.Height(m.helpView())
-		availHeight -= 3
+		availHeight -= 2
 	}
 
 	m.Paginator.PerPage = max(1, availHeight/(m.delegate.Height()+m.delegate.Spacing()))
