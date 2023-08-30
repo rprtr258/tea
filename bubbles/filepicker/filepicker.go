@@ -315,7 +315,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 				}
 			}
 
-			if (!isDir && m.FileAllowed) || (isDir && m.DirAllowed) {
+			if !isDir && m.FileAllowed || isDir && m.DirAllowed {
 				if key.Matches(msg, m.KeyMap.Select) {
 					// Select the current path as the selection
 					m.Path = filepath.Join(m.CurrentDirectory, f.Name())
@@ -448,6 +448,7 @@ func (m *Model) didSelectFile(msg tea.Msg) (bool, string) {
 			if err != nil {
 				return false, ""
 			}
+
 			if info.IsDir() {
 				isDir = true
 			}
