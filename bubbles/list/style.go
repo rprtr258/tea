@@ -30,7 +30,6 @@ type Styles struct {
 	NoItems lipgloss.Style
 
 	PaginationStyle lipgloss.Style
-	HelpStyle       lipgloss.Style
 
 	// Styled characters.
 	ActivePaginationDot   lipgloss.Style
@@ -73,8 +72,6 @@ var (
 			Foreground(subduedColor),
 		PaginationStyle: lipgloss.NewStyle().
 			PaddingLeft(2), //nolint:gomnd
-		HelpStyle: lipgloss.NewStyle().
-			Padding(1, 0, 0, 2),
 		ActivePaginationDot: lipgloss.NewStyle().
 			Foreground(lipgloss.AdaptiveColor{Light: "#847A85", Dark: "#979797"}),
 		InactivePaginationDot: lipgloss.NewStyle().

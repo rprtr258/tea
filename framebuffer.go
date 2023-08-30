@@ -149,6 +149,10 @@ func (vb Viewbox) Styled(style lipgloss.Style) Viewbox {
 func (vb Viewbox) WriteLine(y, offsetX int, line string) int {
 	x := offsetX
 	for _, c := range line {
+		if x >= vb.Width {
+			return x
+		}
+
 		vb.Set(y, x, c)
 		x++
 	}

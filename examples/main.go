@@ -136,7 +136,6 @@ var (
 	_styleItem         = lipgloss.NewStyle().PaddingLeft(4)
 	_styleItemSelected = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
 	_stylePagination   = list.DefaultStyle.PaginationStyle.PaddingLeft(4)
-	_styleHelp         = list.DefaultStyle.HelpStyle.PaddingLeft(4).PaddingBottom(1)
 )
 
 type itemDelegate struct{}
@@ -220,7 +219,6 @@ func runExamplesList(ctx context.Context, title string, examples examples) error
 	l.SetFilteringEnabled(false)
 	l.Styles.Title = _styleTitle
 	l.Styles.PaginationStyle = _stylePagination
-	l.Styles.HelpStyle = _styleHelp
 
 	m, err := tea.NewProgram(ctx, &model{list: l}).Run()
 	if err != nil {

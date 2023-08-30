@@ -113,7 +113,7 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 
 	separator := m.Styles.ShortSeparator.Inline(true).Render(m.ShortSeparator)
 
-	var sb strings.Builder
+	x := 0
 	var totalWidth int
 	for i, kb := range bindings {
 		if !kb.Enabled() {
@@ -131,25 +131,22 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 
 		w := lipgloss.Width(str)
 
-		// If adding this help item would go over the available width, stop
-		// drawing.
+		// If adding this help item would go over the available width, stop drawing.
 		if m.Width > 0 && totalWidth+w > m.Width {
 			// Although if there's room for an ellipsis, print that.
 			tail := " " + m.Styles.Ellipsis.Inline(true).Render(m.Ellipsis)
 			tailWidth := lipgloss.Width(tail)
 
 			if totalWidth+tailWidth < m.Width {
-				sb.WriteString(tail)
+				vb.WriteLine(0, x, tail)
 			}
 
-			break
+			return
 		}
 
 		totalWidth += w
-		sb.WriteString(str)
+		x = vb.WriteLine(0, x, str)
 	}
-
-	vb.WriteLine(0, 0, sb.String())
 }
 
 // FullHelpView renders help columns from a slice of key binding slices. Each

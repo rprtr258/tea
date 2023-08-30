@@ -1173,7 +1173,8 @@ func (m *Model[I]) populatedView() string {
 }
 
 func (m *Model[I]) helpView(vb tea.Viewbox) {
-	m.Help.View(vb.Styled(m.Styles.HelpStyle), m)
+	// m.Help.View(vb.Styled(m.Styles.HelpStyle), m)
+	m.Help.View(vb.Padding(tea.PaddingOptions{Top: 1, Left: 2}), m)
 }
 
 func (m *Model[I]) spinnerView() string {
