@@ -35,16 +35,13 @@ type DefaultItemStyles struct {
 func NewDefaultItemStyles() DefaultItemStyles {
 	s := DefaultItemStyles{
 		NormalTitle: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}).
-			Padding(0, 0, 0, 2),
+			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}),
 		SelectedTitle: lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder, false, false, false, true).
 			BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
-			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}).
-			Padding(0, 0, 0, 1),
+			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}),
 		DimmedTitle: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}).
-			Padding(0, 0, 0, 2),
+			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}),
 		FilterMatch: lipgloss.NewStyle().
 			Underline(true),
 	}
@@ -130,13 +127,13 @@ func (d DefaultDelegate[I]) Update(msg tea.Msg, m *Model[I]) []tea.Cmd {
 
 // Render prints an item.
 func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item I) {
-	title := item.Title()
-	desc := item.Description()
-
 	if m.width <= 0 {
 		// short-circuit
 		return
 	}
+
+	title := item.Title()
+	desc := item.Description()
 
 	s := &d.Styles
 	// Prevent text from exceeding list width
@@ -166,12 +163,16 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 
 	switch {
 	case emptyFilter:
+		vb = vb.Padding(tea.PaddingOptions{Left: 2})
+
 		vb.Styled(s.DimmedTitle).WriteLine(0, 0, title)
 
 		if d.ShowDescription {
 			vb.Styled(s.DimmedDesc).WriteLine(1, 0, desc)
 		}
 	case isSelected && m.FilterState() != Filtering:
+		vb = vb.Padding(tea.PaddingOptions{Left: 1})
+
 		if isFiltered {
 			// Highlight matches
 			unmatched := s.SelectedTitle.Inline(true)
@@ -185,6 +186,8 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 			vb.Styled(s.SelectedDesc).WriteLine(1, 0, desc)
 		}
 	default:
+		vb = vb.Padding(tea.PaddingOptions{Left: 2})
+
 		if isFiltered {
 			// Highlight matches
 			unmatched := s.NormalTitle.Inline(true)

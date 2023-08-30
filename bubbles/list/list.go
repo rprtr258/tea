@@ -995,15 +995,15 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 func (m *Model[I]) View(vb tea.Viewbox) {
 	y := 0 // TODO: use m.height ???
 
-	if m.showTitle || m.showFilter && m.filteringEnabled {
-		y, _ = vb.WriteText(y, 0, m.titleView())
-		y++
-	}
+	// if m.showTitle || m.showFilter && m.filteringEnabled {
+	// 	y, _ = vb.WriteText(y, 0, m.titleView())
+	// 	y++
+	// }
 
-	if m.showStatusBar {
-		y, _ = vb.WriteText(y, 0, m.statusView())
-		y++
-	}
+	// if m.showStatusBar {
+	// 	y, _ = vb.WriteText(y, 0, m.statusView())
+	// 	y++
+	// }
 
 	// TODO: change to layout
 	m.populatedView(vb.Padding(tea.PaddingOptions{
@@ -1012,14 +1012,14 @@ func (m *Model[I]) View(vb tea.Viewbox) {
 	}))
 	y += m.Paginator.PerPage * m.delegate.Height()
 
-	if m.showPagination {
-		y, _ = vb.WriteText(y, 0, m.paginationView())
-		y++
-	}
+	// if m.showPagination {
+	// 	y, _ = vb.WriteText(y, 0, m.paginationView())
+	// 	y++
+	// }
 
-	if m.showHelp {
-		m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
-	}
+	// if m.showHelp {
+	// 	m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
+	// }
 }
 
 func (m *Model[I]) titleView() string {
