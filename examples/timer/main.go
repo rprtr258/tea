@@ -56,8 +56,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) helpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
+func (m *model) helpView(vb tea.Viewbox) {
+	m.help.ShortHelpView(vb.Padding(tea.PaddingOptions{Top: 1}), []key.Binding{
 		m.keymap.start,
 		m.keymap.stop,
 		m.keymap.reset,
@@ -78,7 +78,7 @@ func (m *model) View(vb tea.Viewbox) {
 		m.timer.View(),
 	))
 	if !m.quitting {
-		vb.WriteLine(1, 0, m.helpView())
+		m.helpView(vb.Padding(tea.PaddingOptions{Top: 1}))
 	}
 }
 

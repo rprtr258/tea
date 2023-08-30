@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/rprtr258/fun"
 
@@ -123,12 +122,9 @@ func (m *model) View(vb tea.Viewbox) {
 		"You chose: "+m.inputStyle.Render(m.lastKey),
 	)
 
-	helpView := m.help.View(m.keys)
+	vb.WriteLine(1, 0, status)
 
-	vb.WriteText(1, 0,
-		status+
-			strings.Repeat("\n", 8-strings.Count(status, "\n")-strings.Count(helpView, "\n"))+
-			helpView)
+	m.help.View(vb.Padding(tea.PaddingOptions{Top: 2}), m.keys)
 }
 
 func Main(ctx context.Context) error {

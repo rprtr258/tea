@@ -95,19 +95,20 @@ func (m *Model) Update(_ tea.Msg) []tea.Cmd {
 }
 
 // View renders the help view's current state.
-func (m *Model) View(k KeyMap) string {
+func (m *Model) View(vb tea.Viewbox, k KeyMap) {
 	if m.ShowAll {
-		return m.FullHelpView(k.FullHelp())
+		m.FullHelpView(vb, k.FullHelp())
+	} else {
+		m.ShortHelpView(vb, k.ShortHelp())
 	}
-	return m.ShortHelpView(k.ShortHelp())
 }
 
 // ShortHelpView renders a single line help view from a slice of keybindings.
 // If the line is longer than the maximum width it will be gracefully
 // truncated, showing only as many help items as possible.
-func (m *Model) ShortHelpView(bindings []key.Binding) string {
+func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 	if len(bindings) == 0 {
-		return ""
+		return
 	}
 
 	separator := m.Styles.ShortSeparator.Inline(true).Render(m.ShortSeparator)
@@ -148,14 +149,14 @@ func (m *Model) ShortHelpView(bindings []key.Binding) string {
 		sb.WriteString(str)
 	}
 
-	return sb.String()
+	vb.WriteText(0, 0, sb.String())
 }
 
 // FullHelpView renders help columns from a slice of key binding slices. Each
 // top level slice entry renders into a column.
-func (m *Model) FullHelpView(groups [][]key.Binding) string {
+func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 	if len(groups) == 0 {
-		return ""
+		return
 	}
 
 	var totalWidth int
@@ -203,7 +204,7 @@ func (m *Model) FullHelpView(groups [][]key.Binding) string {
 		out = append(out, sep)
 	}
 
-	return lipgloss.JoinHorizontal(lipgloss.Top, out...)
+	vb.WriteText(0, 0, lipgloss.JoinHorizontal(lipgloss.Top, out...))
 }
 
 func shouldRenderColumn(b []key.Binding) bool {

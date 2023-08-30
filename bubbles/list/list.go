@@ -736,7 +736,9 @@ func (m *Model[I]) updatePagination() {
 		availHeight -= lipgloss.Height(m.paginationView())
 	}
 	if m.showHelp {
-		availHeight -= lipgloss.Height(m.helpView())
+		// TODO: wtf???
+		// availHeight -= lipgloss.Height(m.helpView())
+		availHeight -= 3
 	}
 
 	m.Paginator.PerPage = max(1, availHeight/(m.delegate.Height()+m.delegate.Spacing()))
@@ -1015,7 +1017,8 @@ func (m *Model[I]) View(vb tea.Viewbox) {
 	}
 
 	if m.showHelp {
-		vb.WriteText(y, 0, m.helpView())
+		vb.Padding(tea.PaddingOptions{Top: y})
+		m.helpView(vb)
 	}
 }
 
@@ -1170,8 +1173,8 @@ func (m *Model[I]) populatedView() string {
 	return sb.String()
 }
 
-func (m *Model[I]) helpView() string {
-	return m.Styles.HelpStyle.Render(m.Help.View(m))
+func (m *Model[I]) helpView(vb tea.Viewbox) {
+	m.Help.View(vb.Styled(m.Styles.HelpStyle), m)
 }
 
 func (m *Model[I]) spinnerView() string {

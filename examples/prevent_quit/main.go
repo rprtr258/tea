@@ -123,10 +123,10 @@ func (m *model) View(vb tea.Viewbox) {
 	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: 3}))
 	h := m.textarea.Height()
 	vb.Styled(saveTextStyle).WriteLine(3+h, 1, m.saveText)
-	vb.Styled(saveTextStyle).WriteLine(4+h, 1, m.help.ShortHelpView([]key.Binding{
+	m.help.ShortHelpView(vb.Styled(saveTextStyle).Padding(tea.PaddingOptions{Top: 4 + h, Left: 1}), []key.Binding{
 		m.keymap.save,
 		m.keymap.quit,
-	}))
+	})
 }
 
 func Main(ctx context.Context) error {

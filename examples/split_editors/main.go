@@ -176,13 +176,13 @@ func (m *model) View(vb tea.Viewbox) {
 		m.inputs[i].View(vb.Row(i))
 	}
 
-	vb.WriteText(2+len(m.inputs), 0, m.help.ShortHelpView([]key.Binding{
+	m.help.ShortHelpView(vb.Padding(tea.PaddingOptions{Top: 2 + len(m.inputs)}), []key.Binding{
 		m.keymap.next,
 		m.keymap.prev,
 		m.keymap.add,
 		m.keymap.remove,
 		m.keymap.quit,
-	}))
+	})
 }
 
 func Main(ctx context.Context) error {

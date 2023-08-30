@@ -38,12 +38,12 @@ func (m *model) View(vb tea.Viewbox) {
 	}
 	vb.WriteLine(0, x, m.stopwatch.View())
 	if !m.quitting {
-		vb.WriteLine(2, 0, m.help.ShortHelpView([]key.Binding{
+		m.help.ShortHelpView(vb.Padding(tea.PaddingOptions{Top: 2}), []key.Binding{
 			m.keymap.start,
 			m.keymap.stop,
 			m.keymap.reset,
 			m.keymap.quit,
-		}))
+		})
 	}
 }
 
