@@ -154,11 +154,11 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 	emptyFilter := m.FilterState() == Filtering && m.FilterValue() == ""
 	isFiltered := m.FilterState() == Filtering || m.FilterState() == FilterApplied
 
-	var matchedRunes []int
-	if isFiltered && index < len(m.filteredItems) {
-		// Get indices of matched characters
-		matchedRunes = m.MatchesForItem(index)
-	}
+	// var matchedRunes []int
+	// if isFiltered && index < len(m.filteredItems) {
+	// 	// Get indices of matched characters
+	// 	matchedRunes = m.MatchesForItem(index)
+	// }
 
 	switch {
 	case emptyFilter:
@@ -172,15 +172,17 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 	case isSelected && m.FilterState() != Filtering:
 		vb = vb.Padding(tea.PaddingOptions{Left: 1})
 
+		vb.Styled(s.SelectedTitle).WriteLine(0, 0, lipgloss.NormalBorder.Left)
+
 		if isFiltered {
 			// Highlight matches
-			unmatched := s.SelectedTitle.Inline(true)
-			matched := unmatched.Copy().Inherit(s.FilterMatch)
-			title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
+			// unmatched := s.SelectedTitle.Inline(true)
+			// matched := unmatched.Copy().Inherit(s.FilterMatch)
+			// title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
+			vb.WriteLine(0, 1, title)
+		} else {
+			vb.Styled(s.SelectedTitle).WriteLine(0, 1, title)
 		}
-
-		vb.Styled(s.SelectedTitle).WriteLine(0, 0, lipgloss.NormalBorder.Left)
-		vb.Styled(s.SelectedTitle).WriteLine(0, 1, title)
 
 		if d.ShowDescription {
 			vb.Styled(s.SelectedTitle).WriteLine(1, 0, lipgloss.NormalBorder.Left)
@@ -191,12 +193,13 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 
 		if isFiltered {
 			// Highlight matches
-			unmatched := s.NormalTitle.Inline(true)
-			matched := unmatched.Copy().Inherit(s.FilterMatch)
-			title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
+			// unmatched := s.NormalTitle.Inline(true)
+			// matched := unmatched.Copy().Inherit(s.FilterMatch)
+			// title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
+			vb.Styled(s.NormalTitle).WriteLine(0, 0, title)
+		} else {
+			vb.Styled(s.NormalTitle).WriteLine(0, 0, title)
 		}
-
-		vb.Styled(s.NormalTitle).WriteLine(0, 0, title)
 
 		if d.ShowDescription {
 			vb.Styled(s.NormalDesc).WriteLine(1, 0, desc)
