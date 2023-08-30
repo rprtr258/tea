@@ -136,7 +136,7 @@ func (s Style) AlignVertical(p Alignment) Style {
 // side, followed by the right side, then the bottom, and finally the left.
 //
 // With more than four arguments no padding will be added.
-func (s Style) Padding(i ...int) Style {
+func (s Style) Padding(i ...int) Style { // TODO: remove all padding funcs and props
 	top, right, bottom, left, ok := whichSidesInt(i...)
 	if !ok {
 		return s

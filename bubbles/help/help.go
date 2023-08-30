@@ -111,8 +111,6 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 		return
 	}
 
-	separator := m.Styles.ShortSeparator.Inline(true).Render(m.ShortSeparator)
-
 	x := 0
 	for _, kb := range bindings {
 		if !kb.Enabled() {
@@ -120,12 +118,12 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 		}
 
 		if x > 0 {
-			x = vb.WriteLine(0, x, separator)
+			x = vb.Styled(m.Styles.ShortSeparator).WriteLine(0, x, m.ShortSeparator)
 		}
 
-		x = vb.Styled(m.Styles.ShortKey.Inline(true)).WriteLine(0, x, kb.Help().Key)
+		x = vb.Styled(m.Styles.ShortKey).WriteLine(0, x, kb.Help().Key)
 		x++
-		x = vb.Styled(m.Styles.ShortDesc.Inline(true)).WriteLine(0, x, kb.Help().Desc)
+		x = vb.Styled(m.Styles.ShortDesc).WriteLine(0, x, kb.Help().Desc)
 	}
 }
 
