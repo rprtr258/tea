@@ -148,6 +148,7 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 			if !kb.Enabled() {
 				continue
 			}
+
 			keys = append(keys, kb.Help().Key)
 			descriptions = append(descriptions, kb.Help().Desc)
 		}
@@ -155,8 +156,8 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 		maxKeyLength := maxFunc(keys, ansi.PrintableRuneWidth)
 		maxDescLength := maxFunc(descriptions, ansi.PrintableRuneWidth)
 
-		vbKeys := vb.MaxWidth(maxKeyLength)
-		vbDescs := vb.PaddingLeft(maxKeyLength + 1).MaxWidth(maxDescLength)
+		vbKeys := vb.MaxWidth(maxKeyLength).Styled(m.Styles.FullKey)
+		vbDescs := vb.PaddingLeft(maxKeyLength + 1).MaxWidth(maxDescLength).Styled(m.Styles.FullDesc)
 		for i, key := range keys {
 			vbKeys.WriteLine(i, 0, key)
 			vbDescs.WriteLine(i, 0, descriptions[i])
