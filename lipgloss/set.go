@@ -122,122 +122,12 @@ func (s Style) AlignVertical(p Alignment) Style {
 	return s
 }
 
-// Padding is a shorthand method for setting padding on all sides at once.
-//
-// With one argument, the value is applied to all sides.
-//
-// With two arguments, the value is applied to the vertical and horizontal
-// sides, in that order.
-//
-// With three arguments, the value is applied to the top side, the horizontal
-// sides, and the bottom side, in that order.
-//
-// With four arguments, the value is applied clockwise starting from the top
-// side, followed by the right side, then the bottom, and finally the left.
-//
-// With more than four arguments no padding will be added.
-func (s Style) Padding(i ...int) Style { // TODO: remove all padding funcs and props
-	// top, right, bottom, left, ok := whichSidesInt(i...)
-	// if !ok {
-	// 	return s
-	// }
-
-	// s.set(paddingTopKey, top)
-	// s.set(paddingRightKey, right)
-	// s.set(paddingBottomKey, bottom)
-	// s.set(paddingLeftKey, left)
-	return s
-}
-
-// PaddingLeft adds padding on the left.
-func (s Style) PaddingLeft(i int) Style {
-	// s.set(paddingLeftKey, i)
-	return s
-}
-
-// PaddingRight adds padding on the right.
-func (s Style) PaddingRight(i int) Style {
-	// s.set(paddingRightKey, i)
-	return s
-}
-
-// PaddingTop adds padding to the top of the block.
-func (s Style) PaddingTop(i int) Style {
-	// s.set(paddingTopKey, i)
-	return s
-}
-
-// PaddingBottom adds padding to the bottom of the block.
-func (s Style) PaddingBottom(i int) Style {
-	// s.set(paddingBottomKey, i)
-	return s
-}
-
 // ColorWhitespace determines whether or not the background color should be
 // applied to the padding. This is true by default as it's more than likely the
 // desired and expected behavior, but it can be disabled for certain graphic
 // effects.
 func (s Style) ColorWhitespace(v bool) Style {
 	// s.set(colorWhitespaceKey, v)
-	return s
-}
-
-// Margin is a shorthand method for setting margins on all sides at once.
-//
-// With one argument, the value is applied to all sides.
-//
-// With two arguments, the value is applied to the vertical and horizontal
-// sides, in that order.
-//
-// With three arguments, the value is applied to the top side, the horizontal
-// sides, and the bottom side, in that order.
-//
-// With four arguments, the value is applied clockwise starting from the top
-// side, followed by the right side, then the bottom, and finally the left.
-//
-// With more than four arguments no margin will be added.
-func (s Style) Margin(i ...int) Style { // TODO: remove all margin funcs and props
-	// top, right, bottom, left, ok := whichSidesInt(i...)
-	// if !ok {
-	// 	return s
-	// }
-
-	// s.set(marginTopKey, top)
-	// s.set(marginRightKey, right)
-	// s.set(marginBottomKey, bottom)
-	// s.set(marginLeftKey, left)
-	return s
-}
-
-// MarginLeft sets the value of the left margin.
-func (s Style) MarginLeft(i int) Style {
-	// s.set(marginLeftKey, i)
-	return s
-}
-
-// MarginRight sets the value of the right margin.
-func (s Style) MarginRight(i int) Style {
-	// s.set(marginRightKey, i)
-	return s
-}
-
-// MarginTop sets the value of the top margin.
-func (s Style) MarginTop(i int) Style {
-	// s.set(marginTopKey, i)
-	return s
-}
-
-// MarginBottom sets the value of the bottom margin.
-func (s Style) MarginBottom(i int) Style {
-	// s.set(marginBottomKey, i)
-	return s
-}
-
-// MarginBackground sets the background color of the margin. Note that this is
-// also set when inheriting from a style with a background color. In that case
-// the background color on that style will set the margin color on this style.
-func (s Style) MarginBackground(c TerminalColor) Style {
-	// s.set(marginBackgroundKey, c)
 	return s
 }
 

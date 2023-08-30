@@ -30,20 +30,7 @@ const (
 	alignHorizontalKey
 	alignVerticalKey
 
-	// Padding.
-	paddingTopKey
-	paddingRightKey
-	paddingBottomKey
-	paddingLeftKey
-
 	colorWhitespaceKey
-
-	// Margins.
-	marginTopKey
-	marginRightKey
-	marginBottomKey
-	marginLeftKey
-	marginBackgroundKey
 
 	// Border runes.
 	borderStyleKey
@@ -143,20 +130,6 @@ func (s Style) Copy() Style {
 // Margins, padding, and underlying string values are not inherited.
 func (s Style) Inherit(i Style) Style {
 	for k, v := range i.rules {
-		switch k {
-		case marginTopKey, marginRightKey, marginBottomKey, marginLeftKey:
-			// Margins are not inherited
-			continue
-		case paddingTopKey, paddingRightKey, paddingBottomKey, paddingLeftKey:
-			// Padding is not inherited
-			continue
-		case backgroundKey:
-			// The margins also inherit the background color
-			if !s.isSet(marginBackgroundKey) && !i.isSet(marginBackgroundKey) {
-				s.rules[marginBackgroundKey] = v
-			}
-		}
-
 		if _, ok := s.rules[k]; ok {
 			continue
 		}
@@ -192,10 +165,10 @@ func (s Style) Render(strs ...string) string {
 		horizontalAlign = s.GetAlignHorizontal()
 		verticalAlign   = s.GetAlignVertical()
 
-		topPadding    = s.GetPaddingTop()
-		rightPadding  = s.GetPaddingRight()
-		bottomPadding = s.GetPaddingBottom()
-		leftPadding   = s.GetPaddingLeft()
+		// topPadding    = s.GetPaddingTop()
+		// rightPadding  = s.GetPaddingRight()
+		// bottomPadding = s.GetPaddingBottom()
+		// leftPadding   = s.GetPaddingLeft()
 
 		colorWhitespace = s.getAsBool(colorWhitespaceKey, true)
 		inline          = s.GetInline()
@@ -287,7 +260,7 @@ func (s Style) Render(strs ...string) string {
 
 	// Word wrap
 	if !inline && width > 0 {
-		wrapAt := width - leftPadding - rightPadding
+		wrapAt := width //- leftPadding - rightPadding
 		str = wordwrap.String(str, wrapAt)
 		str = wrap.String(str, wrapAt) // force-wrap long strings
 	}
@@ -320,35 +293,6 @@ func (s Style) Render(strs ...string) string {
 		str = sb.String()
 	}
 
-	// Padding
-	if !inline {
-		if leftPadding > 0 {
-			st := termenv.Style{}
-			if colorWhitespace || styleWhitespace {
-				st = teWhitespace
-			}
-
-			str = padLeft(str, leftPadding, st)
-		}
-
-		if rightPadding > 0 {
-			st := termenv.Style{}
-			if colorWhitespace || styleWhitespace {
-				st = teWhitespace
-			}
-
-			str = padRight(str, rightPadding, st)
-		}
-
-		if topPadding > 0 {
-			str = strings.Repeat("\n", topPadding) + str
-		}
-
-		if bottomPadding > 0 {
-			str += strings.Repeat("\n", bottomPadding)
-		}
-	}
-
 	// Height
 	if height > 0 {
 		str = alignTextVertical(str, verticalAlign, height)
@@ -372,7 +316,6 @@ func (s Style) Render(strs ...string) string {
 
 	if !inline {
 		str = s.applyBorder(str)
-		str = s.applyMargins(str, inline)
 	}
 
 	// Truncate according to MaxHeight
@@ -392,81 +335,4 @@ func (s Style) Render(strs ...string) string {
 	}
 
 	return str
-}
-
-func (s Style) applyMargins(str string, inline bool) string {
-	var styler termenv.Style
-	if bgc := s.getAsColor(marginBackgroundKey); bgc != noColor {
-		styler = styler.Background(bgc.color(s.r))
-	}
-
-	var (
-		leftMargin  = s.getAsInt(marginLeftKey)
-		rightMargin = s.getAsInt(marginRightKey)
-	)
-
-	// Add left and right margin
-	str = padLeft(str, leftMargin, styler)
-	str = padRight(str, rightMargin, styler)
-
-	if inline {
-		return str
-	}
-
-	// Top/bottom margin
-	spaces := strings.Repeat(" ", getWidestWidth(strings.Split(str, "\n")))
-
-	if topMargin := s.getAsInt(marginTopKey); topMargin > 0 {
-		str = styler.Styled(strings.Repeat(spaces+"\n", topMargin)) + str
-	}
-
-	if bottomMargin := s.getAsInt(marginBottomKey); bottomMargin > 0 {
-		str += styler.Styled(strings.Repeat("\n"+spaces, bottomMargin))
-	}
-
-	return str
-}
-
-// Apply left padding.
-func padLeft(str string, n int, style termenv.Style) string {
-	if n == 0 {
-		return str
-	}
-
-	sp := style.Styled(strings.Repeat(" ", n))
-
-	lines := strings.Split(str, "\n")
-
-	var sb strings.Builder
-	for i, line := range lines {
-		sb.WriteString(sp)
-		sb.WriteString(line)
-		if i != len(lines)-1 {
-			sb.WriteRune('\n')
-		}
-	}
-
-	return sb.String()
-}
-
-// Apply right padding.
-func padRight(str string, n int, style termenv.Style) string {
-	if n == 0 || str == "" {
-		return str
-	}
-
-	sp := style.Styled(strings.Repeat(" ", n))
-
-	lines := strings.Split(str, "\n")
-
-	var sb strings.Builder
-	for i, line := range lines {
-		sb.WriteString(line)
-		sb.WriteString(sp)
-		if i != len(lines)-1 {
-			sb.WriteRune('\n')
-		}
-	}
-
-	return sb.String()
 }

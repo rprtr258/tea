@@ -8,7 +8,7 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
+var docStyle = lipgloss.NewStyle() //.Margin(1, 2)
 
 type item struct {
 	title, desc string
@@ -32,8 +32,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			return
 		}
 	case tea.MsgWindowSize:
-		h, v := docStyle.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
+		// h, v := docStyle.GetFrameSize()
+		m.list.SetSize(msg.Width /*-h*/, msg.Height /*-v*/)
 	}
 
 	f(m.list.Update(msg)...)

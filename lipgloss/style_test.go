@@ -138,9 +138,7 @@ func TestStyleInherit(t *testing.T) {
 		Blink(true).
 		Faint(true).
 		Foreground(Color("#ffffff")).
-		Background(Color("#111111")).
-		Margin(1, 1, 1, 1).
-		Padding(1, 1, 1, 1)
+		Background(Color("#111111"))
 
 	i := NewStyle().Inherit(s)
 
@@ -152,15 +150,6 @@ func TestStyleInherit(t *testing.T) {
 	assert.Equal(t, s.GetFaint(), i.GetFaint())
 	assert.Equal(t, s.GetForeground(), i.GetForeground())
 	assert.Equal(t, s.GetBackground(), i.GetBackground())
-
-	assert.NotEqual(t, s.GetMarginLeft(), i.GetMarginLeft())
-	assert.NotEqual(t, s.GetMarginRight(), i.GetMarginRight())
-	assert.NotEqual(t, s.GetMarginTop(), i.GetMarginTop())
-	assert.NotEqual(t, s.GetMarginBottom(), i.GetMarginBottom())
-	assert.NotEqual(t, s.GetPaddingLeft(), i.GetPaddingLeft())
-	assert.NotEqual(t, s.GetPaddingRight(), i.GetPaddingRight())
-	assert.NotEqual(t, s.GetPaddingTop(), i.GetPaddingTop())
-	assert.NotEqual(t, s.GetPaddingBottom(), i.GetPaddingBottom())
 }
 
 func TestStyleCopy(t *testing.T) {
@@ -174,9 +163,7 @@ func TestStyleCopy(t *testing.T) {
 		Blink(true).
 		Faint(true).
 		Foreground(Color("#ffffff")).
-		Background(Color("#111111")).
-		Margin(1, 1, 1, 1).
-		Padding(1, 1, 1, 1)
+		Background(Color("#111111"))
 
 	i := s.Copy()
 
@@ -188,15 +175,6 @@ func TestStyleCopy(t *testing.T) {
 	assert.Equal(t, s.GetFaint(), i.GetFaint())
 	assert.Equal(t, s.GetForeground(), i.GetForeground())
 	assert.Equal(t, s.GetBackground(), i.GetBackground())
-
-	assert.Equal(t, s.GetMarginLeft(), i.GetMarginLeft())
-	assert.Equal(t, s.GetMarginRight(), i.GetMarginRight())
-	assert.Equal(t, s.GetMarginTop(), i.GetMarginTop())
-	assert.Equal(t, s.GetMarginBottom(), i.GetMarginBottom())
-	assert.Equal(t, s.GetPaddingLeft(), i.GetPaddingLeft())
-	assert.Equal(t, s.GetPaddingRight(), i.GetPaddingRight())
-	assert.Equal(t, s.GetPaddingTop(), i.GetPaddingTop())
-	assert.Equal(t, s.GetPaddingBottom(), i.GetPaddingBottom())
 }
 
 func TestStyleUnset(t *testing.T) {
@@ -253,42 +231,6 @@ func TestStyleUnset(t *testing.T) {
 	assert.Equal[TerminalColor](t, col, s.GetBackground())
 	s.UnsetBackground()
 	assert.NotEqual[TerminalColor](t, col, s.GetBackground())
-
-	// margins
-	s = NewStyle().Margin(1, 2, 3, 4)
-	assert.Equal(t, 1, s.GetMarginTop())
-	s.UnsetMarginTop()
-	assert.Equal(t, 0, s.GetMarginTop())
-
-	assert.Equal(t, 2, s.GetMarginRight())
-	s.UnsetMarginRight()
-	assert.Equal(t, 0, s.GetMarginRight())
-
-	assert.Equal(t, 3, s.GetMarginBottom())
-	s.UnsetMarginBottom()
-	assert.Equal(t, 0, s.GetMarginBottom())
-
-	assert.Equal(t, 4, s.GetMarginLeft())
-	s.UnsetMarginLeft()
-	assert.Equal(t, 0, s.GetMarginLeft())
-
-	// padding
-	s = NewStyle().Padding(1, 2, 3, 4)
-	assert.Equal(t, 1, s.GetPaddingTop())
-	s.UnsetPaddingTop()
-	assert.Equal(t, 0, s.GetPaddingTop())
-
-	assert.Equal(t, 2, s.GetPaddingRight())
-	s.UnsetPaddingRight()
-	assert.Equal(t, 0, s.GetPaddingRight())
-
-	assert.Equal(t, 3, s.GetPaddingBottom())
-	s.UnsetPaddingBottom()
-	assert.Equal(t, 0, s.GetPaddingBottom())
-
-	assert.Equal(t, 4, s.GetPaddingLeft())
-	s.UnsetPaddingLeft()
-	assert.Equal(t, 0, s.GetPaddingLeft())
 
 	// border
 	s = NewStyle().Border(NormalBorder, true, true, true, true)

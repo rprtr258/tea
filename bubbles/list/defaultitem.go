@@ -136,7 +136,7 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 
 	s := &d.Styles
 	// Prevent text from exceeding list width
-	textwidth := uint(m.width - s.NormalTitle.GetPaddingLeft() - s.NormalTitle.GetPaddingRight())
+	textwidth := uint(m.width /*- s.NormalTitle.GetPaddingLeft() - s.NormalTitle.GetPaddingRight()*/)
 	title = truncate.StringWithTail(title, textwidth, ellipsis)
 	if d.ShowDescription {
 		var lines []string

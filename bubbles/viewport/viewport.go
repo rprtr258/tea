@@ -363,8 +363,8 @@ func (m *Model) View(vb tea.Viewbox) {
 	if sh := m.Style.GetHeight(); sh != 0 {
 		h = min(h, sh)
 	}
-	contentWidth := w - m.Style.GetHorizontalFrameSize()
-	contentHeight := h - m.Style.GetVerticalFrameSize()
+	contentWidth := w  //- m.Style.GetHorizontalFrameSize()
+	contentHeight := h //- m.Style.GetVerticalFrameSize()
 	contents := lipgloss.NewStyle().
 		Height(contentHeight).    // pad to height.
 		MaxHeight(contentHeight). // truncate height if taller.

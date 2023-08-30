@@ -85,83 +85,9 @@ func (s Style) UnsetAlignVertical() Style {
 	return s
 }
 
-// UnsetPadding removes all padding style rules.
-func (s Style) UnsetPadding() Style {
-	delete(s.rules, paddingLeftKey)
-	delete(s.rules, paddingRightKey)
-	delete(s.rules, paddingTopKey)
-	delete(s.rules, paddingBottomKey)
-	return s
-}
-
-// UnsetPaddingLeft removes the left padding style rule, if set.
-func (s Style) UnsetPaddingLeft() Style {
-	delete(s.rules, paddingLeftKey)
-	return s
-}
-
-// UnsetPaddingRight removes the right padding style rule, if set.
-func (s Style) UnsetPaddingRight() Style {
-	delete(s.rules, paddingRightKey)
-	return s
-}
-
-// UnsetPaddingTop removes the top padding style rule, if set.
-func (s Style) UnsetPaddingTop() Style {
-	delete(s.rules, paddingTopKey)
-	return s
-}
-
-// UnsetPaddingBottom removes the bottom padding style rule, if set.
-func (s Style) UnsetPaddingBottom() Style {
-	delete(s.rules, paddingBottomKey)
-	return s
-}
-
 // UnsetColorWhitespace removes the rule for coloring padding, if set.
 func (s Style) UnsetColorWhitespace() Style {
 	delete(s.rules, colorWhitespaceKey)
-	return s
-}
-
-// UnsetMargins removes all margin style rules.
-func (s Style) UnsetMargins() Style {
-	delete(s.rules, marginLeftKey)
-	delete(s.rules, marginRightKey)
-	delete(s.rules, marginTopKey)
-	delete(s.rules, marginBottomKey)
-	return s
-}
-
-// UnsetMarginLeft removes the left margin style rule, if set.
-func (s Style) UnsetMarginLeft() Style {
-	delete(s.rules, marginLeftKey)
-	return s
-}
-
-// UnsetMarginRight removes the right margin style rule, if set.
-func (s Style) UnsetMarginRight() Style {
-	delete(s.rules, marginRightKey)
-	return s
-}
-
-// UnsetMarginTop removes the top margin style rule, if set.
-func (s Style) UnsetMarginTop() Style {
-	delete(s.rules, marginTopKey)
-	return s
-}
-
-// UnsetMarginBottom removes the bottom margin style rule, if set.
-func (s Style) UnsetMarginBottom() Style {
-	delete(s.rules, marginBottomKey)
-	return s
-}
-
-// UnsetMarginBackground removes the margin's background color. Note that the
-// margin's background color can be set from the background color of another
-// style during inheritance.
-func (s Style) UnsetMarginBackground() Style {
-	delete(s.rules, marginBackgroundKey)
 	return s
 }
 

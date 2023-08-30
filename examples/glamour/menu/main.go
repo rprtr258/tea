@@ -62,8 +62,8 @@ func newExample() (*model, error) {
 	vp := viewport.New(width, 20)
 	vp.Style = lipgloss.NewStyle().
 		BorderStyle(lipgloss.RoundedBorder).
-		BorderForeground(lipgloss.Color("62")).
-		PaddingRight(2)
+		BorderForeground(lipgloss.Color("62"))
+		// PaddingRight(2)
 
 	renderer, err := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),

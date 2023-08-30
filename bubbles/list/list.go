@@ -1031,7 +1031,7 @@ func (m *Model[I]) titleView() string {
 	spinnerView := m.spinnerView()
 	spinnerWidth := lipgloss.Width(spinnerView)
 	spinnerLeftGap := " "
-	spinnerOnLeft := titleBarStyle.GetPaddingLeft() >= spinnerWidth+lipgloss.Width(spinnerLeftGap) && m.showSpinner
+	spinnerOnLeft := /*titleBarStyle.GetPaddingLeft() >= spinnerWidth+lipgloss.Width(spinnerLeftGap) &&*/ m.showSpinner
 
 	var view string
 	// If the filter's showing, draw that. Otherwise draw the title.
@@ -1040,8 +1040,8 @@ func (m *Model[I]) titleView() string {
 	} else if m.showTitle {
 		if m.showSpinner && spinnerOnLeft {
 			view += spinnerView + spinnerLeftGap
-			titleBarGap := titleBarStyle.GetPaddingLeft()
-			titleBarStyle = titleBarStyle.PaddingLeft(titleBarGap - spinnerWidth - lipgloss.Width(spinnerLeftGap))
+			// titleBarGap := titleBarStyle.GetPaddingLeft()
+			// titleBarStyle = titleBarStyle.PaddingLeft(titleBarGap - spinnerWidth - lipgloss.Width(spinnerLeftGap))
 		}
 
 		view += m.Styles.Title.Render(m.Title)

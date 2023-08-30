@@ -853,7 +853,7 @@ func (m *Model) SetWidth(w int) {
 	}
 
 	// Account for base style borders and padding.
-	inputWidth -= m.style.Base.GetHorizontalFrameSize()
+	// inputWidth -= m.style.Base.GetHorizontalFrameSize()
 
 	if m.promptFunc == nil {
 		m.promptWidth = rw.StringWidth(m.Prompt)

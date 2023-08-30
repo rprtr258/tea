@@ -118,8 +118,8 @@ func DefaultStylesWithRenderer(r *lipgloss.Renderer) Styles {
 		Selected:         r.NewStyle().Foreground(lipgloss.Color("212")).Bold(true),
 		FileSize:         r.NewStyle().Foreground(lipgloss.Color("240")).Width(fileSizeWidth).Align(lipgloss.Right),
 		EmptyDirectory: r.NewStyle().
-			Foreground(lipgloss.Color("240")).
-			PaddingLeft(paddingLeft),
+			Foreground(lipgloss.Color("240")),
+		// PaddingLeft(paddingLeft)
 	}
 }
 

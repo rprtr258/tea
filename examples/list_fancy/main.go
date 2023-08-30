@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	appStyle = lipgloss.NewStyle().Padding(1, 2)
+	appStyle = lipgloss.NewStyle() //.Padding(1, 2)
 
 	titleStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#FFFDF5")).
-			Background(lipgloss.Color("#25A065")).
-			Padding(0, 1)
+			Background(lipgloss.Color("#25A065"))
+		// Padding(0, 1)
 
 	statusMessageStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.AdaptiveColor{Light: "#04B575", Dark: "#04B575"}).
@@ -120,8 +120,8 @@ func (m *model) Init(f func(...tea.Cmd)) {
 func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
-		h, v := appStyle.GetFrameSize()
-		m.list.SetSize(msg.Width-h, msg.Height-v)
+		// h, v := appStyle.GetFrameSize()
+		m.list.SetSize(msg.Width /*-h*/, msg.Height /*-v*/)
 
 	case tea.MsgKey:
 		// Don't match any of the keys below if we're actively filtering.

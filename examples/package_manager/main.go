@@ -71,8 +71,8 @@ type model struct {
 var (
 	currentPkgNameStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("211"))
-	doneStyle = lipgloss.NewStyle().
-			Margin(1, 2)
+	doneStyle = lipgloss.NewStyle()
+	// Margin(1, 2)
 	checkMark = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("42")).
 			SetString("✓")

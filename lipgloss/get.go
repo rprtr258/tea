@@ -99,100 +99,10 @@ func (s Style) GetAlignVertical() Alignment {
 	return v
 }
 
-// GetPadding returns the style's top, right, bottom, and left padding values,
-// in that order. 0 is returned for unset values.
-func (s Style) GetPadding() (top, right, bottom, left int) { //nolint:nonamedreturns
-	return s.getAsInt(paddingTopKey),
-		s.getAsInt(paddingRightKey),
-		s.getAsInt(paddingBottomKey),
-		s.getAsInt(paddingLeftKey)
-}
-
-// GetPaddingTop returns the style's top padding. If no value is set 0 is
-// returned.
-func (s Style) GetPaddingTop() int {
-	return s.getAsInt(paddingTopKey)
-}
-
-// GetPaddingRight returns the style's right padding. If no value is set 0 is
-// returned.
-func (s Style) GetPaddingRight() int {
-	return s.getAsInt(paddingRightKey)
-}
-
-// GetPaddingBottom returns the style's bottom padding. If no value is set 0 is
-// returned.
-func (s Style) GetPaddingBottom() int {
-	return s.getAsInt(paddingBottomKey)
-}
-
-// GetPaddingLeft returns the style's left padding. If no value is set 0 is
-// returned.
-func (s Style) GetPaddingLeft() int {
-	return s.getAsInt(paddingLeftKey)
-}
-
-// GetHorizontalPadding returns the style's left and right padding. Unset
-// values are measured as 0.
-func (s Style) GetHorizontalPadding() int {
-	return s.getAsInt(paddingLeftKey) + s.getAsInt(paddingRightKey)
-}
-
-// GetVerticalPadding returns the style's top and bottom padding. Unset values
-// are measured as 0.
-func (s Style) GetVerticalPadding() int {
-	return s.getAsInt(paddingTopKey) + s.getAsInt(paddingBottomKey)
-}
-
 // GetColorWhitespace returns the style's whitespace coloring setting. If no
 // value is set false is returned.
 func (s Style) GetColorWhitespace() bool {
 	return s.getAsBool(colorWhitespaceKey, false)
-}
-
-// GetMargin returns the style's top, right, bottom, and left margins, in that
-// order. 0 is returned for unset values.
-func (s Style) GetMargin() (top, right, bottom, left int) { //nolint:nonamedreturns
-	return s.getAsInt(marginTopKey),
-		s.getAsInt(marginRightKey),
-		s.getAsInt(marginBottomKey),
-		s.getAsInt(marginLeftKey)
-}
-
-// GetMarginTop returns the style's top margin. If no value is set 0 is
-// returned.
-func (s Style) GetMarginTop() int {
-	return s.getAsInt(marginTopKey)
-}
-
-// GetMarginRight returns the style's right margin. If no value is set 0 is
-// returned.
-func (s Style) GetMarginRight() int {
-	return s.getAsInt(marginRightKey)
-}
-
-// GetMarginBottom returns the style's bottom margin. If no value is set 0 is
-// returned.
-func (s Style) GetMarginBottom() int {
-	return s.getAsInt(marginBottomKey)
-}
-
-// GetMarginLeft returns the style's left margin. If no value is set 0 is
-// returned.
-func (s Style) GetMarginLeft() int {
-	return s.getAsInt(marginLeftKey)
-}
-
-// GetHorizontalMargins returns the style's left and right margins. Unset
-// values are measured as 0.
-func (s Style) GetHorizontalMargins() int {
-	return s.getAsInt(marginLeftKey) + s.getAsInt(marginRightKey)
-}
-
-// GetVerticalMargins returns the style's top and bottom margins. Unset values
-// are measured as 0.
-func (s Style) GetVerticalMargins() int {
-	return s.getAsInt(marginTopKey) + s.getAsInt(marginBottomKey)
 }
 
 // GetBorder returns the style's border style (type Border) and value for the
@@ -370,28 +280,6 @@ func (s Style) GetUnderlineSpaces() bool {
 // spaces. If not value is set false is returned.
 func (s Style) GetStrikethroughSpaces() bool {
 	return s.getAsBool(_strikethroughSpacesKey, false)
-}
-
-// GetHorizontalFrameSize returns the sum of the style's horizontal margins, padding
-// and border widths.
-//
-// Provisional: this method may be renamed.
-func (s Style) GetHorizontalFrameSize() int {
-	return s.GetHorizontalMargins() + s.GetHorizontalPadding() + s.GetHorizontalBorderSize()
-}
-
-// GetVerticalFrameSize returns the sum of the style's vertical margins, padding
-// and border widths.
-//
-// Provisional: this method may be renamed.
-func (s Style) GetVerticalFrameSize() int {
-	return s.GetVerticalMargins() + s.GetVerticalPadding() + s.GetVerticalBorderSize()
-}
-
-// GetFrameSize returns the sum of the margins, padding and border width for
-// both the horizontal and vertical margins.
-func (s Style) GetFrameSize() (x, y int) { //nolint:nonamedreturns
-	return s.GetHorizontalFrameSize(), s.GetVerticalFrameSize()
 }
 
 // Returns whether or not the given property is set.
