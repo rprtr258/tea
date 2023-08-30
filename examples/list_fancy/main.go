@@ -120,7 +120,7 @@ func (m *model) Init(f func(...tea.Cmd)) {
 	f(tea.EnterAltScreen)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		h, v := appStyle.GetFrameSize()
@@ -134,7 +134,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 		switch {
 		case key.Matches(msg, m.keys.toggleSpinner):
-			f(m.list.ToggleSpinner()...)
+			yield(m.list.ToggleSpinner()...)
 			return
 		case key.Matches(msg, m.keys.toggleTitleBar):
 			v := !m.list.ShowTitle()
@@ -154,14 +154,14 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		case key.Matches(msg, m.keys.insertItem):
 			m.delegateKeys.remove.SetEnabled(true)
 			newItem := m.itemGenerator.next()
-			f(m.list.InsertItem(0, newItem)...)
-			f(m.list.CmdNewStatusMessage(statusMessageStyle("Added " + newItem.Title())))
+			yield(m.list.InsertItem(0, newItem)...)
+			yield(m.list.CmdNewStatusMessage(statusMessageStyle("Added " + newItem.Title())))
 			return
 		}
 	}
 
 	// This will also call our delegate's update function.
-	f(m.list.Update(msg)...)
+	yield(m.list.Update(msg)...)
 }
 
 func (m *model) View(vb tea.Viewbox) {
