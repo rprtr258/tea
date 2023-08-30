@@ -133,8 +133,8 @@ func maxFunc[T any, R cmp.Ordered](slice []T, f func(T) R) R {
 	return res
 }
 
-// FullHelpView renders help columns from a slice of key binding slices. Each
-// top level slice entry renders into a column.
+// FullHelpView renders help columns from a slice of key binding slices.
+// Each top level slice entry renders into a column.
 func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 	// Iterate over groups to build columns
 	for _, group := range groups {
