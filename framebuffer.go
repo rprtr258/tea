@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 
-	// "github.com/muesli/termenv"
-
 	"github.com/rprtr258/tea/lipgloss"
 )
 
