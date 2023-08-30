@@ -10,12 +10,12 @@ type randomItemGenerator struct {
 	descs      []string
 	titleIndex int
 	descIndex  int
-	mtx        *sync.Mutex
+	mu         *sync.Mutex
 	shuffle    *sync.Once
 }
 
 func (r *randomItemGenerator) reset() {
-	r.mtx = &sync.Mutex{}
+	r.mu = &sync.Mutex{}
 	r.shuffle = &sync.Once{}
 
 	r.titles = []string{
@@ -138,12 +138,12 @@ func (r *randomItemGenerator) reset() {
 }
 
 func (r *randomItemGenerator) next() item {
-	if r.mtx == nil {
+	if r.mu == nil {
 		r.reset()
 	}
 
-	r.mtx.Lock()
-	defer r.mtx.Unlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	i := item{
 		title:       r.titles[r.titleIndex],
