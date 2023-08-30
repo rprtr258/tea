@@ -37,7 +37,7 @@ func NewViewbox(height, width int) Viewbox {
 	}
 
 	styles := make([]lipgloss.Style, height*width)
-	for i := range buf {
+	for i := range styles {
 		styles[i] = lipgloss.NewStyle()
 	}
 
@@ -56,6 +56,18 @@ func NewViewbox(height, width int) Viewbox {
 		X:      0,
 		style:  lipgloss.NewStyle(),
 	}
+}
+
+func (vb *Viewbox) Clear() {
+	for i := range vb.fb.B {
+		vb.fb.B[i] = ' '
+	}
+
+	for i := range vb.fb.styles {
+		vb.fb.styles[i] = lipgloss.NewStyle()
+	}
+
+	vb.style = lipgloss.NewStyle()
 }
 
 // Render framebuffer to string
@@ -135,6 +147,10 @@ func (vb Viewbox) Styled(style lipgloss.Style) Viewbox {
 // Set writes a rune to the framebuffer in position relative to viewbox
 // 0 <= y < height, 0 <= x < width
 func (vb Viewbox) Set(y, x int, c rune) {
+	if y < 0 || y >= vb.Height || x < 0 || x >= vb.Width {
+		return
+	}
+
 	vb.fb.B[(vb.Y+y)*vb.fb.Width+vb.X+x] = c
 }
 

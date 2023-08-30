@@ -3,8 +3,6 @@ package basics
 import (
 	"context"
 
-	"github.com/rprtr258/fun"
-
 	"github.com/rprtr258/tea"
 )
 
@@ -12,6 +10,7 @@ type model struct {
 	cursor   int
 	choices  []string
 	selected map[int]struct{}
+	vb       tea.Viewbox
 }
 
 func initialModel() *model {
@@ -22,17 +21,23 @@ func initialModel() *model {
 		// the map like a mathematical set. The keys refer to the indexes
 		// of the `choices` slice, above.
 		selected: make(map[int]struct{}),
+		cursor:   0,
+
+		vb: tea.NewViewbox(0, 0),
 	}
 }
 
 func (m *model) Init(func(...tea.Cmd)) {}
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) { //nolint:gocritic
+	case tea.MsgWindowSize:
+		// TODO: m.vb.SetSize(msg.Width, msg.Height)
+		m.vb = tea.NewViewbox(msg.Height, msg.Width)
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			f(tea.Quit)
+			yield(tea.Quit)
 		case "up", "k":
 			if m.cursor > 0 {
 				m.cursor--
@@ -42,8 +47,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 				m.cursor++
 			}
 		case "enter", " ":
-			_, ok := m.selected[m.cursor]
-			if ok {
+			if _, ok := m.selected[m.cursor]; ok {
 				delete(m.selected, m.cursor)
 			} else {
 				m.selected[m.cursor] = struct{}{}
@@ -53,24 +57,35 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(r tea.Renderer) {
-	r.Write("What should we buy at the market?\n\n")
+	m.vb.Clear()
 
-	for i, choice := range m.choices {
-		r.Write(fun.IF(m.cursor == i, ">", " "))
-
-		checked := " "
-		if _, ok := m.selected[i]; ok {
-			checked = "x"
-		}
-		r.Write(" [")
-		r.Write(checked)
-		r.Write("] ")
-
-		r.Write(choice)
-		r.Write("\n")
+	// TODO: WriteLine, WriteText
+	for i, c := range "What should we buy at the market?" {
+		m.vb.Set(0, i, c)
 	}
 
-	r.Write("\nPress q to quit.\n")
+	vbChoices := m.vb.Padding(tea.PaddingOptions{Top: 2})
+	vbChoices.Set(m.cursor, 0, '>')
+	for i, choice := range m.choices {
+		vbChoices.Set(i, 2, '[')
+		if _, ok := m.selected[i]; ok {
+			vbChoices.Set(i, 3, 'x')
+		}
+		vbChoices.Set(i, 4, ']')
+
+		// TODO: WriteLine, WriteText
+		for j, c := range choice {
+			vbChoices.Set(i, j+6, c)
+		}
+	}
+
+	vbFooter := vbChoices.Padding(tea.PaddingOptions{Top: len(m.choices) + 1}) // TODO: rewrite?
+	// TODO: WriteLine, WriteText
+	for i, c := range "Press q to quit." {
+		vbFooter.Set(0, i, c)
+	}
+
+	r.Write(m.vb.Render())
 }
 
 func Main(ctx context.Context) error {
