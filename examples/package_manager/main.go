@@ -12,6 +12,52 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
+var packages = [...]string{
+	"babys-monads",
+	"bad-kitty",
+	"cashew-apple",
+	"chai",
+	"coffee-CUPS",
+	"currykit",
+	"currywurst-devel",
+	"eggy",
+	"fullenglish",
+	"hojicha",
+	"jalapeño",
+	"libesszet",
+	"libgardening",
+	"libpurring",
+	"libtacos",
+	"libyuzu",
+	"licorice-utils",
+	"molasses-utils",
+	"old-socks-devel",
+	"party-gherkin",
+	"rock-lobster",
+	"schnurrkit",
+	"snow-peas",
+	"spicerack",
+	"standmixer",
+	"vegeutils",
+	"xkohlrabi",
+	"xmodmeow",
+	"zeichenorientierte-benutzerschnittstellen",
+}
+
+func getPackages() []string {
+	pkgs := packages
+
+	rand.Shuffle(len(pkgs), func(i, j int) {
+		pkgs[i], pkgs[j] = pkgs[j], pkgs[i]
+	})
+
+	for k := range pkgs {
+		major, minor, patch := rand.Intn(10), rand.Intn(10), rand.Intn(10) //nolint:gosec
+		pkgs[k] += fmt.Sprintf("-%d.%d.%d", major, minor, patch)
+	}
+	return pkgs[:]
+}
+
 type model struct {
 	packages []string
 	index    int
@@ -23,14 +69,20 @@ type model struct {
 }
 
 var (
-	currentPkgNameStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("211"))
-	doneStyle           = lipgloss.NewStyle().Margin(1, 2)
-	checkMark           = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
+	currentPkgNameStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("211"))
+	doneStyle = lipgloss.NewStyle().
+			Margin(1, 2)
+	checkMark = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("42")).
+			SetString("✓")
 )
 
 func newModel() *model {
-	s := spinner.New()
-	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
+	s := spinner.New(
+		spinner.WithSpinner(spinner.Dot),
+		spinner.WithStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("63"))),
+	)
 	return &model{
 		packages: getPackages(),
 		spinner:  s,
@@ -42,28 +94,27 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(
+func (m *model) Init(yield func(...tea.Cmd)) {
+	yield(
 		downloadAndInstall(m.packages[m.index]),
 		m.spinner.CmdTick,
 	)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.width, m.height = msg.Width, msg.Height
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
-			f(tea.Quit)
-			return
+			yield(tea.Quit)
 		}
 	case msgInstalledPkg:
 		if m.index >= len(m.packages)-1 {
 			// Everything's been installed. We're done!
 			m.done = true
-			f(tea.Quit)
+			yield(tea.Quit)
 			return
 		}
 
@@ -71,30 +122,27 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		progressCmd := m.progress.SetPercent(float64(m.index) / float64(len(m.packages)-1))
 
 		m.index++
-		f(
+		yield(
 			progressCmd,
 			tea.Printf("%s %s", checkMark, m.packages[m.index]), // print success message above our program
 			downloadAndInstall(m.packages[m.index]),             // download the next package
 		)
-		return
 	case spinner.MsgTick:
-		f(m.spinner.Update(msg)...)
-		return
+		yield(m.spinner.Update(msg)...)
 	case progress.MsgFrame:
-		f(m.progress.Update(msg)...)
-		return
+		yield(m.progress.Update(msg)...)
 	}
 }
 
 func (m *model) View(vb tea.Viewbox) {
 	n := len(m.packages)
-	w := lipgloss.Width(fmt.Sprintf("%d", n))
 
 	if m.done {
 		vb.Styled(doneStyle).WriteLine(0, 0, fmt.Sprintf("Done! Installed %d packages.", n))
 		return
 	}
 
+	w := lipgloss.Width(fmt.Sprintf("%d", n))
 	pkgCount := fmt.Sprintf(" %*d/%*d", w, m.index, w, n-1)
 
 	spin := m.spinner.View() + " "
