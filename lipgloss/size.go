@@ -27,6 +27,7 @@ func Width(str string) int {
 // counting \n characters. If your strings use \r\n for newlines you should
 // convert them to \n first, or simply write a separate function for measuring
 // height.
+// TODO: remove
 func Height(str string) int {
 	return strings.Count(str, "\n") + 1
 }

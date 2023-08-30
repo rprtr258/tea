@@ -89,7 +89,7 @@ func (s Style) Width(i int) Style {
 // Height sets the height of the block before applying margins. If the height of
 // the text block is less than this value after applying padding (or not), the
 // block will be set to this height.
-func (s Style) Height(i int) Style {
+func (s Style) Height(i int) Style { // TODO: remove
 	s.set(heightKey, i)
 	return s
 }

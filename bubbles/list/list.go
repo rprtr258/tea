@@ -994,45 +994,29 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 
 // View renders the component.
 func (m *Model[I]) View(vb tea.Viewbox) {
-	var sections []string
-	availHeight := m.height
+	y := 0 // TODO: use m.height ???
 
-	if m.showTitle || (m.showFilter && m.filteringEnabled) {
-		v := m.titleView()
-		sections = append(sections, v)
-		availHeight -= lipgloss.Height(v)
+	if m.showTitle || m.showFilter && m.filteringEnabled {
+		y, _ = vb.WriteText(y, 0, m.titleView())
+		y++
 	}
 
 	if m.showStatusBar {
-		v := m.statusView()
-		sections = append(sections, v)
-		availHeight -= lipgloss.Height(v)
+		y, _ = vb.WriteText(y, 0, m.statusView())
+		y++
 	}
 
-	var pagination string
-	if m.showPagination {
-		pagination = m.paginationView()
-		availHeight -= lipgloss.Height(pagination)
-	}
-
-	var help string
-	if m.showHelp {
-		help = m.helpView()
-		availHeight -= lipgloss.Height(help)
-	}
-
-	content := lipgloss.NewStyle().Height(availHeight).Render(m.populatedView())
-	sections = append(sections, content)
+	y, _ = vb.WriteText(y, 0, m.populatedView())
+	y++
 
 	if m.showPagination {
-		sections = append(sections, pagination)
+		y, _ = vb.WriteText(y, 0, m.paginationView())
+		y++
 	}
 
 	if m.showHelp {
-		sections = append(sections, help)
+		vb.WriteText(y, 0, m.helpView())
 	}
-
-	vb.WriteText(0, 0, lipgloss.JoinVertical(lipgloss.Left, sections...))
 }
 
 func (m *Model[I]) titleView() string {
