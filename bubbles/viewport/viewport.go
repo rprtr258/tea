@@ -347,14 +347,14 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 // View renders the viewport into a string.
-func (m *Model) View() string {
-	if m.HighPerformanceRendering {
-		// Just send newlines since we're going to be rendering the actual
-		// content separately. We still need to send something that equals the
-		// height of this view so that the Bubble Tea standard renderer can
-		// position anything below this view properly.
-		return strings.Repeat("\n", max(0, m.Height-1))
-	}
+func (m *Model) View(vb tea.Viewbox) {
+	// if m.HighPerformanceRendering {
+	// 	// Just send newlines since we're going to be rendering the actual
+	// 	// content separately. We still need to send something that equals the
+	// 	// height of this view so that the Bubble Tea standard renderer can
+	// 	// position anything below this view properly.
+	// 	return strings.Repeat("\n", max(0, m.Height-1))
+	// }
 
 	w, h := m.Width, m.Height
 	if sw := m.Style.GetWidth(); sw != 0 {
@@ -370,9 +370,9 @@ func (m *Model) View() string {
 		MaxHeight(contentHeight). // truncate height if taller.
 		MaxWidth(contentWidth).   // truncate width.
 		Render(strings.Join(m.visibleLines(), "\n"))
-	return m.Style.Copy().
-		UnsetWidth().UnsetHeight(). // Style size already applied in contents.
-		Render(contents)
+	vb. // Style size already applied in contents.
+		Styled(m.Style.Copy().UnsetWidth().UnsetHeight()).
+		WriteText(0, 0, contents)
 }
 
 func clamp(v, low, high int) int {

@@ -43,19 +43,15 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("What kind of Bubble Tea would you like to order?\n\n")
-
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, "What kind of Bubble Tea would you like to order?")
+	vb = vb.Padding(tea.PaddingOptions{Top: 1})
 	for i := 0; i < len(choices); i++ {
-		if m.cursor == i {
-			r.Write("(•) ")
-		} else {
-			r.Write("( ) ")
-		}
-		r.Write(choices[i])
-		r.Write("\n")
+		vb.WriteLine(i, 0, "( ) "+choices[i])
 	}
-	r.Write("\n(press q to quit)\n")
+	vb.Set(m.cursor, 1, '•')
+	vb = vb.Padding(tea.PaddingOptions{Top: len(choices)})
+	vb.WriteLine(1, 0, "(press q to quit)")
 }
 
 func Main(ctx context.Context) error {

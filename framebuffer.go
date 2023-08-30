@@ -174,7 +174,9 @@ func (vb Viewbox) Set(y, x int, c rune) {
 		return
 	}
 
-	vb.fb.B[(vb.Y+y)*vb.fb.Width+vb.X+x] = c
+	i := (vb.Y+y)*vb.fb.Width + vb.X + x
+	vb.fb.B[i] = c
+	vb.fb.styles[i] = vb.style
 }
 
 // background colors y'th row bacground to given color from x1 to x2 with

@@ -111,12 +111,9 @@ func (c cellbuffer) ready() bool {
 	return len(c.cells) > 0
 }
 
-func (c cellbuffer) Render(r tea.Renderer) {
+func (c cellbuffer) Render(vb tea.Viewbox) {
 	for i := 0; i < len(c.cells); i++ {
-		if i > 0 && i%c.stride == 0 && i < len(c.cells)-1 {
-			r.Write("\n")
-		}
-		r.Write(string(c.cells[i]))
+		vb.WriteLine(i, 0, string(c.cells[i]))
 	}
 }
 
@@ -166,8 +163,8 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	m.cells.Render(r)
+func (m *model) View(vb tea.Viewbox) {
+	m.cells.Render(vb)
 }
 
 func Main(ctx context.Context) error {

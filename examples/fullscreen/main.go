@@ -36,10 +36,10 @@ func (m *model) Update(message tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("\n\n     Hi. This program will exit in ")
-	r.Write(fmt.Sprint(*m))
-	r.Write(" seconds...")
+func (m *model) View(vb tea.Viewbox) {
+	x := vb.WriteLine(2, 0, "     Hi. This program will exit in ")
+	x = vb.WriteLine(2, x, fmt.Sprint(*m))
+	vb.WriteLine(2, x, " seconds...")
 }
 
 func tick() tea.Cmd {

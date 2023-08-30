@@ -39,8 +39,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.list.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write(docStyle.Render(m.list.View()))
+func (m *model) View(vb tea.Viewbox) {
+	vb.Styled(docStyle).WriteText(0, 0, m.list.View())
 }
 
 func Main(ctx context.Context) error {

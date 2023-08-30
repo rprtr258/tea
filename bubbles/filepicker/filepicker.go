@@ -338,9 +338,9 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 // View returns the view of the file picker.
-func (m *Model) View(r tea.Renderer) {
+func (m *Model) View(vb tea.Viewbox) {
 	if len(m.files) == 0 {
-		r.Write(m.Styles.EmptyDirectory.String())
+		vb.WriteLine(0, 0, m.Styles.EmptyDirectory.String())
 		return
 	}
 
@@ -370,13 +370,12 @@ func (m *Model) View(r tea.Renderer) {
 				selected = fmt.Sprintf("%s → %s", selected, symlinkPath)
 			}
 			if disabled {
-				r.Write(m.Styles.DisabledSelected.Render(m.Cursor))
-				r.Write(m.Styles.DisabledSelected.Render(selected))
+				x := vb.WriteLine(i, 0, m.Styles.DisabledSelected.Render(m.Cursor))
+				vb.WriteLine(i, x, m.Styles.DisabledSelected.Render(selected))
 			} else {
-				r.Write(m.Styles.Cursor.Render(m.Cursor))
-				r.Write(m.Styles.Selected.Render(selected))
+				x := vb.WriteLine(i, 0, m.Styles.Cursor.Render(m.Cursor))
+				vb.WriteLine(i, x, m.Styles.Selected.Render(selected))
 			}
-			r.Write("\n")
 			continue
 		}
 
@@ -394,13 +393,12 @@ func (m *Model) View(r tea.Renderer) {
 		if isSymlink {
 			fileName = fmt.Sprintf("%s → %s", fileName, symlinkPath)
 		}
-		r.Write(fmt.Sprintf(
+		vb.WriteLine(i, 0, fmt.Sprintf(
 			"  %s %s %s",
 			m.Styles.Permission.Render(info.Mode().String()),
 			m.Styles.FileSize.Render(size),
 			fileName,
 		))
-		r.Write("\n")
 	}
 }
 

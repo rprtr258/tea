@@ -28,9 +28,9 @@ func (m *testModel) Update(msg Msg, f func(...Cmd)) {
 	}
 }
 
-func (m *testModel) View(r Renderer) {
+func (m *testModel) View(vb Viewbox) {
 	m.viewCalled.Store(true)
-	r.Write("success\n")
+	vb.WriteLine(0, 0, "success")
 }
 
 func TestTeaModel(t *testing.T) {

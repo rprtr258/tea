@@ -149,27 +149,18 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf(
-		` Total: $21.50:
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, " Total: $21.50:")
+	vb.WriteLine(2, 0, inputStyle.Width(30).Render("Card Number"))
+	vb.WriteLine(3, 0, m.inputs[_ccn].View())
 
- %s
- %s
+	x := vb.WriteLine(5, 0, inputStyle.Width(6).Render("EXP"))
+	vb.WriteLine(5, x+1, inputStyle.Width(6).Render("CVV"))
 
- %s  %s
- %s  %s
+	x = vb.WriteLine(6, 0, m.inputs[_exp].View())
+	vb.WriteLine(6, x+1, m.inputs[_cvv].View())
 
- %s
-
- `,
-		inputStyle.Width(30).Render("Card Number"),
-		m.inputs[_ccn].View(),
-		inputStyle.Width(6).Render("EXP"),
-		inputStyle.Width(6).Render("CVV"),
-		m.inputs[_exp].View(),
-		m.inputs[_cvv].View(),
-		continueStyle.Render("Continue ->"),
-	))
+	vb.WriteLine(8, x+1, continueStyle.Render("Continue ->"))
 }
 
 // nextInput focuses the next input field

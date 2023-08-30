@@ -18,7 +18,6 @@ package progress_static
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -70,14 +69,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	pad := strings.Repeat(" ", padding)
-	r.Write("\n")
-	r.Write(pad)
-	r.Write(m.progress.ViewAs(m.percent))
-	r.Write("\n\n")
-	r.Write(pad)
-	r.Write(helpStyle("Press any key to quit"))
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(1, padding, m.progress.ViewAs(m.percent))
+	vb.WriteLine(3, padding, helpStyle("Press any key to quit"))
 }
 
 func Main(ctx context.Context) error {

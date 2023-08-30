@@ -26,7 +26,7 @@ import (
 //
 //	// Join on the top edge
 //	str := lipgloss.JoinHorizontal(lipgloss.Top, blockA, blockB)
-func JoinHorizontal(pos Position, strs ...string) string {
+func JoinHorizontal(pos Position, strs ...string) string { // TODO: instead do viewboxes layouts
 	if len(strs) == 0 {
 		return ""
 	}

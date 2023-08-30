@@ -1,7 +1,6 @@
 package progress_download
 
 import (
-	"strings"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -59,19 +58,12 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.err != nil {
-		r.Write("Error downloading: ")
-		r.Write(m.err.Error())
-		r.Write("\n")
+		vb.WriteLine(0, 0, "Error downloading: "+m.err.Error())
 		return
 	}
 
-	pad := strings.Repeat(" ", padding)
-	r.Write("\n")
-	r.Write(pad)
-	r.Write(m.progress.View())
-	r.Write("\n\n")
-	r.Write(pad)
-	r.Write(helpStyle("Press any key to quit"))
+	vb.WriteLine(1, padding, m.progress.View())
+	vb.WriteLine(3, padding, helpStyle("Press any key to quit"))
 }

@@ -77,11 +77,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.viewport.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write(m.viewport.View())
-	r.Write("\n\n")
-	r.Write(m.textarea.View())
-	r.Write("\n\n")
+func (m *model) View(vb tea.Viewbox) {
+	m.viewport.View(vb)
+	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: 2}))
 }
 
 func Main(ctx context.Context) error {

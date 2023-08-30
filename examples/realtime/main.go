@@ -41,7 +41,6 @@ type model struct {
 	sub       chan struct{} // where we'll receive activity notifications
 	responses int           // how many responses we've received
 	spinner   spinner.Model
-	quitting  bool
 }
 
 func (m *model) Init(f func(...tea.Cmd)) {
@@ -55,7 +54,6 @@ func (m *model) Init(f func(...tea.Cmd)) {
 func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg.(type) {
 	case tea.MsgKey:
-		m.quitting = true
 		f(tea.Quit)
 	case msgResponse:
 		m.responses++                // record external activity
@@ -65,15 +63,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("\n ")
-	r.Write(m.spinner.View())
-	r.Write(" Events received: ")
-	r.Write(fmt.Sprint(m.responses))
-	r.Write("\n\n Press any key to exit\n")
-	if m.quitting {
-		r.Write("\n")
-	}
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(1, 0, " "+m.spinner.View()+" Events received: "+fmt.Sprint(m.responses))
+	vb.WriteLine(3, 0, " Press any key to exit")
 }
 
 func Main(ctx context.Context) error {

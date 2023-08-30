@@ -68,30 +68,20 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	var s string
-
+func (m *model) View(vb tea.Viewbox) {
 	if m.quitting {
-		s += "That’s all for today!"
+		vb.WriteLine(0, 0, "That’s all for today!")
 	} else {
-		s += m.spinner.View() + " Eating food..."
+		vb.WriteLine(0, 0, m.spinner.View()+" Eating food...")
 	}
 
-	s += "\n\n"
-
-	for _, res := range m.results {
-		s += res.String() + "\n"
+	for i, res := range m.results {
+		vb.WriteLine(2+i, 0, res.String())
 	}
 
 	if !m.quitting {
-		s += helpStyle.Render("Press any key to exit")
+		vb.Styled(helpStyle).WriteLine(2+len(m.results), 0, "Press any key to exit")
 	}
-
-	if m.quitting {
-		s += "\n"
-	}
-
-	r.Write(appStyle.Render(s))
 }
 
 func randomFood() string {

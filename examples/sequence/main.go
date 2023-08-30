@@ -27,7 +27,7 @@ func (*model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (*model) View(tea.Renderer) {}
+func (*model) View(tea.Viewbox) {}
 
 func Main(ctx context.Context) error {
 	_, err := tea.NewProgram(ctx, &model{}).Run()

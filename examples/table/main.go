@@ -39,9 +39,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.table.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write(baseStyle.Render(m.table.View()))
-	r.Write("\n")
+func (m *model) View(vb tea.Viewbox) {
+	m.table.View(vb.Styled(baseStyle))
 }
 
 func Main(ctx context.Context) error {

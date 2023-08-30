@@ -43,7 +43,7 @@ type Model interface {
 	Update(Msg, func(...Cmd))
 
 	// View renders the program's UI. The view is rendered after every Update.
-	View(Renderer)
+	View(Viewbox)
 }
 
 // Cmd is an IO operation that returns a message when it's complete. If it's
@@ -141,6 +141,7 @@ type Program[M Model] struct {
 	output        *termenv.Output
 	restoreOutput func() error
 	renderer      Renderer
+	vb            Viewbox
 
 	// where to read inputs from, this will usually be os.Stdin.
 	input        io.Reader
@@ -336,6 +337,10 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 			case msgExec:
 				// NB: this blocks.
 				p.exec(msg.cmd, msg.fn)
+
+				// TODO: move to renderer
+			case MsgWindowSize:
+				p.vb = NewViewbox(msg.Height, msg.Width)
 			}
 
 			p.renderer.handleMessages(msg)
@@ -344,7 +349,9 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 				cmds <- c
 			}) // run update, process command (if any)
 			p.renderer.reset()
-			model.View(p.renderer)
+			p.vb.Clear()
+			model.View(p.vb)
+			p.renderer.Write(p.vb.Render())
 		}
 	}
 }
@@ -460,7 +467,9 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Render the initial view.
 	p.renderer.reset()
-	model.View(p.renderer)
+	p.vb.Clear()
+	model.View(p.vb)
+	p.renderer.Write(p.vb.Render())
 
 	// Subscribe to user input.
 	if p.input != nil {
@@ -483,7 +492,9 @@ func (p *Program[M]) Run() (M, error) {
 	} else {
 		// Ensure we rendered the final state of the model.
 		p.renderer.reset()
-		model.View(p.renderer)
+		p.vb.Clear()
+		model.View(p.vb)
+		p.renderer.Write(p.vb.Render())
 	}
 
 	// Tear down.

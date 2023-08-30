@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"strings"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -87,33 +86,31 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	n := len(m.packages)
 	w := lipgloss.Width(fmt.Sprintf("%d", n))
 
 	if m.done {
-		r.Write(doneStyle.Render(fmt.Sprintf("Done! Installed %d packages.\n", n)))
+		vb.Styled(doneStyle).WriteLine(0, 0, fmt.Sprintf("Done! Installed %d packages.", n))
 		return
 	}
 
 	pkgCount := fmt.Sprintf(" %*d/%*d", w, m.index, w, n-1)
 
 	spin := m.spinner.View() + " "
-	r.Write(spin)
+	x := vb.WriteLine(0, 0, spin)
 
 	prog := m.progress.View()
 	cellsAvail := max(0, m.width-lipgloss.Width(spin+prog+pkgCount))
 
 	pkgName := currentPkgNameStyle.Render(m.packages[m.index])
 	info := lipgloss.NewStyle().MaxWidth(cellsAvail).Render("Installing " + pkgName)
-	r.Write(info)
+	x = vb.WriteLine(0, x, info)
 
-	cellsRemaining := max(0, m.width-lipgloss.Width(spin+info+prog+pkgCount))
-	gap := strings.Repeat(" ", cellsRemaining)
-	r.Write(gap)
+	x += max(0, m.width-lipgloss.Width(spin+info+prog+pkgCount))
 
-	r.Write(prog)
-	r.Write(pkgCount)
+	x = vb.WriteLine(0, x, prog)
+	vb.WriteLine(0, x, pkgCount)
 }
 
 type msgInstalledPkg string

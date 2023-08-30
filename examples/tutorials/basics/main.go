@@ -10,7 +10,6 @@ type model struct {
 	cursor   int
 	choices  []string
 	selected map[int]struct{}
-	vb       tea.Viewbox
 }
 
 func initialModel() *model {
@@ -22,8 +21,6 @@ func initialModel() *model {
 		// of the `choices` slice, above.
 		selected: make(map[int]struct{}),
 		cursor:   0,
-
-		vb: tea.NewViewbox(0, 0),
 	}
 }
 
@@ -32,8 +29,6 @@ func (m *model) Init(func(...tea.Cmd)) {}
 func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgWindowSize:
-		// TODO: m.vb.SetSize(msg.Width, msg.Height)
-		m.vb = tea.NewViewbox(msg.Height, msg.Width)
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -56,12 +51,10 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	m.vb.Clear()
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, "What should we buy at the market?")
 
-	m.vb.WriteLine(0, 0, "What should we buy at the market?")
-
-	vbChoices := m.vb.Padding(tea.PaddingOptions{Top: 2})
+	vbChoices := vb.Padding(tea.PaddingOptions{Top: 2})
 	vbChoices.Set(m.cursor, 0, '>')
 	for i, choice := range m.choices {
 		// 0123456789...
@@ -75,8 +68,6 @@ func (m *model) View(r tea.Renderer) {
 	}
 
 	vbChoices.WriteLine(len(m.choices)+1, 0, "Press q to quit.")
-
-	r.Write(m.vb.Render())
 }
 
 func Main(ctx context.Context) error {

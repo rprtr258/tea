@@ -8,11 +8,9 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/mattn/go-isatty"
-	"github.com/muesli/reflow/indent"
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
@@ -76,27 +74,26 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	var sb strings.Builder
-	sb.WriteString("\n")
-	sb.WriteString(m.spinner.View())
-	sb.WriteString(" Doing some work...\n\n")
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(1, 0, m.spinner.View()+" Doing some work...")
 
-	for _, res := range m.results {
-		sb.WriteString(fun.IF(
+	for i, res := range m.results {
+		vb.WriteLine(3+i, 0, fun.IF(
 			res.duration == 0,
-			"........................\n",
-			fmt.Sprintf("%c Job finished in %s\n", res.emoji, res.duration),
+			"........................",
+			fmt.Sprintf("%c Job finished in %s", res.emoji, res.duration),
 		))
 	}
 
-	sb.WriteString(_helpStyle("\nPress any key to exit\n"))
+	vb.WriteLine(3+len(m.results), 0, _helpStyle("\nPress any key to exit\n"))
 
+	y := 3 + len(m.results)
 	if m.quitting {
-		sb.WriteString("\n")
+		y++
 	}
 
-	r.Write(indent.String(sb.String(), 1))
+	// TODO: indent
+	// r.Write(indent.String(sb.String(), 1))
 }
 
 // msgProcessFinished is sent when a pretend process completes.

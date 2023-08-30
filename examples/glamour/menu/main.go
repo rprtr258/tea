@@ -99,9 +99,10 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write(m.viewport.View())
-	r.Write(helpStyle("\n  ↑/↓: Navigate • q: Quit\n"))
+func (m *model) View(vb tea.Viewbox) {
+	m.viewport.View(vb)
+	// TODO: right after viewport
+	vb.WriteLine(vb.Height-1, 0, helpStyle("  ↑/↓: Navigate • q: Quit"))
 }
 
 func Main(ctx context.Context) error {

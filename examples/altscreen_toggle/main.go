@@ -2,7 +2,6 @@ package altscreen_toggle
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/muesli/termenv"
 	"github.com/rprtr258/fun"
@@ -41,9 +40,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.quitting {
-		r.Write("Bye!\n")
+		vb.WriteLine(0, 0, "Bye!")
 		return
 	}
 
@@ -58,7 +57,10 @@ func (m *model) View(r tea.Renderer) {
 		inlineMode,
 	)
 
-	r.Write(fmt.Sprintf("\n\n  You're in %s\n\n\n%s", keyword(mode), help("  space: switch modes • q: exit\n")))
+	x := vb.WriteLine(2, 0, "  You're in ")
+	vb.WriteLine(2, x, keyword(mode))
+
+	vb.WriteLine(6, 0, help("  space: switch modes • q: exit"))
 }
 
 func Main(ctx context.Context) error {

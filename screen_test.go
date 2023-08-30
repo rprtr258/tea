@@ -19,8 +19,8 @@ func (m *initCmdModel) Update(msg Msg, f func(...Cmd)) {
 	}
 }
 
-func (m *initCmdModel) View(r Renderer) {
-	r.Write("success\n")
+func (m *initCmdModel) View(vb Viewbox) {
+	vb.WriteLine(0, 0, "success")
 }
 
 //nolint:lll // uuh

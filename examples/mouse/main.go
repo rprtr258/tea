@@ -29,12 +29,12 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("Do mouse stuff. When you're done press q to quit.\n\n")
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, "Do mouse stuff. When you're done press q to quit.")
 
 	if m.init {
 		e := m.mouseEvent
-		r.Write(fmt.Sprintf("(X: %d, Y: %d) %s", e.X, e.Y, e))
+		vb.WriteLine(2, 0, fmt.Sprintf("(X: %d, Y: %d) %s", e.X, e.Y, e))
 	}
 }
 

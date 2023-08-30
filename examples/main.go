@@ -187,13 +187,12 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.list.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.choice.main != nil || m.quitting {
 		return
 	}
 
-	r.Write("\n")
-	r.Write(m.list.View())
+	vb.WriteText(1, 0, m.list.View())
 }
 
 func runExamplesList(ctx context.Context, title string, examples examples) error {

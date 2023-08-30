@@ -2,7 +2,6 @@ package tabs
 
 import (
 	"context"
-	"strings"
 
 	"github.com/rprtr258/fun"
 
@@ -60,7 +59,7 @@ var (
 			UnsetBorderTop()
 )
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	renderedTabs := fun.Map[string](
 		m.Tabs,
 		func(t string, i int) string {
@@ -77,14 +76,13 @@ func (m *model) View(r tea.Renderer) {
 			return style.Render(t)
 		})
 
-	var doc strings.Builder
 	row := lipgloss.JoinHorizontal(lipgloss.Top, renderedTabs...)
-	doc.WriteString(row)
-	doc.WriteString("\n")
-	doc.WriteString(windowStyle.
-		Width(lipgloss.Width(row) - windowStyle.GetHorizontalFrameSize()).
-		Render(m.TabContent[m.activeTab]))
-	r.Write(docStyle.Render(doc.String()))
+	vb.Styled(docStyle).WriteText(0, 0,
+		row+
+			"\n"+
+			windowStyle.
+				Width(lipgloss.Width(row)-windowStyle.GetHorizontalFrameSize()).
+				Render(m.TabContent[m.activeTab]))
 }
 
 func Main(ctx context.Context) error {

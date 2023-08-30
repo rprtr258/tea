@@ -1022,9 +1022,10 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 // View renders the text area in its current state.
-func (m *Model) View() string {
+func (m *Model) View(vb tea.Viewbox) {
 	if m.Value() == "" && m.row == 0 && m.col == 0 && m.Placeholder != "" {
-		return m.placeholderView()
+		m.placeholderView(vb)
+		return
 	}
 
 	m.Cursor.TextStyle = m.style.CursorLine
@@ -1109,7 +1110,7 @@ func (m *Model) View() string {
 	}
 
 	m.viewport.SetContent(s.String())
-	return m.style.Base.Render(m.viewport.View())
+	m.viewport.View(vb.Styled(m.style.Base))
 }
 
 func (m *Model) getPromptString(displayLine int) string {
@@ -1126,7 +1127,7 @@ func (m *Model) getPromptString(displayLine int) string {
 }
 
 // placeholderView returns the prompt and placeholder view, if any.
-func (m *Model) placeholderView() string {
+func (m *Model) placeholderView(vb tea.Viewbox) {
 	var (
 		s     strings.Builder
 		p     = rw.Truncate(m.Placeholder, m.width, "...")
@@ -1162,7 +1163,8 @@ func (m *Model) placeholderView() string {
 	}
 
 	m.viewport.SetContent(s.String())
-	return m.style.Base.Render(m.viewport.View())
+
+	m.viewport.View(vb.Styled(m.style.Base))
 }
 
 // Blink returns the blink command for the cursor.

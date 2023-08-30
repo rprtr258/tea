@@ -233,8 +233,9 @@ func (m *Model) Blur() {
 }
 
 // View renders the component.
-func (m *Model) View() string {
-	return m.headersView() + "\n" + m.viewport.View()
+func (m *Model) View(vb tea.Viewbox) {
+	m.headersView(vb)
+	m.viewport.View(vb.Padding(tea.PaddingOptions{Top: len(m.cols) + 1}))
 }
 
 // UpdateViewport updates the list content based on the previously defined
@@ -378,14 +379,14 @@ func (m *Model) FromValues(value, separator string) {
 	m.SetRows(rows)
 }
 
-func (m *Model) headersView() string {
+func (m *Model) headersView(vb tea.Viewbox) {
 	s := make([]string, 0, len(m.cols))
 	for _, col := range m.cols {
 		style := lipgloss.NewStyle().Width(col.Width).MaxWidth(col.Width).Inline(true)
 		renderedCell := style.Render(runewidth.Truncate(col.Title, col.Width, "…"))
 		s = append(s, m.styles.Header.Render(renderedCell))
 	}
-	return lipgloss.JoinHorizontal(lipgloss.Left, s...)
+	vb.WriteText(0, 0, lipgloss.JoinHorizontal(lipgloss.Left, s...))
 }
 
 func (m *Model) renderRow(rowID int) string {

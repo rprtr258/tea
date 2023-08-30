@@ -144,24 +144,19 @@ func (m *model) updateInputs(msg tea.Msg) []tea.Cmd {
 	return cmds
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	for i := range m.inputs {
-		r.Write(m.inputs[i].View())
-		if i < len(m.inputs)-1 {
-			r.Write("\n")
-		}
+		vb.WriteLine(i, 0, m.inputs[i].View())
 	}
 
-	r.Write("\n\n")
-	r.Write(fun.IF(
+	vb.WriteLine(1+len(m.inputs), 0, fun.IF(
 		m.focusIndex == len(m.inputs),
 		focusedButton,
 		blurredButton,
 	))
-	r.Write("\n\n")
-	r.Write(helpStyle.Render("cursor mode is "))
-	r.Write(cursorModeHelpStyle.Render(m.cursorMode.String()))
-	r.Write(helpStyle.Render(" (ctrl+r to change style)"))
+	x := vb.Styled(helpStyle).WriteLine(2+len(m.inputs), 0, "cursor mode is ")
+	x = vb.Styled(cursorModeHelpStyle).WriteLine(2+len(m.inputs), x, m.cursorMode.String())
+	vb.Styled(helpStyle).WriteLine(2+len(m.inputs), x, " (ctrl+r to change style)")
 }
 
 func Main(ctx context.Context) error {

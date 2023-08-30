@@ -16,7 +16,6 @@ import (
 
 	"github.com/fogleman/ease"
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/muesli/reflow/indent"
 	"github.com/muesli/termenv"
 
 	"github.com/rprtr258/tea"
@@ -93,19 +92,21 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 // The main view, which just calls the appropriate sub-view
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.Quitting {
-		r.Write("\n  See you later!\n\n")
+		vb.WriteLine(1, 2, "See you later!")
 		return
 	}
 
 	var s string
 	if !m.Chosen {
-		s = choicesView(m)
+		s = m.choicesView()
 	} else {
-		s = chosenView(m)
+		s = m.chosenView()
 	}
-	r.Write(indent.String("\n"+s+"\n\n", 2))
+	vb.WriteLine(1, 0, s)
+	// TODO: indent
+	// r.Write(indent.String("\n"+s+"\n\n", 2))
 }
 
 // Sub-update functions
@@ -175,7 +176,7 @@ func (m *model) updateChosen(msg tea.Msg, f func(...tea.Cmd)) {
 // Sub-views
 
 // The first view, where you're choosing a task
-func choicesView(m *model) string {
+func (m *model) choicesView() string {
 	c := m.Choice
 
 	tpl := "What to do today?\n\n"
@@ -195,7 +196,7 @@ func choicesView(m *model) string {
 }
 
 // The second view, after a task has been chosen
-func chosenView(m *model) string {
+func (m *model) chosenView() string {
 	var msg string
 
 	switch m.Choice {

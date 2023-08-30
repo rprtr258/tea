@@ -70,15 +70,14 @@ func (m *model) resetSpinner() {
 	)
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("\n ")
-	r.Write(m.spinner.View())
-	if m.index != 1 {
-		r.Write(" ")
-	}
-	r.Write(textStyle("Spinning..."))
-	r.Write("\n\n")
-	r.Write(helpStyle("h/l, ←/→: change spinner • q: exit\n"))
+func (m *model) View(vb tea.Viewbox) {
+	x := vb.WriteLine(0, 1, m.spinner.View())
+	// TODO: ???
+	// if m.index != 1 {
+	// 	r.Write(" ")
+	// }
+	vb.WriteLine(0, x, textStyle("Spinning..."))
+	vb.WriteLine(2, 0, helpStyle("h/l, ←/→: change spinner • q: exit\n"))
 }
 
 func Main(ctx context.Context) error {

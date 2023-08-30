@@ -50,10 +50,10 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.textarea.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("Tell me a story.\n\n")
-	r.Write(m.textarea.View())
-	r.Write("\n\n(ctrl+c to quit)\n\n")
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, "Tell me a story.")
+	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: 1, Bottom: 2}))
+	vb.WriteLine(2+m.textarea.Height(), 0, "(ctrl+c to quit)")
 }
 
 func Main(ctx context.Context) error {

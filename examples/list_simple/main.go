@@ -73,19 +73,18 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.list.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.choice != "" {
-		r.Write(quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice)))
+		vb.Styled(quitTextStyle).WriteText(0, 0, fmt.Sprintf("%s? Sounds good to me.", m.choice))
 		return
 	}
 
 	if m.quitting {
-		r.Write(quitTextStyle.Render("Not hungry? That’s cool."))
+		vb.Styled(quitTextStyle).WriteText(0, 0, "Not hungry? That’s cool.")
 		return
 	}
 
-	r.Write("\n")
-	r.Write(m.list.View())
+	vb.WriteText(1, 0, m.list.View())
 }
 
 func Main(ctx context.Context) error {

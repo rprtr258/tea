@@ -111,9 +111,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.quitting {
-		r.Write("Bye!\n")
+		vb.WriteLine(0, 0, "Bye!")
 		return
 	}
 
@@ -125,10 +125,10 @@ func (m *model) View(r tea.Renderer) {
 
 	helpView := m.help.View(m.keys)
 
-	r.Write("\n")
-	r.Write(status)
-	r.Write(strings.Repeat("\n", 8-strings.Count(status, "\n")-strings.Count(helpView, "\n")))
-	r.Write(helpView)
+	vb.WriteText(1, 0,
+		status+
+			strings.Repeat("\n", 8-strings.Count(status, "\n")-strings.Count(helpView, "\n"))+
+			helpView)
 }
 
 func Main(ctx context.Context) error {

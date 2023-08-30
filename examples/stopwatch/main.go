@@ -28,27 +28,23 @@ func (m *model) Init(f func(...tea.Cmd)) {
 	f(m.stopwatch.Init()...)
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	// Note: you could further customize the time output by getting the
 	// duration from m.stopwatch.Elapsed(), which returns a time.Duration, and
 	// skip m.stopwatch.View() altogether.
+	x := 0
 	if !m.quitting {
-		r.Write("Elapsed: ")
+		x = vb.WriteLine(0, 0, "Elapsed: ")
 	}
-	r.Write(m.stopwatch.View())
-	r.Write("\n")
+	vb.WriteLine(0, x, m.stopwatch.View())
 	if !m.quitting {
-		r.Write(m.helpView())
+		vb.WriteLine(2, 0, m.help.ShortHelpView([]key.Binding{
+			m.keymap.start,
+			m.keymap.stop,
+			m.keymap.reset,
+			m.keymap.quit,
+		}))
 	}
-}
-
-func (m *model) helpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
-		m.keymap.start,
-		m.keymap.stop,
-		m.keymap.reset,
-		m.keymap.quit,
-	})
 }
 
 func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {

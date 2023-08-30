@@ -2,14 +2,14 @@ package commands
 
 import (
 	"context"
-	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rprtr258/tea"
 )
 
-const url = "https://charm.sh/"
+const _url = "https://charm.sh/"
 
 type model struct {
 	status int
@@ -18,7 +18,7 @@ type model struct {
 
 func checkServer() tea.Msg {
 	c := &http.Client{Timeout: 10 * time.Second}
-	res, err := c.Get(url) //nolint:noctx
+	res, err := c.Get(_url) //nolint:noctx
 	if err != nil {
 		return msgErr(err)
 	}
@@ -51,20 +51,22 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.err != nil {
-		r.Write("\nWe had some trouble: ")
-		r.Write(m.err.Error())
-		r.Write("\n\n")
+		x := vb.WriteLine(1, 0, "We had some trouble: ")
+		vb.WriteLine(1, x, m.err.Error())
 		return
 	}
 
-	r.Write("\n")
-	r.Write(fmt.Sprintf("Checking %s ... ", url))
+	x := vb.WriteLine(1, 0, "Checking ")
+	x = vb.WriteLine(1, x, _url)
+	x = vb.WriteLine(1, x, " ... ")
 	if m.status > 0 {
-		r.Write(fmt.Sprintf("%d %s!", m.status, http.StatusText(m.status)))
+		x = vb.WriteLine(1, x, strconv.Itoa(m.status))
+		x = vb.WriteLine(1, x, " ")
+		x = vb.WriteLine(1, x, http.StatusText(m.status))
+		vb.WriteLine(1, x, "!")
 	}
-	r.Write("\n\n")
 }
 
 func Main(ctx context.Context) error {

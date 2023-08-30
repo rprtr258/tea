@@ -51,10 +51,11 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("Key presses: ")
-	r.Write(fmt.Sprint(m.tag))
-	r.Write("\nTo exit press any key, then wait for one second without pressing anything.")
+func (m *model) View(vb tea.Viewbox) {
+	x := vb.WriteLine(0, 0, "Key presses: ")
+	vb.WriteLine(0, x, fmt.Sprint(m.tag))
+
+	vb.WriteLine(1, 0, "To exit press any key, then wait for one second without pressing anything.")
 }
 
 func Main(ctx context.Context) error {

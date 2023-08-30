@@ -65,20 +65,20 @@ func (m *model) helpView() string {
 	})
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	// For a more detailed timer view you could read m.timer.Timeout to get the
 	// remaining time as a time.Duration and skip calling m.timer.View() entirely.
+	x := 0
 	if !m.quitting {
-		r.Write("Exiting in ")
+		x = vb.WriteLine(0, 0, "Exiting in ")
 	}
-	r.Write(fun.IF(
+	vb.WriteLine(0, x, fun.IF(
 		m.timer.Timedout(),
 		"All done!",
 		m.timer.View(),
 	))
-	r.Write("\n")
 	if !m.quitting {
-		r.Write(m.helpView())
+		vb.WriteLine(1, 0, m.helpView())
 	}
 }
 

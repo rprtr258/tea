@@ -61,25 +61,20 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.quitting {
-		r.Write("")
 		return
 	}
 
-	r.Write("\n  ")
 	switch {
 	case m.err != nil:
-		r.Write(m.filepicker.Styles.DisabledFile.Render(m.err.Error()))
+		vb.WriteLine(1, 1, m.filepicker.Styles.DisabledFile.Render(m.err.Error()))
 	case m.selectedFile == "":
-		r.Write("Pick a file:")
+		vb.WriteLine(1, 1, "Pick a file:")
 	default:
-		r.Write("Selected file: ")
-		r.Write(m.filepicker.Styles.Selected.Render(m.selectedFile))
+		vb.WriteLine(1, 1, "Selected file: "+m.filepicker.Styles.Selected.Render(m.selectedFile))
 	}
-	r.Write("\n\n")
-	m.filepicker.View(r)
-	r.Write("\n")
+	m.filepicker.View(vb.Padding(tea.PaddingOptions{Top: 3}))
 }
 
 func Main(ctx context.Context) error {

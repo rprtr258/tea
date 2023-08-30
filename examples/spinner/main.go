@@ -12,8 +12,7 @@ import (
 )
 
 type model struct {
-	spinner  spinner.Model
-	quitting bool
+	spinner spinner.Model
 }
 
 func initialModel() *model {
@@ -32,7 +31,6 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
-			m.quitting = true
 			f(tea.Quit)
 		}
 	default:
@@ -40,13 +38,11 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("\n\n   ")
-	r.Write(m.spinner.View())
-	r.Write(" Loading forever...press q to quit\n\n")
-	if m.quitting {
-		r.Write("\n")
-	}
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(2, 1, m.spinner.View()+" Loading forever...press q to quit")
+	// if m.quitting {
+	// 	r.Write("\n")
+	// }
 }
 
 func Main(ctx context.Context) error {

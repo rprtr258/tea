@@ -11,7 +11,9 @@ import (
 
 func TestNew(t *testing.T) {
 	textarea := newTextArea()
-	view := textarea.View()
+	vb := tea.NewViewbox(10, 10)
+	textarea.View(vb)
+	view := vb.Render()
 
 	assert.Contains(t, view, ">", "Text area did not render the prompt")
 	assert.Contains(t, view, "World!", "Text area did not render the placeholder")
@@ -26,7 +28,9 @@ func TestInput(t *testing.T) {
 		textarea.Update(keyPress(k))
 	}
 
-	view := textarea.View()
+	vb := tea.NewViewbox(10, 10)
+	textarea.View(vb)
+	view := vb.Render()
 
 	assert.Contains(t, view, input, "Text area did not render the input")
 	assert.Len(t, input, textarea.col, "Text area did not move the cursor to the correct position")
@@ -48,7 +52,9 @@ func TestSoftWrap(t *testing.T) {
 		textarea.Update(keyPress(k))
 	}
 
-	view := textarea.View()
+	vb := tea.NewViewbox(10, 10)
+	textarea.View(vb)
+	view := vb.Render()
 
 	for _, word := range strings.Split(input, " ") {
 		assert.Contains(t, view, word, "Text area did not render the input")
@@ -78,7 +84,9 @@ func TestCharLimit(t *testing.T) {
 		textarea.Update(keyPress(k))
 	}
 
-	view := textarea.View()
+	vb := tea.NewViewbox(10, 10)
+	textarea.View(vb)
+	view := vb.Render()
 	assert.NotContains(t, view, input[1], "Text area should not include input past the character limit")
 }
 
@@ -96,7 +104,9 @@ func TestVerticalScrolling(t *testing.T) {
 		textarea.Update(keyPress(k))
 	}
 
-	view := textarea.View()
+	vb := tea.NewViewbox(10, 10)
+	textarea.View(vb)
+	view := vb.Render()
 
 	// The view should contain the first "line" of the input.
 	assert.Contains(t, view, "This is a really", "Text area did not render the input")
@@ -109,7 +119,9 @@ func TestVerticalScrolling(t *testing.T) {
 		"the text area.",
 	} {
 		textarea.viewport.LineDown(1)
-		view = textarea.View()
+		vb := tea.NewViewbox(10, 10)
+		textarea.View(vb)
+		view := vb.Render()
 		assert.Contains(t, view, line, "Text area did not render the correct scrolled input")
 	}
 }
@@ -131,9 +143,10 @@ func TestWordWrapOverflowing(t *testing.T) {
 
 	input := "Testing Testing Testing Testing Testing Testing Testing Testing"
 
+	vb := tea.NewViewbox(10, 10)
 	for _, k := range input {
 		textarea.Update(keyPress(k))
-		textarea.View()
+		textarea.View(vb)
 	}
 
 	// We have essentially filled the text area with input.
@@ -145,7 +158,7 @@ func TestWordWrapOverflowing(t *testing.T) {
 
 	for _, k := range input {
 		textarea.Update(keyPress(k))
-		textarea.View()
+		textarea.View(vb)
 	}
 
 	lastLineWidth := textarea.LineInfo().Width
@@ -162,9 +175,10 @@ func TestValueSoftWrap(t *testing.T) {
 
 	input := "Testing Testing Testing Testing Testing Testing Testing Testing"
 
+	vb := tea.NewViewbox(10, 10)
 	for _, k := range input {
 		textarea.Update(keyPress(k))
-		textarea.View()
+		textarea.View(vb)
 	}
 
 	value := textarea.Value()
@@ -349,7 +363,9 @@ func TestRendersEndOfLineBuffer(t *testing.T) {
 	textarea.ShowLineNumbers = true
 	textarea.SetWidth(20)
 
-	view := textarea.View()
+	vb := tea.NewViewbox(10, 10)
+	textarea.View(vb)
+	view := vb.Render()
 	assert.Contains(t, view, "~", "Expected to see a tilde at the end of the line")
 }
 

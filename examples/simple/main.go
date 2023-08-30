@@ -52,10 +52,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 // View returns a string based on data in the model. That string which will be
 // rendered to the terminal.
-func (m *model) View(r tea.Renderer) {
-	r.Write("Hi. This program will exit in ")
-	r.Write(fmt.Sprint(*m))
-	r.Write(" seconds. To quit sooner press any key.\n")
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, "Hi. This program will exit in "+fmt.Sprint(*m)+" seconds. To quit sooner press any key.")
 }
 
 func Main(ctx context.Context) error {

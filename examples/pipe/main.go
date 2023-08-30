@@ -52,10 +52,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.userInput.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("\nYou piped in: ")
-	r.Write(m.userInput.View())
-	r.Write("\n\nPress ^C to exit")
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(1, 0, "You piped in: "+m.userInput.View())
+	vb.WriteLine(3, 0, "Press ^C to exit")
 }
 
 func Main(ctx context.Context) error {

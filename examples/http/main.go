@@ -42,19 +42,18 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("Checking ")
-	r.Write(_url)
-	r.Write("...")
+func (m *model) View(vb tea.Viewbox) {
+	x := vb.WriteLine(0, 0, "Checking ")
+	x = vb.WriteLine(0, x, _url)
+	x = vb.WriteLine(0, x, "...")
 	if m.err != nil {
-		r.Write("something went wrong: ")
-		r.Write(m.err.Error())
+		x = vb.WriteLine(0, x, "something went wrong: ")
+		vb.WriteLine(0, x, m.err.Error())
 	} else if m.status != 0 {
-		r.Write(fmt.Sprint(m.status))
-		r.Write(" ")
-		r.Write(http.StatusText(m.status))
+		x = vb.WriteLine(0, x, fmt.Sprint(m.status))
+		x = vb.WriteLine(0, x, " ")
+		vb.WriteLine(0, x, http.StatusText(m.status))
 	}
-	r.Write("\n")
 }
 
 func checkServer() tea.Msg {

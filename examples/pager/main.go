@@ -92,17 +92,15 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.viewport.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if !m.ready {
-		r.Write("\n  Initializing...")
+		vb.WriteLine(0, 0, "  Initializing...")
 		return
 	}
 
-	r.Write(m.headerView())
-	r.Write("\n")
-	r.Write(m.viewport.View())
-	r.Write("\n")
-	r.Write(m.footerView())
+	vb.WriteLine(0, 0, m.headerView())
+	m.viewport.View(vb.Padding(tea.PaddingOptions{Top: 1}))
+	vb.WriteLine(2+m.viewport.Height, 0, m.footerView())
 }
 
 func (m *model) headerView() string {

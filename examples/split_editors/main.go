@@ -171,15 +171,12 @@ func (m *model) updateKeybindings() {
 	m.keymap.remove.SetEnabled(len(m.inputs) > minInputs)
 }
 
-func (m *model) View(r tea.Renderer) {
-	views := make([]string, len(m.inputs))
+func (m *model) View(vb tea.Viewbox) {
 	for i := range m.inputs {
-		views[i] = m.inputs[i].View()
+		m.inputs[i].View(vb.Row(i))
 	}
 
-	r.Write(lipgloss.JoinHorizontal(lipgloss.Top, views...))
-	r.Write("\n\n")
-	r.Write(m.help.ShortHelpView([]key.Binding{
+	vb.WriteText(2+len(m.inputs), 0, m.help.ShortHelpView([]key.Binding{
 		m.keymap.next,
 		m.keymap.prev,
 		m.keymap.add,

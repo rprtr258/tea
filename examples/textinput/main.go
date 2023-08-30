@@ -43,10 +43,10 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.textInput.Update(msg)...)
 }
 
-func (m *model) View(r tea.Renderer) {
-	r.Write("What’s your favorite Pokémon?\n\n")
-	r.Write(m.textInput.View())
-	r.Write("\n\n(esc to quit)\n")
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, "What’s your favorite Pokémon?")
+	vb.WriteLine(2, 0, m.textInput.View())
+	vb.WriteLine(3, 0, "(esc to quit)")
 }
 
 func Main(ctx context.Context) error {

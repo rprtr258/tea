@@ -30,7 +30,7 @@ func (m *testExecModel) Update(msg Msg, f func(...Cmd)) {
 	}
 }
 
-func (m *testExecModel) View(Renderer) {}
+func (m *testExecModel) View(Viewbox) {}
 
 func TestTeaExec(t *testing.T) {
 	for name, test := range map[string]struct {

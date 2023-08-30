@@ -52,13 +52,15 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.err != nil {
-		r.Write("Error: " + m.err.Error() + "\n")
+		vb.WriteLine(0, 0, "Error: "+m.err.Error())
 		return
 	}
 
-	r.Write("Press 'e' to open your EDITOR.\nPress 'a' to toggle the altscreen\nPress 'q' to quit.\n")
+	vb.WriteLine(0, 0, "Press 'e' to open your EDITOR.")
+	vb.WriteLine(1, 0, "Press 'a' to toggle the altscreen")
+	vb.WriteLine(2, 0, "Press 'q' to quit.")
 }
 
 func Main(ctx context.Context) error {

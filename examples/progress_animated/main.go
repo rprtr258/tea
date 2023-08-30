@@ -9,7 +9,6 @@ package progress_animated
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -60,14 +59,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
-	pad := strings.Repeat(" ", padding)
-	r.Write("\n")
-	r.Write(pad)
-	r.Write(m.progress.View())
-	r.Write("\n\n")
-	r.Write(pad)
-	r.Write(helpStyle("Press any key to quit"))
+func (m *model) View(vb tea.Viewbox) {
+	vb.WriteLine(1, padding, m.progress.View())
+	vb.WriteLine(3, padding, helpStyle("Press any key to quit"))
 }
 
 var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render

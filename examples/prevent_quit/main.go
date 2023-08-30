@@ -104,31 +104,29 @@ func (m *model) updatePromptView(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 }
 
-func (m *model) View(r tea.Renderer) {
+func (m *model) View(vb tea.Viewbox) {
 	if m.quitting {
 		if m.hasChanges {
-			r.Write(quitViewStyle.Render(lipgloss.JoinHorizontal(
+			vb.Styled(quitViewStyle).WriteText(0, 0, lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				"You have unsaved changes. Quit without saving?",
 				choiceStyle.Render("[yn]"),
-			)))
+			))
 			return
 		}
 
-		r.Write("Very important, thank you\n")
+		vb.WriteLine(0, 0, "Very important, thank you")
 		return
 	}
 
-	r.Write("\nType some important things.\n\n")
-	r.Write(m.textarea.View())
-	r.Write("\n\n ")
-	r.Write(saveTextStyle.Render(m.saveText))
-	r.Write("\n ")
-	r.Write(m.help.ShortHelpView([]key.Binding{
+	vb.WriteLine(1, 0, "Type some important things.")
+	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: 3}))
+	h := m.textarea.Height()
+	vb.Styled(saveTextStyle).WriteLine(3+h, 1, m.saveText)
+	vb.Styled(saveTextStyle).WriteLine(4+h, 1, m.help.ShortHelpView([]key.Binding{
 		m.keymap.save,
 		m.keymap.quit,
 	}))
-	r.Write("\n\n")
 }
 
 func Main(ctx context.Context) error {
