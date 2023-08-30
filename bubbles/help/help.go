@@ -134,12 +134,9 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 		return
 	}
 
-	var totalWidth int
-	sep := m.Styles.FullSeparator.Render(m.FullSeparator)
-	sepWidth := lipgloss.Width(sep)
 	x, y := 0, 0
 	// Iterate over groups to build columns
-	for i, group := range groups {
+	for _, group := range groups {
 		if group == nil || !shouldRenderColumn(group) {
 			continue
 		}
@@ -160,23 +157,9 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 			m.Styles.FullDesc.Render(strings.Join(descriptions, "\n")),
 		)
 
-		// Column
-		totalWidth += lipgloss.Width(col)
-		if m.Width > 0 && totalWidth > m.Width {
-			break
-		}
-
 		x, y = vb.WriteText(y, x, col)
 
-		// Separator
-		if i < len(group)-1 {
-			totalWidth += sepWidth
-			if m.Width > 0 && totalWidth > m.Width {
-				break
-			}
-		}
-
-		x = vb.WriteLine(y, x, sep)
+		x = vb.Styled(m.Styles.FullSeparator).WriteLine(y, x, m.FullSeparator)
 	}
 }
 
