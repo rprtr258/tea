@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/muesli/reflow/ansi"
 	"github.com/muesli/reflow/truncate"
 	"github.com/rprtr258/fun"
 	"github.com/sahilm/fuzzy"
@@ -1118,21 +1117,15 @@ func (m *Model[I]) paginationView(vb tea.Viewbox) {
 		return
 	}
 
-	s := m.Paginator.View()
-
+	style := m.Styles.PaginationStyle
 	// If the dot pagination is wider than the width of the window
 	// use the arabic paginator.
-	if ansi.PrintableRuneWidth(s) > m.width {
+	if vb.Width > 0 && m.Paginator.TotalPages > vb.Width {
 		m.Paginator.Type = paginator.Arabic
-		s = m.Styles.ArabicPagination.Render(m.Paginator.View())
+		style = m.Styles.ArabicPagination
 	}
 
-	style := m.Styles.PaginationStyle
-	if m.delegate.Spacing() == 0 && style.GetMarginTop() == 0 {
-		style = style.Copy().MarginTop(1)
-	}
-
-	vb.Styled(style).WriteText(0, 0, s)
+	m.Paginator.View(vb.Styled(style))
 }
 
 func (m *Model[I]) populatedView(vb tea.Viewbox) {

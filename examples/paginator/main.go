@@ -59,7 +59,7 @@ func (m *model) View(vb tea.Viewbox) {
 		vb.WriteLine(3+2*i, 0, "  • "+item)
 	}
 	y := 3 + 2*(end-start)
-	vb.WriteLine(y, 0, "  "+m.paginator.View())
+	m.paginator.View(vb.Padding(tea.PaddingOptions{Top: y, Left: 2}))
 	vb.WriteLine(y+2, 0, "  h/l ←/→ page • q: quit")
 }
 

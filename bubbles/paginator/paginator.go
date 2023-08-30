@@ -6,7 +6,6 @@ package paginator
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/key"
@@ -144,29 +143,23 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	return nil
 }
 
-// View renders the pagination to a string.
-func (m *Model) View() string {
+// View renders the pagination.
+func (m *Model) View(vb tea.Viewbox) {
 	switch m.Type {
 	case Dots:
-		return m.dotsView()
+		m.dotsView(vb)
 	default:
-		return m.arabicView()
+		m.arabicView(vb)
 	}
 }
 
-func (m *Model) dotsView() string {
-	var sb strings.Builder
+func (m *Model) dotsView(vb tea.Viewbox) {
 	for i := 0; i < m.TotalPages; i++ {
-		if i == m.Page {
-			sb.WriteRune(m.ActiveDot)
-			continue
-		}
-
-		sb.WriteRune(m.InactiveDot)
+		vb.Set(0, i, m.InactiveDot)
 	}
-	return sb.String()
+	vb.Set(0, m.Page, m.ActiveDot)
 }
 
-func (m *Model) arabicView() string {
-	return fmt.Sprintf(m.ArabicFormat, m.Page+1, m.TotalPages)
+func (m *Model) arabicView(vb tea.Viewbox) {
+	vb.WriteLine(0, 0, fmt.Sprintf(m.ArabicFormat, m.Page+1, m.TotalPages))
 }
