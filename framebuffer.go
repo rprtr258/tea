@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/muesli/termenv"
-	"github.com/samber/lo"
 
 	"github.com/rprtr258/tea/lipgloss"
 )
@@ -60,28 +59,33 @@ func NewViewbox(height, width int) Viewbox {
 }
 
 // Render framebuffer to string
+// TODO: optimize
 func (vb Viewbox) Render() string {
 	var sb strings.Builder
-	bg := ""
-	fg := ""
+	// bg := ""
+	// fg := ""
 	for y := 0; y < vb.fb.Height*vb.fb.Width; y += vb.fb.Width {
 		if y > 0 {
 			sb.WriteRune('\n')
 		}
 
-		fullRow := vb.fb.B[y : y+vb.fb.Width]
+		// fullRow := vb.fb.B[y : y+vb.fb.Width]
 		for x := 0; x < vb.fb.Width; x++ {
-			if vb.fb.backgrounds[y+x] != bg || vb.fb.foregrounds[y+x] != fg {
-				bg = vb.fb.backgrounds[y+x]
-				fg = vb.fb.foregrounds[y+x]
-				sb.WriteString(ctrlSeq(termenv.ResetSeq) + lo.
-					Switch[bool, string](true).
-					Case(bg == "" && fg == "", "").
-					Case(bg == "", ctrlSeq(fg)).
-					Case(fg == "", ctrlSeq(bg)).
-					Default(ctrlSeq(bg+";"+fg)))
-			}
-			sb.WriteRune(fullRow[x])
+			i := y + x
+
+			sb.WriteString(vb.fb.styles[i].SetString(string([]rune{vb.fb.B[i]})).String())
+
+			// 	if vb.fb.backgrounds[y+x] != bg || vb.fb.foregrounds[y+x] != fg {
+			// 		bg = vb.fb.backgrounds[y+x]
+			// 		fg = vb.fb.foregrounds[y+x]
+			// 		sb.WriteString(ctrlSeq(termenv.ResetSeq) + lo.
+			// 			Switch[bool, string](true).
+			// 			Case(bg == "" && fg == "", "").
+			// 			Case(bg == "", ctrlSeq(fg)).
+			// 			Case(fg == "", ctrlSeq(bg)).
+			// 			Default(ctrlSeq(bg+";"+fg)))
+			// 	}
+			// 	sb.WriteRune(fullRow[x])
 		}
 	}
 	return sb.String()
