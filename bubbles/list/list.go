@@ -5,7 +5,6 @@ package list
 
 import (
 	"fmt"
-	"io"
 	"slices"
 	"strings"
 	"time"
@@ -39,7 +38,7 @@ type Item interface {
 // help items will be added to the help view.
 type ItemDelegate[I Item] interface {
 	// Render renders the item's view.
-	Render(w io.Writer, m *Model[I], index int, item I)
+	Render(vb tea.Viewbox, m *Model[I], index int, item I)
 
 	// Height is the height of the list item.
 	Height() int
@@ -998,27 +997,31 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 func (m *Model[I]) View(vb tea.Viewbox) {
 	y := 0 // TODO: use m.height ???
 
-	if m.showTitle || m.showFilter && m.filteringEnabled {
-		y, _ = vb.WriteText(y, 0, m.titleView())
-		y++
-	}
+	// if m.showTitle || m.showFilter && m.filteringEnabled {
+	// 	y, _ = vb.WriteText(y, 0, m.titleView())
+	// 	y++
+	// }
 
-	if m.showStatusBar {
-		y, _ = vb.WriteText(y, 0, m.statusView())
-		y++
-	}
+	// if m.showStatusBar {
+	// 	y, _ = vb.WriteText(y, 0, m.statusView())
+	// 	y++
+	// }
 
-	y, _ = vb.WriteText(y, 0, m.populatedView())
-	y++
+	// TODO: change to layout
+	m.populatedView(vb.Padding(tea.PaddingOptions{
+		Top:    y,
+		Bottom: fun.IF(m.showPagination, 2, 0) + fun.IF(m.showHelp, 2, 0),
+	}))
+	y += m.height + 1
 
-	if m.showPagination {
-		y, _ = vb.WriteText(y, 0, m.paginationView())
-		y++
-	}
+	// if m.showPagination {
+	// 	y, _ = vb.WriteText(y, 0, m.paginationView())
+	// 	y++
+	// }
 
-	if m.showHelp {
-		m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
-	}
+	// if m.showHelp {
+	// 	m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
+	// }
 }
 
 func (m *Model[I]) titleView() string {
@@ -1132,44 +1135,27 @@ func (m *Model[I]) paginationView() string {
 	return style.Render(s)
 }
 
-func (m *Model[I]) populatedView() string {
+func (m *Model[I]) populatedView(vb tea.Viewbox) {
 	items := m.VisibleItems()
 
 	// Empty states
 	if len(items) == 0 {
-		if m.filterState == Filtering {
-			return ""
+		if m.filterState != Filtering {
+			vb.Styled(m.Styles.NoItems).WriteLine(0, 0, "No "+m.itemNamePlural+".")
 		}
 
-		return m.Styles.NoItems.Render("No " + m.itemNamePlural + ".")
+		return
 	}
 
-	var sb strings.Builder
-	if len(items) > 0 {
-		start, end := m.Paginator.GetSliceBounds(len(items))
-		docs := items[start:end]
+	start, end := m.Paginator.GetSliceBounds(len(items))
+	docs := items[start:end]
 
-		for i, item := range docs {
-			m.delegate.Render(&sb, m, i+start, item)
-			if i != len(docs)-1 {
-				fmt.Fprint(&sb, strings.Repeat("\n", m.delegate.Spacing()+1))
-			}
+	for i, item := range docs {
+		m.delegate.Render(vb, m, i+start, item)
+		if i != len(docs)-1 {
+			vb = vb.Padding(tea.PaddingOptions{Top: m.delegate.Spacing() + 1})
 		}
 	}
-
-	// If there aren't enough items to fill up this page (always the last page)
-	// then we need to add some newlines to fill up the space where items would
-	// have been.
-	itemsOnPage := m.Paginator.ItemsOnPage(len(items))
-	if itemsOnPage < m.Paginator.PerPage {
-		n := (m.Paginator.PerPage - itemsOnPage) * (m.delegate.Height() + m.delegate.Spacing())
-		if len(items) == 0 {
-			n -= m.delegate.Height() - 1
-		}
-		fmt.Fprint(&sb, strings.Repeat("\n", n))
-	}
-
-	return sb.String()
 }
 
 func (m *Model[I]) helpView(vb tea.Viewbox) {

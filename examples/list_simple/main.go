@@ -3,7 +3,6 @@ package list_simple
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/list"
@@ -27,17 +26,14 @@ type itemDelegate struct{}
 func (d itemDelegate) Height() int                                     { return 1 }
 func (d itemDelegate) Spacing() int                                    { return 0 }
 func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m *list.Model[item], index int, i item) {
+func (d itemDelegate) Render(vb tea.Viewbox, m *list.Model[item], index int, i item) {
 	str := fmt.Sprintf("%d. %s", index+1, i)
 
-	var res string
 	if index == m.Index() {
-		res = selectedItemStyle.Render("> " + str)
+		vb.Styled(selectedItemStyle).WriteLine(0, 0, "> "+str)
 	} else {
-		res = itemStyle.Render(str)
+		vb.Styled(itemStyle).WriteLine(0, 0, str)
 	}
-
-	fmt.Fprint(w, res)
 }
 
 type model struct {

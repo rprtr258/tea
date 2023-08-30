@@ -3,8 +3,6 @@ package main
 import (
 	"cmp"
 	"context"
-	"fmt"
-	"io"
 	"log"
 	"os"
 	"slices"
@@ -143,15 +141,12 @@ type itemDelegate struct{}
 func (d itemDelegate) Height() int                                     { return 1 }
 func (d itemDelegate) Spacing() int                                    { return 0 }
 func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m *list.Model[item], index int, i item) {
-	var res string
+func (d itemDelegate) Render(vb tea.Viewbox, m *list.Model[item], index int, i item) {
 	if index == m.Index() {
-		res = _styleItemSelected.Render("> " + i.name)
+		vb.Styled(_styleItemSelected).WriteLine(0, 0, "> "+i.name)
 	} else {
-		res = _styleItem.Render(i.name)
+		vb.Styled(_styleItem).WriteLine(0, 0, i.name)
 	}
-
-	fmt.Fprint(w, res)
 }
 
 type model struct {

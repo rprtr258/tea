@@ -1,12 +1,11 @@
 package list
 
 import (
-	"fmt"
-	"io"
 	"strings"
 
 	"github.com/muesli/reflow/truncate"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/bubbles/key"
 	"github.com/rprtr258/tea/lipgloss"
@@ -108,10 +107,7 @@ func (d *DefaultDelegate[I]) SetHeight(i int) {
 // This has effect only if ShowDescription is true,
 // otherwise height is always 1.
 func (d DefaultDelegate[I]) Height() int {
-	if d.ShowDescription {
-		return d.height
-	}
-	return 1
+	return fun.IF(d.ShowDescription, d.height, 1)
 }
 
 // SetSpacing sets the delegate's spacing.
@@ -133,7 +129,7 @@ func (d DefaultDelegate[I]) Update(msg tea.Msg, m *Model[I]) []tea.Cmd {
 }
 
 // Render prints an item.
-func (d DefaultDelegate[I]) Render(w io.Writer, m *Model[I], index int, item I) {
+func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item I) {
 	title := item.Title()
 	desc := item.Description()
 
@@ -170,8 +166,11 @@ func (d DefaultDelegate[I]) Render(w io.Writer, m *Model[I], index int, item I) 
 
 	switch {
 	case emptyFilter:
-		title = s.DimmedTitle.Render(title)
-		desc = s.DimmedDesc.Render(desc)
+		vb.Styled(s.DimmedTitle).WriteLine(0, 0, title)
+
+		if d.ShowDescription {
+			vb.Styled(s.DimmedDesc).WriteLine(1, 0, desc)
+		}
 	case isSelected && m.FilterState() != Filtering:
 		if isFiltered {
 			// Highlight matches
@@ -179,8 +178,12 @@ func (d DefaultDelegate[I]) Render(w io.Writer, m *Model[I], index int, item I) 
 			matched := unmatched.Copy().Inherit(s.FilterMatch)
 			title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
 		}
-		title = s.SelectedTitle.Render(title)
-		desc = s.SelectedDesc.Render(desc)
+
+		vb.Styled(s.SelectedTitle).WriteLine(0, 0, title)
+
+		if d.ShowDescription {
+			vb.Styled(s.SelectedDesc).WriteLine(1, 0, desc)
+		}
 	default:
 		if isFiltered {
 			// Highlight matches
@@ -188,16 +191,13 @@ func (d DefaultDelegate[I]) Render(w io.Writer, m *Model[I], index int, item I) 
 			matched := unmatched.Copy().Inherit(s.FilterMatch)
 			title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
 		}
-		title = s.NormalTitle.Render(title)
-		desc = s.NormalDesc.Render(desc)
-	}
 
-	if d.ShowDescription {
-		fmt.Fprintf(w, "%s\n%s", title, desc)
-		return
-	}
+		vb.Styled(s.NormalTitle).WriteLine(0, 0, title)
 
-	fmt.Fprint(w, title)
+		if d.ShowDescription {
+			vb.Styled(s.NormalDesc).WriteLine(1, 0, desc)
+		}
+	}
 }
 
 // ShortHelp returns the delegate's short help.

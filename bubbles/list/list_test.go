@@ -2,7 +2,6 @@ package list
 
 import (
 	"fmt"
-	"io"
 	"testing"
 
 	"github.com/rprtr258/assert"
@@ -21,8 +20,8 @@ var _ ItemDelegate[item] = itemDelegate{}
 func (d itemDelegate) Height() int                                { return 1 }
 func (d itemDelegate) Spacing() int                               { return 0 }
 func (d itemDelegate) Update(_ tea.Msg, _ *Model[item]) []tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m *Model[item], index int, i item) {
-	fmt.Fprint(w, m.Styles.TitleBar.Render(fmt.Sprintf("%d. %s", index+1, i)))
+func (d itemDelegate) Render(vb tea.Viewbox, m *Model[item], index int, i item) {
+	vb.WriteLine(0, 0, m.Styles.TitleBar.Render(fmt.Sprintf("%d. %s", index+1, i)))
 }
 
 func TestStatusBarItemName(t *testing.T) {
