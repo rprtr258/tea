@@ -79,19 +79,16 @@ type model struct {
 }
 
 func newModel() *model {
-	var (
-		itemGenerator randomItemGenerator
-		delegateKeys  = newDelegateKeyMap()
-		listKeys      = newListKeyMap()
-	)
-
+	var itemGenerator randomItemGenerator
 	// Make initial list of items
 	const numItems = 24
 	items := make([]item, numItems)
-	for i := 0; i < numItems; i++ {
+	for i := range items {
 		items[i] = itemGenerator.next()
 	}
 
+	delegateKeys := newDelegateKeyMap()
+	listKeys := newListKeyMap()
 	// Setup list
 	delegate := newItemDelegate[item](delegateKeys)
 	groceryList := list.New[item](items, delegate, 0, 0)

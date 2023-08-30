@@ -163,6 +163,6 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 			vbDescs.WriteLine(i, 0, descriptions[i])
 		}
 
-		vb = vbDescs.PaddingLeft(maxDescLength + 3)
+		vb = vb.PaddingLeft(maxKeyLength + 1 + maxDescLength + 3)
 	}
 }
