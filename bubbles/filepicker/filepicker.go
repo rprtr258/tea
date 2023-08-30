@@ -25,8 +25,9 @@ var (
 // Return the next ID we should use on the Model.
 func nextID() int {
 	idMtx.Lock()
-	defer idMtx.Unlock()
 	lastID++
+	idMtx.Unlock()
+
 	return lastID
 }
 
@@ -36,7 +37,7 @@ func New() Model {
 		id:               nextID(),
 		CurrentDirectory: ".",
 		Cursor:           ">",
-		AllowedTypes:     []string{},
+		AllowedTypes:     nil,
 		selected:         0,
 		ShowHidden:       false,
 		DirAllowed:       false,
@@ -45,10 +46,10 @@ func New() Model {
 		Height:           0,
 		max:              0,
 		min:              0,
-		selectedStack:    newStack(),
-		minStack:         newStack(),
-		maxStack:         newStack(),
-		KeyMap:           DefaultKeyMap(),
+		selectedStack:    stack{},
+		minStack:         stack{},
+		maxStack:         stack{},
+		KeyMap:           DefaultKeyMap,
 		Styles:           DefaultStyles(),
 	}
 }
@@ -80,18 +81,16 @@ type KeyMap struct {
 }
 
 // DefaultKeyMap defines the default keybindings.
-func DefaultKeyMap() KeyMap {
-	return KeyMap{
-		GoToTop:  key.NewBinding(key.WithKeys("g"), key.WithHelp("g", "first")),
-		GoToLast: key.NewBinding(key.WithKeys("G"), key.WithHelp("G", "last")),
-		Down:     key.NewBinding(key.WithKeys("j", "down", "ctrl+n"), key.WithHelp("j", "down")),
-		Up:       key.NewBinding(key.WithKeys("k", "up", "ctrl+p"), key.WithHelp("k", "up")),
-		PageUp:   key.NewBinding(key.WithKeys("K", "pgup"), key.WithHelp("pgup", "page up")),
-		PageDown: key.NewBinding(key.WithKeys("J", "pgdown"), key.WithHelp("pgdown", "page down")),
-		Back:     key.NewBinding(key.WithKeys("h", "backspace", "left", "esc"), key.WithHelp("h", "back")),
-		Open:     key.NewBinding(key.WithKeys("l", "right", "enter"), key.WithHelp("l", "open")),
-		Select:   key.NewBinding(key.WithKeys("enter"), key.WithHelp("enter", "select")),
-	}
+var DefaultKeyMap = KeyMap{
+	GoToTop:  key.NewBinding(key.WithKeys("g"), key.WithHelp("g", "first")),
+	GoToLast: key.NewBinding(key.WithKeys("G"), key.WithHelp("G", "last")),
+	Down:     key.NewBinding(key.WithKeys("j", "down", "ctrl+n"), key.WithHelp("j", "down")),
+	Up:       key.NewBinding(key.WithKeys("k", "up", "ctrl+p"), key.WithHelp("k", "up")),
+	PageUp:   key.NewBinding(key.WithKeys("K", "pgup"), key.WithHelp("pgup", "page up")),
+	PageDown: key.NewBinding(key.WithKeys("J", "pgdown"), key.WithHelp("pgdown", "page down")),
+	Back:     key.NewBinding(key.WithKeys("h", "backspace", "left", "esc"), key.WithHelp("h", "back")),
+	Open:     key.NewBinding(key.WithKeys("l", "right", "enter"), key.WithHelp("l", "open")),
+	Select:   key.NewBinding(key.WithKeys("enter"), key.WithHelp("enter", "select")),
 }
 
 // Styles defines the possible customizations for styles in the file picker.
@@ -187,12 +186,6 @@ func (s *stack) Pop() int {
 
 func (s stack) Length() int {
 	return len(s.data)
-}
-
-func newStack() stack {
-	return stack{
-		data: make([]int, 0),
-	}
 }
 
 func (m *Model) pushView() {
