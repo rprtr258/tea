@@ -753,9 +753,7 @@ func (m *Model[I]) updatePagination() {
 	m.cursor = index % m.Paginator.PerPage
 
 	// Make sure the page stays in bounds
-	if m.Paginator.Page >= m.Paginator.TotalPages-1 {
-		m.Paginator.Page = max(0, m.Paginator.TotalPages-1)
-	}
+	m.Paginator.Page = min(m.Paginator.Page, m.Paginator.TotalPages-1)
 }
 
 func (m *Model[I]) hideStatusMessage() {
@@ -997,31 +995,31 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 func (m *Model[I]) View(vb tea.Viewbox) {
 	y := 0 // TODO: use m.height ???
 
-	// if m.showTitle || m.showFilter && m.filteringEnabled {
-	// 	y, _ = vb.WriteText(y, 0, m.titleView())
-	// 	y++
-	// }
+	if m.showTitle || m.showFilter && m.filteringEnabled {
+		y, _ = vb.WriteText(y, 0, m.titleView())
+		y++
+	}
 
-	// if m.showStatusBar {
-	// 	y, _ = vb.WriteText(y, 0, m.statusView())
-	// 	y++
-	// }
+	if m.showStatusBar {
+		y, _ = vb.WriteText(y, 0, m.statusView())
+		y++
+	}
 
 	// TODO: change to layout
 	m.populatedView(vb.Padding(tea.PaddingOptions{
 		Top:    y,
 		Bottom: fun.IF(m.showPagination, 2, 0) + fun.IF(m.showHelp, 2, 0),
 	}))
-	y += m.height + 1
+	y += m.Paginator.PerPage * m.delegate.Height()
 
-	// if m.showPagination {
-	// 	y, _ = vb.WriteText(y, 0, m.paginationView())
-	// 	y++
-	// }
+	if m.showPagination {
+		y, _ = vb.WriteText(y, 0, m.paginationView())
+		y++
+	}
 
-	// if m.showHelp {
-	// 	m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
-	// }
+	if m.showHelp {
+		m.helpView(vb.Padding(tea.PaddingOptions{Top: y}))
+	}
 }
 
 func (m *Model[I]) titleView() string {

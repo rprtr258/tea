@@ -131,8 +131,8 @@ func (i item) FilterValue() string { return i.name }
 
 var (
 	_styleTitle        = lipgloss.NewStyle().MarginLeft(2)
-	_styleItem         = lipgloss.NewStyle().PaddingLeft(4)
-	_styleItemSelected = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
+	_styleItem         = lipgloss.NewStyle()
+	_styleItemSelected = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
 	_stylePagination   = list.DefaultStyle.PaginationStyle.PaddingLeft(4)
 )
 
@@ -143,9 +143,9 @@ func (d itemDelegate) Spacing() int                                    { return 
 func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return nil }
 func (d itemDelegate) Render(vb tea.Viewbox, m *list.Model[item], index int, i item) {
 	if index == m.Index() {
-		vb.Styled(_styleItemSelected).WriteLine(0, 0, "> "+i.name)
+		vb.Padding(tea.PaddingOptions{Left: 2}).Styled(_styleItemSelected).WriteLine(0, 0, "> "+i.name)
 	} else {
-		vb.Styled(_styleItem).WriteLine(0, 0, i.name)
+		vb.Padding(tea.PaddingOptions{Left: 4}).Styled(_styleItem).WriteLine(0, 0, i.name)
 	}
 }
 
