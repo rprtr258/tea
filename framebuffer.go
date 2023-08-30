@@ -144,6 +144,29 @@ func (vb Viewbox) Styled(style lipgloss.Style) Viewbox {
 	}
 }
 
+// WriteLine starting from x=offset without wrapping, returns end offset
+func (vb Viewbox) WriteLine(y, offsetX int, line string) int {
+	x := offsetX
+	for _, c := range line {
+		vb.Set(y, vb.X+x, c)
+		x++
+	}
+	return x
+}
+
+// WriteText starting from y, x with wrapping, returns end position
+func (vb Viewbox) WriteText(y, x int, text string) (int, int) {
+	for _, c := range text {
+		vb.Set(vb.Y+y, vb.X+x, c)
+		x++
+		if x >= vb.Width {
+			x = 0
+			y++
+		}
+	}
+	return y, x
+}
+
 // Set writes a rune to the framebuffer in position relative to viewbox
 // 0 <= y < height, 0 <= x < width
 func (vb Viewbox) Set(y, x int, c rune) {

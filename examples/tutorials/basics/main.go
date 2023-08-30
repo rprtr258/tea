@@ -59,31 +59,22 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 func (m *model) View(r tea.Renderer) {
 	m.vb.Clear()
 
-	// TODO: WriteLine, WriteText
-	for i, c := range "What should we buy at the market?" {
-		m.vb.Set(0, i, c)
-	}
+	m.vb.WriteLine(0, 0, "What should we buy at the market?")
 
 	vbChoices := m.vb.Padding(tea.PaddingOptions{Top: 2})
 	vbChoices.Set(m.cursor, 0, '>')
 	for i, choice := range m.choices {
+		// 0123456789...
+		// > [x] Buy carrots
 		vbChoices.Set(i, 2, '[')
 		if _, ok := m.selected[i]; ok {
 			vbChoices.Set(i, 3, 'x')
 		}
 		vbChoices.Set(i, 4, ']')
-
-		// TODO: WriteLine, WriteText
-		for j, c := range choice {
-			vbChoices.Set(i, j+6, c)
-		}
+		vbChoices.WriteLine(i, 6, choice)
 	}
 
-	vbFooter := vbChoices.Padding(tea.PaddingOptions{Top: len(m.choices) + 1}) // TODO: rewrite?
-	// TODO: WriteLine, WriteText
-	for i, c := range "Press q to quit." {
-		vbFooter.Set(0, i, c)
-	}
+	vbChoices.WriteLine(len(m.choices)+1, 0, "Press q to quit.")
 
 	r.Write(m.vb.Render())
 }
