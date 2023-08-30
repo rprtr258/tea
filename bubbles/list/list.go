@@ -1070,8 +1070,7 @@ func (m *Model[I]) titleView() string {
 		// Place spinner on the right
 		availSpace := m.width - lipgloss.Width(m.Styles.TitleBar.Render(view))
 		if availSpace > spinnerWidth {
-			view += strings.Repeat(" ", availSpace-spinnerWidth)
-			view += spinnerView
+			view += strings.Repeat(" ", availSpace-spinnerWidth) + spinnerView
 		}
 	}
 

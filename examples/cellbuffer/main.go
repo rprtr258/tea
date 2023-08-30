@@ -112,8 +112,14 @@ func (c cellbuffer) ready() bool {
 }
 
 func (c cellbuffer) Render(vb tea.Viewbox) {
-	for i := 0; i < len(c.cells); i++ {
-		vb.WriteLine(i, 0, string(c.cells[i]))
+	if c.stride == 0 {
+		return
+	}
+
+	for y := 0; y < c.height(); y++ {
+		for x := 0; x < c.width(); x++ {
+			vb.Set(y, x, rune(c.cells[y*c.stride+x]))
+		}
 	}
 }
 
