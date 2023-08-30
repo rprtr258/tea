@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestSetColorProfile(t *testing.T) {

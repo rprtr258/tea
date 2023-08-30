@@ -4,11 +4,11 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestSanitize(t *testing.T) {
-	td := []struct {
+	for _, test := range []struct {
 		input, output string
 	}{
 		{"", ""},
@@ -25,11 +25,9 @@ func TestSanitize(t *testing.T) {
 		{"he\tl\n\nlo", "helXXXXlo"},
 		{"hel\x1blo", "hello"},
 		{"hello\xc2", "hello"}, // invalid utf8
-	}
-
-	for _, tc := range td {
-		runes := make([]rune, 0, len(tc.input))
-		b := []byte(tc.input)
+	} {
+		runes := make([]rune, 0, len(test.input))
+		b := []byte(test.input)
 		for i, w := 0, 0; i < len(b); i += w {
 			var r rune
 			r, w = utf8.DecodeRune(b[i:])
@@ -39,6 +37,6 @@ func TestSanitize(t *testing.T) {
 		s := NewSanitizer(ReplaceNewlines("XX"), ReplaceTabs(""))
 		result := s.Sanitize(runes)
 		rs := string(result)
-		assert.Equal(t, tc.output, rs, "input: %q, result: %v", tc.input, result)
+		assert.Equalf(t, test.output, rs, "input: %q, result: %v", test.input, result)
 	}
 }

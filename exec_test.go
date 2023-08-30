@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"context"
 	"os/exec"
+	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 type msgExecFinished struct{ err error }
@@ -57,7 +58,7 @@ func TestTeaExec(t *testing.T) {
 			m := &testExecModel{cmd: test.cmd}
 			_, err := NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf).Run()
 			assert.NoError(t, err)
-			assert.IsType(t, test.expectErr, m.err)
+			assert.Equal(t, reflect.TypeOf(test.expectErr), reflect.TypeOf(m.err))
 		})
 	}
 }

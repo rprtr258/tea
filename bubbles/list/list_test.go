@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 
 	"github.com/rprtr258/tea"
 )
@@ -27,25 +27,25 @@ func (d itemDelegate) Render(w io.Writer, m *Model[item], index int, i item) {
 
 func TestStatusBarItemName(t *testing.T) {
 	list := New[item]([]item{item("foo"), item("bar")}, itemDelegate{}, 10, 10)
-	assert.Contains(t, list.statusView(), "2 items")
+	assert.Substring(t, list.statusView(), "2 items")
 
 	list.SetItems([]item{item("foo")})
-	assert.Contains(t, list.statusView(), "1 item")
+	assert.Substring(t, list.statusView(), "1 item")
 }
 
 func TestStatusBarWithoutItems(t *testing.T) {
 	list := New[item]([]item{}, itemDelegate{}, 10, 10)
-	assert.Contains(t, list.statusView(), "No items")
+	assert.Substring(t, list.statusView(), "No items")
 }
 
 func TestCustomStatusBarItemName(t *testing.T) {
 	list := New[item]([]item{item("foo"), item("bar")}, itemDelegate{}, 10, 10)
 	list.SetStatusBarItemName("connection", "connections")
-	assert.Contains(t, list.statusView(), "2 connections")
+	assert.Substring(t, list.statusView(), "2 connections")
 
 	list.SetItems([]item{item("foo")})
-	assert.Contains(t, list.statusView(), "1 connection")
+	assert.Substring(t, list.statusView(), "1 connection")
 
 	list.SetItems([]item{})
-	assert.Contains(t, list.statusView(), "No connections")
+	assert.Substring(t, list.statusView(), "No connections")
 }

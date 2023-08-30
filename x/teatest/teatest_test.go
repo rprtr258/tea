@@ -7,7 +7,7 @@ import (
 	"testing/iotest"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestRequireEqualOutputUpdate(t *testing.T) {
@@ -19,14 +19,14 @@ func TestWaitForErrorReader(t *testing.T) {
 	err := doWaitFor(iotest.ErrReader(fmt.Errorf("fake")), func([]byte) bool {
 		return true
 	}, WithDuration(time.Millisecond), WithCheckInterval(10*time.Microsecond))
-	assert.EqualError(t, err, "WaitFor: fake")
+	assert.Equal(t, err.Error(), "WaitFor: fake")
 }
 
 func TestWaitForTimeout(t *testing.T) {
 	err := doWaitFor(strings.NewReader("nope"), func([]byte) bool {
 		return false
 	}, WithDuration(time.Millisecond), WithCheckInterval(10*time.Microsecond))
-	assert.EqualError(t, err, "WaitFor: condition not met after 1ms")
+	assert.Equal(t, err.Error(), "WaitFor: condition not met after 1ms")
 }
 
 func enableUpdate(tb testing.TB) {

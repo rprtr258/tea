@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/x/teatest"
@@ -73,7 +74,7 @@ func TestApp(t *testing.T) {
 	assert.NoError(t, tm.Quit())
 
 	out := readBts(t, tm.FinalOutput(t, teatest.WithFinalTimeout(time.Second)))
-	assert.Regexp(t, `This program will exit in \d+ seconds`, string(out))
+	assert.True(t, regexp.MustCompile(`This program will exit in \d+ seconds`).Match(out))
 	teatest.RequireEqualOutput(t, out)
 
 	assert.Equal(t, model(9), *tm.FinalModel(t))
@@ -87,7 +88,7 @@ func TestAppInteractive(t *testing.T) {
 	tm.Send("ignored msg")
 
 	bts := readBts(t, tm.Output())
-	assert.Contains(t, string(bts), "This program will exit in 9 seconds")
+	assert.Substring(t, string(bts), "This program will exit in 9 seconds")
 
 	teatest.WaitFor(t, tm.Output(), func(out []byte) bool {
 		return bytes.Contains(out, []byte("This program will exit in 7 seconds"))

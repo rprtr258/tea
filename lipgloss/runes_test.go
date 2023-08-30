@@ -3,7 +3,7 @@ package lipgloss
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestStyleRunes(t *testing.T) {

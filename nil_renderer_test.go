@@ -3,7 +3,7 @@ package tea
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestNilRenderer(t *testing.T) {
@@ -14,7 +14,7 @@ func TestNilRenderer(t *testing.T) {
 	r.Write("a")
 	r.repaint()
 	r.enterAltScreen()
-	assert.False(t, r.altScreen(), "altScreen should always return false")
+	assert.False(t, r.altScreen())
 	r.exitAltScreen()
 	r.clearScreen()
 	r.setCursor(true)

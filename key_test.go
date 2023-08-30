@@ -16,8 +16,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rprtr258/assert"
 	"github.com/rprtr258/fun"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestKeyString(t *testing.T) {
@@ -113,8 +113,8 @@ func TestDetectSequence(t *testing.T) {
 	for _, test := range buildBaseSeqTests() {
 		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
 			hasSeq, width, msg := detectSequence(test.seq)
-			assert.True(t, hasSeq, "no sequence found")
-			assert.Len(t, test.seq, width, "parser did not consume the entire input")
+			assert.Truef(t, hasSeq, "no sequence found")
+			assert.Equalf(t, len(test.seq), width, "parser did not consume the entire input")
 			assert.Equal(t, test.msg, msg)
 		})
 	}
@@ -159,7 +159,7 @@ func TestDetectOneMsg(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
 			width, msg := detectOneMsg(test.seq)
-			assert.Len(t, test.seq, width)
+			assert.Equal(t, len(test.seq), width)
 			assert.Equal(t, test.msg, msg)
 		})
 	}
@@ -600,11 +600,11 @@ func runTestDetectSequence(
 			// w is the length of the last sequence detected.
 			for tn, i, w := 0, 0, 0; i < len(td.data); tn, i = tn+1, i+w {
 				hasSequence, width, msg := detectSequence(td.data[i:])
-				assert.True(t, hasSequence, "at %d (ev %d): failed to find sequence", i, tn)
+				assert.Truef(t, hasSequence, "at %d (ev %d): failed to find sequence", i, tn)
 				assert.Equal(t, td.lengths[tn], width)
 				w = width
 
-				assert.Equal(t, td.names[tn], msg.(fmt.Stringer).String(), "at %d (ev %d)", i, tn)
+				assert.Equalf(t, td.names[tn], msg.(fmt.Stringer).String(), "at %d (ev %d)", i, tn)
 			}
 		})
 	}

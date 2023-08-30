@@ -5,17 +5,17 @@ import (
 	"testing"
 
 	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestRendererHasDarkBackground(t *testing.T) {
 	r1 := NewRenderer(os.Stdout)
 	r1.SetHasDarkBackground(false)
-	assert.False(t, r1.HasDarkBackground(), "Expected renderer to have light background")
+	assert.False(t, r1.HasDarkBackground())
 
 	r2 := NewRenderer(os.Stdout)
 	r2.SetHasDarkBackground(true)
-	assert.True(t, r2.HasDarkBackground(), "Expected renderer to have dark background")
+	assert.True(t, r2.HasDarkBackground())
 }
 
 func TestRendererWithOutput(t *testing.T) {

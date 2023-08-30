@@ -3,11 +3,12 @@ package simple
 import (
 	"bytes"
 	"io"
+	"regexp"
 	"testing"
 	"time"
 
 	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/lipgloss"
@@ -34,7 +35,7 @@ func TestApp(t *testing.T) {
 	assert.NoError(t, tm.Quit())
 
 	out := readBts(t, tm.FinalOutput(t))
-	assert.Regexp(t, `This program will exit in \d+ seconds`, string(out))
+	assert.True(t, regexp.MustCompile(`This program will exit in \d+ seconds`).Match(out))
 	teatest.RequireEqualOutput(t, out)
 
 	assert.Equal(t, model(9), *tm.FinalModel(t))
@@ -49,7 +50,7 @@ func TestAppInteractive(t *testing.T) {
 	time.Sleep(time.Second + 200*time.Millisecond)
 	tm.Send("ignored msg")
 
-	assert.Contains(t, string(readBts(t, tm.Output())), "This program will exit in 9 seconds")
+	assert.Substring(t, string(readBts(t, tm.Output())), "This program will exit in 9 seconds")
 
 	teatest.WaitFor(t, tm.Output(), func(out []byte) bool {
 		return bytes.Contains(out, []byte("This program will exit in 7 seconds"))

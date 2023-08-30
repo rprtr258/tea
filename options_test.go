@@ -5,26 +5,26 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestOptions(t *testing.T) {
 	t.Run("output", func(t *testing.T) {
 		var b bytes.Buffer
 		p := NewProgram[*testModel](context.Background(), nil).WithOutput(&b)
-		assert.Nil(t, p.output.TTY())
+		assert.Zero(t, p.output.TTY())
 	})
 
 	t.Run("custom input", func(t *testing.T) {
 		var b bytes.Buffer
 		p := NewProgram[*testModel](context.Background(), nil).WithInput(&b)
-		assert.Equal(t, &b, p.input)
+		assert.Equal(t, &b, p.input.(*bytes.Buffer))
 		assert.Equal(t, customInput, p.inputType)
 	})
 
 	t.Run("renderer", func(t *testing.T) {
 		p := NewProgram[*testModel](context.Background(), nil).WithoutRenderer()
-		assert.IsType(t, (*nilRenderer)(nil), p.renderer)
+		_ = p.renderer.(*nilRenderer)
 	})
 
 	t.Run("without signals", func(t *testing.T) {
@@ -34,7 +34,7 @@ func TestOptions(t *testing.T) {
 
 	t.Run("filter", func(t *testing.T) {
 		p := NewProgram[*testModel](context.Background(), nil).WithFilter(func(_ *testModel, msg Msg) Msg { return msg })
-		assert.NotNil(t, p.filter)
+		assert.NotZero(t, p.filter)
 	})
 
 	t.Run("input options", func(t *testing.T) {

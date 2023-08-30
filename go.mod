@@ -2,6 +2,8 @@ module github.com/rprtr258/tea
 
 go 1.21
 
+replace github.com/rprtr258/assert => ../assert
+
 require (
 	github.com/alecthomas/chroma/v2 v2.8.0
 	github.com/atotto/clipboard v0.1.4
@@ -23,10 +25,10 @@ require (
 	github.com/muesli/reflow v0.3.0
 	github.com/muesli/termenv v0.15.2
 	github.com/olekukonko/tablewriter v0.0.5
+	github.com/rprtr258/assert v0.0.0-00010101000000-000000000000
 	github.com/rprtr258/fun v0.0.6
 	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f
 	github.com/samber/lo v1.38.1
-	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/yuin/goldmark v1.5.4
 	github.com/yuin/goldmark-emoji v1.0.2
@@ -46,10 +48,14 @@ require (
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/rogpeppe/go-internal v1.6.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect

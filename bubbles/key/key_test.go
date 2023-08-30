@@ -3,7 +3,7 @@ package key
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestBinding_Enabled(t *testing.T) {
@@ -11,12 +11,12 @@ func TestBinding_Enabled(t *testing.T) {
 		WithKeys("k", "up"),
 		WithHelp("↑/k", "move up"),
 	)
-	assert.True(t, binding.Enabled(), "expected key to be Enabled")
+	assert.True(t, binding.Enabled())
 
 	binding.SetEnabled(false)
-	assert.False(t, binding.Enabled(), "expected key not to be Enabled")
+	assert.False(t, binding.Enabled())
 
 	binding.SetEnabled(true)
 	binding.Unbind()
-	assert.False(t, binding.Enabled(), "expected key not to be Enabled")
+	assert.False(t, binding.Enabled())
 }

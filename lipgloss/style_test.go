@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestStyleRender(t *testing.T) {
@@ -245,14 +245,14 @@ func TestStyleUnset(t *testing.T) {
 	// colors
 	col := Color("#ffffff")
 	s = NewStyle().Foreground(col)
-	assert.Equal(t, col, s.GetForeground())
+	assert.Equal[TerminalColor](t, col, s.GetForeground())
 	s.UnsetForeground()
-	assert.NotEqual(t, col, s.GetForeground())
+	assert.NotEqual[TerminalColor](t, col, s.GetForeground())
 
 	s = NewStyle().Background(col)
-	assert.Equal(t, col, s.GetBackground())
+	assert.Equal[TerminalColor](t, col, s.GetBackground())
 	s.UnsetBackground()
-	assert.NotEqual(t, col, s.GetBackground())
+	assert.NotEqual[TerminalColor](t, col, s.GetBackground())
 
 	// margins
 	s = NewStyle().Margin(1, 2, 3, 4)
