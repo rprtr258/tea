@@ -87,7 +87,7 @@ func TestCharLimit(t *testing.T) {
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
 	view := vb.Render()
-	assert.False(t, strings.Contains(view, input[1])) //"Text area should not include input past the character limit")
+	assert.Falsef(t, strings.Contains(view, input[1]), "Text area should not include input past the character limit")
 }
 
 func TestVerticalScrolling(t *testing.T) {
