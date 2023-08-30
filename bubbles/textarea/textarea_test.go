@@ -104,9 +104,9 @@ func TestVerticalScrolling(t *testing.T) {
 		textarea.Update(keyPress(k))
 	}
 
-	vb := tea.NewViewbox(10, 10)
+	vb := tea.NewViewbox(100, 10)
 	textarea.View(vb)
-	view := vb.Render()
+	view := strings.Join(strings.Split(vb.Render(), "\n"), "")
 
 	// The view should contain the first "line" of the input.
 	assert.Contains(t, view, "This is a really", "Text area did not render the input")
@@ -119,9 +119,9 @@ func TestVerticalScrolling(t *testing.T) {
 		"the text area.",
 	} {
 		textarea.viewport.LineDown(1)
-		vb := tea.NewViewbox(10, 10)
+		vb := tea.NewViewbox(100, 10)
 		textarea.View(vb)
-		view := vb.Render()
+		view := strings.Join(strings.Split(vb.Render(), "\n"), "")
 		assert.Contains(t, view, line, "Text area did not render the correct scrolled input")
 	}
 }
