@@ -138,7 +138,7 @@ func maxFunc[T any, R cmp.Ordered](slice []T, f func(T) R) R {
 func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 	// Iterate over groups to build columns
 	for _, group := range groups {
-		if group == nil || !fun.Any(group, (key.Binding).Enabled) {
+		if !fun.Any(group, (key.Binding).Enabled) {
 			continue
 		}
 
