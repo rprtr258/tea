@@ -20,9 +20,9 @@ type framebuffer struct {
 
 // Viewbox is a view of the terminal to render to
 type Viewbox struct {
-	framebuffer
-	ViewHeight, ViewWidth int
-	Y, X                  int
+	fb            framebuffer
+	Height, Width int
+	Y, X          int
 }
 
 // NewViewbox creates a new Framebuffer
@@ -32,17 +32,17 @@ func NewViewbox(height, width int) Viewbox {
 		buf[i] = ' '
 	}
 	return Viewbox{
-		framebuffer: framebuffer{
+		fb: framebuffer{
 			B:           buf,
 			backgrounds: make([]string, height*width),
 			foregrounds: make([]string, height*width),
 			Height:      height,
 			Width:       width,
 		},
-		ViewHeight: height,
-		ViewWidth:  width,
-		Y:          0,
-		X:          0,
+		Height: height,
+		Width:  width,
+		Y:      0,
+		X:      0,
 	}
 }
 
@@ -51,16 +51,16 @@ func (vb Viewbox) Render() string {
 	var sb strings.Builder
 	bg := ""
 	fg := ""
-	for y := 0; y < vb.Height*vb.Width; y += vb.Width {
+	for y := 0; y < vb.fb.Height*vb.fb.Width; y += vb.fb.Width {
 		if y > 0 {
 			sb.WriteRune('\n')
 		}
 
-		fullRow := vb.B[y : y+vb.Width]
-		for x := 0; x < vb.Width; x++ {
-			if vb.backgrounds[y+x] != bg || vb.foregrounds[y+x] != fg {
-				bg = vb.backgrounds[y+x]
-				fg = vb.foregrounds[y+x]
+		fullRow := vb.fb.B[y : y+vb.fb.Width]
+		for x := 0; x < vb.fb.Width; x++ {
+			if vb.fb.backgrounds[y+x] != bg || vb.fb.foregrounds[y+x] != fg {
+				bg = vb.fb.backgrounds[y+x]
+				fg = vb.fb.foregrounds[y+x]
 				sb.WriteString(ctrlSeq(termenv.ResetSeq) + lo.
 					Switch[bool, string](true).
 					Case(bg == "" && fg == "", "").
@@ -77,11 +77,11 @@ func (vb Viewbox) Render() string {
 // Row returns view to current viewbox's row
 func (vb Viewbox) Row(y int) Viewbox {
 	return Viewbox{
-		framebuffer: vb.framebuffer,
-		ViewHeight:  1,
-		ViewWidth:   vb.Width,
-		Y:           y + vb.Y,
-		X:           vb.X,
+		fb:     vb.fb,
+		Height: 1,
+		Width:  vb.fb.Width,
+		Y:      y + vb.Y,
+		X:      vb.X,
 	}
 }
 
@@ -94,25 +94,25 @@ type PaddingOptions struct {
 // 0 <= top <= bottom < height, 0 <= left <= right < width
 func (vb Viewbox) Padding(opt PaddingOptions) Viewbox {
 	return Viewbox{
-		framebuffer: vb.framebuffer,
-		ViewHeight:  vb.ViewHeight - opt.Top - opt.Bottom,
-		ViewWidth:   vb.ViewWidth - opt.Left - opt.Right,
-		Y:           vb.Y + opt.Top,
-		X:           vb.X + opt.Left,
+		fb:     vb.fb,
+		Height: vb.Height - opt.Top - opt.Bottom,
+		Width:  vb.Width - opt.Left - opt.Right,
+		Y:      vb.Y + opt.Top,
+		X:      vb.X + opt.Left,
 	}
 }
 
 // Set writes a rune to the framebuffer in position relative to viewbox
 // 0 <= y < height, 0 <= x < width
 func (vb Viewbox) Set(y, x int, c rune) {
-	vb.B[(vb.Y+y)*vb.Width+vb.X+x] = c
+	vb.fb.B[(vb.Y+y)*vb.fb.Width+vb.X+x] = c
 }
 
 // Background colors y'th row bacground to given color from x1 to x2 with
 // coordinates relative to viewbox
 func (vb Viewbox) Background(y, x1, x2 int, background termenv.Color) {
 	for x := x1 + vb.X; x < x2+vb.X; x++ {
-		vb.backgrounds[(y+vb.Y)*vb.Width+x] = background.Sequence(true)
+		vb.fb.backgrounds[(y+vb.Y)*vb.fb.Width+x] = background.Sequence(true)
 	}
 }
 
@@ -120,6 +120,6 @@ func (vb Viewbox) Background(y, x1, x2 int, background termenv.Color) {
 // coordinates relative to viewbox
 func (vb Viewbox) Foreground(y, x1, x2 int, foreground termenv.Color) {
 	for x := x1 + vb.X; x < x2+vb.X; x++ {
-		vb.foregrounds[(y+vb.Y)*vb.Width+x] = foreground.Sequence(false)
+		vb.fb.foregrounds[(y+vb.Y)*vb.fb.Width+x] = foreground.Sequence(false)
 	}
 }
