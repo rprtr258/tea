@@ -196,40 +196,40 @@ func (s Style) ColorWhitespace(v bool) Style {
 // side, followed by the right side, then the bottom, and finally the left.
 //
 // With more than four arguments no margin will be added.
-func (s Style) Margin(i ...int) Style {
-	top, right, bottom, left, ok := whichSidesInt(i...)
-	if !ok {
-		return s
-	}
+func (s Style) Margin(i ...int) Style { // TODO: remove all margin funcs and props
+	// top, right, bottom, left, ok := whichSidesInt(i...)
+	// if !ok {
+	// 	return s
+	// }
 
-	s.set(marginTopKey, top)
-	s.set(marginRightKey, right)
-	s.set(marginBottomKey, bottom)
-	s.set(marginLeftKey, left)
+	// s.set(marginTopKey, top)
+	// s.set(marginRightKey, right)
+	// s.set(marginBottomKey, bottom)
+	// s.set(marginLeftKey, left)
 	return s
 }
 
 // MarginLeft sets the value of the left margin.
 func (s Style) MarginLeft(i int) Style {
-	s.set(marginLeftKey, i)
+	// s.set(marginLeftKey, i)
 	return s
 }
 
 // MarginRight sets the value of the right margin.
 func (s Style) MarginRight(i int) Style {
-	s.set(marginRightKey, i)
+	// s.set(marginRightKey, i)
 	return s
 }
 
 // MarginTop sets the value of the top margin.
 func (s Style) MarginTop(i int) Style {
-	s.set(marginTopKey, i)
+	// s.set(marginTopKey, i)
 	return s
 }
 
 // MarginBottom sets the value of the bottom margin.
 func (s Style) MarginBottom(i int) Style {
-	s.set(marginBottomKey, i)
+	// s.set(marginBottomKey, i)
 	return s
 }
 
@@ -237,7 +237,7 @@ func (s Style) MarginBottom(i int) Style {
 // also set when inheriting from a style with a background color. In that case
 // the background color on that style will set the margin color on this style.
 func (s Style) MarginBackground(c TerminalColor) Style {
-	s.set(marginBackgroundKey, c)
+	// s.set(marginBackgroundKey, c)
 	return s
 }
 
