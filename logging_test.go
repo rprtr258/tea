@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLogToFile(t *testing.T) {

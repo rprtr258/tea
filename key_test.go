@@ -16,8 +16,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rprtr258/assert"
 	"github.com/rprtr258/fun"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestKeyString(t *testing.T) {

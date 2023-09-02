@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRendererHasDarkBackground(t *testing.T) {

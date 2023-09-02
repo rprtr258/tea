@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type msgString string

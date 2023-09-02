@@ -7,7 +7,7 @@ import (
 	"testing/iotest"
 	"time"
 
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRequireEqualOutputUpdate(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSanitize(t *testing.T) {

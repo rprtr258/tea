@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/rprtr258/tea"
 )

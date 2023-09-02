@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/muesli/termenv"
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 	"github.com/yuin/goldmark"
 	emoji "github.com/yuin/goldmark-emoji"
 	"github.com/yuin/goldmark/extension"

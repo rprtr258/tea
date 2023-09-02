@@ -99,9 +99,9 @@ func (m model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 }
 
 func (m model) View(r tea.Renderer) {
-	r.Write(fmt.Sprintf(
+	r.Write([]byte(fmt.Sprintf(
 		"What’s your favorite Charm repository?\n\n%s\n\n%s\n",
 		m.textInput.View(),
 		"(tab to complete, ctrl+n/ctrl+p to cycle through suggestions, esc to quit)",
-	))
+	)))
 }

@@ -3,7 +3,7 @@ package table
 import (
 	"testing"
 
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFromValues(t *testing.T) {

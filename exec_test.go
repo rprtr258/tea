@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/rprtr258/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type msgExecFinished struct{ err error }
