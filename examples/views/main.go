@@ -16,7 +16,7 @@ import (
 
 	"github.com/fogleman/ease"
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 
 	"github.com/rprtr258/tea"
 )
@@ -231,7 +231,7 @@ func progressbar(percent float64) string {
 	fullSize := int(math.Round(w * percent))
 	var fullCells string
 	for i := 0; i < fullSize; i++ {
-		fullCells += termenv.String(progressFullChar).Foreground(term.Color(ramp[i])).String()
+		fullCells += termenv.R(progressFullChar, term.Color(ramp[i]).Fg)
 	}
 
 	emptySize := int(w) - fullSize
@@ -244,12 +244,12 @@ func progressbar(percent float64) string {
 
 // Color a string's foreground with the given value.
 func colorFg(val, color string) string {
-	return termenv.String(val).Foreground(term.Color(color)).String()
+	return termenv.R(val, term.Color(color).Fg)
 }
 
 // Return a function that will colorize the foreground of a given string.
 func makeFgStyle(color string) func(string) string {
-	return termenv.Style{}.Foreground(term.Color(color)).Styled
+	return termenv.S(term.Color(color).Fg).Render
 }
 
 // Generate a blend of colors.

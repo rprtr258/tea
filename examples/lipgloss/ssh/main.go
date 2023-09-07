@@ -20,7 +20,7 @@ import (
 	"github.com/charmbracelet/wish"
 	lm "github.com/charmbracelet/wish/logging"
 	"github.com/creack/pty"
-	"github.com/muesli/termenv"
+	termenv "github.com/rprtr258/col"
 
 	"github.com/rprtr258/tea/lipgloss"
 )
@@ -166,7 +166,7 @@ func handler(next ssh.Handler) ssh.Handler {
 		fmt.Fprintf(&str, "%s %t %s\n\n",
 			styles.bold.Copy().UnsetString().Render("Has dark background?"),
 			renderer.HasDarkBackground(),
-			renderer.Output.BackgroundColor(),
+			renderer.Output.BackgroundColor().Hex,
 		)
 
 		block := renderer.Place(width,

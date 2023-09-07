@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 type initCmdModel struct{}
@@ -82,11 +82,7 @@ func TestMsgClear(t *testing.T) {
 			assert.NoError(t, err)
 			wg.Wait()
 
-			if test.expected != out.String() {
-				// assert.Equal(t, test.expected, out.String())
-				t.Errorf(`expected: %q
-                    got: %q`, test.expected, out.String())
-			}
+			assert.Equal(t, test.expected, out.String())
 		})
 	}
 }

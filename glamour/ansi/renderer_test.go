@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
+	termenv "github.com/rprtr258/col"
 	"github.com/yuin/goldmark"
 	emoji "github.com/yuin/goldmark-emoji"
 	"github.com/yuin/goldmark/extension"

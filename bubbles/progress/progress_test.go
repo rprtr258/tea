@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
+	termenv "github.com/rprtr258/col"
 )
 
 const (
@@ -36,10 +36,10 @@ func TestGradient(t *testing.T) {
 
 			// build the expected colors by colorizing an empty string and then cutting off the following reset sequence
 			sb := strings.Builder{}
-			sb.WriteString(termenv.String("").Foreground(termenv.RGBColor(colAHex)).String())
+			sb.WriteString(termenv.R("", termenv.RGBColor(colAHex).Fg))
 			expFirst := strings.Split(sb.String(), AnsiReset)[0]
 			sb.Reset()
-			sb.WriteString(termenv.String("").Foreground(termenv.RGBColor(colBHex)).String())
+			sb.WriteString(termenv.R("", termenv.RGBColor(colBHex).Fg))
 			expLast := strings.Split(sb.String(), AnsiReset)[0]
 
 			for _, width := range []int{3, 5, 50} {

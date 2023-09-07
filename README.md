@@ -297,7 +297,7 @@ your program in another window.
 [lipgloss]: https://github.com/rprtr258/tea/lipgloss
 [harmonica]: https://github.com/charmbracelet/harmonica
 [bubblezone]: https://github.com/lrstanley/bubblezone
-[termenv]: https://github.com/muesli/termenv
+[termenv]: https://github.com/rprtr258/col
 [reflow]: https://github.com/muesli/reflow
 
 ## Bubble Tea in the Wild

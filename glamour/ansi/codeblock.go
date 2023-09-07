@@ -8,7 +8,7 @@ import (
 	"github.com/alecthomas/chroma/v2/quick"
 	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/muesli/reflow/indent"
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 )
 
 // chromaStyleTheme name used for rendering.

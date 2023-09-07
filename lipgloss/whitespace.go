@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/ansi"
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 )
 
 // whitespace is a whitespace renderer.
@@ -20,7 +20,7 @@ type whitespace struct {
 func newWhitespace(r *Renderer, opts ...WhitespaceOption) *whitespace {
 	w := &whitespace{
 		re:    r,
-		style: r.ColorProfile().String(),
+		style: r.ColorProfile().S(),
 	}
 	for _, opt := range opts {
 		opt(w)
@@ -55,7 +55,7 @@ func (w whitespace) render(width int) string {
 		b.WriteString(strings.Repeat(" ", short))
 	}
 
-	return w.style.Styled(b.String())
+	return w.style.Render(b.String())
 }
 
 // WhitespaceOption sets a styling rule for rendering whitespace.

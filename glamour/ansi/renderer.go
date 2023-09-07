@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 	east "github.com/yuin/goldmark-emoji/ast"
 	"github.com/yuin/goldmark/ast"
 	astext "github.com/yuin/goldmark/extension/ast"

@@ -8,7 +8,7 @@ import (
 	"github.com/muesli/reflow/truncate"
 	"github.com/muesli/reflow/wordwrap"
 	"github.com/muesli/reflow/wrap"
-	"github.com/muesli/termenv"
+	termenv "github.com/rprtr258/col"
 )
 
 // Property for a key.
@@ -189,7 +189,7 @@ func (s Style) Render(strs ...string) string {
 	// no-op on non-Windows systems and on Windows runs only once.
 	enableLegacyWindowsANSI()
 
-	te := s.r.ColorProfile().String()
+	te := s.r.ColorProfile().S()
 	if bold {
 		te = te.Bold()
 	}
@@ -199,7 +199,7 @@ func (s Style) Render(strs ...string) string {
 	if underline {
 		te = te.Underline()
 	}
-	teWhitespace := s.r.ColorProfile().String()
+	teWhitespace := s.r.ColorProfile().S()
 	if reverse {
 		teWhitespace = teWhitespace.Reverse()
 		te = te.Reverse()
@@ -218,7 +218,7 @@ func (s Style) Render(strs ...string) string {
 	// paragraphs) separately?
 	styleWhitespace := reverse
 
-	teSpace := s.r.ColorProfile().String()
+	teSpace := s.r.ColorProfile().S()
 	if fg != noColor {
 		te = te.Foreground(fg.color(s.r))
 		if styleWhitespace {
@@ -279,10 +279,10 @@ func (s Style) Render(strs ...string) string {
 						runeStyle = teSpace
 					}
 
-					sb.WriteString(runeStyle.Styled(string(r)))
+					sb.WriteString(runeStyle.Render(string(r)))
 				}
 			} else {
-				sb.WriteString(te.Styled(line))
+				sb.WriteString(te.Render(line))
 			}
 
 			if i != len(lines)-1 {
@@ -304,8 +304,8 @@ func (s Style) Render(strs ...string) string {
 	{
 		numLines := strings.Count(str, "\n")
 
-		if !(numLines == 0 && width == 0) {
-			st := termenv.Style{}
+		if numLines != 0 || width != 0 {
+			st := termenv.S()
 			if colorWhitespace || styleWhitespace {
 				st = teWhitespace
 			}

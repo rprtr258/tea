@@ -1,7 +1,9 @@
 package textinput
 
 import (
+	"reflect"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/atotto/clipboard"
@@ -15,10 +17,9 @@ import (
 )
 
 // Internal messages for clipboard operations.
-type (
-	msgPaste    string
-	msgPasteErr struct{ err error }
-)
+type pasteMsg string
+
+type pasteErrMsg struct{ error }
 
 // EchoMode sets the input behavior of the text input field.
 type EchoMode int
@@ -34,8 +35,6 @@ const (
 	// EchoNone displays nothing as characters are entered. This is commonly
 	// seen for password fields on the command line.
 	EchoNone
-
-	// EchoOnEdit.
 )
 
 // ValidateFunc is a function that returns an error if the input is invalid.
@@ -56,6 +55,9 @@ type KeyMap struct {
 	LineStart               key.Binding
 	LineEnd                 key.Binding
 	Paste                   key.Binding
+	AcceptSuggestion        key.Binding
+	NextSuggestion          key.Binding
+	PrevSuggestion          key.Binding
 }
 
 // DefaultKeyMap is the default set of key bindings for navigating and acting
@@ -74,6 +76,9 @@ var DefaultKeyMap = KeyMap{
 	LineStart:               key.NewBinding(key.WithKeys("home", "ctrl+a")),
 	LineEnd:                 key.NewBinding(key.WithKeys("end", "ctrl+e")),
 	Paste:                   key.NewBinding(key.WithKeys("ctrl+v")),
+	AcceptSuggestion:        key.NewBinding(key.WithKeys("tab")),
+	NextSuggestion:          key.NewBinding(key.WithKeys("down", "ctrl+n")),
+	PrevSuggestion:          key.NewBinding(key.WithKeys("up", "ctrl+p")),
 }
 
 // Model is the Bubble Tea model for this text input element.
@@ -87,13 +92,20 @@ type Model struct {
 	EchoCharacter rune
 	Cursor        cursor.Model
 
+	// Deprecated: use [cursor.BlinkSpeed] instead.
+	BlinkSpeed time.Duration
+
 	// Styles. These will be applied as inline styles.
 	//
 	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/rprtr258/tea/lipgloss
+	// https://github.com/charmbracelet/lipgloss
 	PromptStyle      lipgloss.Style
 	TextStyle        lipgloss.Style
 	PlaceholderStyle lipgloss.Style
+	CompletionStyle  lipgloss.Style
+
+	// Deprecated: use Cursor.Style instead.
+	CursorStyle lipgloss.Style
 
 	// CharLimit is the maximum amount of characters this input element will
 	// accept. If 0 or less, there's no limit.
@@ -130,6 +142,15 @@ type Model struct {
 
 	// rune sanitizer for input.
 	rsan runeutil.Sanitizer
+
+	// Should the input suggest to complete
+	ShowSuggestions bool
+
+	// suggestions is a list of suggestions that may be used to complete the
+	// input.
+	suggestions            [][]rune
+	matchedSuggestions     [][]rune
+	currentSuggestionIndex int
 }
 
 // New creates a new model with default settings.
@@ -139,14 +160,22 @@ func New() Model {
 		EchoCharacter:    '*',
 		CharLimit:        0,
 		PlaceholderStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
+		ShowSuggestions:  false,
+		CompletionStyle:  lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
 		Cursor:           cursor.New(),
 		KeyMap:           DefaultKeyMap,
 
-		value: nil,
-		focus: false,
-		pos:   0,
+		suggestions: [][]rune{},
+		value:       nil,
+		focus:       false,
+		pos:         0,
 	}
 }
+
+// NewModel creates a new model with default settings.
+//
+// Deprecated: Use [New] instead.
+var NewModel = New
 
 // SetValue sets the value of the text input.
 func (m *Model) SetValue(s string) {
@@ -179,12 +208,12 @@ func (m *Model) setValueInternal(runes []rune) {
 }
 
 // Value returns the value of the text input.
-func (m *Model) Value() string {
+func (m Model) Value() string {
 	return string(m.value)
 }
 
 // Position returns the cursor position.
-func (m *Model) Position() int {
+func (m Model) Position() int {
 	return m.pos
 }
 
@@ -206,7 +235,7 @@ func (m *Model) CursorEnd() {
 }
 
 // Focused returns the focus state on the model.
-func (m *Model) Focused() bool {
+func (m Model) Focused() bool {
 	return m.focus
 }
 
@@ -228,6 +257,17 @@ func (m *Model) Blur() {
 func (m *Model) Reset() {
 	m.value = nil
 	m.SetCursor(0)
+}
+
+// SetSuggestions sets the suggestions for the input.
+func (m *Model) SetSuggestions(suggestions []string) {
+	m.suggestions = [][]rune{}
+
+	for _, s := range suggestions {
+		m.suggestions = append(m.suggestions, []rune(s))
+	}
+
+	m.updateSuggestions()
 }
 
 // rsan initializes or retrieves the rune sanitizer.
@@ -500,7 +540,7 @@ func (m *Model) wordForward() {
 	}
 }
 
-func (m *Model) echoTransform(v string) string {
+func (m Model) echoTransform(v string) string {
 	switch m.EchoMode {
 	case EchoPassword:
 		return strings.Repeat(string(m.EchoCharacter), rw.StringWidth(v))
@@ -514,14 +554,23 @@ func (m *Model) echoTransform(v string) string {
 }
 
 // Update is the Bubble Tea update loop.
-func (m *Model) Update(msg tea.Msg) []tea.Cmd {
+func (m Model) Update(msg tea.Msg) []tea.Cmd {
 	if !m.focus {
 		return nil
 	}
 
+	// Need to check for completion before, because key is configurable and might be double assigned
+	keyMsg, ok := msg.(tea.MsgKey)
+	if ok && key.Matches(keyMsg, m.KeyMap.AcceptSuggestion) {
+		if m.canAcceptSuggestion() {
+			m.value = append(m.value, m.matchedSuggestions[m.currentSuggestionIndex][len(m.value):]...)
+			m.CursorEnd()
+		}
+	}
+
 	// Let's remember where the position of the cursor currently is so that if
 	// the cursor position changes, we can reset the blink.
-	oldPos := m.pos
+	oldPos := m.pos //nolint
 
 	switch msg := msg.(type) {
 	case tea.MsgKey:
@@ -549,6 +598,8 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			if m.pos < len(m.value) {
 				m.SetCursor(m.pos + 1)
 			}
+		case key.Matches(msg, m.KeyMap.DeleteWordBackward):
+			m.deleteWordBackward()
 		case key.Matches(msg, m.KeyMap.LineStart):
 			m.CursorStart()
 		case key.Matches(msg, m.KeyMap.DeleteCharacterForward):
@@ -565,19 +616,30 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			return []tea.Cmd{Paste}
 		case key.Matches(msg, m.KeyMap.DeleteWordForward):
 			m.deleteWordForward()
+		case key.Matches(msg, m.KeyMap.NextSuggestion):
+			m.nextSuggestion()
+		case key.Matches(msg, m.KeyMap.PrevSuggestion):
+			m.previousSuggestion()
 		default:
 			// Input one or more regular characters.
 			m.insertRunesFromUserInput(msg.Runes)
 		}
 
-	case msgPaste:
+		// Check again if can be completed
+		// because value might be something that does not match the completion prefix
+		m.updateSuggestions()
+
+	case pasteMsg:
 		m.insertRunesFromUserInput([]rune(msg))
 
-	case msgPasteErr:
-		m.Err = msg.err
+	case pasteErrMsg:
+		m.Err = msg
 	}
 
-	cmds := m.Cursor.Update(msg)
+	var cmds []tea.Cmd
+
+	cmds = append(cmds, m.Cursor.Update(msg)...)
+
 	if oldPos != m.pos && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
 		cmds = append(cmds, m.Cursor.CmdBlink()...)
@@ -588,7 +650,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 // View renders the textinput in its current state.
-func (m *Model) View() string {
+func (m Model) View() string {
 	// Placeholder text
 	if len(m.value) == 0 && m.Placeholder != "" {
 		return m.placeholderView()
@@ -605,9 +667,23 @@ func (m *Model) View() string {
 		m.Cursor.SetChar(char)
 		v += m.Cursor.View()                                   // cursor and text under it
 		v += styleText(m.echoTransform(string(value[pos+1:]))) // text after cursor
+		v += m.completionView(0)                               // suggested completion
 	} else {
-		m.Cursor.SetChar(" ")
-		v += m.Cursor.View()
+		if m.canAcceptSuggestion() {
+			suggestion := m.matchedSuggestions[m.currentSuggestionIndex]
+			if len(value) < len(suggestion) {
+				m.Cursor.TextStyle = m.CompletionStyle
+				m.Cursor.SetChar(m.echoTransform(string(suggestion[pos])))
+				v += m.Cursor.View()
+				v += m.completionView(1)
+			} else {
+				m.Cursor.SetChar(" ")
+				v += m.Cursor.View()
+			}
+		} else {
+			m.Cursor.SetChar(" ")
+			v += m.Cursor.View()
+		}
 	}
 
 	// If a max width and background color were set fill the empty spaces with
@@ -625,7 +701,7 @@ func (m *Model) View() string {
 }
 
 // placeholderView returns the prompt and placeholder view, if any.
-func (m *Model) placeholderView() string {
+func (m Model) placeholderView() string {
 	var (
 		v     string
 		p     = m.Placeholder
@@ -651,9 +727,9 @@ func Blink() tea.Msg {
 func Paste() tea.Msg {
 	str, err := clipboard.ReadAll()
 	if err != nil {
-		return msgPasteErr{err}
+		return pasteErrMsg{err}
 	}
-	return msgPaste(str)
+	return pasteMsg(str)
 }
 
 func clamp(v, low, high int) int {
@@ -661,4 +737,124 @@ func clamp(v, low, high int) int {
 		low, high = high, low
 	}
 	return min(high, max(low, v))
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// Deprecated.
+
+// Deprecated: use cursor.Mode.
+type CursorMode int
+
+const (
+	// Deprecated: use cursor.CursorBlink.
+	CursorBlink = CursorMode(cursor.CursorBlink)
+	// Deprecated: use cursor.CursorStatic.
+	CursorStatic = CursorMode(cursor.CursorStatic)
+	// Deprecated: use cursor.CursorHide.
+	CursorHide = CursorMode(cursor.CursorHide)
+)
+
+func (c CursorMode) String() string {
+	return cursor.Mode(c).String()
+}
+
+// Deprecated: use cursor.Mode().
+func (m Model) CursorMode() CursorMode {
+	return CursorMode(m.Cursor.Mode())
+}
+
+// Deprecated: use cursor.SetMode().
+func (m *Model) SetCursorMode(mode CursorMode) []tea.Cmd {
+	return m.Cursor.SetMode(cursor.Mode(mode))
+}
+
+func (m Model) completionView(offset int) string {
+	var (
+		value = m.value
+		style = m.PlaceholderStyle.Inline(true).Render
+	)
+
+	if m.canAcceptSuggestion() {
+		suggestion := m.matchedSuggestions[m.currentSuggestionIndex]
+		if len(value) < len(suggestion) {
+			return style(string(suggestion[len(value)+offset:]))
+		}
+	}
+	return ""
+}
+
+// AvailableSuggestions returns the list of available suggestions.
+func (m *Model) AvailableSuggestions() []string {
+	suggestions := []string{}
+	for _, s := range m.suggestions {
+		suggestions = append(suggestions, string(s))
+	}
+
+	return suggestions
+}
+
+// CurrentSuggestion returns the currently selected suggestion.
+func (m *Model) CurrentSuggestion() string {
+	return string(m.matchedSuggestions[m.currentSuggestionIndex])
+}
+
+// canAcceptSuggestion returns whether there is an acceptable suggestion to
+// autocomplete the current value.
+func (m *Model) canAcceptSuggestion() bool {
+	return len(m.matchedSuggestions) > 0
+}
+
+// updateSuggestions refreshes the list of matching suggestions.
+func (m *Model) updateSuggestions() {
+	if !m.ShowSuggestions {
+		return
+	}
+
+	if len(m.value) <= 0 || len(m.suggestions) <= 0 {
+		m.matchedSuggestions = [][]rune{}
+		return
+	}
+
+	matches := [][]rune{}
+	for _, s := range m.suggestions {
+		suggestion := string(s)
+
+		if strings.HasPrefix(strings.ToLower(suggestion), strings.ToLower(string(m.value))) {
+			matches = append(matches, []rune(suggestion))
+		}
+	}
+	if !reflect.DeepEqual(matches, m.matchedSuggestions) {
+		m.currentSuggestionIndex = 0
+	}
+
+	m.matchedSuggestions = matches
+}
+
+// nextSuggestion selects the next suggestion.
+func (m *Model) nextSuggestion() {
+	m.currentSuggestionIndex = (m.currentSuggestionIndex + 1)
+	if m.currentSuggestionIndex >= len(m.matchedSuggestions) {
+		m.currentSuggestionIndex = 0
+	}
+}
+
+// previousSuggestion selects the previous suggestion.
+func (m *Model) previousSuggestion() {
+	m.currentSuggestionIndex = (m.currentSuggestionIndex - 1)
+	if m.currentSuggestionIndex < 0 {
+		m.currentSuggestionIndex = len(m.matchedSuggestions) - 1
+	}
 }

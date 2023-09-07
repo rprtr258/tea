@@ -5,7 +5,7 @@ import (
 
 	"github.com/mattn/go-runewidth"
 	"github.com/muesli/reflow/ansi"
-	"github.com/muesli/termenv"
+	termenv "github.com/rprtr258/col"
 )
 
 // Border contains a series of values which comprise the various parts of a border.
@@ -339,7 +339,7 @@ func (s Style) styleBorder(border string, fg, bg TerminalColor) string {
 		return border
 	}
 
-	style := termenv.Style{}
+	style := termenv.S()
 
 	if fg != noColor {
 		style = style.Foreground(fg.color(s.r))
@@ -348,7 +348,7 @@ func (s Style) styleBorder(border string, fg, bg TerminalColor) string {
 		style = style.Background(bg.color(s.r))
 	}
 
-	return style.Styled(border)
+	return style.Render(border)
 }
 
 func maxRuneWidth(str string) int {

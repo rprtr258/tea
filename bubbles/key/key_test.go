@@ -3,7 +3,7 @@ package key
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestBinding_Enabled(t *testing.T) {

@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/harmonica"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/ansi"
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/lipgloss"
@@ -310,19 +310,16 @@ func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
 			}
 
 			c := m.rampColorA.BlendLuv(m.rampColorB, p).Hex()
-			b.WriteString(termenv.
-				String(string(m.Full)).
-				Foreground(m.color(c)).
-				String())
+			b.WriteString(termenv.R(string(m.Full), m.color(c).Fg))
 		}
 	} else {
 		// Solid fill
-		s := termenv.String(string(m.Full)).Foreground(m.color(m.FullColor)).String()
+		s := termenv.R(string(m.Full), m.color(m.FullColor).Fg)
 		b.WriteString(strings.Repeat(s, fw))
 	}
 
 	// Empty fill
-	e := termenv.String(string(m.Empty)).Foreground(m.color(m.EmptyColor)).String()
+	e := termenv.R(string(m.Empty), m.color(m.EmptyColor).Fg)
 	n := max(0, tw-fw)
 	b.WriteString(strings.Repeat(e, n))
 }

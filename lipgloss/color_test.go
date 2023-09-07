@@ -5,8 +5,9 @@ import (
 	"image/color"
 	"testing"
 
-	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/lucasb-eyer/go-colorful"
+	"github.com/rprtr258/assert"
+	termenv "github.com/rprtr258/col"
 )
 
 func TestSetColorProfile(t *testing.T) {
@@ -204,7 +205,8 @@ func TestRGBA(t *testing.T) {
 			r.SetColorProfile(test.profile)
 			r.SetHasDarkBackground(test.darkBg)
 
-			r, g, b, _ := termenv.ConvertToRGB(test.input.color(_renderer)).RGBA()
+			c, _ := colorful.Hex(test.input.color(_renderer).Hex)
+			r, g, b, _ := c.RGBA()
 			o := uint(r/256)<<16 + uint(g/256)<<8 + uint(b/256)
 			assert.Equal(t, test.expected, o)
 		})

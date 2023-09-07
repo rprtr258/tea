@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 )
 
 // BaseElement renders a styled primitive element.
@@ -37,17 +37,17 @@ func renderText(w io.Writer, p termenv.Profile, rules StylePrimitive, s string) 
 		return
 	}
 
-	out := termenv.String(s)
-
 	if rules.Upper != nil && *rules.Upper {
-		out = termenv.String(strings.ToUpper(s))
+		s = strings.ToUpper(s)
 	}
 	if rules.Lower != nil && *rules.Lower {
-		out = termenv.String(strings.ToLower(s))
+		s = strings.ToLower(s)
 	}
 	if rules.Title != nil && *rules.Title {
-		out = termenv.String(strings.Title(s)) //nolint:staticcheck
+		s = strings.Title(s) //nolint:staticcheck
 	}
+
+	out := termenv.S()
 	if rules.Color != nil {
 		out = out.Foreground(p.Color(*rules.Color))
 	}
@@ -76,7 +76,7 @@ func renderText(w io.Writer, p termenv.Profile, rules StylePrimitive, s string) 
 		out = out.Blink()
 	}
 
-	_, _ = w.Write([]byte(out.String()))
+	_, _ = w.Write([]byte(out.Render(s)))
 }
 
 func (e *BaseElement) Render(w io.Writer, ctx RenderContext) error {

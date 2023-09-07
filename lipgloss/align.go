@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/ansi"
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 )
 
 // Perform text alignment. If the string is multi-lined, we also make all lines
@@ -23,17 +23,17 @@ func alignTextHorizontal(str string, pos Alignment, width int, style termenv.Sty
 		if shortAmount := widestLine - lineWidth + max(0, width-widestLine); shortAmount > 0 {
 			switch pos {
 			case Right:
-				line = style.Styled(strings.Repeat(" ", shortAmount)) + line
+				line = style.Render(strings.Repeat(" ", shortAmount)) + line
 			case Center:
 				left := shortAmount / 2
 				right := left + shortAmount%2 // note that we put the remainder on the right
 
-				leftSpaces := style.Styled(strings.Repeat(" ", left))
-				rightSpaces := style.Styled(strings.Repeat(" ", right))
+				leftSpaces := style.Render(strings.Repeat(" ", left))
+				rightSpaces := style.Render(strings.Repeat(" ", right))
 
 				line = leftSpaces + line + rightSpaces
 			default: // Left
-				line += style.Styled(strings.Repeat(" ", shortAmount))
+				line += style.Render(strings.Repeat(" ", shortAmount))
 			}
 		}
 

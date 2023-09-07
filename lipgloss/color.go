@@ -3,7 +3,7 @@ package lipgloss
 import (
 	"strconv"
 
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 )
 
 // TerminalColor is a color intended to be rendered in the terminal.
@@ -23,7 +23,7 @@ type NoColor struct{}
 var noColor = NoColor{}
 
 func (NoColor) color(*Renderer) termenv.Color {
-	return termenv.NoColor{}
+	return termenv.NoColor()
 }
 
 // Color specifies a color by hex or ANSI value. For example:
@@ -88,7 +88,7 @@ func (c CompleteColor) color(r *Renderer) termenv.Color {
 	case termenv.ANSI:
 		return p.Color(c.ANSI)
 	default:
-		return termenv.NoColor{}
+		return termenv.NoColor()
 	}
 }
 

@@ -3,7 +3,7 @@ package altscreen_toggle
 import (
 	"context"
 
-	"github.com/muesli/termenv"
+	termenv "github.com/rprtr258/col"
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
@@ -11,8 +11,8 @@ import (
 
 var (
 	color   = termenv.EnvColorProfile().Color
-	keyword = termenv.Style{}.Foreground(color("204")).Background(color("235")).Styled
-	help    = termenv.Style{}.Foreground(color("241")).Styled
+	keyword = termenv.S().Foreground(color("204")).Background(color("235")).Render
+	help    = termenv.S().Foreground(color("241")).Render
 )
 
 type model struct {

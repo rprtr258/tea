@@ -6,7 +6,7 @@ package lipgloss
 import (
 	"sync"
 
-	"github.com/muesli/termenv"
+	"github.com/rprtr258/col"
 )
 
 var enableANSI sync.Once

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 
 	"github.com/rprtr258/tea"
 )
@@ -16,8 +16,8 @@ func TestNew(t *testing.T) {
 	textarea.View(vb)
 	view := string(vb.Render())
 
-	assert.Substringf(t, view, ">", "Text area did not render the prompt")
-	assert.Substringf(t, view, "World!", "Text area did not render the placeholder")
+	assert.Truef(t, strings.Contains(view, ">"), "Text area did not render the prompt")
+	assert.Truef(t, strings.Contains(view, "World!"), "Text area did not render the placeholder")
 }
 
 func TestInput(t *testing.T) {
@@ -33,7 +33,7 @@ func TestInput(t *testing.T) {
 	textarea.View(vb)
 	view := string(vb.Render())
 
-	assert.Substringf(t, view, input, "Text area did not render the input")
+	assert.Truef(t, strings.Contains(view, input), "Text area did not render the input")
 	assert.Equalf(t, len(input), textarea.col, "Text area did not move the cursor to the correct position")
 }
 
@@ -58,7 +58,7 @@ func TestSoftWrap(t *testing.T) {
 	view := string(vb.Render())
 
 	for _, word := range strings.Split(input, " ") {
-		assert.Substringf(t, view, word, "Text area did not render the input")
+		assert.Truef(t, strings.Contains(view, word), "Text area did not render the input")
 	}
 
 	// Due to the word wrapping, each word will be on a new line and the
@@ -110,7 +110,7 @@ func TestVerticalScrolling(t *testing.T) {
 	view := string(bytes.Join(bytes.Split(vb.Render(), []byte("\n")), nil))
 
 	// The view should contain the first "line" of the input.
-	assert.Substringf(t, view, "This is a really", "Text area did not render the input")
+	assert.Truef(t, strings.Contains(view, "This is a really"), "Text area did not render the input")
 
 	// But we should be able to scroll to see the next line.
 	// Let's scroll down for each line to view the full input.
@@ -123,7 +123,7 @@ func TestVerticalScrolling(t *testing.T) {
 		vb := tea.NewViewbox(100, 10)
 		textarea.View(vb)
 		view := string(bytes.Join(bytes.Split(vb.Render(), []byte("\n")), nil))
-		assert.Substringf(t, view, line, "Text area did not render the correct scrolled input")
+		assert.Truef(t, strings.Contains(view, line), "Text area did not render the correct scrolled input")
 	}
 }
 
@@ -367,7 +367,7 @@ func TestRendersEndOfLineBuffer(t *testing.T) {
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
 	view := string(vb.Render())
-	assert.Substringf(t, view, "~", "Expected to see a tilde at the end of the line")
+	assert.Truef(t, strings.Contains(view, "~"), "Expected to see a tilde at the end of the line")
 }
 
 func newTextArea() Model {

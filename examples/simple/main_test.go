@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"io"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/muesli/termenv"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
+	termenv "github.com/rprtr258/col"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/lipgloss"
@@ -51,7 +52,7 @@ func TestAppInteractive(t *testing.T) {
 	time.Sleep(time.Second + 200*time.Millisecond)
 	tm.Send("ignored msg")
 
-	assert.Substring(t, string(readBts(t, tm.Output())), "This program will exit in 9 seconds")
+	assert.True(t, strings.Contains(string(readBts(t, tm.Output())), "This program will exit in 9 seconds"))
 
 	teatest.WaitFor(t, tm.Output(), func(out []byte) bool {
 		return bytes.Contains(out, []byte("This program will exit in 7 seconds"))
