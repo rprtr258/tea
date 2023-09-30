@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/list"
+	"github.com/rprtr258/tea/components/list"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

@@ -1,13 +1,12 @@
 package spinner
 
-// A simple program demonstrating the spinner component from the Bubbles
-// component library.
+// A simple program demonstrating spinner component.
 
 import (
 	"context"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/components/spinner"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

@@ -1,7 +1,6 @@
 package chat
 
-// A simple program demonstrating the text area component from the Bubbles
-// component library.
+// A simple program demonstrating text area component.
 
 import (
 	"context"
@@ -9,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/textarea"
-	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/components/textarea"
+	"github.com/rprtr258/tea/components/viewport"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

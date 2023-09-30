@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/list"
+	"github.com/rprtr258/tea/components/list"
 	"github.com/rprtr258/tea/examples/altscreen_toggle"
 	"github.com/rprtr258/tea/examples/cellbuffer"
 	"github.com/rprtr258/tea/examples/chat"

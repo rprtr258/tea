@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/progress"
+	"github.com/rprtr258/tea/components/progress"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

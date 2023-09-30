@@ -1,7 +1,6 @@
 package pager
 
-// An example program demonstrating the pager component from the Bubbles
-// component library.
+// An example program demonstrating pager component.
 
 import (
 	"context"
@@ -10,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/components/viewport"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

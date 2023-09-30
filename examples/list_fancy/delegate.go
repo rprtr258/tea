@@ -2,8 +2,8 @@ package list_fancy
 
 import (
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/key"
-	"github.com/rprtr258/tea/bubbles/list"
+	"github.com/rprtr258/tea/components/key"
+	"github.com/rprtr258/tea/components/list"
 )
 
 func newItemDelegate[I list.DefaultItem](keys *delegateKeyMap) list.DefaultDelegate[I] {

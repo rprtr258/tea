@@ -1,16 +1,13 @@
 package textarea
 
-// A simple program demonstrating the textarea component from the Bubbles
-// component library.
+// A simple program demonstrating textarea component.
 
 import (
 	"context"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/textarea"
+	"github.com/rprtr258/tea/components/textarea"
 )
-
-type msgErr error
 
 type model struct {
 	textarea textarea.Model

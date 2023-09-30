@@ -7,9 +7,9 @@ import (
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/help"
-	"github.com/rprtr258/tea/bubbles/key"
-	"github.com/rprtr258/tea/bubbles/timer"
+	"github.com/rprtr258/tea/components/help"
+	"github.com/rprtr258/tea/components/key"
+	"github.com/rprtr258/tea/components/timer"
 )
 
 const timeout = time.Second * 5

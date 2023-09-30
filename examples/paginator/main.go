@@ -1,7 +1,6 @@
 package paginator
 
-// A simple program demonstrating the paginator component from the Bubbles
-// component library.
+// A simple program demonstrating paginator component.
 
 import (
 	"context"
@@ -10,7 +9,7 @@ import (
 	"github.com/rprtr258/fun/iter"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/paginator"
+	"github.com/rprtr258/tea/components/paginator"
 )
 
 func newModel() *model {

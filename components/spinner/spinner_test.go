@@ -5,7 +5,7 @@ import (
 
 	"github.com/rprtr258/assert"
 
-	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/components/spinner"
 )
 
 func TestSpinnerNew(t *testing.T) {

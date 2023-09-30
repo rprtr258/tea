@@ -1,7 +1,6 @@
 package textinputs
 
-// A simple example demonstrating the use of multiple text input components
-// from the Bubbles component library.
+// A simple example demonstrating the use of multiple text input components.
 
 import (
 	"context"
@@ -10,8 +9,8 @@ import (
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/cursor"
-	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/components/cursor"
+	"github.com/rprtr258/tea/components/textinput"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

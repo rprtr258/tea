@@ -10,9 +10,9 @@ import (
 	rw "github.com/mattn/go-runewidth"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/cursor"
-	"github.com/rprtr258/tea/bubbles/key"
-	"github.com/rprtr258/tea/bubbles/runeutil"
+	"github.com/rprtr258/tea/components/cursor"
+	"github.com/rprtr258/tea/components/key"
+	"github.com/rprtr258/tea/components/runeutil"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

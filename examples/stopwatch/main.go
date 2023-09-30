@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/help"
-	"github.com/rprtr258/tea/bubbles/key"
-	"github.com/rprtr258/tea/bubbles/stopwatch"
+	"github.com/rprtr258/tea/components/help"
+	"github.com/rprtr258/tea/components/key"
+	"github.com/rprtr258/tea/components/stopwatch"
 )
 
 type model struct {

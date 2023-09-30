@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/viewport"
+	"github.com/rprtr258/tea/components/viewport"
 	"github.com/rprtr258/tea/glamour"
 	"github.com/rprtr258/tea/lipgloss"
 )

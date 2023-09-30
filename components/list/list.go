@@ -14,11 +14,11 @@ import (
 	"github.com/sahilm/fuzzy"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/help"
-	"github.com/rprtr258/tea/bubbles/key"
-	"github.com/rprtr258/tea/bubbles/paginator"
-	"github.com/rprtr258/tea/bubbles/spinner"
-	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/components/help"
+	"github.com/rprtr258/tea/components/key"
+	"github.com/rprtr258/tea/components/paginator"
+	"github.com/rprtr258/tea/components/spinner"
+	"github.com/rprtr258/tea/components/textinput"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

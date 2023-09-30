@@ -14,7 +14,7 @@ import (
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/spinner"
+	"github.com/rprtr258/tea/components/spinner"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

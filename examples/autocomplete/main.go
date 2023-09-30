@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/components/textinput"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

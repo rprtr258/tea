@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/spinner"
-	"github.com/rprtr258/tea/bubbles/timer"
+	"github.com/rprtr258/tea/components/spinner"
+	"github.com/rprtr258/tea/components/timer"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

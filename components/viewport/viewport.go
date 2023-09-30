@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/key"
+	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/lipgloss"
 )
 

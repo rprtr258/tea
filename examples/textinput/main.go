@@ -1,13 +1,12 @@
 package textinput
 
-// A simple program demonstrating the text input component from the Bubbles
-// component library.
+// A simple program demonstrating the text input component.
 
 import (
 	"context"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/bubbles/textinput"
+	"github.com/rprtr258/tea/components/textinput"
 )
 
 type model struct {
