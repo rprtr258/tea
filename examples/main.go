@@ -21,9 +21,6 @@ import (
 	"github.com/rprtr258/tea/examples/exec"
 	"github.com/rprtr258/tea/examples/file_picker"
 	"github.com/rprtr258/tea/examples/fullscreen"
-	"github.com/rprtr258/tea/examples/glamour/custom_renderer"
-	"github.com/rprtr258/tea/examples/glamour/helloworld"
-	"github.com/rprtr258/tea/examples/glamour/menu"
 	"github.com/rprtr258/tea/examples/help"
 	"github.com/rprtr258/tea/examples/http"
 	"github.com/rprtr258/tea/examples/lipgloss/layout"
@@ -31,6 +28,9 @@ import (
 	"github.com/rprtr258/tea/examples/list_default"
 	"github.com/rprtr258/tea/examples/list_fancy"
 	"github.com/rprtr258/tea/examples/list_simple"
+	"github.com/rprtr258/tea/examples/markdown/custom_renderer"
+	"github.com/rprtr258/tea/examples/markdown/helloworld"
+	"github.com/rprtr258/tea/examples/markdown/menu"
 	"github.com/rprtr258/tea/examples/mouse"
 	"github.com/rprtr258/tea/examples/package_manager"
 	"github.com/rprtr258/tea/examples/pager"
@@ -250,10 +250,10 @@ func main() {
 				},
 			},
 			{
-				Name:  "glamour",
-				Usage: "glamour examples",
+				Name:  "markdown",
+				Usage: "markdown examples",
 				Action: func(ctx *cli.Context) error {
-					return runExamplesList(ctx.Context, "Glamour examples", glamourExamples)
+					return runExamplesList(ctx.Context, "Markdown examples", glamourExamples)
 				},
 			},
 		},
