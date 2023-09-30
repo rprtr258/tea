@@ -183,7 +183,7 @@ var DefaultKeyMap = KeyMap{
     ),
 }
 
-func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
     switch msg := msg.(type) {
     case tea.MsgKey:
         switch {
@@ -193,7 +193,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             // The user pressed down
         }
     }
-    return m, nil
+    return nil
 }
 ```
 

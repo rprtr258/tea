@@ -140,7 +140,7 @@ For now, we'll just deal with `tea.MsgKey` messages, which are automatically
 sent to the update function when keys are pressed.
 
 ```go
-func (m *model) Update(msg tea.Msg) (model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) tea.Cmd {
     switch msg := msg.(type) {
     // Is it a key press?
     case tea.MsgKey:
@@ -148,7 +148,7 @@ func (m *model) Update(msg tea.Msg) (model, tea.Cmd) {
         switch msg.String() {
         // These keys should exit the program.
         case "ctrl+c", "q":
-            return m, tea.Quit
+            return tea.Quit
         // The "up" and "k" keys move the cursor up
         case "up", "k":
             if m.cursor > 0 {
@@ -173,7 +173,7 @@ func (m *model) Update(msg tea.Msg) (model, tea.Cmd) {
 
     // Return the updated model to the Bubble Tea runtime for processing.
     // Note that we're not returning a command.
-    return m, nil
+    return nil
 }
 ```
 
