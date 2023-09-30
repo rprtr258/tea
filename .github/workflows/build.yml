@@ -31,7 +31,7 @@ jobs:
       #   if: matrix.os != 'windows-latest'
 
       # - name: Test-windows
-      #   run: go test $(go list ./... | grep -v glamour)
+      #   run: go test $(go list ./... | grep -v markdown)
       #   if: matrix.os == 'windows-latest'
 
       # - name: Build examples

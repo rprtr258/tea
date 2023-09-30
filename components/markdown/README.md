@@ -1,4 +1,4 @@
-# Glamour
+# Markdown
 
 <p>
     <img src="https://stuff.charm.sh/glamour/glamour-github-header.png" width="245" alt="Glamour Title Treatment"><br>
@@ -13,7 +13,7 @@ Stylesheet-based markdown rendering for your CLI apps.
 
 ![Glamour dark style example](https://stuff.charm.sh/glamour/glamour-example.png)
 
-`glamour` lets you render [markdown](https://en.wikipedia.org/wiki/Markdown)
+`markdown` lets you render [markdown](https://en.wikipedia.org/wiki/Markdown)
 documents & templates on [ANSI](https://en.wikipedia.org/wiki/ANSI_escape_code)
 compatible terminals. You can create your own stylesheet or simply use one of
 the stylish defaults.
@@ -21,7 +21,7 @@ the stylish defaults.
 ## Usage
 
 ```go
-import "github.com/rprtr258/tea/glamour"
+import "github.com/rprtr258/tea/components/markdown"
 
 in := `# Hello World
 
@@ -31,7 +31,7 @@ Check out the [other examples](https://github.com/rprtr258/tea/glamour/tree/mast
 Bye!
 `
 
-out, err := glamour.Render(in, "dark")
+out, err := markdown.Render(in, "dark")
 fmt.Print(out)
 ```
 

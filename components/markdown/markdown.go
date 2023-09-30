@@ -1,4 +1,4 @@
-package glamour
+package markdown
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rprtr258/col"
+	termenv "github.com/rprtr258/col"
 	"github.com/yuin/goldmark"
 	emoji "github.com/yuin/goldmark-emoji"
 	"github.com/yuin/goldmark/extension"
@@ -14,7 +14,7 @@ import (
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/util"
 
-	"github.com/rprtr258/tea/glamour/ansi"
+	"github.com/rprtr258/tea/components/markdown/ansi"
 )
 
 // Default styles.
@@ -244,6 +244,7 @@ func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 	return buf.Bytes(), err
 }
 
+// TODO: remove wtf
 func getEnvironmentStyle() string {
 	glamourStyle := os.Getenv("GLAMOUR_STYLE")
 	if glamourStyle == "" {

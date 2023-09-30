@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/rprtr258/tea/glamour"
-	"github.com/rprtr258/tea/glamour/ansi"
+	"github.com/rprtr258/tea/components/markdown"
+	"github.com/rprtr258/tea/components/markdown/ansi"
 )
 
 func writeStyleJSON(filename string, styleConfig *ansi.StyleConfig) error {
@@ -23,7 +23,7 @@ func writeStyleJSON(filename string, styleConfig *ansi.StyleConfig) error {
 }
 
 func run() error {
-	for style, styleConfig := range glamour.DefaultStyles {
+	for style, styleConfig := range markdown.DefaultStyles {
 		filename := filepath.Join("styles", style+".json")
 		if err := writeStyleJSON(filename, styleConfig); err != nil {
 			return err

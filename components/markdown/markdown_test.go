@@ -1,4 +1,4 @@
-package glamour
+package markdown
 
 import (
 	"io"

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/components/markdown"
 	"github.com/rprtr258/tea/components/viewport"
-	"github.com/rprtr258/tea/glamour"
 	"github.com/rprtr258/tea/lipgloss"
 )
 
@@ -65,9 +65,9 @@ func newExample() (*model, error) {
 		BorderForeground(lipgloss.Color("62"))
 		// PaddingRight(2)
 
-	renderer, err := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
-		glamour.WithWordWrap(width),
+	renderer, err := markdown.NewTermRenderer(
+		markdown.WithAutoStyle(),
+		markdown.WithWordWrap(width),
 	)
 	if err != nil {
 		return nil, err

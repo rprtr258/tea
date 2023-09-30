@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/rprtr258/tea/glamour"
+	"github.com/rprtr258/tea/components/markdown"
 )
 
 func Main(context.Context) error {
@@ -26,7 +26,7 @@ func main() {
 Bye!
 `
 
-	out, _ := glamour.Render(in, "dark")
+	out, _ := markdown.Render(in, "dark")
 	fmt.Print(out)
 	return nil
 }

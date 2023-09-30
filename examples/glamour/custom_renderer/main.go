@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/rprtr258/tea/glamour"
+	"github.com/rprtr258/tea/components/markdown"
 )
 
 func Main(context.Context) error {
@@ -13,9 +13,9 @@ func Main(context.Context) error {
 Word-wrapping will occur when lines exceed the limit of 40 characters.
 `
 
-	r, _ := glamour.NewTermRenderer(
-		glamour.WithStandardStyle("dark"),
-		glamour.WithWordWrap(40),
+	r, _ := markdown.NewTermRenderer(
+		markdown.WithStandardStyle("dark"),
+		markdown.WithWordWrap(40),
 	)
 
 	out, err := r.Render(in)

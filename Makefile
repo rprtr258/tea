@@ -24,6 +24,6 @@ run-tutorials:
 run-lipgloss:
 	@go run examples/main.go lipgloss
 
-.PHONY: run-glamour
-run-glamour:
-	@go run examples/main.go glamour
+.PHONY: run-markdown
+run-markdown:
+	@go run examples/main.go markdown

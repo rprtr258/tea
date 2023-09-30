@@ -1,6 +1,6 @@
-package glamour
+package markdown
 
-import "github.com/rprtr258/tea/glamour/ansi"
+import "github.com/rprtr258/tea/components/markdown/ansi"
 
 var DraculaStyleConfig = ansi.StyleConfig{
 	Document: ansi.StyleBlock{
