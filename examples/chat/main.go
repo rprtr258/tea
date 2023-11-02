@@ -47,7 +47,7 @@ Type a message and press Enter to send.`)
 		textarea:    ta,
 		messages:    []string{},
 		viewport:    vp,
-		senderStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("5")),
+		senderStyle: lipgloss.NewStyle().Foreground(lipgloss.FgColor("5")),
 		err:         nil,
 	}
 }

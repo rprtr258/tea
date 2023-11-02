@@ -8,7 +8,7 @@ import (
 	"github.com/rprtr258/tea/lipgloss"
 )
 
-var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
+var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("#626262")).Render
 
 const (
 	padding  = 2

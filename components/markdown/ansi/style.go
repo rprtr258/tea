@@ -41,7 +41,7 @@ type StylePrimitive struct {
 	BlockSuffix     string  `json:"block_suffix,omitempty"`
 	Prefix          string  `json:"prefix,omitempty"`
 	Suffix          string  `json:"suffix,omitempty"`
-	Color           *string `json:"color,omitempty"`
+	ForegroundColor *string `json:"color,omitempty"`
 	BackgroundColor *string `json:"background_color,omitempty"`
 	Underline       *bool   `json:"underline,omitempty"`
 	Bold            *bool   `json:"bold,omitempty"`
@@ -149,7 +149,7 @@ func cascadeStyles(toBlock bool, s ...StyleBlock) StyleBlock {
 func cascadeStyle(parent StyleBlock, child StyleBlock, toBlock bool) StyleBlock {
 	s := child
 
-	s.Color = parent.Color
+	s.ForegroundColor = parent.ForegroundColor
 	s.BackgroundColor = parent.BackgroundColor
 	s.Underline = parent.Underline
 	s.Bold = parent.Bold
@@ -173,8 +173,8 @@ func cascadeStyle(parent StyleBlock, child StyleBlock, toBlock bool) StyleBlock 
 		s.Suffix = parent.Suffix
 	}
 
-	if child.Color != nil {
-		s.Color = child.Color
+	if child.ForegroundColor != nil {
+		s.ForegroundColor = child.ForegroundColor
 	}
 	if child.BackgroundColor != nil {
 		s.BackgroundColor = child.BackgroundColor

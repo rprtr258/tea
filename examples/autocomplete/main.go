@@ -69,7 +69,7 @@ func initialModel() model {
 	ti := textinput.New()
 	ti.Prompt = "charmbracelet/"
 	ti.Placeholder = "repo..."
-	ti.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
+	ti.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.FgColor("63"))
 	ti.Focus()
 	ti.CharLimit = 50
 	ti.Width = 20

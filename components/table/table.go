@@ -98,7 +98,7 @@ type Styles struct {
 // DefaultStyles returns a set of default style definitions for this table.
 func DefaultStyles() Styles {
 	return Styles{
-		Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),
+		Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.FgColor("212")),
 		Header:   lipgloss.NewStyle().Bold(true), /*.Padding(0, 1)*/
 		Cell:     lipgloss.NewStyle(),            /*.Padding(0, 1)*/
 	}

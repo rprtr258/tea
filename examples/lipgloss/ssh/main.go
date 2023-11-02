@@ -20,7 +20,7 @@ import (
 	"github.com/charmbracelet/wish"
 	lm "github.com/charmbracelet/wish/logging"
 	"github.com/creack/pty"
-	termenv "github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 
 	"github.com/rprtr258/tea/lipgloss"
 )
@@ -49,13 +49,13 @@ func makeStyles(r *lipgloss.Renderer) styles {
 		italic:        r.NewStyle().SetString("italic").Italic(true),
 		underline:     r.NewStyle().SetString("underline").Underline(true),
 		strikethrough: r.NewStyle().SetString("strikethrough").Strikethrough(true),
-		red:           r.NewStyle().SetString("red").Foreground(lipgloss.Color("#E88388")),
-		green:         r.NewStyle().SetString("green").Foreground(lipgloss.Color("#A8CC8C")),
-		yellow:        r.NewStyle().SetString("yellow").Foreground(lipgloss.Color("#DBAB79")),
-		blue:          r.NewStyle().SetString("blue").Foreground(lipgloss.Color("#71BEF2")),
-		magenta:       r.NewStyle().SetString("magenta").Foreground(lipgloss.Color("#D290E4")),
-		cyan:          r.NewStyle().SetString("cyan").Foreground(lipgloss.Color("#66C2CD")),
-		gray:          r.NewStyle().SetString("gray").Foreground(lipgloss.Color("#B9BFCA")),
+		red:           r.NewStyle().SetString("red").Foreground(lipgloss.FgColor("#E88388")),
+		green:         r.NewStyle().SetString("green").Foreground(lipgloss.FgColor("#A8CC8C")),
+		yellow:        r.NewStyle().SetString("yellow").Foreground(lipgloss.FgColor("#DBAB79")),
+		blue:          r.NewStyle().SetString("blue").Foreground(lipgloss.FgColor("#71BEF2")),
+		magenta:       r.NewStyle().SetString("magenta").Foreground(lipgloss.FgColor("#D290E4")),
+		cyan:          r.NewStyle().SetString("cyan").Foreground(lipgloss.FgColor("#66C2CD")),
+		gray:          r.NewStyle().SetString("gray").Foreground(lipgloss.FgColor("#B9BFCA")),
 	}
 }
 
@@ -166,13 +166,13 @@ func handler(next ssh.Handler) ssh.Handler {
 		fmt.Fprintf(&str, "%s %t %s\n\n",
 			styles.bold.Copy().UnsetString().Render("Has dark background?"),
 			renderer.HasDarkBackground(),
-			renderer.Output.BackgroundColor().Hex,
+			"ABOBA", // TODO: print renderer.Output.BackgroundColor().Hex
 		)
 
 		block := renderer.Place(width,
 			lipgloss.Height(str.String()), lipgloss.Center, lipgloss.Center, str.String(),
 			lipgloss.WithWhitespaceChars("/"),
-			lipgloss.WithWhitespaceForeground(lipgloss.AdaptiveColor{Light: "250", Dark: "236"}),
+			lipgloss.WithWhitespaceForeground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("250"), Dark: lipgloss.FgColor("236")}),
 		)
 
 		// Render to client.

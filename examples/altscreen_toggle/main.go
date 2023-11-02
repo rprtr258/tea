@@ -3,16 +3,21 @@ package altscreen_toggle
 import (
 	"context"
 
-	termenv "github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 	"github.com/rprtr258/fun"
+	"github.com/rprtr258/scuf"
 
 	"github.com/rprtr258/tea"
 )
 
 var (
 	color   = termenv.EnvColorProfile().Color
-	keyword = termenv.S().Foreground(color("204")).Background(color("235")).Render
-	help    = termenv.S().Foreground(color("241")).Render
+	keyword = func(s string) string {
+		return scuf.String(s, scuf.FgANSI256(204), scuf.BgANSI256(235))
+	}
+	help = func(s string) string {
+		return scuf.String(s, scuf.FgANSI256(241))
+	}
 )
 
 type model struct {

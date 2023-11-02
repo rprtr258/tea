@@ -25,7 +25,7 @@ type model struct {
 func newModel(initialValue string) *model {
 	i := textinput.New()
 	i.Prompt = ""
-	i.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
+	i.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.FgColor("63"))
 	i.Width = 48
 	i.SetValue(initialValue)
 	i.CursorEnd()

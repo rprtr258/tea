@@ -3,7 +3,7 @@ package tea
 import (
 	"io"
 
-	"github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 )
 
 // WithOutput sets the output which, by default, is stdout. In most cases you

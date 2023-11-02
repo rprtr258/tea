@@ -3,7 +3,7 @@ package lipgloss
 import (
 	"io"
 
-	"github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 )
 
 // Renderer is a lipgloss terminal renderer.

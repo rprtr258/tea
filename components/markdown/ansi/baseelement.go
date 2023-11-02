@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/rprtr258/col"
+	"github.com/rprtr258/scuf"
 )
 
 // BaseElement renders a styled primitive element.
@@ -32,7 +32,7 @@ func formatToken(format string, token string) (string, error) {
 	return b.String(), err
 }
 
-func renderText(w io.Writer, p termenv.Profile, rules StylePrimitive, s string) {
+func renderText(w io.Writer, rules StylePrimitive, s string) {
 	if len(s) == 0 {
 		return
 	}
@@ -47,57 +47,57 @@ func renderText(w io.Writer, p termenv.Profile, rules StylePrimitive, s string) 
 		s = strings.Title(s) //nolint:staticcheck
 	}
 
-	out := termenv.S()
-	if rules.Color != nil {
-		out = out.Foreground(p.Color(*rules.Color))
+	out := []scuf.Modifier{}
+	if rules.ForegroundColor != nil {
+		out = append(out, scuf.BgRGB(scuf.MustParseHexRGB(*rules.ForegroundColor)))
 	}
 	if rules.BackgroundColor != nil {
-		out = out.Background(p.Color(*rules.BackgroundColor))
+		out = append(out, scuf.BgRGB(scuf.MustParseHexRGB(*rules.BackgroundColor)))
 	}
 	if rules.Underline != nil && *rules.Underline {
-		out = out.Underline()
+		out = append(out, scuf.ModUnderline)
 	}
 	if rules.Bold != nil && *rules.Bold {
-		out = out.Bold()
+		out = append(out, scuf.ModBold)
 	}
 	if rules.Italic != nil && *rules.Italic {
-		out = out.Italic()
+		out = append(out, scuf.ModItalic)
 	}
 	if rules.CrossedOut != nil && *rules.CrossedOut {
-		out = out.CrossOut()
+		out = append(out, scuf.ModCrossout)
 	}
 	if rules.Overlined != nil && *rules.Overlined {
-		out = out.Overline()
+		out = append(out, scuf.ModOverline)
 	}
 	if rules.Inverse != nil && *rules.Inverse {
-		out = out.Reverse()
+		out = append(out, scuf.ModReverse)
 	}
 	if rules.Blink != nil && *rules.Blink {
-		out = out.Blink()
+		out = append(out, scuf.ModBlink)
 	}
 
-	_, _ = w.Write([]byte(out.Render(s)))
+	_, _ = w.Write([]byte(scuf.String(s, out...)))
 }
 
 func (e *BaseElement) Render(w io.Writer, ctx RenderContext) error {
 	bs := ctx.blockStack
 
-	renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, e.Prefix)
+	renderText(w, bs.Current().Style.StylePrimitive, e.Prefix)
 	defer func() {
-		renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, e.Suffix)
+		renderText(w, bs.Current().Style.StylePrimitive, e.Suffix)
 	}()
 
 	rules := bs.With(e.Style)
 	// render unstyled prefix/suffix
-	renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.BlockPrefix)
+	renderText(w, bs.Current().Style.StylePrimitive, rules.BlockPrefix)
 	defer func() {
-		renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.BlockSuffix)
+		renderText(w, bs.Current().Style.StylePrimitive, rules.BlockSuffix)
 	}()
 
 	// render styled prefix/suffix
-	renderText(w, ctx.options.ColorProfile, rules, rules.Prefix)
+	renderText(w, rules, rules.Prefix)
 	defer func() {
-		renderText(w, ctx.options.ColorProfile, rules, rules.Suffix)
+		renderText(w, rules, rules.Suffix)
 	}()
 
 	s := e.Token
@@ -108,6 +108,6 @@ func (e *BaseElement) Render(w io.Writer, ctx RenderContext) error {
 			return err
 		}
 	}
-	renderText(w, ctx.options.ColorProfile, rules, s)
+	renderText(w, rules, s)
 	return nil
 }

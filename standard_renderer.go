@@ -12,7 +12,7 @@ import (
 
 	"github.com/muesli/ansi/compressor"
 	"github.com/muesli/reflow/truncate"
-	"github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 	"github.com/rprtr258/fun"
 )
 

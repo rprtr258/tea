@@ -39,41 +39,41 @@ type Styles struct {
 }
 
 var (
-	verySubduedColor = lipgloss.AdaptiveColor{Light: "#DDDADA", Dark: "#3C3C3C"}
-	subduedColor     = lipgloss.AdaptiveColor{Light: "#9B9B9B", Dark: "#5C5C5C"}
+	verySubduedColor = lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#DDDADA"), Dark: lipgloss.FgRGB("#3C3C3C")}
+	subduedColor     = lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#9B9B9B"), Dark: lipgloss.FgRGB("#5C5C5C")}
 	// DefaultStyle is a set of default style definitions for list component.
 	DefaultStyle = Styles{
 		TitleBar: lipgloss.NewStyle(),
 		// Padding(0, 0, 1, 2),
 		Title: lipgloss.NewStyle().
-			Background(lipgloss.Color("62")).
-			Foreground(lipgloss.Color("230")),
+			Background(lipgloss.BgColor("62")).
+			Foreground(lipgloss.FgColor("230")),
 		// Padding(0, 1),
 		Spinner: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#8E8E8E", Dark: "#747373"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#8E8E8E"), Dark: lipgloss.FgColor("#747373")}),
 		FilterPrompt: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#04B575", Dark: "#ECFD65"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#04B575"), Dark: lipgloss.FgColor("#ECFD65")}),
 		FilterCursor: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#EE6FF8"), Dark: lipgloss.FgColor("#EE6FF8")}),
 		DefaultFilterCharacterMatch: lipgloss.NewStyle().
 			Underline(true),
 		StatusBar: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#A49FA5"), Dark: lipgloss.FgColor("#777777")}),
 		// Padding(0, 0, 1, 2),
 		StatusEmpty: lipgloss.NewStyle().
 			Foreground(subduedColor),
 		StatusBarActiveFilter: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#1a1a1a"), Dark: lipgloss.FgColor("#dddddd")}),
 		StatusBarFilterCount: lipgloss.NewStyle().
 			Foreground(verySubduedColor),
 		NoItems: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#909090", Dark: "#626262"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#909090"), Dark: lipgloss.FgColor("#626262")}),
 		ArabicPagination: lipgloss.NewStyle().
 			Foreground(subduedColor),
 		PaginationStyle: lipgloss.NewStyle(),
 		// PaddingLeft(2), //nolint:gomnd
 		ActivePaginationDot: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#847A85", Dark: "#979797"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#847A85"), Dark: lipgloss.FgColor("#979797")}),
 		InactivePaginationDot: lipgloss.NewStyle().
 			Foreground(verySubduedColor),
 		DividerDot: lipgloss.NewStyle().

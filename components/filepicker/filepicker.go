@@ -12,6 +12,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
+	"github.com/rprtr258/scuf"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/lipgloss"
@@ -107,18 +108,17 @@ func DefaultStyles() Styles {
 // with a given Lip Gloss renderer.
 func DefaultStylesWithRenderer(r *lipgloss.Renderer) Styles {
 	return Styles{
-		DisabledCursor:   r.NewStyle().Foreground(lipgloss.Color("247")),
-		Cursor:           r.NewStyle().Foreground(lipgloss.Color("212")),
-		Symlink:          r.NewStyle().Foreground(lipgloss.Color("36")),
-		Directory:        r.NewStyle().Foreground(lipgloss.Color("99")),
+		DisabledCursor:   r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(247))),
+		Cursor:           r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(212))),
+		Symlink:          r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(36))),
+		Directory:        r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(99))),
 		File:             r.NewStyle(),
-		DisabledFile:     r.NewStyle().Foreground(lipgloss.Color("243")),
-		DisabledSelected: r.NewStyle().Foreground(lipgloss.Color("247")),
-		Permission:       r.NewStyle().Foreground(lipgloss.Color("244")),
-		Selected:         r.NewStyle().Foreground(lipgloss.Color("212")).Bold(true),
-		FileSize:         r.NewStyle().Foreground(lipgloss.Color("240")).Width(fileSizeWidth).Align(lipgloss.Right),
-		EmptyDirectory: r.NewStyle().
-			Foreground(lipgloss.Color("240")),
+		DisabledFile:     r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(243))),
+		DisabledSelected: r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(247))),
+		Permission:       r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(244))),
+		Selected:         r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(212))).Bold(true),
+		FileSize:         r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(240))).Width(fileSizeWidth).Align(lipgloss.Right),
+		EmptyDirectory:   r.NewStyle().Foreground(lipgloss.Raw(scuf.FgANSI256(240))),
 		// PaddingLeft(paddingLeft)
 	}
 }

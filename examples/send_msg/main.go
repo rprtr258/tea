@@ -16,9 +16,9 @@ import (
 )
 
 var (
-	spinnerStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
-	helpStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("241")) //.Margin(1, 0)
-	dotStyle      = helpStyle.Copy()                                      //.UnsetMargins()
+	spinnerStyle  = lipgloss.NewStyle().Foreground(lipgloss.FgColor("63"))
+	helpStyle     = lipgloss.NewStyle().Foreground(lipgloss.FgColor("241")) //.Margin(1, 0)
+	dotStyle      = helpStyle.Copy()                                        //.UnsetMargins()
 	durationStyle = dotStyle.Copy()
 	appStyle      = lipgloss.NewStyle() //.Margin(1, 2, 0, 2)
 )

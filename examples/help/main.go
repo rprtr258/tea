@@ -78,7 +78,7 @@ func newModel() *model {
 	return &model{
 		keys:       keys,
 		help:       help.New(),
-		inputStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
+		inputStyle: lipgloss.NewStyle().Foreground(lipgloss.FgColor("#FF75B7")),
 	}
 }
 

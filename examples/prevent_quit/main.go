@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	choiceStyle   = lipgloss.NewStyle(). /*.PaddingLeft(1)*/ Foreground(lipgloss.Color("241"))
-	saveTextStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
-	quitViewStyle = lipgloss.NewStyle(). /*.Padding(1)*/ Border(lipgloss.RoundedBorder).BorderForeground(lipgloss.Color("170"))
+	choiceStyle   = lipgloss.NewStyle(). /*.PaddingLeft(1)*/ Foreground(lipgloss.FgColor("241"))
+	saveTextStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("170"))
+	quitViewStyle = lipgloss.NewStyle(). /*.Padding(1)*/ Border(lipgloss.RoundedBorder).BorderForeground(lipgloss.FgColor("170"))
 )
 
 type model struct {

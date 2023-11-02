@@ -93,23 +93,23 @@ var DefaultKeyMap = KeyMap{
 var (
 	_styleFocusedDefault = Style{
 		Base:             lipgloss.NewStyle(),
-		CursorLine:       lipgloss.NewStyle().Background(lipgloss.AdaptiveColor{Light: "255", Dark: "0"}),
-		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "240"}),
-		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "254", Dark: "0"}),
-		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
-		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
-		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.Color("7")),
+		CursorLine:       lipgloss.NewStyle().Background(lipgloss.AdaptiveColor{Light: lipgloss.BgColor("255"), Dark: lipgloss.BgColor("0")}),
+		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("240"), Dark: lipgloss.FgColor("7")}),
+		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("254"), Dark: lipgloss.FgColor("0")}),
+		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("249"), Dark: lipgloss.FgColor("7")}),
+		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
+		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.FgColor("7")),
 		Text:             lipgloss.NewStyle(),
 	}
 	_styleBlurredDefault = Style{
 		Base:             lipgloss.NewStyle(),
-		CursorLine:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "7"}),
-		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
-		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "254", Dark: "0"}),
-		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "249", Dark: "7"}),
-		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
-		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.Color("7")),
-		Text:             lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "245", Dark: "7"}),
+		CursorLine:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("245"), Dark: lipgloss.FgColor("7")}),
+		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("249"), Dark: lipgloss.FgColor("7")}),
+		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("254"), Dark: lipgloss.FgColor("0")}),
+		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("249"), Dark: lipgloss.FgColor("7")}),
+		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
+		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.FgColor("7")),
+		Text:             lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("245"), Dark: lipgloss.FgColor("7")}),
 	}
 )
 

@@ -4,13 +4,13 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/ansi"
-	"github.com/rprtr258/col"
+	"github.com/rprtr258/scuf"
 )
 
 // Perform text alignment. If the string is multi-lined, we also make all lines
 // the same width by padding them with spaces. If a termenv style is passed,
 // use that to style the spaces added.
-func alignTextHorizontal(str string, pos Alignment, width int, style termenv.Style) string {
+func alignTextHorizontal(str string, pos Alignment, width int, style []scuf.Modifier) string {
 	lines := strings.Split(str, "\n")
 	widestLine := getWidestWidth(lines)
 
@@ -23,17 +23,17 @@ func alignTextHorizontal(str string, pos Alignment, width int, style termenv.Sty
 		if shortAmount := widestLine - lineWidth + max(0, width-widestLine); shortAmount > 0 {
 			switch pos {
 			case Right:
-				line = style.Render(strings.Repeat(" ", shortAmount)) + line
+				line = scuf.String(strings.Repeat(" ", shortAmount), style...) + line
 			case Center:
 				left := shortAmount / 2
 				right := left + shortAmount%2 // note that we put the remainder on the right
 
-				leftSpaces := style.Render(strings.Repeat(" ", left))
-				rightSpaces := style.Render(strings.Repeat(" ", right))
+				leftSpaces := scuf.String(strings.Repeat(" ", left), style...)
+				rightSpaces := scuf.String(strings.Repeat(" ", right), style...)
 
 				line = leftSpaces + line + rightSpaces
 			default: // Left
-				line += style.Render(strings.Repeat(" ", shortAmount))
+				line += scuf.String(strings.Repeat(" ", shortAmount), style...)
 			}
 		}
 

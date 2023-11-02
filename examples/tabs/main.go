@@ -44,7 +44,7 @@ var (
 	activeTabBorder   = tabBorderWithBottom("┘", " ", "└")
 	docStyle          = lipgloss.NewStyle()
 	// Padding(1, 2, 1, 2)
-	highlightColor   = lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}
+	highlightColor   = lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#874BFD"), Dark: lipgloss.FgColor("#7D56F4")}
 	inactiveTabStyle = lipgloss.NewStyle().
 				Border(inactiveTabBorder, true).
 				BorderForeground(highlightColor)

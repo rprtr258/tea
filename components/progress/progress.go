@@ -10,8 +10,8 @@ import (
 	"github.com/charmbracelet/harmonica"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/ansi"
-	"github.com/rprtr258/col"
 
+	"github.com/rprtr258/scuf"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/lipgloss"
 )
@@ -113,13 +113,6 @@ func WithSpringOptions(frequency, damping float64) Option {
 	}
 }
 
-// WithColorProfile sets the color profile to use for the progress bar.
-func WithColorProfile(p termenv.Profile) Option {
-	return func(m *Model) {
-		m.colorProfile = p
-	}
-}
-
 // MsgFrame indicates that an animation step should occur.
 type MsgFrame struct {
 	id  int
@@ -167,9 +160,6 @@ type Model struct {
 	// of the progress bar. When false, the width of the gradient will be set
 	// to the full width of the progress bar.
 	scaleRamp bool
-
-	// Color profile for the progress bar.
-	colorProfile termenv.Profile
 }
 
 // New returns a model with default values.
@@ -183,7 +173,6 @@ func New(opts ...Option) Model {
 		EmptyColor:     "#606060",
 		ShowPercentage: true,
 		PercentFormat:  " %3.0f%%",
-		colorProfile:   termenv.ColorProfile(),
 	}
 	if !m.springCustomized {
 		m.SetSpringOptions(defaultFrequency, defaultDamping)
@@ -309,17 +298,16 @@ func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
 				p = float64(i) / float64(tw-1)
 			}
 
-			c := m.rampColorA.BlendLuv(m.rampColorB, p).Hex()
-			b.WriteString(termenv.R(string(m.Full), m.color(c).Fg))
+			b.WriteString(scuf.String(string(m.Full), scuf.FgRGB(m.rampColorA.BlendLuv(m.rampColorB, p).RGB255())))
 		}
 	} else {
 		// Solid fill
-		s := termenv.R(string(m.Full), m.color(m.FullColor).Fg)
+		s := scuf.String(string(m.Full), scuf.FgRGB(scuf.MustParseHexRGB(m.FullColor)))
 		b.WriteString(strings.Repeat(s, fw))
 	}
 
 	// Empty fill
-	e := termenv.R(string(m.Empty), m.color(m.EmptyColor).Fg)
+	e := scuf.String(string(m.Empty), scuf.FgRGB(scuf.MustParseHexRGB(m.EmptyColor)))
 	n := max(0, tw-fw)
 	b.WriteString(strings.Repeat(e, n))
 }
@@ -344,10 +332,6 @@ func (m *Model) setRamp(colorA, colorB colorful.Color, scaled bool) {
 	m.scaleRamp = scaled
 	m.rampColorA = colorA
 	m.rampColorB = colorB
-}
-
-func (m *Model) color(c string) termenv.Color {
-	return m.colorProfile.Color(c)
 }
 
 // IsAnimating returns false if the progress bar reached equilibrium and is no longer animating.

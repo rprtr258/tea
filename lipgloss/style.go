@@ -8,7 +8,8 @@ import (
 	"github.com/muesli/reflow/truncate"
 	"github.com/muesli/reflow/wordwrap"
 	"github.com/muesli/reflow/wrap"
-	termenv "github.com/rprtr258/col"
+	"github.com/rprtr258/fun"
+	"github.com/rprtr258/scuf"
 )
 
 // Property for a key.
@@ -68,6 +69,7 @@ func NewStyle() Style {
 	return _renderer.NewStyle()
 }
 
+// TODO: make func
 // NewStyle returns a new, empty Style. While it's syntactic sugar for the
 // Style{} primitive, it's recommended to use this function for creating styles
 // in case the underlying implementation changes. It takes an optional string
@@ -189,26 +191,26 @@ func (s Style) Render(strs ...string) string {
 	// no-op on non-Windows systems and on Windows runs only once.
 	enableLegacyWindowsANSI()
 
-	te := s.r.ColorProfile().S()
+	te := []scuf.Modifier{}
 	if bold {
-		te = te.Bold()
+		te = append(te, scuf.ModBold)
 	}
 	if italic {
-		te = te.Italic()
+		te = append(te, scuf.ModItalic)
 	}
 	if underline {
-		te = te.Underline()
+		te = append(te, scuf.ModUnderline)
 	}
-	teWhitespace := s.r.ColorProfile().S()
+	teWhitespace := []scuf.Modifier{}
 	if reverse {
-		teWhitespace = teWhitespace.Reverse()
-		te = te.Reverse()
+		teWhitespace = append(teWhitespace, scuf.ModReverse)
+		te = append(te, scuf.ModReverse)
 	}
 	if blink {
-		te = te.Blink()
+		te = append(te, scuf.ModBlink)
 	}
 	if faint {
-		te = te.Faint()
+		te = append(te, scuf.ModFaint)
 	}
 
 	// Do we need to style spaces separately?
@@ -218,39 +220,39 @@ func (s Style) Render(strs ...string) string {
 	// paragraphs) separately?
 	styleWhitespace := reverse
 
-	teSpace := s.r.ColorProfile().S()
-	if fg != noColor {
-		te = te.Foreground(fg.color(s.r))
+	teSpace := []scuf.Modifier{}
+	if fg != nil {
+		te = append(te, fg.color())
 		if styleWhitespace {
-			teWhitespace = teWhitespace.Foreground(fg.color(s.r))
+			teWhitespace = append(teWhitespace, fg.color())
 		}
 		if useSpaceStyler {
-			teSpace = teSpace.Foreground(fg.color(s.r))
+			teSpace = append(teSpace, fg.color())
 		}
 	}
 
-	if bg != noColor {
-		te = te.Background(bg.color(s.r))
+	if bg != nil {
+		te = append(te, bg.color())
 		if colorWhitespace {
-			teWhitespace = teWhitespace.Background(bg.color(s.r))
+			teWhitespace = append(teWhitespace, bg.color())
 		}
 		if useSpaceStyler {
-			teSpace = teSpace.Background(bg.color(s.r))
+			teSpace = append(teSpace, bg.color())
 		}
 	}
 
 	if underline {
-		te = te.Underline()
+		te = append(te, scuf.ModUnderline)
 	}
 	if strikethrough {
-		te = te.CrossOut()
+		te = append(te, scuf.ModCrossout)
 	}
 
 	if underlineSpaces {
-		teSpace = teSpace.Underline()
+		teSpace = append(teSpace, scuf.ModUnderline)
 	}
 	if strikethroughSpaces {
-		teSpace = teSpace.CrossOut()
+		teSpace = append(teSpace, scuf.ModCrossout)
 	}
 
 	// Strip newlines in single line mode
@@ -274,15 +276,11 @@ func (s Style) Render(strs ...string) string {
 			if useSpaceStyler {
 				// Look for spaces and apply a different styler
 				for _, r := range line {
-					runeStyle := te
-					if unicode.IsSpace(r) {
-						runeStyle = teSpace
-					}
-
-					sb.WriteString(runeStyle.Render(string(r)))
+					runeStyle := fun.IF(unicode.IsSpace(r), teSpace, te)
+					sb.WriteString(scuf.String(string(r), runeStyle...))
 				}
 			} else {
-				sb.WriteString(te.Render(line))
+				sb.WriteString(scuf.String(line, te...))
 			}
 
 			if i != len(lines)-1 {
@@ -305,11 +303,7 @@ func (s Style) Render(strs ...string) string {
 		numLines := strings.Count(str, "\n")
 
 		if numLines != 0 || width != 0 {
-			st := termenv.S()
-			if colorWhitespace || styleWhitespace {
-				st = teWhitespace
-			}
-
+			st := fun.IF(colorWhitespace || styleWhitespace, teWhitespace, nil)
 			str = alignTextHorizontal(str, horizontalAlign, width, st)
 		}
 	}

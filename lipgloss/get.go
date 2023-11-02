@@ -302,12 +302,12 @@ func (s Style) getAsBool(k propKey, defaultVal bool) bool {
 func (s Style) getAsColor(k propKey) TerminalColor {
 	v, ok := s.rules[k]
 	if !ok {
-		return noColor
+		return nil
 	}
 	if c, ok := v.(TerminalColor); ok {
 		return c
 	}
-	return noColor
+	return nil
 }
 
 func (s Style) getAsInt(k propKey) int {

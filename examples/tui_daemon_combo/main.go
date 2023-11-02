@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	_helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
+	_helpStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("241")).Render
 	_emojis    = []rune("🍦🧋🍡🤠👾😭🦊🐯🦆🥨🎏🍔🍒🍥🎮📦🦁🐶🐸🍕🥐🧲🚒🥇🏆🌽")
 )
 
@@ -38,7 +38,7 @@ func newModel() *model {
 	const showLastResults = 5
 
 	sp := spinner.New()
-	sp.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("206"))
+	sp.Style = lipgloss.NewStyle().Foreground(lipgloss.FgColor("206"))
 
 	return &model{
 		spinner: sp,

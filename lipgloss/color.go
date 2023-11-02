@@ -3,37 +3,57 @@ package lipgloss
 import (
 	"strconv"
 
-	"github.com/rprtr258/col"
+	"github.com/muesli/termenv"
+	"github.com/rprtr258/fun"
+	"github.com/rprtr258/scuf"
 )
 
 // TerminalColor is a color intended to be rendered in the terminal.
 type TerminalColor interface {
-	color(*Renderer) termenv.Color
+	color() scuf.Modifier
 }
 
-// NoColor is used to specify the absence of color styling. When this is active
-// foreground colors will be rendered with the terminal's default text color,
-// and background colors will not be drawn at all.
-//
-// Example usage:
-//
-//	var style = someStyle.Copy().Background(lipgloss.NoColor{})
-type NoColor struct{}
-
-var noColor = NoColor{}
-
-func (NoColor) color(*Renderer) termenv.Color {
-	return termenv.NoColor()
+func FgRGB(hex string) TerminalColor {
+	return Raw(scuf.FgRGB(scuf.MustParseHexRGB(hex)))
 }
 
-// Color specifies a color by hex or ANSI value. For example:
-//
-//	ansiColor := lipgloss.Color("21")
-//	hexColor := lipgloss.Color("#0000ff")
-type Color string
+func BgRGB(hex string) TerminalColor {
+	return Raw(scuf.BgRGB(scuf.MustParseHexRGB(hex)))
+}
 
-func (c Color) color(r *Renderer) termenv.Color {
-	return r.ColorProfile().Color(string(c))
+// TODO: remove, just to deal with cringe
+type Raw scuf.Modifier
+
+func (r Raw) color() scuf.Modifier {
+	return scuf.Modifier(r)
+}
+
+// FgColor specifies a color by hex or ANSI value. For example:
+//
+//	ansiColor := lipgloss.FgColor("21")
+//	hexColor := lipgloss.FgColor("#0000ff")
+func FgColor(s string) Raw {
+	if s[0] == '#' {
+		return Raw(scuf.FgRGB(scuf.MustParseHexRGB(s)))
+	}
+
+	x, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err.Error())
+	}
+	return Raw(scuf.FgANSI256(x))
+}
+
+func BgColor(s string) Raw {
+	if s[0] == '#' {
+		return Raw(scuf.BgRGB(scuf.MustParseHexRGB(s)))
+	}
+
+	x, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err.Error())
+	}
+	return Raw(scuf.BgANSI256(x))
 }
 
 // ANSIColor is a color specified by an ANSI color value. It's merely syntactic
@@ -45,10 +65,8 @@ func (c Color) color(r *Renderer) termenv.Color {
 //	// These two statements are equivalent.
 //	colorA := lipgloss.ANSIColor(21)
 //	colorB := lipgloss.Color("21")
-type ANSIColor uint
-
-func (ac ANSIColor) color(r *Renderer) termenv.Color {
-	return Color(strconv.FormatUint(uint64(ac), 10)).color(r)
+func ANSIColor(x uint) TerminalColor {
+	return Raw(scuf.FgANSI256(int(x)))
 }
 
 // AdaptiveColor provides color options for light and dark backgrounds. The
@@ -59,36 +77,32 @@ func (ac ANSIColor) color(r *Renderer) termenv.Color {
 //
 //	color := lipgloss.AdaptiveColor{Light: "#0000ff", Dark: "#000099"}
 type AdaptiveColor struct {
-	Light string
-	Dark  string
+	Light TerminalColor
+	Dark  TerminalColor
 }
 
-func (ac AdaptiveColor) color(r *Renderer) termenv.Color {
-	if r.HasDarkBackground() {
-		return Color(ac.Dark).color(r)
-	}
-	return Color(ac.Light).color(r)
+func (ac AdaptiveColor) color() scuf.Modifier {
+	return fun.IF(_renderer.HasDarkBackground(), ac.Dark, ac.Light).color()
 }
 
 // CompleteColor specifies exact values for truecolor, ANSI256, and ANSI color
 // profiles. Automatic color degradation will not be performed.
 type CompleteColor struct {
-	TrueColor string
-	ANSI256   string
-	ANSI      string
+	TrueColor TerminalColor
+	ANSI256   TerminalColor
+	ANSI      TerminalColor
 }
 
-func (c CompleteColor) color(r *Renderer) termenv.Color {
-	p := r.ColorProfile()
-	switch p {
+func (c CompleteColor) color() scuf.Modifier {
+	switch _renderer.ColorProfile() {
 	case termenv.TrueColor:
-		return p.Color(c.TrueColor)
+		return c.TrueColor.color()
 	case termenv.ANSI256:
-		return p.Color(c.ANSI256)
+		return c.ANSI256.color()
 	case termenv.ANSI:
-		return p.Color(c.ANSI)
+		return c.ANSI.color()
 	default:
-		return termenv.NoColor()
+		return nil
 	}
 }
 
@@ -100,9 +114,6 @@ type CompleteAdaptiveColor struct {
 	Dark  CompleteColor
 }
 
-func (cac CompleteAdaptiveColor) color(r *Renderer) termenv.Color {
-	if r.HasDarkBackground() {
-		return cac.Dark.color(r)
-	}
-	return cac.Light.color(r)
+func (cac CompleteAdaptiveColor) color() scuf.Modifier {
+	return fun.IF(_renderer.HasDarkBackground(), cac.Dark, cac.Light).color()
 }

@@ -32,7 +32,7 @@ const (
 	maxWidth = 80
 )
 
-var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
+var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("#626262")).Render
 
 type msgTick time.Time
 

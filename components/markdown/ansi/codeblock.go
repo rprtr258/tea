@@ -8,7 +8,7 @@ import (
 	"github.com/alecthomas/chroma/v2/quick"
 	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/muesli/reflow/indent"
-	"github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 )
 
 // chromaStyleTheme name used for rendering.
@@ -27,8 +27,8 @@ type CodeBlockElement struct {
 func chromaStyle(style StylePrimitive) string {
 	var s string
 
-	if style.Color != nil {
-		s = *style.Color
+	if style.ForegroundColor != nil {
+		s = *style.ForegroundColor
 	}
 	if style.BackgroundColor != nil {
 		if s != "" {
@@ -119,16 +119,16 @@ func (e *CodeBlockElement) Render(w io.Writer, ctx RenderContext) error {
 	}
 
 	iw := indent.NewWriterPipe(w, indentation+margin, func(wr io.Writer) {
-		renderText(w, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, " ")
+		renderText(w, bs.Current().Style.StylePrimitive, " ")
 	})
 
 	if len(theme) > 0 {
-		renderText(iw, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.BlockPrefix)
+		renderText(iw, bs.Current().Style.StylePrimitive, rules.BlockPrefix)
 		err := quick.Highlight(iw, e.Code, e.Language, "terminal256", theme)
 		if err != nil {
 			return err
 		}
-		renderText(iw, ctx.options.ColorProfile, bs.Current().Style.StylePrimitive, rules.BlockSuffix)
+		renderText(iw, bs.Current().Style.StylePrimitive, rules.BlockSuffix)
 		return nil
 	}
 

@@ -12,7 +12,7 @@ import (
 var (
 	titleStyle        = lipgloss.NewStyle() //.MarginLeft(2)
 	itemStyle         = lipgloss.NewStyle() //.PaddingLeft(4)
-	selectedItemStyle = lipgloss.NewStyle(). /*.PaddingLeft(2)*/ Foreground(lipgloss.Color("170"))
+	selectedItemStyle = lipgloss.NewStyle(). /*.PaddingLeft(2)*/ Foreground(lipgloss.FgColor("170"))
 	paginationStyle   = list.DefaultStyle.PaginationStyle //.PaddingLeft(4)
 	quitTextStyle     = lipgloss.NewStyle()               //.Margin(1, 0, 2, 4)
 )

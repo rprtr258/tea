@@ -211,7 +211,7 @@ func (vb Viewbox) WriteText(y, x int, text string) (int, int) {
 		}
 
 		vb.Set(y, x, c)
-		x++
+		x += 1
 		if x >= vb.Width {
 			x = 0
 			y++

@@ -428,7 +428,6 @@ This is common when running tests, CI, or when piping output elsewhere.</p>
 ```go
 import (
     "github.com/rprtr258/tea/lipgloss"
-    "github.com/rprtr258/col"
 )
 
 lipgloss.SetColorProfile(termenv.TrueColor)
@@ -458,7 +457,7 @@ Lip Gloss is built on the excellent [Termenv][termenv] and [Reflow][reflow]
 libraries which deal with color and ANSI-aware text operations, respectively.
 For many use cases Termenv and Reflow will be sufficient for your needs.
 
-[termenv]: https://github.com/rprtr258/col
+[termenv]: https://github.com/rprtr258/scuf
 [reflow]: https://github.com/muesli/reflow
 
 

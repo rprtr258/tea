@@ -10,7 +10,7 @@ import (
 
 var baseStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder).
-	BorderForeground(lipgloss.Color("240"))
+	BorderForeground(lipgloss.FgColor("240"))
 
 type model struct {
 	table table.Model
@@ -164,12 +164,12 @@ func Main(ctx context.Context) error {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(lipgloss.FgColor("240")).
 		BorderBottom(true).
 		Bold(false)
 	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
+		Foreground(lipgloss.FgColor("229")).
+		Background(lipgloss.BgColor("57")).
 		Bold(false)
 	t.SetStyles(s)
 

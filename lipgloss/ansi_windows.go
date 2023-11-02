@@ -5,8 +5,6 @@ package lipgloss
 
 import (
 	"sync"
-
-	"github.com/rprtr258/col"
 )
 
 var enableANSI sync.Once

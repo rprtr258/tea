@@ -70,18 +70,18 @@ type model struct {
 
 var (
 	currentPkgNameStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("211"))
+				Foreground(lipgloss.FgColor("211"))
 	doneStyle = lipgloss.NewStyle()
 	// Margin(1, 2)
 	checkMark = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("42")).
+			Foreground(lipgloss.FgColor("42")).
 			SetString("✓")
 )
 
 func newModel() *model {
 	s := spinner.New(
 		spinner.WithSpinner(spinner.Dot),
-		spinner.WithStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("63"))),
+		spinner.WithStyle(lipgloss.NewStyle().Foreground(lipgloss.FgColor("63"))),
 	)
 	return &model{
 		packages: getPackages(),

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	termenv "github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 	"github.com/yuin/goldmark"
 	emoji "github.com/yuin/goldmark-emoji"
 	"github.com/yuin/goldmark/extension"

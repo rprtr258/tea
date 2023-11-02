@@ -17,9 +17,9 @@ const (
 	_cvv
 )
 
-const (
-	hotPink  = lipgloss.Color("#FF06B7")
-	darkGray = lipgloss.Color("#767676")
+var (
+	hotPink  = lipgloss.FgColor("#FF06B7")
+	darkGray = lipgloss.FgColor("#767676")
 )
 
 var (

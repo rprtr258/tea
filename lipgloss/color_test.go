@@ -3,49 +3,49 @@ package lipgloss
 import (
 	"fmt"
 	"image/color"
+	"log"
 	"testing"
 
 	"github.com/lucasb-eyer/go-colorful"
+	"github.com/muesli/termenv"
 	"github.com/rprtr258/assert"
-	termenv "github.com/rprtr258/col"
+	"github.com/rprtr258/scuf"
 )
 
 func TestSetColorProfile(t *testing.T) {
-	r := _renderer
-	input := "hello"
+	t.Parallel()
 
 	for name, test := range map[string]struct {
-		profile  termenv.Profile
+		col      scuf.Modifier
 		expected string
 	}{
 		"ascii": {
-			termenv.Ascii,
+			nil,
 			"hello",
 		},
 		"ansi": {
-			termenv.ANSI,
+			scuf.FgANSI(12),
 			"\x1b[94mhello\x1b[0m",
 		},
 		"ansi256": {
-			termenv.ANSI256,
+			scuf.FgANSI256(62),
 			"\x1b[38;5;62mhello\x1b[0m",
 		},
 		"truecolor": {
-			termenv.TrueColor,
+			scuf.FgRGB(scuf.MustParseHexRGB("#5956E0")),
 			"\x1b[38;2;89;86;224mhello\x1b[0m",
 		},
 	} {
+		test := test
 		t.Run(name, func(t *testing.T) {
-			r.SetColorProfile(test.profile)
-			style := NewStyle().Foreground(Color("#5A56E0"))
-			res := style.Render(input)
+			t.Parallel()
 
-			assert.Equal(t, test.expected, res)
+			assert.Equal(t, test.expected, scuf.String("hello", test.col))
 		})
 	}
 }
 
-func TestHexToColor(t *testing.T) {
+func TestxToColor(t *testing.T) {
 	t.Parallel()
 
 	for input, expected := range map[string]uint{
@@ -67,81 +67,80 @@ func TestHexToColor(t *testing.T) {
 }
 
 func TestRGBA(t *testing.T) {
-	r := DefaultRenderer()
 	for i, test := range []struct {
 		profile  termenv.Profile
 		darkBg   bool
 		input    TerminalColor
-		expected uint
+		expected string
 	}{
 		// lipgloss.Color
 		{
 			termenv.TrueColor,
 			true,
-			Color("#FF0000"),
-			0xFF0000,
+			FgColor("#FF0000"),
+			"FF0000",
 		},
 		{
 			termenv.TrueColor,
 			true,
-			Color("9"),
-			0xFF0000,
+			FgColor("9"),
+			"FF0000",
 		},
 		{
 			termenv.TrueColor,
 			true,
-			Color("21"),
-			0x0000FF,
+			FgColor("21"),
+			"0000FF",
 		},
 		// lipgloss.AdaptiveColor
 		{
 			termenv.TrueColor,
 			true,
-			AdaptiveColor{Light: "#0000FF", Dark: "#FF0000"},
-			0xFF0000,
+			AdaptiveColor{Light: FgColor("#0000FF"), Dark: FgColor("#FF0000")},
+			"FF0000",
 		},
 		{
 			termenv.TrueColor,
 			false,
-			AdaptiveColor{Light: "#0000FF", Dark: "#FF0000"},
-			0x0000FF,
+			AdaptiveColor{Light: FgColor("#0000FF"), Dark: FgColor("#FF0000")},
+			"0000FF",
 		},
 		{
 			termenv.TrueColor,
 			true,
-			AdaptiveColor{Light: "21", Dark: "9"},
-			0xFF0000,
+			AdaptiveColor{Light: FgColor("21"), Dark: FgColor("9")},
+			"FF0000",
 		},
 		{
 			termenv.TrueColor,
 			false,
-			AdaptiveColor{Light: "21", Dark: "9"},
-			0x0000FF,
+			AdaptiveColor{Light: FgColor("21"), Dark: FgColor("9")},
+			"0000FF",
 		},
-		// lipgloss.CompleteColor
+		// CompleteColor
 		{
 			termenv.TrueColor,
 			true,
-			CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
-			0xFF0000,
+			CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
+			"FF0000",
 		},
 		{
 			termenv.ANSI256,
 			true,
-			CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
-			0xFFFFFF,
+			CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
+			"FFFFFF",
 		},
 		{
 			termenv.ANSI,
 			true,
-			CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
-			0x0000FF,
+			CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
+			"0000FF",
 		},
 		{
 			termenv.TrueColor,
 			true,
-			CompleteColor{TrueColor: "", ANSI256: "231", ANSI: "12"},
-			0x000000,
+			CompleteColor{TrueColor: FgColor("#000000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
+			"000000",
 		},
 		// lipgloss.CompleteAdaptiveColor
 		// dark
@@ -149,66 +148,67 @@ func TestRGBA(t *testing.T) {
 			termenv.TrueColor,
 			true,
 			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: "#0000FF", ANSI256: "231", ANSI: "12"},
-				Dark:  CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
+				Light: CompleteColor{TrueColor: FgColor("#0000FF"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
+				Dark:  CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
 			},
-			0xFF0000,
+			"FF0000",
 		},
 		{
 			termenv.ANSI256,
 			true,
 			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: "#FF0000", ANSI256: "21", ANSI: "12"},
-				Dark:  CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
+				Light: CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("21"), ANSI: FgColor("12")},
+				Dark:  CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
 			},
-			0xFFFFFF,
+			"FFFFFF",
 		},
 		{
 			termenv.ANSI,
 			true,
 			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "9"},
-				Dark:  CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
+				Light: CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("9")},
+				Dark:  CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
 			},
-			0x0000FF,
+			"0000FF",
 		},
 		// light
 		{
 			termenv.TrueColor,
 			false,
 			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: "#0000FF", ANSI256: "231", ANSI: "12"},
-				Dark:  CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
+				Light: CompleteColor{TrueColor: FgColor("#0000FF"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
+				Dark:  CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
 			},
-			0x0000FF,
+			"0000FF",
 		},
 		{
 			termenv.ANSI256,
 			false,
 			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: "#FF0000", ANSI256: "21", ANSI: "12"},
-				Dark:  CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
+				Light: CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("21"), ANSI: FgColor("12")},
+				Dark:  CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
 			},
-			0x0000FF,
+			"0000FF",
 		},
 		{
 			termenv.ANSI,
 			false,
 			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "9"},
-				Dark:  CompleteColor{TrueColor: "#FF0000", ANSI256: "231", ANSI: "12"},
+				Light: CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("9")},
+				Dark:  CompleteColor{TrueColor: FgColor("#FF0000"), ANSI256: FgColor("231"), ANSI: FgColor("12")},
 			},
-			0xFF0000,
+			"FF0000",
 		},
 	} {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			r.SetColorProfile(test.profile)
-			r.SetHasDarkBackground(test.darkBg)
+			_renderer.SetColorProfile(test.profile)
+			_renderer.SetHasDarkBackground(test.darkBg)
 
-			c, _ := colorful.Hex(test.input.color(_renderer).Hex)
+			c, err := colorful.Hex(scuf.ToHex(test.input.color()))
+			log.Println(scuf.ToHex(test.input.color()))
+			assert.NoError(t, err)
 			r, g, b, _ := c.RGBA()
-			o := uint(r/256)<<16 + uint(g/256)<<8 + uint(b/256)
-			assert.Equal(t, test.expected, o)
+			assert.Equal(t, test.expected, fmt.Sprintf("%02X%02X%02X", r/256, g/256, b/256))
 		})
 	}
 }

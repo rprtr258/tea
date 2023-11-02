@@ -18,24 +18,24 @@ const (
 )
 
 var (
-	cursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("212"))
+	cursorStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("212"))
 
 	cursorLineStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("57")).
-			Foreground(lipgloss.Color("230"))
+			Background(lipgloss.BgColor("57")).
+			Foreground(lipgloss.FgColor("230"))
 
 	placeholderStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("238"))
+				Foreground(lipgloss.FgColor("238"))
 
 	endOfBufferStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("235"))
+				Foreground(lipgloss.FgColor("235"))
 
 	focusedPlaceholderStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("99"))
+				Foreground(lipgloss.FgColor("99"))
 
 	focusedBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder).
-				BorderForeground(lipgloss.Color("238"))
+				BorderForeground(lipgloss.FgColor("238"))
 
 	blurredBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.HiddenBorder)

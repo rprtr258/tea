@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muesli/termenv"
 	"github.com/rprtr258/assert"
-	termenv "github.com/rprtr258/col"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/lipgloss"

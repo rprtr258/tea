@@ -6,7 +6,7 @@ import (
 
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/rprtr258/assert"
-	termenv "github.com/rprtr258/col"
+	"github.com/rprtr258/scuf"
 )
 
 const (
@@ -21,12 +21,10 @@ func TestGradient(t *testing.T) {
 
 	for name, opts := range map[string][]Option{
 		"progress bar with gradient": {
-			WithColorProfile(termenv.TrueColor),
 			WithoutPercentage(),
 			WithGradient(colA, colB),
 		},
 		"progress bar with scaled gradient": {
-			WithColorProfile(termenv.TrueColor),
 			WithoutPercentage(),
 			WithScaledGradient(colA, colB),
 		},
@@ -36,10 +34,10 @@ func TestGradient(t *testing.T) {
 
 			// build the expected colors by colorizing an empty string and then cutting off the following reset sequence
 			sb := strings.Builder{}
-			sb.WriteString(termenv.R("", termenv.RGBColor(colAHex).Fg))
+			sb.WriteString(scuf.String("", scuf.FgRGB(scuf.MustParseHexRGB(colAHex))))
 			expFirst := strings.Split(sb.String(), AnsiReset)[0]
 			sb.Reset()
-			sb.WriteString(termenv.R("", termenv.RGBColor(colBHex).Fg))
+			sb.WriteString(scuf.String("", scuf.FgRGB(scuf.MustParseHexRGB(colBHex))))
 			expLast := strings.Split(sb.String(), AnsiReset)[0]
 
 			for _, width := range []int{3, 5, 50} {

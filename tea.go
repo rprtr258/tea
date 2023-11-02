@@ -23,7 +23,7 @@ import (
 	"github.com/containerd/console"
 	isatty "github.com/mattn/go-isatty"
 	"github.com/muesli/cancelreader"
-	"github.com/rprtr258/col"
+	"github.com/muesli/termenv"
 )
 
 // ErrProgramKilled is returned by [Program.Run] when the program got killed.

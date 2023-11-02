@@ -64,7 +64,7 @@ func (m *model) View(vb tea.Viewbox) {
 	vb.WriteLine(3, padding, helpStyle("Press any key to quit"))
 }
 
-var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
+var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("#626262")).Render
 
 func Main(ctx context.Context) error {
 	m := &model{

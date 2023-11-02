@@ -50,7 +50,7 @@ Some famous people that have eaten here lately:
 Bon appétit!
 `
 
-var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
+var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("241")).Render
 
 type model struct {
 	viewport viewport.Model
@@ -62,7 +62,7 @@ func newExample() (*model, error) {
 	vp := viewport.New(width, 20)
 	vp.Style = lipgloss.NewStyle().
 		BorderStyle(lipgloss.RoundedBorder).
-		BorderForeground(lipgloss.Color("62"))
+		BorderForeground(lipgloss.FgColor("62"))
 		// PaddingRight(2)
 
 	renderer, err := markdown.NewTermRenderer(

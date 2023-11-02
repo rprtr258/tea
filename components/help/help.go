@@ -60,18 +60,18 @@ type Model struct {
 // New creates a new help view with some useful defaults.
 func New() Model {
 	keyStyle := lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{
-		Light: "#909090",
-		Dark:  "#626262",
+		Light: lipgloss.FgColor("#909090"),
+		Dark:  lipgloss.FgColor("#626262"),
 	})
 
 	descStyle := lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{
-		Light: "#B2B2B2",
-		Dark:  "#4A4A4A",
+		Light: lipgloss.FgColor("#B2B2B2"),
+		Dark:  lipgloss.FgColor("#4A4A4A"),
 	})
 
 	sepStyle := lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{
-		Light: "#DDDADA",
-		Dark:  "#3C3C3C",
+		Light: lipgloss.FgColor("#DDDADA"),
+		Dark:  lipgloss.FgColor("#3C3C3C"),
 	})
 
 	return Model{

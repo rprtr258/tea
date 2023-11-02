@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/muesli/termenv"
 	"github.com/rprtr258/assert"
-	termenv "github.com/rprtr258/col"
 	"github.com/yuin/goldmark"
 	emoji "github.com/yuin/goldmark-emoji"
 	"github.com/yuin/goldmark/extension"
@@ -19,19 +19,19 @@ import (
 )
 
 const (
-	generateExamples = false
-	generateIssues   = false
-	examplesDir      = "../styles/examples/"
-	issuesDir        = "../testdata/issues/"
+	_generateExamples = false
+	_generateIssues   = false
+	_examplesDir      = "../styles/examples/"
+	_issuesDir        = "../testdata/issues/"
 )
 
 func TestRenderer(t *testing.T) {
-	files, err := filepath.Glob(examplesDir + "*.md")
+	files, err := filepath.Glob(_examplesDir + "*.md")
 	assert.NoError(t, err)
 
 	for _, f := range files {
 		bn := strings.TrimSuffix(filepath.Base(f), ".md")
-		sn := filepath.Join(examplesDir, bn+".style")
+		sn := filepath.Join(_examplesDir, bn+".style")
 		tn := filepath.Join("../testdata", bn+".test")
 
 		in, err := os.ReadFile(f)
@@ -66,7 +66,7 @@ func TestRenderer(t *testing.T) {
 		assert.NoError(t, md.Convert(in, &buf))
 
 		// generate
-		if generateExamples {
+		if _generateExamples {
 			err = os.WriteFile(tn, buf.Bytes(), 0o644)
 			assert.NoError(t, err)
 			continue
@@ -81,13 +81,13 @@ func TestRenderer(t *testing.T) {
 }
 
 func TestRendererIssues(t *testing.T) {
-	files, err := filepath.Glob(issuesDir + "*.md")
+	files, err := filepath.Glob(_issuesDir + "*.md")
 	assert.NoError(t, err)
 
 	for _, f := range files {
 		bn := strings.TrimSuffix(filepath.Base(f), ".md")
 		t.Run(bn, func(t *testing.T) {
-			tn := filepath.Join(issuesDir, bn+".test")
+			tn := filepath.Join(_issuesDir, bn+".test")
 
 			in, err := os.ReadFile(f)
 			assert.NoError(t, err)
@@ -121,7 +121,7 @@ func TestRendererIssues(t *testing.T) {
 			assert.NoError(t, md.Convert(in, &buf))
 
 			// generate
-			if generateIssues {
+			if _generateIssues {
 				assert.NoError(t, os.WriteFile(tn, buf.Bytes(), 0o644))
 				return
 			}

@@ -2,6 +2,7 @@ package textarea
 
 import (
 	"bytes"
+	"log"
 	"strings"
 	"testing"
 
@@ -367,6 +368,9 @@ func TestRendersEndOfLineBuffer(t *testing.T) {
 	vb := tea.NewViewbox(10, 10)
 	textarea.View(vb)
 	view := string(vb.Render())
+	for _, line := range strings.Split(string(vb.Render()), "\n") {
+		log.Printf("%q\n", line)
+	}
 	assert.Truef(t, strings.Contains(view, "~"), "Expected to see a tilde at the end of the line")
 }
 

@@ -53,9 +53,9 @@ var (
 				Height(5).
 				Align(lipgloss.Center, lipgloss.Center).
 				BorderStyle(lipgloss.NormalBorder).
-				BorderForeground(lipgloss.Color("69"))
-	spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
-	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
+				BorderForeground(lipgloss.FgColor("69"))
+	spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("69"))
+	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.FgColor("241"))
 )
 
 type mainModel struct {

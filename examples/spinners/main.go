@@ -23,9 +23,9 @@ var (
 		spinner.Circle,
 	}
 
-	textStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Render
-	spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
-	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render
+	textStyle    = lipgloss.NewStyle().Foreground(lipgloss.FgColor("252")).Render
+	spinnerStyle = lipgloss.NewStyle().Foreground(lipgloss.FgColor("69"))
+	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.FgColor("241")).Render
 )
 
 type model struct {

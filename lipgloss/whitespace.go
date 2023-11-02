@@ -4,13 +4,14 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/ansi"
-	"github.com/rprtr258/col"
+	"github.com/rprtr258/fun"
+	"github.com/rprtr258/scuf"
 )
 
 // whitespace is a whitespace renderer.
 type whitespace struct {
 	re    *Renderer
-	style termenv.Style
+	style []TerminalColor
 	chars string
 }
 
@@ -20,7 +21,7 @@ type whitespace struct {
 func newWhitespace(r *Renderer, opts ...WhitespaceOption) *whitespace {
 	w := &whitespace{
 		re:    r,
-		style: r.ColorProfile().S(),
+		style: nil,
 	}
 	for _, opt := range opts {
 		opt(w)
@@ -55,24 +56,22 @@ func (w whitespace) render(width int) string {
 		b.WriteString(strings.Repeat(" ", short))
 	}
 
-	return w.style.Render(b.String())
+	return scuf.String(b.String(), fun.Map[scuf.Modifier](w.style, (TerminalColor).color)...)
 }
 
 // WhitespaceOption sets a styling rule for rendering whitespace.
 type WhitespaceOption func(*whitespace)
 
 // WithWhitespaceForeground sets the color of the characters in the whitespace.
-func WithWhitespaceForeground(c TerminalColor) WhitespaceOption {
+func WithWhitespaceForeground(fg TerminalColor) WhitespaceOption {
 	return func(w *whitespace) {
-		w.style = w.style.Foreground(c.color(w.re))
+		w.style = append(w.style, fg)
 	}
 }
 
 // WithWhitespaceBackground sets the background color of the whitespace.
-func WithWhitespaceBackground(c TerminalColor) WhitespaceOption {
-	return func(w *whitespace) {
-		w.style = w.style.Background(c.color(w.re))
-	}
+func WithWhitespaceBackground(bg TerminalColor) WhitespaceOption {
+	return WithWhitespaceForeground(bg)
 }
 
 // WithWhitespaceChars sets the characters to be rendered in the whitespace.

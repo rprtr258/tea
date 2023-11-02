@@ -159,9 +159,9 @@ func New() Model {
 		Prompt:           "> ",
 		EchoCharacter:    '*',
 		CharLimit:        0,
-		PlaceholderStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
+		PlaceholderStyle: lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
 		ShowSuggestions:  false,
-		CompletionStyle:  lipgloss.NewStyle().Foreground(lipgloss.Color("240")),
+		CompletionStyle:  lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
 		Cursor:           cursor.New(),
 		KeyMap:           DefaultKeyMap,
 

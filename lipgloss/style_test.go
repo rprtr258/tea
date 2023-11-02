@@ -5,8 +5,9 @@ import (
 	"io"
 	"testing"
 
+	"github.com/muesli/termenv"
 	"github.com/rprtr258/assert"
-	termenv "github.com/rprtr258/col"
+	"github.com/rprtr258/scuf"
 )
 
 func TestStyleRender(t *testing.T) {
@@ -20,11 +21,11 @@ func TestStyleRender(t *testing.T) {
 		expected string
 	}{
 		{
-			NewStyle().Foreground(Color("#5A56E0")),
+			NewStyle().Foreground(FgColor("#5956E0")),
 			"\x1b[38;2;89;86;224mhello\x1b[0m",
 		},
 		{
-			NewStyle().Foreground(AdaptiveColor{Light: "#fffe12", Dark: "#5A56E0"}),
+			NewStyle().Foreground(AdaptiveColor{Light: FgColor("#fffe12"), Dark: FgColor("#5956E0")}),
 			"\x1b[38;2;89;86;224mhello\x1b[0m",
 		},
 		{
@@ -68,11 +69,11 @@ func TestStyleCustomRender(t *testing.T) {
 		expected string
 	}{
 		{
-			r.NewStyle().Foreground(Color("#5A56E0")),
+			r.NewStyle().Foreground(FgColor("#5956E0")),
 			"\x1b[38;2;89;86;224mhello\x1b[0m",
 		},
 		{
-			r.NewStyle().Foreground(AdaptiveColor{Light: "#fffe12", Dark: "#5A56E0"}),
+			r.NewStyle().Foreground(AdaptiveColor{Light: FgColor("#fffe12"), Dark: FgColor("#5A56E0")}),
 			"\x1b[38;2;255;254;18mhello\x1b[0m",
 		},
 		{
@@ -137,8 +138,8 @@ func TestStyleInherit(t *testing.T) {
 		Strikethrough(true).
 		Blink(true).
 		Faint(true).
-		Foreground(Color("#ffffff")).
-		Background(Color("#111111"))
+		Foreground(FgColor("#ffffff")).
+		Background(FgColor("#111111"))
 
 	i := NewStyle().Inherit(s)
 
@@ -162,8 +163,8 @@ func TestStyleCopy(t *testing.T) {
 		Strikethrough(true).
 		Blink(true).
 		Faint(true).
-		Foreground(Color("#ffffff")).
-		Background(Color("#111111"))
+		Foreground(FgColor("#ffffff")).
+		Background(FgColor("#111111"))
 
 	i := s.Copy()
 
@@ -221,16 +222,16 @@ func TestStyleUnset(t *testing.T) {
 	assert.False(t, s.GetInline())
 
 	// colors
-	col := Color("#ffffff")
-	s = NewStyle().Foreground(col)
-	assert.Equal[TerminalColor](t, col, s.GetForeground())
+	colcol := TerminalColor(Raw(scuf.FgRGB(scuf.MustParseHexRGB("#ffffff"))))
+	s = NewStyle().Foreground(colcol)
+	assert.Equal(t, colcol, s.GetForeground())
 	s.UnsetForeground()
-	assert.NotEqual[TerminalColor](t, col, s.GetForeground())
+	assert.NotEqual(t, colcol, s.GetForeground())
 
-	s = NewStyle().Background(col)
-	assert.Equal[TerminalColor](t, col, s.GetBackground())
+	s = NewStyle().Background(colcol)
+	assert.Equal(t, colcol, s.GetBackground())
 	s.UnsetBackground()
-	assert.NotEqual[TerminalColor](t, col, s.GetBackground())
+	assert.NotEqual(t, colcol, s.GetBackground())
 
 	// border
 	s = NewStyle().Border(NormalBorder, true, true, true, true)
@@ -288,7 +289,7 @@ func TestStyleValue(t *testing.T) {
 func BenchmarkStyleRender(b *testing.B) {
 	s := NewStyle().
 		Bold(true).
-		Foreground(Color("#ffffff"))
+		Foreground(FgColor("#ffffff"))
 
 	for i := 0; i < b.N; i++ {
 		s.Render("Hello world")

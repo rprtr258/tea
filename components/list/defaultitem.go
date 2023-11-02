@@ -35,21 +35,21 @@ type DefaultItemStyles struct {
 func NewDefaultItemStyles() DefaultItemStyles {
 	s := DefaultItemStyles{
 		NormalTitle: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#1a1a1a"), Dark: lipgloss.FgRGB("#dddddd")}),
 		SelectedTitle: lipgloss.NewStyle().
-			BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
-			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}),
+			BorderForeground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#F793FF"), Dark: lipgloss.FgRGB("#AD58B4")}).
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#EE6FF8"), Dark: lipgloss.FgRGB("#EE6FF8")}),
 		DimmedTitle: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"}),
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#A49FA5"), Dark: lipgloss.FgRGB("#777777")}),
 		FilterMatch: lipgloss.NewStyle().
 			Underline(true),
 	}
 	s.NormalDesc = s.NormalTitle.Copy().
-		Foreground(lipgloss.AdaptiveColor{Light: "#A49FA5", Dark: "#777777"})
+		Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#A49FA5"), Dark: lipgloss.FgRGB("#777777")})
 	s.SelectedDesc = s.SelectedTitle.Copy().
-		Foreground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"})
+		Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#F793FF"), Dark: lipgloss.FgRGB("#AD58B4")})
 	s.DimmedDesc = s.DimmedTitle.Copy().
-		Foreground(lipgloss.AdaptiveColor{Light: "#C2B8C2", Dark: "#4D4D4D"})
+		Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#C2B8C2"), Dark: lipgloss.FgRGB("#4D4D4D")})
 
 	return s
 }

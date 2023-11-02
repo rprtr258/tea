@@ -5,7 +5,7 @@ import (
 
 	"github.com/mattn/go-runewidth"
 	"github.com/muesli/reflow/ansi"
-	termenv "github.com/rprtr258/col"
+	"github.com/rprtr258/scuf"
 )
 
 // Border contains a series of values which comprise the various parts of a border.
@@ -335,20 +335,7 @@ func renderHorizontalEdge(left, middle, right string, width int) string {
 
 // Apply foreground and background styling to a border.
 func (s Style) styleBorder(border string, fg, bg TerminalColor) string {
-	if fg == noColor && bg == noColor {
-		return border
-	}
-
-	style := termenv.S()
-
-	if fg != noColor {
-		style = style.Foreground(fg.color(s.r))
-	}
-	if bg != noColor {
-		style = style.Background(bg.color(s.r))
-	}
-
-	return style.Render(border)
+	return scuf.String(border, fg.color(), bg.color())
 }
 
 func maxRuneWidth(str string) int {

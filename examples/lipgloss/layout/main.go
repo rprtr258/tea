@@ -29,9 +29,10 @@ var (
 
 	// General.
 
-	subtle    = lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#383838"}
-	highlight = lipgloss.AdaptiveColor{Light: "#874BFD", Dark: "#7D56F4"}
-	special   = lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}
+	subtle      = lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#D9DCCF"), Dark: lipgloss.FgColor("#383838")}
+	highlight   = lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#874BFD"), Dark: lipgloss.FgColor("#7D56F4")}
+	special     = lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#43BF6D"), Dark: lipgloss.FgColor("#73F59F")}
+	highlightBg = lipgloss.AdaptiveColor{Light: lipgloss.BgColor("#874BFD"), Dark: lipgloss.BgColor("#7D56F4")}
 
 	divider = lipgloss.NewStyle().
 		SetString("•").
@@ -84,7 +85,7 @@ var (
 		// MarginRight(5).
 		// Padding(0, 1).
 		Italic(true).
-		Foreground(lipgloss.Color("#FFF7DB")).
+		Foreground(lipgloss.FgColor("#FFF7DB")).
 		SetString("Lip Gloss")
 
 	descStyle = lipgloss.NewStyle() //.MarginTop(1)
@@ -98,7 +99,7 @@ var (
 
 	dialogBoxStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder).
-			BorderForeground(lipgloss.Color("#874BFD")).
+			BorderForeground(lipgloss.FgColor("#874BFD")).
 		// Padding(1, 0).
 		BorderTop(true).
 		BorderLeft(true).
@@ -106,14 +107,14 @@ var (
 		BorderBottom(true)
 
 	buttonStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFF7DB")).
-			Background(lipgloss.Color("#888B7E"))
+			Foreground(lipgloss.FgColor("#FFF7DB")).
+			Background(lipgloss.BgColor("#888B7E"))
 		// Padding(0, 3).
 		// MarginTop(1)
 
 	activeButtonStyle = buttonStyle.Copy().
-				Foreground(lipgloss.Color("#FFF7DB")).
-				Background(lipgloss.Color("#F25D94")).
+				Foreground(lipgloss.FgColor("#FFF7DB")).
+				Background(lipgloss.BgColor("#F25D94")).
 		// MarginRight(2).
 		Underline(true)
 
@@ -145,7 +146,7 @@ var (
 	listDone = func(s string) string {
 		return checkMark + lipgloss.NewStyle().
 			Strikethrough(true).
-			Foreground(lipgloss.AdaptiveColor{Light: "#969B86", Dark: "#696969"}).
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#969B86"), Dark: lipgloss.FgColor("#696969")}).
 			Render(s)
 	}
 
@@ -153,8 +154,8 @@ var (
 
 	historyStyle = lipgloss.NewStyle().
 			Align(lipgloss.Left).
-			Foreground(lipgloss.Color("#FAFAFA")).
-			Background(highlight).
+			Foreground(lipgloss.FgColor("#FAFAFA")).
+			Background(highlightBg).
 		// Margin(1, 3, 0, 0).
 		// Padding(1, 2).
 		Height(19).
@@ -163,27 +164,27 @@ var (
 	// Status Bar.
 
 	statusNugget = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFDF5"))
+			Foreground(lipgloss.FgColor("#FFFDF5"))
 		// Padding(0, 1)
 
 	statusBarStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#343433", Dark: "#C1C6B2"}).
-			Background(lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#353533"})
+			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("#343433"), Dark: lipgloss.FgColor("#C1C6B2")}).
+			Background(lipgloss.AdaptiveColor{Light: lipgloss.BgColor("#D9DCCF"), Dark: lipgloss.BgColor("#353533")})
 
 	statusStyle = lipgloss.NewStyle().
 			Inherit(statusBarStyle).
-			Foreground(lipgloss.Color("#FFFDF5")).
-			Background(lipgloss.Color("#FF5F87"))
+			Foreground(lipgloss.FgColor("#FFFDF5")).
+			Background(lipgloss.BgColor("#FF5F87"))
 		// Padding(0, 1).
 		// MarginRight(1)
 
 	encodingStyle = statusNugget.Copy().
-			Background(lipgloss.Color("#A550DF")).
+			Background(lipgloss.BgColor("#A550DF")).
 			Align(lipgloss.Right)
 
 	statusText = lipgloss.NewStyle().Inherit(statusBarStyle)
 
-	fishCakeStyle = statusNugget.Copy().Background(lipgloss.Color("#6124DF"))
+	fishCakeStyle = statusNugget.Copy().Background(lipgloss.BgColor("#6124DF"))
 
 	// Page.
 
@@ -247,7 +248,7 @@ func Main(context.Context) error {
 
 		for i, v := range colors {
 			const offset = 2
-			c := lipgloss.Color(v[0])
+			c := lipgloss.BgColor(v[0])
 			fmt.Fprint(&title, titleStyle.Copy(). /*.MarginLeft(i*offset)*/ Background(c))
 			if i < len(colors)-1 {
 				title.WriteRune('\n')
@@ -289,7 +290,7 @@ func Main(context.Context) error {
 		b := strings.Builder{}
 		for _, x := range colors {
 			for _, y := range x {
-				s := lipgloss.NewStyle().SetString("  ").Background(lipgloss.Color(y))
+				s := lipgloss.NewStyle().SetString("  ").Background(lipgloss.BgColor(y))
 				b.WriteString(s.String())
 			}
 			b.WriteRune('\n')
