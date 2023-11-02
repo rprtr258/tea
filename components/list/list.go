@@ -1,4 +1,4 @@
-// Package list provides a feature-rich Bubble Tea component for browsing
+// Package list provides a feature-rich Tea component for browsing
 // a general purpose list of items. It features optional filtering, pagination,
 // help, status messages, and a spinner to indicate activity.
 package list
@@ -19,7 +19,7 @@ import (
 	"github.com/rprtr258/tea/components/paginator"
 	"github.com/rprtr258/tea/components/spinner"
 	"github.com/rprtr258/tea/components/textinput"
-	"github.com/rprtr258/tea/lipgloss"
+	"github.com/rprtr258/tea/styles"
 )
 
 // Item is an item that appears in the list.
@@ -93,18 +93,6 @@ func DefaultFilter(term string, targets []string) []Rank {
 	})
 	return fun.Map[Rank](
 		ranks,
-		func(r fuzzy.Match) Rank {
-			return Rank{
-				Index:          r.Index,
-				MatchedIndexes: r.MatchedIndexes,
-			}
-		})
-}
-
-// UnsortedFilter uses the sahilm/fuzzy to filter through the list. It does not sort the results.
-func UnsortedFilter(term string, targets []string) []Rank {
-	return fun.Map[Rank](
-		fuzzy.FindNoSort(term, targets),
 		func(r fuzzy.Match) Rank {
 			return Rank{
 				Index:          r.Index,
@@ -205,8 +193,9 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 
 	p := paginator.New()
 	p.Type = paginator.Dots
-	// p.ActiveDot = DefaultStyle.ActivePaginationDot.Render(bullet)
-	// p.InactiveDot = DefaultStyle.InactivePaginationDot.Render(bullet)
+	p.ActiveDotStyle = DefaultStyle.ActivePaginationDot
+	p.InactiveDotStyle = DefaultStyle.InactivePaginationDot
+	p.InactiveDot = bullet
 
 	m := Model[I]{
 		showTitle:             true,
@@ -641,12 +630,12 @@ func (m *Model[I]) SetHeight(v int) {
 }
 
 func (m *Model[I]) setSize(width, height int) {
-	promptWidth := lipgloss.Width(m.Styles.Title.Render(m.FilterInput.Prompt))
+	promptWidth := styles.Width(m.Styles.Title.Render(m.FilterInput.Prompt))
 
 	m.width = width
 	m.height = height
 	m.Help.Width = width
-	m.FilterInput.Width = width - promptWidth - lipgloss.Width(m.spinnerView())
+	m.FilterInput.Width = width - promptWidth - styles.Width(m.spinnerView())
 	m.updatePagination()
 }
 
@@ -724,20 +713,16 @@ func (m *Model[I]) updatePagination() {
 	index := m.Index()
 	availHeight := m.height
 
-	if m.showTitle || (m.showFilter && m.filteringEnabled) {
-		availHeight -= lipgloss.Height(m.titleView())
+	if m.showTitle || m.showFilter && m.filteringEnabled {
+		availHeight -= 2
 	}
 	if m.showStatusBar {
-		availHeight -= lipgloss.Height(m.statusView())
+		availHeight -= 2
 	}
 	if m.showPagination {
-		// TODO: wtf???
-		// availHeight -= lipgloss.Height(m.paginationView())
 		availHeight -= 2
 	}
 	if m.showHelp {
-		// TODO: wtf???
-		// availHeight -= lipgloss.Height(m.helpView())
 		availHeight -= 2
 	}
 
@@ -764,35 +749,35 @@ func (m *Model[I]) hideStatusMessage() {
 	}
 }
 
-// Update is the Bubble Tea update loop.
-func (m *Model[I]) Update(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
-
+// Update is the Tea update loop.
+func (m *Model[I]) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if key.Matches(msg, m.KeyMap.ForceQuit) {
-			return []tea.Cmd{tea.Quit}
+			f(tea.Quit)
+			return
 		}
 
 	case MsgFilterMatches[I]:
 		m.filteredItems = filteredItems[I](msg)
-		return nil
+		return
 
 	case spinner.MsgTick:
-		cmd := m.spinner.Update(msg)
-		if m.showSpinner {
-			cmds = append(cmds, cmd...)
-		}
+		m.spinner.Update(msg, nil)
+		// if m.showSpinner {
+		// 	cmds = append(cmds, cmd...)
+		// }
 
 	case msgStatusMessageTimeout:
 		m.hideStatusMessage()
 	}
 
 	if m.filterState == Filtering {
-		return append(cmds, m.handleFiltering(msg)...)
+		m.handleFiltering(msg, f)
+		return
 	}
 
-	return append(cmds, m.handleBrowsing(msg)...)
+	f(m.handleBrowsing(msg)...)
 }
 
 // Updates for when a user is browsing the list.
@@ -862,9 +847,7 @@ func (m *Model[I]) handleBrowsing(msg tea.Msg) []tea.Cmd {
 }
 
 // Updates for when a user is in the filter editing interface.
-func (m *Model[I]) handleFiltering(msg tea.Msg) []tea.Cmd {
-	var cmds []tea.Cmd
-
+func (m *Model[I]) handleFiltering(msg tea.Msg, f func(...tea.Cmd)) {
 	// Handle keys
 	if msg, ok := msg.(tea.MsgKey); ok {
 		switch {
@@ -900,20 +883,19 @@ func (m *Model[I]) handleFiltering(msg tea.Msg) []tea.Cmd {
 
 	// Update the filter text input component
 	oldValue := m.FilterInput.Value()
-	inputCmd := m.FilterInput.Update(msg)
+	m.FilterInput.Update(msg, f)
 	filterChanged := oldValue != m.FilterInput.Value()
-	cmds = append(cmds, inputCmd...)
 
 	// If the filtering input has changed, request updated filtering
 	if filterChanged {
-		cmds = append(cmds, cmdFilterItems(*m))
+		f(cmdFilterItems(*m))
 		m.KeyMap.AcceptWhileFiltering.SetEnabled(m.FilterInput.Value() != "")
 	}
 
 	// Update pagination
 	m.updatePagination()
 
-	return cmds
+	return
 }
 
 // ShortHelp returns bindings to show in the abbreviated help view. It's part
@@ -994,82 +976,70 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 
 // View renders the component.
 func (m *Model[I]) View(vb tea.Viewbox) {
-	y := 1 // TODO: use m.height ???
+	if m.showHelp {
+		m.helpView(vb.PaddingTop(vb.Height - 1).PaddingLeft(2))
+		vb = vb.Padding(tea.PaddingOptions{Bottom: 2})
+	}
+
+	if m.showPagination {
+		m.paginationView(vb.PaddingTop(vb.Height - 1).PaddingLeft(2))
+		vb = vb.Padding(tea.PaddingOptions{Bottom: 2})
+	}
 
 	if m.showTitle || m.showFilter && m.filteringEnabled {
-		y, _ = vb.WriteText(y, 2, m.titleView())
-		y += 2
+		m.titleView(vb.PaddingLeft(2))
+		vb = vb.PaddingTop(2)
 	}
 
 	if m.showStatusBar {
-		y, _ = vb.WriteText(y, 0, m.statusView())
-		y++
+		m.statusView(vb.PaddingLeft(2))
+		vb = vb.PaddingTop(2)
 	}
 
-	// TODO: change to layout
-	m.populatedView(vb.Padding(tea.PaddingOptions{
-		Top:    y,
-		Bottom: fun.IF(m.showPagination, 2, 0) + fun.IF(m.showHelp, 2, 0),
-	}))
-	y += m.Paginator.PerPage * m.delegate.Height()
-
-	if m.showPagination {
-		m.paginationView(vb.Padding(tea.PaddingOptions{Top: y + 1, Left: 2}))
-		y++
-	}
-
-	if m.showHelp {
-		m.helpView(vb.Padding(tea.PaddingOptions{Top: y + 1}))
-	}
+	m.populatedView(vb)
 }
 
-func (m *Model[I]) titleView() string {
-	titleBarStyle := m.Styles.TitleBar.Copy()
+func (m *Model[I]) titleView(vb tea.Viewbox) {
+	vb = vb.Styled(m.Styles.TitleBar)
 
 	// We need to account for the size of the spinner, even if we don't
 	// render it, to reserve some space for it should we turn it on later.
-	spinnerView := m.spinnerView()
-	spinnerWidth := lipgloss.Width(spinnerView)
-	spinnerLeftGap := " "
-	spinnerOnLeft := /*titleBarStyle.GetPaddingLeft() >= spinnerWidth+lipgloss.Width(spinnerLeftGap) &&*/ m.showSpinner
+	// spinnerView := m.spinnerView()
+	// spinnerWidth := styles.Width(spinnerView)
+	// spinnerLeftGap := " "
+	// spinnerOnLeft := /*titleBarStyle.GetPaddingLeft() >= spinnerWidth+styles.Width(spinnerLeftGap) &&*/ m.showSpinner
 
-	var view string
 	// If the filter's showing, draw that. Otherwise draw the title.
 	if m.showFilter && m.filterState == Filtering {
-		view += m.FilterInput.View()
+		m.FilterInput.View(vb)
 	} else if m.showTitle {
-		if m.showSpinner && spinnerOnLeft {
-			view += spinnerView + spinnerLeftGap
-			// titleBarGap := titleBarStyle.GetPaddingLeft()
-			// titleBarStyle = titleBarStyle.PaddingLeft(titleBarGap - spinnerWidth - lipgloss.Width(spinnerLeftGap))
-		}
+		// if m.showSpinner && spinnerOnLeft {
+		// 	vb = vb.WriteLine(spinnerView + spinnerLeftGap)
+		// 	// titleBarGap := titleBarStyle.GetPaddingLeft()
+		// 	// titleBarStyle = titleBarStyle.PaddingLeft(titleBarGap - spinnerWidth - styles.Width(spinnerLeftGap))
+		// }
 
-		view += m.Styles.Title.Render(m.Title)
+		vb.Styled(m.Styles.Title).WriteLine(" ").WriteLine(m.Title).WriteLine(" ")
 
-		// Status message
-		if m.filterState != Filtering {
-			view += "  " + m.statusMessage
-			view = truncate.StringWithTail(view, uint(m.width-spinnerWidth), ellipsis)
-		}
+		// // Status message
+		// if m.filterState != Filtering {
+		// 	vb.WriteLine(truncate.StringWithTail("  "+m.statusMessage, uint(m.width-spinnerWidth), ellipsis))
+		// }
 	}
 
-	// Spinner
-	if m.showSpinner && !spinnerOnLeft {
-		// Place spinner on the right
-		availSpace := m.width - lipgloss.Width(m.Styles.TitleBar.Render(view))
-		if availSpace > spinnerWidth {
-			view += strings.Repeat(" ", availSpace-spinnerWidth) + spinnerView
-		}
-	}
-
-	if len(view) > 0 {
-		return titleBarStyle.Render(view)
-	}
-
-	return view
+	// // Spinner
+	// if m.showSpinner && !spinnerOnLeft {
+	// 	// Place spinner on the right
+	// 	// availSpace := m.width - styles.Width(m.Styles.TitleBar.Render(view))
+	// 	// if availSpace > spinnerWidth {
+	// 	// 	x = vb.WriteLine(0, x, strings.Repeat(" ", availSpace-spinnerWidth)+spinnerView)
+	// 	// }
+	// }
 }
 
-func (m *Model[I]) statusView() string {
+func (m *Model[I]) statusView(vb tea.Viewbox) {
+	vb = vb.Styled(m.Styles.StatusBar)
+
 	visibleItems := len(m.VisibleItems())
 
 	itemName := m.itemNameSingular
@@ -1079,37 +1049,35 @@ func (m *Model[I]) statusView() string {
 
 	itemsDisplay := fmt.Sprintf("%d %s", visibleItems, itemName)
 
-	var status string
 	switch {
 	case m.filterState == Filtering:
 		// Filter results
-		status = itemsDisplay
 		if visibleItems == 0 {
-			status = m.Styles.StatusEmpty.Render("Nothing matched")
+			vb = vb.Styled(m.Styles.StatusEmpty).WriteLine("Nothing matched")
+		} else {
+			vb = vb.WriteLine(itemsDisplay)
 		}
 	case len(m.items) == 0:
 		// Not filtering: no items.
-		status = m.Styles.StatusEmpty.Render("No " + m.itemNamePlural)
+		vb = vb.Styled(m.Styles.StatusEmpty).WriteLine("No " + m.itemNamePlural)
 	default:
 		// Normal
 		filtered := m.FilterState() == FilterApplied
 
+		status := ""
 		if filtered {
-			f := strings.TrimSpace(m.FilterInput.Value())
-			f = truncate.StringWithTail(f, 10, "…")
-			status = fmt.Sprintf("“%s” ", f)
+			status = fmt.Sprintf("“%s” ", truncate.StringWithTail(strings.TrimSpace(m.FilterInput.Value()), 10, "…"))
 		}
-
 		status += itemsDisplay
+
+		vb = vb.WriteLine(status)
 	}
 
 	totalItems := len(m.items)
 	if numFiltered := totalItems - visibleItems; numFiltered > 0 {
-		status += m.Styles.DividerDot.Render(" " + bullet + " ")
-		status += m.Styles.StatusBarFilterCount.Render(fmt.Sprintf("%d filtered", numFiltered))
+		vb = vb.Styled(m.Styles.DividerDot).WriteLine(string([]rune{' ', bullet, ' '}))
+		vb.Styled(m.Styles.StatusBarFilterCount).WriteLine(fmt.Sprintf("%d filtered", numFiltered))
 	}
-
-	return m.Styles.StatusBar.Render(status)
 }
 
 func (m *Model[I]) paginationView(vb tea.Viewbox) {
@@ -1134,7 +1102,7 @@ func (m *Model[I]) populatedView(vb tea.Viewbox) {
 	// Empty states
 	if len(items) == 0 {
 		if m.filterState != Filtering {
-			vb.Styled(m.Styles.NoItems).WriteLine(0, 0, "No "+m.itemNamePlural+".")
+			vb.Styled(m.Styles.NoItems).WriteLine("No " + m.itemNamePlural + ".")
 		}
 
 		return
@@ -1145,18 +1113,19 @@ func (m *Model[I]) populatedView(vb tea.Viewbox) {
 
 	for i, item := range docs {
 		m.delegate.Render(vb, m, i+start, item)
-		if i != len(docs)-1 {
-			vb = vb.Padding(tea.PaddingOptions{Top: m.delegate.Spacing() + 1})
+		if i < len(docs)-1 {
+			vb = vb.PaddingTop(m.delegate.Spacing() + m.delegate.Height())
 		}
 	}
 }
 
 func (m *Model[I]) helpView(vb tea.Viewbox) {
-	m.Help.View(vb.Padding(tea.PaddingOptions{Top: 1, Left: 2}), m)
+	m.Help.View(vb, m)
 }
 
 func (m *Model[I]) spinnerView() string {
-	return m.spinner.View()
+	m.spinner.View(tea.Viewbox{})
+	return ""
 }
 
 func cmdFilterItems[I Item](m Model[I]) tea.Cmd {

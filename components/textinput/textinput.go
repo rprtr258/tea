@@ -13,7 +13,7 @@ import (
 	"github.com/rprtr258/tea/components/cursor"
 	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/components/runeutil"
-	"github.com/rprtr258/tea/lipgloss"
+	"github.com/rprtr258/tea/styles"
 )
 
 // Internal messages for clipboard operations.
@@ -81,7 +81,7 @@ var DefaultKeyMap = KeyMap{
 	PrevSuggestion:          key.NewBinding(key.WithKeys("up", "ctrl+p")),
 }
 
-// Model is the Bubble Tea model for this text input element.
+// Model is the Tea model for this text input element.
 type Model struct {
 	Err error
 
@@ -98,14 +98,14 @@ type Model struct {
 	// Styles. These will be applied as inline styles.
 	//
 	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/charmbracelet/lipgloss
-	PromptStyle      lipgloss.Style
-	TextStyle        lipgloss.Style
-	PlaceholderStyle lipgloss.Style
-	CompletionStyle  lipgloss.Style
+	// https://github.com/charmbracelet/styles
+	PromptStyle      styles.Style
+	TextStyle        styles.Style
+	PlaceholderStyle styles.Style
+	CompletionStyle  styles.Style
 
 	// Deprecated: use Cursor.Style instead.
-	CursorStyle lipgloss.Style
+	CursorStyle styles.Style
 
 	// CharLimit is the maximum amount of characters this input element will
 	// accept. If 0 or less, there's no limit.
@@ -159,9 +159,9 @@ func New() Model {
 		Prompt:           "> ",
 		EchoCharacter:    '*',
 		CharLimit:        0,
-		PlaceholderStyle: lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
+		PlaceholderStyle: styles.Style{}.Foreground(styles.FgColor("240")),
 		ShowSuggestions:  false,
-		CompletionStyle:  lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
+		CompletionStyle:  styles.Style{}.Foreground(styles.FgColor("240")),
 		Cursor:           cursor.New(),
 		KeyMap:           DefaultKeyMap,
 
@@ -169,6 +169,13 @@ func New() Model {
 		value:       nil,
 		focus:       false,
 		pos:         0,
+
+		// Textinput has all its input on a single line so collapse
+		// newlines/tabs to single spaces.
+		rsan: runeutil.NewSanitizer(
+			runeutil.ReplaceTabs(" "),
+			runeutil.ReplaceNewlines(" "),
+		),
 	}
 }
 
@@ -272,12 +279,6 @@ func (m *Model) SetSuggestions(suggestions []string) {
 
 // rsan initializes or retrieves the rune sanitizer.
 func (m *Model) san() runeutil.Sanitizer {
-	if m.rsan == nil {
-		// Textinput has all its input on a single line so collapse
-		// newlines/tabs to single spaces.
-		m.rsan = runeutil.NewSanitizer(
-			runeutil.ReplaceTabs(" "), runeutil.ReplaceNewlines(" "))
-	}
 	return m.rsan
 }
 
@@ -553,10 +554,10 @@ func (m Model) echoTransform(v string) string {
 	}
 }
 
-// Update is the Bubble Tea update loop.
-func (m Model) Update(msg tea.Msg) []tea.Cmd {
+// Update is the Tea update loop.
+func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	if !m.focus {
-		return nil
+		return
 	}
 
 	// Need to check for completion before, because key is configurable and might be double assigned
@@ -598,8 +599,6 @@ func (m Model) Update(msg tea.Msg) []tea.Cmd {
 			if m.pos < len(m.value) {
 				m.SetCursor(m.pos + 1)
 			}
-		case key.Matches(msg, m.KeyMap.DeleteWordBackward):
-			m.deleteWordBackward()
 		case key.Matches(msg, m.KeyMap.LineStart):
 			m.CursorStart()
 		case key.Matches(msg, m.KeyMap.DeleteCharacterForward):
@@ -613,7 +612,8 @@ func (m Model) Update(msg tea.Msg) []tea.Cmd {
 		case key.Matches(msg, m.KeyMap.DeleteBeforeCursor):
 			m.deleteBeforeCursor()
 		case key.Matches(msg, m.KeyMap.Paste):
-			return []tea.Cmd{Paste}
+			f(Paste)
+			return
 		case key.Matches(msg, m.KeyMap.DeleteWordForward):
 			m.deleteWordForward()
 		case key.Matches(msg, m.KeyMap.NextSuggestion):
@@ -636,53 +636,53 @@ func (m Model) Update(msg tea.Msg) []tea.Cmd {
 		m.Err = msg
 	}
 
-	var cmds []tea.Cmd
-
-	cmds = append(cmds, m.Cursor.Update(msg)...)
+	m.Cursor.Update(msg, f)
 
 	if oldPos != m.pos && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
-		cmds = append(cmds, m.Cursor.CmdBlink()...)
+		f(m.Cursor.CmdBlink()...)
 	}
 
 	m.handleOverflow()
-	return cmds
 }
 
 // View renders the textinput in its current state.
-func (m Model) View() string {
+func (m Model) View(vb tea.Viewbox) {
 	// Placeholder text
 	if len(m.value) == 0 && m.Placeholder != "" {
-		return m.placeholderView()
+		m.placeholderView(vb)
+		return
 	}
-
-	styleText := m.TextStyle.Inline(true).Render
 
 	value := m.value[m.offset:m.offsetRight]
 	pos := max(0, m.pos-m.offset)
-	v := styleText(m.echoTransform(string(value[:pos])))
+	v := m.echoTransform(string(value[:pos]))
 
 	if pos < len(value) {
 		char := m.echoTransform(string(value[pos]))
 		m.Cursor.SetChar(char)
-		v += m.Cursor.View()                                   // cursor and text under it
-		v += styleText(m.echoTransform(string(value[pos+1:]))) // text after cursor
-		v += m.completionView(0)                               // suggested completion
+		st, cursor := m.Cursor.View()
+		v += st.Render(cursor)                      // cursor and text under it
+		v += m.echoTransform(string(value[pos+1:])) // text after cursor
+		v += m.completionView(0)                    // suggested completion
 	} else {
 		if m.canAcceptSuggestion() {
 			suggestion := m.matchedSuggestions[m.currentSuggestionIndex]
 			if len(value) < len(suggestion) {
 				m.Cursor.TextStyle = m.CompletionStyle
 				m.Cursor.SetChar(m.echoTransform(string(suggestion[pos])))
-				v += m.Cursor.View()
+				st, cursor := m.Cursor.View()
+				v += st.Render(cursor)
 				v += m.completionView(1)
 			} else {
 				m.Cursor.SetChar(" ")
-				v += m.Cursor.View()
+				st, cursor := m.Cursor.View()
+				v += st.Render(cursor)
 			}
 		} else {
 			m.Cursor.SetChar(" ")
-			v += m.Cursor.View()
+			st, cursor := m.Cursor.View()
+			v += st.Render(cursor)
 		}
 	}
 
@@ -694,28 +694,25 @@ func (m Model) View() string {
 		if valWidth+padding <= m.Width && pos < len(value) {
 			padding++
 		}
-		v += styleText(strings.Repeat(" ", padding))
+		v += strings.Repeat(" ", padding)
 	}
 
-	return m.PromptStyle.Render(m.Prompt) + v
+	vb.Styled(m.PromptStyle).WriteLine(m.Prompt)
+	vb.PaddingLeft(len(m.Prompt)).WriteLine(v)
 }
 
 // placeholderView returns the prompt and placeholder view, if any.
-func (m Model) placeholderView() string {
-	var (
-		v     string
-		p     = m.Placeholder
-		style = m.PlaceholderStyle.Inline(true).Render
-	)
+func (m Model) placeholderView(vb tea.Viewbox) {
+	vb.Styled(m.PromptStyle).WriteLine(m.Prompt)
+	vb = vb.PaddingLeft(len(m.Prompt))
 
 	m.Cursor.TextStyle = m.PlaceholderStyle
-	m.Cursor.SetChar(p[:1])
-	v += m.Cursor.View()
+	m.Cursor.SetChar(m.Placeholder[:1])
+	st, cursor := m.Cursor.View()
+	vb.Styled(st).WriteLine(cursor)
+	vb = vb.PaddingLeft(1)
 
-	// The rest of the placeholder text
-	v += style(p[1:])
-
-	return m.PromptStyle.Render(m.Prompt) + v
+	vb.Styled(m.PlaceholderStyle).WriteLine(m.Placeholder[1:])
 }
 
 // Blink is a command used to initialize cursor blinking.
@@ -823,7 +820,7 @@ func (m *Model) updateSuggestions() {
 		return
 	}
 
-	if len(m.value) <= 0 || len(m.suggestions) <= 0 {
+	if len(m.value) == 0 || len(m.suggestions) == 0 {
 		m.matchedSuggestions = [][]rune{}
 		return
 	}

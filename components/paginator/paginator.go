@@ -1,4 +1,4 @@
-// Package paginator provides a Bubble Tea package for calculating pagination
+// Package paginator provides a Tea package for calculating pagination
 // and rendering pagination info. Note that this package does not render actual
 // pages: it's purely for handling keystrokes related to pagination, and
 // rendering pagination status.
@@ -9,6 +9,7 @@ import (
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/key"
+	"github.com/rprtr258/tea/styles"
 )
 
 // Type specifies the way we render pagination.
@@ -33,22 +34,17 @@ var DefaultKeyMap = KeyMap{
 	NextPage: key.NewBinding(key.WithKeys("pgdown", "right", "l")),
 }
 
-// Model is the Bubble Tea model for this user interface.
+// Model is the Tea model for this user interface.
 type Model struct {
-	// Type configures how the pagination is rendered (Arabic, Dots).
-	Type Type
-	// Page is the current page number.
-	Page int
-	// PerPage is the number of items per page.
-	PerPage int
-	// TotalPages is the total number of pages.
-	TotalPages int
-	// ActiveDot is used to mark the current page under the Dots display type.
-	ActiveDot rune
-	// InactiveDot is used to mark inactive pages under the Dots display type.
-	InactiveDot rune
-	// ArabicFormat is the printf-style format to use for the Arabic display type.
-	ArabicFormat string
+	Type             Type // Type configures how the pagination is rendered (Arabic, Dots).
+	Page             int  // Page is the current page number.
+	PerPage          int  // PerPage is the number of items per page.
+	TotalPages       int  // TotalPages is the total number of pages.
+	ActiveDot        rune // ActiveDot is used to mark the current page under the Dots display type.
+	ActiveDotStyle   styles.Style
+	InactiveDot      rune // InactiveDot is used to mark inactive pages under the Dots display type.
+	InactiveDotStyle styles.Style
+	ArabicFormat     string // ArabicFormat is the printf-style format to use for the Arabic display type.
 
 	// KeyMap encodes the keybindings recognized by the widget.
 	KeyMap KeyMap
@@ -152,11 +148,11 @@ func (m *Model) View(vb tea.Viewbox) {
 
 func (m *Model) dotsView(vb tea.Viewbox) {
 	for i := 0; i < m.TotalPages; i++ {
-		vb.Set(0, i, m.InactiveDot)
+		vb.Styled(m.InactiveDotStyle).Set(0, i, m.InactiveDot)
 	}
-	vb.Set(0, m.Page, m.ActiveDot)
+	vb.Styled(m.ActiveDotStyle).Set(0, m.Page, m.ActiveDot)
 }
 
 func (m *Model) arabicView(vb tea.Viewbox) {
-	vb.WriteLine(0, 0, fmt.Sprintf(m.ArabicFormat, m.Page+1, m.TotalPages))
+	vb.WriteLine(fmt.Sprintf(m.ArabicFormat, m.Page+1, m.TotalPages))
 }

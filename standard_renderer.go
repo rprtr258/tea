@@ -153,6 +153,9 @@ func (r *standardRenderer) flush() {
 		return
 	}
 
+	r.out.Write(r.buf.Bytes())
+	return
+
 	newLines := strings.Split(r.buf.String(), "\n")
 
 	// If we know the output's height, we can use it to determine how many
@@ -411,7 +414,7 @@ func (r *standardRenderer) setIgnoredLines(from, to int) {
 }
 
 // clearIgnoredLines returns control of any ignored lines to the standard
-// Bubble Tea renderer. That is, any lines previously set to be ignored can be
+// Tea renderer. That is, any lines previously set to be ignored can be
 // rendered to again.
 func (r *standardRenderer) clearIgnoredLines() {
 	r.ignoreLines = nil
@@ -424,17 +427,17 @@ func (r *standardRenderer) clearIgnoredLines() {
 // To call this function use command ScrollUp().
 //
 // For this to work renderer.ignoreLines must be set to ignore the scrollable
-// region since we are bypassing the normal Bubble Tea renderer here.
+// region since we are bypassing the normal Tea renderer here.
 //
 // Because this method relies on the terminal dimensions, it's only valid for
 // full-window applications (generally those that use the alternate screen
 // buffer).
 //
 // This method bypasses the normal rendering buffer and is philosophically
-// different than the normal way we approach rendering in Bubble Tea. It's for
+// different than the normal way we approach rendering in Tea. It's for
 // use in high-performance rendering, such as a pager that could potentially
 // be rendering very complicated ansi. In cases where the content is simpler
-// standard Bubble Tea rendering should suffice.
+// standard Tea rendering should suffice.
 func (r *standardRenderer) insertTop(lines []string, topBoundary, bottomBoundary int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -462,7 +465,7 @@ func (r *standardRenderer) insertTop(lines []string, topBoundary, bottomBoundary
 //
 // See note in insertTop() for caveats, how this function only makes sense for
 // full-window applications, and how it differs from the normal way we do
-// rendering in Bubble Tea.
+// rendering in Tea.
 func (r *standardRenderer) insertBottom(lines []string, topBoundary, bottomBoundary int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

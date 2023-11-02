@@ -1,21 +1,21 @@
-# Bubble Tea
+# Tea
 
 <p>
-    <img src="https://stuff.charm.sh/tea/tea-github-header-simple.png" width="313" alt="Bubble Tea Title Treatment"><br>
+    <img src="https://stuff.charm.sh/tea/tea-github-header-simple.png" width="313" alt="Tea Title Treatment"><br>
     <a href="https://github.com/rprtr258/tea/releases"><img src="https://img.shields.io/github/release/charmbracelet/tea.svg" alt="Latest Release"></a>
     <a href="https://pkg.go.dev/github.com/rprtr258/tea?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
     <a href="https://github.com/rprtr258/tea/actions"><img src="https://github.com/rprtr258/tea/workflows/build/badge.svg" alt="Build Status"></a>
 </p>
 
 The fun, functional and stateful way to build terminal apps. A Go framework
-based on [The Elm Architecture][elm]. Bubble Tea is well-suited for simple and
+based on [The Elm Architecture][elm]. Tea is well-suited for simple and
 complex terminal applications, either inline, full-window, or a mix of both.
 
 <p>
-    <img src="https://stuff.charm.sh/tea/tea-example.gif" width="100%" alt="Bubble Tea Example">
+    <img src="https://stuff.charm.sh/tea/tea-example.gif" width="100%" alt="Tea Example">
 </p>
 
-Bubble Tea is in use in production and includes a number of features and
+Tea is in use in production and includes a number of features and
 performance optimizations we’ve added along the way. Among those is a standard
 framerate-based renderer, a renderer for high-performance scrollable
 regions which works alongside the main renderer, and mouse support.
@@ -27,7 +27,7 @@ To get started, see the tutorial below, the [examples][examples], the
 
 ## By the way
 
-Be sure to check out [Bubbles][bubbles], a library of common UI components for Bubble Tea.
+Be sure to check out [Bubbles][bubbles], a library of common UI components for Tea.
 
 <p>
     <a href="https://github.com/rprtr258/tea/bubbles"><img src="https://stuff.charm.sh/bubbles/bubbles-badge.png" width="174" alt="Bubbles Badge"></a>&nbsp;&nbsp;
@@ -38,7 +38,7 @@ Be sure to check out [Bubbles][bubbles], a library of common UI components for B
 
 ## Tutorial
 
-Bubble Tea is based on the functional design paradigms of [The Elm
+Tea is based on the functional design paradigms of [The Elm
 Architecture][elm], which happens to work nicely with Go. It's a delightful way
 to build applications.
 
@@ -55,7 +55,7 @@ By the way, the non-annotated source code for this program is available
 For this tutorial, we're making a shopping list.
 
 To start we'll define our package and import some libraries. Our only external
-import will be the Bubble Tea library, which we'll call `tea` for short.
+import will be the Tea library, which we'll call `tea` for short.
 
 ```go
 package main
@@ -68,7 +68,7 @@ import (
 )
 ```
 
-Bubble Tea programs are comprised of a **model** that describes the application
+Tea programs are comprised of a **model** that describes the application
 state and three simple methods on that model:
 
 * **Init**, a function that returns an initial command for the application to run.
@@ -171,7 +171,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
         }
     }
 
-    // Return the updated model to the Bubble Tea runtime for processing.
+    // Return the updated model to the Tea runtime for processing.
     // Note that we're not returning a command.
     return nil
 }
@@ -179,7 +179,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 
 You may have noticed that <kbd>ctrl+c</kbd> and <kbd>q</kbd> above return
 a `tea.Quit` command with the model. That’s a special command which instructs
-the Bubble Tea runtime to quit, exiting the program.
+the Tea runtime to quit, exiting the program.
 
 ### The View Method
 
@@ -188,7 +188,7 @@ simplest. We look at the model in its current state and use it to return
 a `string`. That string is our UI!
 
 Because the view describes the entire UI of your application, you don’t have to
-worry about redrawing logic and stuff like that. Bubble Tea takes care of it
+worry about redrawing logic and stuff like that. Tea takes care of it
 for you.
 
 ```go
@@ -239,7 +239,7 @@ This tutorial covers the basics of building an interactive terminal UI, but
 in the real world you'll also need to perform I/O. To learn about that have a
 look at the [Command Tutorial][cmd]. It's pretty simple.
 
-There are also several [Bubble Tea examples][examples] available and, of course,
+There are also several [Tea examples][examples] available and, of course,
 there are [Go Docs][docs].
 
 [cmd]: http://github.com/rprtr258/tea/tree/master/tutorials/commands/
@@ -250,7 +250,7 @@ there are [Go Docs][docs].
 
 ### Debugging with Delve
 
-Since Bubble Tea apps assume control of stdin and stdout, you’ll need to run
+Since Tea apps assume control of stdin and stdout, you’ll need to run
 delve in headless mode and then connect to it:
 
 ```bash
@@ -267,9 +267,9 @@ actually watch out what address the first `dlv` run tells you to connect to.
 
 ### Logging Stuff
 
-You can’t really log to stdout with Bubble Tea because your TUI is busy
+You can’t really log to stdout with Tea because your TUI is busy
 occupying that! You can, however, log to a file by including something like
-the following prior to starting your Bubble Tea program:
+the following prior to starting your Tea program:
 
 ```go
 if len(os.Getenv("DEBUG")) > 0 {
@@ -284,25 +284,25 @@ if len(os.Getenv("DEBUG")) > 0 {
 To see what’s being logged in real time, run `tail -f debug.log` while you run
 your program in another window.
 
-## Libraries we use with Bubble Tea
+## Libraries we use with Tea
 
-* [Bubbles][bubbles]: Common Bubble Tea components such as text inputs, viewports, spinners and so on
-* [Lip Gloss][lipgloss]: Style, format and layout tools for terminal applications
+* [Bubbles][bubbles]: Common Tea components such as text inputs, viewports, spinners and so on
+* [Lip Gloss][styles]: Style, format and layout tools for terminal applications
 * [Harmonica][harmonica]: A spring animation library for smooth, natural motion
-* [BubbleZone][bubblezone]: Easy mouse event tracking for Bubble Tea components
+* [BubbleZone][bubblezone]: Easy mouse event tracking for Tea components
 * [Termenv][termenv]: Advanced ANSI styling for terminal applications
 * [Reflow][reflow]: Advanced ANSI-aware methods for working with text
 
 [bubbles]: https://github.com/rprtr258/tea/bubbles
-[lipgloss]: https://github.com/rprtr258/tea/lipgloss
+[styles]: https://github.com/rprtr258/tea/styles
 [harmonica]: https://github.com/charmbracelet/harmonica
 [bubblezone]: https://github.com/lrstanley/bubblezone
 [termenv]: https://github.com/rprtr258/scuf ???
 [reflow]: https://github.com/muesli/reflow
 
-## Bubble Tea in the Wild
+## Tea in the Wild
 
-For some Bubble Tea programs in production, see:
+For some Tea programs in production, see:
 
 * [AT CLI](https://github.com/daskycodes/at_cli): execute AT Commands via serial port connections
 * [Aztify](https://github.com/Azure/aztfy): bring Microsoft Azure resources under Terraform
@@ -374,7 +374,7 @@ We'd love to hear your thoughts on this project. Feel free to drop us a note!
 
 ## Acknowledgments
 
-Bubble Tea is based on the paradigms of [The Elm Architecture][elm] by Evan
+Tea is based on the paradigms of [The Elm Architecture][elm] by Evan
 Czaplicki et alia and the excellent [go-tea][gotea] by TJ Holowaychuk. It’s
 inspired by the many great [_Zeichenorientierte Benutzerschnittstellen_][zb]
 of days past.

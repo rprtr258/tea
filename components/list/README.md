@@ -26,7 +26,7 @@ type DefaultItem interface {
 ```
 
 You can see a working example in our [Kancli][kancli] project built
-explicitly for a tutorial on lists and composite views in Bubble Tea. 
+explicitly for a tutorial on lists and composite views in Tea. 
 
 [VIDEO](https://youtu.be/ZA93qgdLUzM)
 
@@ -46,7 +46,7 @@ import "github.com/rprtr258/tea/bubbles/list"
 d := list.NewDefaultDelegate()
 
 // Change colors
-c := lipgloss.Color("#6f03fc")
+c := styles.Color("#6f03fc")
 d.Styles.SelectedTitle = d.Styles.SelectedTitle.Foreground(c).BorderLeftForeground(c)
 d.Styles.SelectedDesc = d.Styles.SelectedTitle.Copy() // reuse the title style here
 

@@ -87,7 +87,7 @@ const (
 	withoutSignalHandler
 
 	// Catching panics is incredibly useful for restoring the terminal to a
-	// usable state after a panic occurs. When this is set, Bubble Tea will
+	// usable state after a panic occurs. When this is set, Tea will
 	// recover from panics, print the stack trace, and disable raw mode. This
 	// feature is on by default.
 	withoutCatchPanics
@@ -173,7 +173,7 @@ type Program[M Model] struct {
 // Quit.
 type MsgQuit struct{}
 
-// Quit is a special command that tells the Bubble Tea program to exit.
+// Quit is a special command that tells the Tea program to exit.
 func Quit() Msg {
 	return MsgQuit{}
 }
@@ -235,6 +235,29 @@ func (p *Program[M]) handleSignals() chan struct{} {
 	return ch
 }
 
+// listenForResize sends messages (or errors) when the terminal resizes.
+// Argument output should be the file descriptor for the terminal; usually
+// os.Stdout.
+func (p *Program[M]) listenForResize(done chan struct{}) {
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGWINCH)
+
+	defer func() {
+		signal.Stop(sig)
+		close(done)
+	}()
+
+	for {
+		select {
+		case <-p.ctx.Done():
+			return
+		case <-sig:
+		}
+
+		p.checkResize()
+	}
+}
+
 // handleResize handles terminal resize events.
 func (p *Program[M]) handleResize() chan struct{} {
 	ch := make(chan struct{})
@@ -285,7 +308,7 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 }
 
 // eventLoop is the central message loop. It receives and handles the default
-// Bubble Tea messages, update the model and triggers redraws.
+// Tea messages, update the model and triggers redraws.
 func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 	for {
 		select {
@@ -446,7 +469,7 @@ func (p *Program[M]) Run() (M, error) {
 	model := p.initialModel
 	var initCmds []Cmd
 	model.Init(func(cmds ...Cmd) {
-		initCmds = cmds
+		initCmds = append(initCmds, cmds...)
 	})
 	if len(initCmds) > 0 {
 		ch := make(chan struct{})
@@ -532,10 +555,10 @@ func (p *Program[M]) Send(msg Msg) {
 	}
 }
 
-// Quit is a convenience function for quitting Bubble Tea programs. Use it
-// when you need to shut down a Bubble Tea program from the outside.
+// Quit is a convenience function for quitting Tea programs. Use it
+// when you need to shut down a Tea program from the outside.
 //
-// If you wish to quit from within a Bubble Tea program use the Quit command.
+// If you wish to quit from within a Tea program use the Quit command.
 //
 // If the program is not running this will be a no-op, so it's safe to call
 // if the program is unstarted or has already exited.

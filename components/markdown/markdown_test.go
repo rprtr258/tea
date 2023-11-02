@@ -21,8 +21,7 @@ func TestTermRendererWriter(t *testing.T) {
 	)
 	assert.NoError(t, err)
 
-	in, err := os.ReadFile(markdown)
-	assert.NoError(t, err)
+	in := assert.UseFileContent(t, markdown)
 
 	_, err = r.Write(in)
 	assert.NoError(t, err)
@@ -39,8 +38,7 @@ func TestTermRendererWriter(t *testing.T) {
 	}
 
 	// verify
-	td, err := os.ReadFile(testFile)
-	assert.NoError(t, err)
+	td := assert.UseFileContent(t, testFile)
 
 	assert.Equal(t, td, b)
 }
@@ -49,15 +47,13 @@ func TestTermRenderer(t *testing.T) {
 	r, err := NewTermRenderer(WithStandardStyle("dark"))
 	assert.NoError(t, err)
 
-	in, err := os.ReadFile(markdown)
-	assert.NoError(t, err)
+	in := assert.UseFileContent(t, markdown)
 
 	b, err := r.Render(string(in))
 	assert.NoError(t, err)
 
 	// verify
-	td, err := os.ReadFile(testFile)
-	assert.NoError(t, err)
+	td := assert.UseFileContent(t, testFile)
 
 	assert.Equal(t, string(td), b)
 }
@@ -83,15 +79,13 @@ func TestWithPreservedNewLines(t *testing.T) {
 	)
 	assert.NoError(t, err)
 
-	in, err := os.ReadFile("testdata/preserved_newline.in")
-	assert.NoError(t, err)
+	in := assert.UseFileContent(t, "testdata/preserved_newline.in")
 
 	b, err := r.Render(string(in))
 	assert.NoError(t, err)
 
 	// verify
-	td, err := os.ReadFile("testdata/preserved_newline.test")
-	assert.NoError(t, err)
+	td := assert.UseFileContent(t, "testdata/preserved_newline.test")
 
 	assert.Equal(t, string(td), b)
 }
@@ -108,15 +102,13 @@ func TestStyles(t *testing.T) {
 }
 
 func TestRenderHelpers(t *testing.T) {
-	in, err := os.ReadFile(markdown)
-	assert.NoError(t, err)
+	in := assert.UseFileContent(t, markdown)
 
 	b, err := Render(string(in), "dark")
 	assert.NoError(t, err)
 
 	// verify
-	td, err := os.ReadFile(testFile)
-	assert.NoError(t, err)
+	td := assert.UseFileContent(t, testFile)
 
 	assert.Equal(t, string(td), b)
 }
@@ -135,8 +127,7 @@ func TestCapitalization(t *testing.T) {
 	assert.NoError(t, err)
 
 	// expected outcome
-	td, err := os.ReadFile("testdata/capitalization.test")
-	assert.NoError(t, err)
+	td := assert.UseFileContent(t, "testdata/capitalization.test")
 
 	assert.Equal(t, string(td), b)
 }

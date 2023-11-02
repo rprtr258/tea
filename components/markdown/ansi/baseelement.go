@@ -49,7 +49,7 @@ func renderText(w io.Writer, rules StylePrimitive, s string) {
 
 	out := []scuf.Modifier{}
 	if rules.ForegroundColor != nil {
-		out = append(out, scuf.BgRGB(scuf.MustParseHexRGB(*rules.ForegroundColor)))
+		out = append(out, scuf.FgRGB(scuf.MustParseHexRGB(*rules.ForegroundColor)))
 	}
 	if rules.BackgroundColor != nil {
 		out = append(out, scuf.BgRGB(scuf.MustParseHexRGB(*rules.BackgroundColor)))

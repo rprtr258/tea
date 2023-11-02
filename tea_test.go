@@ -30,7 +30,7 @@ func (m *testModel) Update(msg Msg, f func(...Cmd)) {
 
 func (m *testModel) View(vb Viewbox) {
 	m.viewCalled.Store(true)
-	vb.WriteLine(0, 0, "success")
+	vb.WriteLine("success")
 }
 
 func TestTeaModel(t *testing.T) {

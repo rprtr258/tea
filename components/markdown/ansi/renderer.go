@@ -36,54 +36,48 @@ func NewRenderer(options Options) *Renderer {
 
 // RegisterFuncs implements NodeRenderer.RegisterFuncs.
 func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
-	// blocks
-	reg.Register(ast.KindDocument, r.renderNode)
-	reg.Register(ast.KindHeading, r.renderNode)
-	reg.Register(ast.KindBlockquote, r.renderNode)
-	reg.Register(ast.KindCodeBlock, r.renderNode)
-	reg.Register(ast.KindFencedCodeBlock, r.renderNode)
-	reg.Register(ast.KindHTMLBlock, r.renderNode)
-	reg.Register(ast.KindList, r.renderNode)
-	reg.Register(ast.KindListItem, r.renderNode)
-	reg.Register(ast.KindParagraph, r.renderNode)
-	reg.Register(ast.KindTextBlock, r.renderNode)
-	reg.Register(ast.KindThematicBreak, r.renderNode)
-
-	// inlines
-	reg.Register(ast.KindAutoLink, r.renderNode)
-	reg.Register(ast.KindCodeSpan, r.renderNode)
-	reg.Register(ast.KindEmphasis, r.renderNode)
-	reg.Register(ast.KindImage, r.renderNode)
-	reg.Register(ast.KindLink, r.renderNode)
-	reg.Register(ast.KindRawHTML, r.renderNode)
-	reg.Register(ast.KindText, r.renderNode)
-	reg.Register(ast.KindString, r.renderNode)
-
-	// tables
-	reg.Register(astext.KindTable, r.renderNode)
-	reg.Register(astext.KindTableHeader, r.renderNode)
-	reg.Register(astext.KindTableRow, r.renderNode)
-	reg.Register(astext.KindTableCell, r.renderNode)
-
-	// definitions
-	reg.Register(astext.KindDefinitionList, r.renderNode)
-	reg.Register(astext.KindDefinitionTerm, r.renderNode)
-	reg.Register(astext.KindDefinitionDescription, r.renderNode)
-
-	// footnotes
-	reg.Register(astext.KindFootnote, r.renderNode)
-	reg.Register(astext.KindFootnoteList, r.renderNode)
-	reg.Register(astext.KindFootnoteLink, r.renderNode)
-	reg.Register(astext.KindFootnoteBacklink, r.renderNode)
-
-	// checkboxes
-	reg.Register(astext.KindTaskCheckBox, r.renderNode)
-
-	// strikethrough
-	reg.Register(astext.KindStrikethrough, r.renderNode)
-
-	// emoji
-	reg.Register(east.KindEmoji, r.renderNode)
+	for _, nodeKind := range []ast.NodeKind{
+		astext.KindTaskCheckBox,  // checkboxes
+		astext.KindStrikethrough, // strikethrough
+		east.KindEmoji,           // emoji
+		// blocks
+		ast.KindDocument,
+		ast.KindHeading,
+		ast.KindBlockquote,
+		ast.KindCodeBlock,
+		ast.KindFencedCodeBlock,
+		ast.KindHTMLBlock,
+		ast.KindList,
+		ast.KindListItem,
+		ast.KindParagraph,
+		ast.KindTextBlock,
+		ast.KindThematicBreak,
+		// inlines
+		ast.KindAutoLink,
+		ast.KindCodeSpan,
+		ast.KindEmphasis,
+		ast.KindImage,
+		ast.KindLink,
+		ast.KindRawHTML,
+		ast.KindText,
+		ast.KindString,
+		// tables
+		astext.KindTable,
+		astext.KindTableHeader,
+		astext.KindTableRow,
+		astext.KindTableCell,
+		// definitions
+		astext.KindDefinitionList,
+		astext.KindDefinitionTerm,
+		astext.KindDefinitionDescription,
+		// footnotes
+		astext.KindFootnote,
+		astext.KindFootnoteList,
+		astext.KindFootnoteLink,
+		astext.KindFootnoteBacklink,
+	} {
+		reg.Register(nodeKind, r.renderNode)
+	}
 }
 
 func (r *Renderer) renderNode(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {

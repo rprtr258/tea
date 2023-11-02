@@ -2,7 +2,6 @@ package tea
 
 import (
 	"log"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -19,8 +18,7 @@ func TestLogToFile(t *testing.T) {
 	log.Println("some test log")
 	assert.NoError(t, f.Close())
 
-	out, err := os.ReadFile(path)
-	assert.NoError(t, err)
+	out := assert.UseFileContent(t, path)
 
 	assert.Equal(t, prefix+" some test log\n", string(out))
 }

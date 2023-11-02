@@ -1,8 +1,6 @@
 package ansi
 
-import (
-	"io"
-)
+import "io"
 
 // An ImageElement is used to render images elements.
 type ImageElement struct {
@@ -18,19 +16,20 @@ func (e *ImageElement) Render(w io.Writer, ctx RenderContext) error {
 			Token: e.Text,
 			Style: ctx.options.Styles.ImageText,
 		}
-		err := el.Render(w, ctx)
-		if err != nil {
+
+		if err := el.Render(w, ctx); err != nil {
 			return err
 		}
 	}
+
 	if len(e.URL) > 0 {
 		el := &BaseElement{
 			Token:  resolveRelativeURL(e.BaseURL, e.URL),
 			Prefix: " ",
 			Style:  ctx.options.Styles.Image,
 		}
-		err := el.Render(w, ctx)
-		if err != nil {
+
+		if err := el.Render(w, ctx); err != nil {
 			return err
 		}
 	}

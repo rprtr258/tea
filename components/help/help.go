@@ -8,7 +8,7 @@ import (
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/key"
-	"github.com/rprtr258/tea/lipgloss"
+	"github.com/rprtr258/tea/styles"
 )
 
 // KeyMap is a map of keybindings used to generate help. Since it's an
@@ -31,16 +31,16 @@ type KeyMap interface {
 
 // Styles is a set of available style definitions for the Help bubble.
 type Styles struct {
-	Ellipsis lipgloss.Style
+	Ellipsis styles.Style
 
 	// Styling for the short help
-	ShortKey       lipgloss.Style
-	ShortDesc      lipgloss.Style
-	ShortSeparator lipgloss.Style
+	ShortKey       styles.Style
+	ShortDesc      styles.Style
+	ShortSeparator styles.Style
 
 	// Styling for the full help
-	FullKey  lipgloss.Style
-	FullDesc lipgloss.Style
+	FullKey  styles.Style
+	FullDesc styles.Style
 }
 
 // Model contains the state of the help view.
@@ -59,21 +59,9 @@ type Model struct {
 
 // New creates a new help view with some useful defaults.
 func New() Model {
-	keyStyle := lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{
-		Light: lipgloss.FgColor("#909090"),
-		Dark:  lipgloss.FgColor("#626262"),
-	})
-
-	descStyle := lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{
-		Light: lipgloss.FgColor("#B2B2B2"),
-		Dark:  lipgloss.FgColor("#4A4A4A"),
-	})
-
-	sepStyle := lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{
-		Light: lipgloss.FgColor("#DDDADA"),
-		Dark:  lipgloss.FgColor("#3C3C3C"),
-	})
-
+	keyStyle := styles.Style{}.Foreground(styles.FgAdaptiveColor("#909090", "#626262"))
+	descStyle := styles.Style{}.Foreground(styles.FgAdaptiveColor("#B2B2B2", "#4A4A4A"))
+	sepStyle := styles.Style{}.Foreground(styles.FgAdaptiveColor("#DDDADA", "#3C3C3C"))
 	return Model{
 		ShortSeparator: " • ",
 		Ellipsis:       "…",
@@ -88,7 +76,7 @@ func New() Model {
 	}
 }
 
-// Update helps satisfy the Bubble Tea Model interface. It's a no-op.
+// Update helps satisfy the Tea Model interface. It's a no-op.
 func (m *Model) Update(_ tea.Msg) []tea.Cmd {
 	return nil
 }
@@ -110,19 +98,18 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 		return
 	}
 
-	x := 0
-	for _, kb := range bindings {
+	for i, kb := range bindings {
 		if !kb.Enabled() {
 			continue
 		}
 
-		if x > 0 {
-			x = vb.Styled(m.Styles.ShortSeparator).WriteLine(0, x, m.ShortSeparator)
+		if i > 0 {
+			vb = vb.Styled(m.Styles.ShortSeparator).WriteLine(m.ShortSeparator)
 		}
 
-		x = vb.Styled(m.Styles.ShortKey).WriteLine(0, x, kb.Help().Key)
-		x++
-		x = vb.Styled(m.Styles.ShortDesc).WriteLine(0, x, kb.Help().Desc)
+		vb = vb.Styled(m.Styles.ShortKey).WriteLine(kb.Help().Key)
+		vb = vb.PaddingLeft(1)
+		vb = vb.Styled(m.Styles.ShortDesc).WriteLine(kb.Help().Desc)
 	}
 }
 
@@ -160,8 +147,8 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 		vbKeys := vb.MaxWidth(maxKeyLength).Styled(m.Styles.FullKey)
 		vbDescs := vb.PaddingLeft(maxKeyLength + 1).MaxWidth(maxDescLength).Styled(m.Styles.FullDesc)
 		for i, key := range keys {
-			vbKeys.WriteLine(i, 0, key)
-			vbDescs.WriteLine(i, 0, descriptions[i])
+			vbKeys.PaddingTop(i).WriteLine(key)
+			vbDescs.PaddingTop(i).WriteLine(descriptions[i])
 		}
 
 		vb = vb.PaddingLeft(maxKeyLength + 1 + maxDescLength + 3)

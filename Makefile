@@ -14,16 +14,16 @@ fmt:
 
 .PHONY: run-examples
 run-examples:
-	@go run examples/main.go
+	@go run cmd/main.go
 
 .PHONY: run-tutorials
 run-tutorials:
-	@go run examples/main.go tutorials
+	@go run cmd/main.go tutorials
 
-.PHONY: run-lipgloss
-run-lipgloss:
-	@go run examples/main.go lipgloss
+.PHONY: run-styles
+run-styles:
+	@go run cmd/main.go styles
 
 .PHONY: run-markdown
 run-markdown:
-	@go run examples/main.go markdown
+	@go run cmd/main.go markdown

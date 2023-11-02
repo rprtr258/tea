@@ -1,5 +1,5 @@
 // Package key provides some types and functions for generating user-definable
-// keymappings useful in Bubble Tea components. There are a few different ways
+// keymappings useful in Tea components. There are a few different ways
 // you can define a keymapping with this package. Here's one example:
 //
 //	type KeyMap struct {
@@ -129,11 +129,11 @@ type Help struct {
 }
 
 // Matches checks if the given MsgKey matches the given bindings.
-func Matches(k tea.MsgKey, b ...Binding) bool {
-	keys := k.String()
-	for _, binding := range b {
-		for _, v := range binding.keys {
-			if keys == v && binding.Enabled() {
+func Matches(key tea.MsgKey, bindings ...Binding) bool {
+	keys := key.String()
+	for _, binding := range bindings {
+		for _, bindingKey := range binding.keys {
+			if keys == bindingKey && binding.Enabled() {
 				return true
 			}
 		}

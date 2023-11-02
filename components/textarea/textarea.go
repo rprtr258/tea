@@ -10,11 +10,12 @@ import (
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/components/box"
 	"github.com/rprtr258/tea/components/cursor"
 	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/components/runeutil"
 	"github.com/rprtr258/tea/components/viewport"
-	"github.com/rprtr258/tea/lipgloss"
+	"github.com/rprtr258/tea/styles"
 )
 
 const (
@@ -92,24 +93,24 @@ var DefaultKeyMap = KeyMap{
 
 var (
 	_styleFocusedDefault = Style{
-		Base:             lipgloss.NewStyle(),
-		CursorLine:       lipgloss.NewStyle().Background(lipgloss.AdaptiveColor{Light: lipgloss.BgColor("255"), Dark: lipgloss.BgColor("0")}),
-		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("240"), Dark: lipgloss.FgColor("7")}),
-		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("254"), Dark: lipgloss.FgColor("0")}),
-		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("249"), Dark: lipgloss.FgColor("7")}),
-		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
-		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.FgColor("7")),
-		Text:             lipgloss.NewStyle(),
+		Base:             styles.Style{},
+		CursorLine:       styles.Style{}.Background(styles.BgAdaptiveColor("255", "0")),
+		CursorLineNumber: styles.Style{}.Foreground(styles.FgAdaptiveColor("240", "")),
+		EndOfBuffer:      styles.Style{}.Foreground(styles.FgAdaptiveColor("254", "0")),
+		LineNumber:       styles.Style{}.Foreground(styles.FgAdaptiveColor("249", "7")),
+		Placeholder:      styles.Style{}.Foreground(styles.FgColor("240")),
+		Prompt:           styles.Style{}.Foreground(styles.FgColor("7")),
+		Text:             styles.Style{},
 	}
 	_styleBlurredDefault = Style{
-		Base:             lipgloss.NewStyle(),
-		CursorLine:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("245"), Dark: lipgloss.FgColor("7")}),
-		CursorLineNumber: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("249"), Dark: lipgloss.FgColor("7")}),
-		EndOfBuffer:      lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("254"), Dark: lipgloss.FgColor("0")}),
-		LineNumber:       lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("249"), Dark: lipgloss.FgColor("7")}),
-		Placeholder:      lipgloss.NewStyle().Foreground(lipgloss.FgColor("240")),
-		Prompt:           lipgloss.NewStyle().Foreground(lipgloss.FgColor("7")),
-		Text:             lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgColor("245"), Dark: lipgloss.FgColor("7")}),
+		Base:             styles.Style{},
+		CursorLine:       styles.Style{}.Foreground(styles.FgAdaptiveColor("245", "7")),
+		CursorLineNumber: styles.Style{}.Foreground(styles.FgAdaptiveColor("249", "7")),
+		EndOfBuffer:      styles.Style{}.Foreground(styles.FgAdaptiveColor("254", "0")),
+		LineNumber:       styles.Style{}.Foreground(styles.FgAdaptiveColor("249", "7")),
+		Placeholder:      styles.Style{}.Foreground(styles.FgColor("240")),
+		Prompt:           styles.Style{}.Foreground(styles.FgColor("7")),
+		Text:             styles.Style{}.Foreground(styles.FgAdaptiveColor("245", "7")),
 	}
 )
 
@@ -144,19 +145,19 @@ type LineInfo struct {
 // depending on the focus state.
 //
 // For an introduction to styling with Lip Gloss see:
-// https://github.com/rprtr258/tea/lipgloss
+// https://github.com/rprtr258/tea/styles
 type Style struct {
-	Base             lipgloss.Style
-	CursorLine       lipgloss.Style
-	CursorLineNumber lipgloss.Style
-	EndOfBuffer      lipgloss.Style
-	LineNumber       lipgloss.Style
-	Placeholder      lipgloss.Style
-	Prompt           lipgloss.Style
-	Text             lipgloss.Style
+	Base             styles.Style
+	CursorLine       styles.Style
+	CursorLineNumber styles.Style
+	EndOfBuffer      styles.Style
+	LineNumber       styles.Style
+	Placeholder      styles.Style
+	Prompt           styles.Style
+	Text             styles.Style
 }
 
-// Model is the Bubble Tea model for this text area element.
+// Model is the Tea model for this text area element.
 type Model struct {
 	Err error
 
@@ -245,8 +246,7 @@ type Model struct {
 	// lineNumberFormat is the format string used to display line numbers.
 	lineNumberFormat string
 
-	// viewport is the vertically-scrollable viewport of the multi-line text
-	// input.
+	// viewport is the vertically-scrollable viewport of the multi-line text input.
 	viewport *viewport.Model
 
 	// rune sanitizer for input.
@@ -263,7 +263,7 @@ func New() Model {
 		CharLimit:            _defaultCharLimit,
 		MaxHeight:            _defaultMaxHeight,
 		MaxWidth:             _defaultMaxWidth,
-		Prompt:               lipgloss.ThickBorder.Left + " ",
+		Prompt:               string([]rune{box.ThickBorder.Left}) + " ",
 		style:                &_styleBlurredDefault,
 		FocusedStyle:         _styleFocusedDefault,
 		BlurredStyle:         _styleBlurredDefault,
@@ -279,6 +279,10 @@ func New() Model {
 		lineNumberFormat: "%2v ",
 
 		viewport: &vp,
+
+		// Textinput has all its input on a single line so collapse
+		// newlines/tabs to single spaces.
+		rsan: runeutil.NewSanitizer(),
 	}
 
 	m.SetHeight(defaultHeight)
@@ -551,11 +555,6 @@ func (m *Model) Reset() {
 
 // san initializes or retrieves the rune sanitizer.
 func (m *Model) san() runeutil.Sanitizer {
-	if m.rsan == nil {
-		// Textinput has all its input on a single line so collapse
-		// newlines/tabs to single spaces.
-		m.rsan = runeutil.NewSanitizer()
-	}
 	return m.rsan
 }
 
@@ -894,11 +893,11 @@ func (m *Model) SetHeight(h int) {
 	}
 }
 
-// Update is the Bubble Tea update loop.
-func (m *Model) Update(msg tea.Msg) []tea.Cmd {
+// Update is the Tea update loop.
+func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	if !m.focus {
 		m.Cursor.Blur()
-		return nil
+		return
 	}
 
 	// Used to determine if the cursor should blink.
@@ -960,7 +959,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			m.deleteWordRight()
 		case key.Matches(msg, m.KeyMap.InsertNewline):
 			if m.MaxHeight > 0 && len(m.value) >= m.MaxHeight {
-				return nil
+				return
 			}
 			m.col = clamp(m.col, 0, len(m.value[m.row]))
 			m.splitLine(m.row, m.col)
@@ -975,7 +974,8 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 		case key.Matches(msg, m.KeyMap.WordForward):
 			m.wordRight()
 		case key.Matches(msg, m.KeyMap.Paste):
-			return []tea.Cmd{Paste}
+			f(Paste)
+			return
 		case key.Matches(msg, m.KeyMap.CharacterBackward):
 			m.characterLeft(false /* insideLine */)
 		case key.Matches(msg, m.KeyMap.LinePrevious):
@@ -1006,19 +1006,18 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 		m.Err = msg
 	}
 
-	cmds := m.viewport.Update(msg)
+	f(m.viewport.Update(msg)...)
 
 	newRow, newCol := m.cursorLineNumber(), m.col
-	cmd := m.Cursor.Update(msg)
+	m.Cursor.Update(msg, f)
 	if (newRow != oldRow || newCol != oldCol) && m.Cursor.Mode() == cursor.CursorBlink {
 		m.Cursor.Blink = false
-		cmd = m.Cursor.CmdBlink()
+		f(m.Cursor.CmdBlink()...)
 	}
-	cmds = append(cmds, cmd...)
 
 	m.repositionView()
 
-	return cmds
+	return
 }
 
 // View renders the text area in its current state.
@@ -1028,12 +1027,12 @@ func (m *Model) View(vb tea.Viewbox) {
 		return
 	}
 
+	vb = vb.Styled(m.style.Base)
+
 	m.Cursor.TextStyle = m.style.CursorLine
 
 	lineInfo := m.LineInfo()
 
-	var newLines int
-	var s strings.Builder
 	displayLine := 0
 	for l, line := range m.value {
 		wrappedLines := wrap(line, m.width)
@@ -1044,21 +1043,25 @@ func (m *Model) View(vb tea.Viewbox) {
 			m.style.Text,
 		)
 
-		for wl, wrappedLine := range wrappedLines {
-			prompt := m.getPromptString(displayLine)
-			prompt = m.style.Prompt.Render(prompt)
-			s.WriteString(style.Render(prompt))
+		for y, wrappedLine := range wrappedLines {
+			vb = vb.
+				PaddingTop(1).
+				Styled(style).
+				Styled(m.style.Prompt).
+				WriteLine(m.getPromptString(displayLine))
 			displayLine++
 
 			if m.ShowLineNumbers {
-				if wl == 0 {
-					s.WriteString(style.Render(fun.IF(
-						m.row == l,
-						m.style.CursorLineNumber.Render(fmt.Sprintf(m.lineNumberFormat, l+1)),
-						m.style.LineNumber.Render(fmt.Sprintf(m.lineNumberFormat, l+1)),
-					)))
+				if y == 0 {
+					vb = vb.
+						Styled(style).
+						Styled(fun.IF(m.row == l, m.style.CursorLineNumber, m.style.LineNumber)).
+						WriteLine(fmt.Sprintf(m.lineNumberFormat, l+1))
 				} else {
-					s.WriteString(m.style.LineNumber.Render(style.Render("   ")))
+					vb = vb.
+						Styled(style).
+						Styled(m.style.LineNumber).
+						WriteLine("   ")
 				}
 			}
 
@@ -1075,42 +1078,50 @@ func (m *Model) View(vb tea.Viewbox) {
 				wrappedLine = []rune(strings.TrimSuffix(string(wrappedLine), " "))
 				padding -= m.width - strwidth
 			}
-			if m.row == l && lineInfo.RowOffset == wl {
-				s.WriteString(style.Render(string(wrappedLine[:lineInfo.ColumnOffset])))
+			if m.row == l && lineInfo.RowOffset == y {
+				vb = vb.
+					Styled(style).
+					WriteLine(string(wrappedLine[:lineInfo.ColumnOffset]))
 				if m.col >= len(line) && lineInfo.CharOffset >= m.width {
 					m.Cursor.SetChar(" ")
-					s.WriteString(m.Cursor.View())
+					st, cursor := m.Cursor.View()
+					vb = vb.Styled(st).WriteLine(cursor)
 				} else {
 					m.Cursor.SetChar(string(wrappedLine[lineInfo.ColumnOffset]))
-					s.WriteString(style.Render(m.Cursor.View()))
-					s.WriteString(style.Render(string(wrappedLine[lineInfo.ColumnOffset+1:])))
+					st, cursor := m.Cursor.View()
+					vb = vb.
+						Styled(style).
+						Styled(st).
+						WriteLine(cursor)
+					vb = vb.
+						Styled(style).
+						WriteLine(string(wrappedLine[lineInfo.ColumnOffset+1:]))
 				}
 			} else {
-				s.WriteString(style.Render(string(wrappedLine)))
+				vb = vb.Styled(style).WriteLine(string(wrappedLine))
 			}
-			s.WriteString(style.Render(strings.Repeat(" ", max(0, padding))))
-			s.WriteRune('\n')
-			newLines++
+			vb = vb.Styled(style).WriteLine(strings.Repeat(" ", max(0, padding)))
 		}
 	}
 
 	// Always show at least `m.Height` lines at all times.
 	// To do this we can simply pad out a few extra new lines in the view.
-	for i := 0; i < m.height; i++ {
-		prompt := m.getPromptString(displayLine)
-		prompt = m.style.Prompt.Render(prompt)
-		s.WriteString(prompt)
+	for y := 0; y < m.height; y++ {
+		vb = vb.
+			PaddingTop(1).
+			Styled(m.style.Prompt).
+			WriteLine(m.getPromptString(displayLine))
 		displayLine++
 
 		if m.ShowLineNumbers {
-			lineNumber := m.style.EndOfBuffer.Render((fmt.Sprintf(m.lineNumberFormat, string(m.EndOfBufferCharacter))))
-			s.WriteString(lineNumber)
+			vb.
+				Styled(m.style.EndOfBuffer).
+				WriteLine(fmt.Sprintf(m.lineNumberFormat, string(m.EndOfBufferCharacter)))
 		}
-		s.WriteRune('\n')
 	}
 
-	m.viewport.SetContent(s.String())
-	m.viewport.View(vb.Styled(m.style.Base))
+	// m.viewport.SetContent(s.String())
+	// m.viewport.View(vb.Styled(m.style.Base))
 }
 
 func (m *Model) getPromptString(displayLine int) string {
@@ -1128,43 +1139,52 @@ func (m *Model) getPromptString(displayLine int) string {
 
 // placeholderView returns the prompt and placeholder view, if any.
 func (m *Model) placeholderView(vb tea.Viewbox) {
-	var (
-		s     strings.Builder
-		p     = rw.Truncate(m.Placeholder, m.width, "...")
-		style = m.style.Placeholder.Inline(true)
-	)
+	vb = vb.Styled(m.style.Base)
 
-	prompt := m.getPromptString(0)
-	prompt = m.style.Prompt.Render(prompt)
-	s.WriteString(m.style.CursorLine.Render(prompt))
+	p := rw.Truncate(m.Placeholder, m.width, "...")
+	style := m.style.Placeholder.Inline(true)
+
+	vb = vb.
+		Styled(m.style.Prompt).
+		Styled(m.style.CursorLine).
+		WriteLine(m.getPromptString(0))
 
 	if m.ShowLineNumbers {
-		s.WriteString(m.style.CursorLine.Render(m.style.CursorLineNumber.Render((fmt.Sprintf(m.lineNumberFormat, 1)))))
+		vb = vb.
+			Styled(m.style.CursorLine).
+			Styled(m.style.CursorLineNumber).
+			WriteLine(fmt.Sprintf(m.lineNumberFormat, 1))
 	}
 
 	m.Cursor.TextStyle = m.style.Placeholder
 	m.Cursor.SetChar(string(p[0]))
-	s.WriteString(m.style.CursorLine.Render(m.Cursor.View()))
+	st, cursor := m.Cursor.View()
+	vb = vb.
+		Styled(m.style.CursorLine).
+		Styled(st).
+		WriteLine(cursor)
 
 	// The rest of the placeholder text
-	s.WriteString(m.style.CursorLine.Render(style.Render(p[1:] + strings.Repeat(" ", max(0, m.width-rw.StringWidth(p))))))
+	vb = vb.
+		Styled(m.style.CursorLine).
+		Styled(style).
+		WriteLine(p[1:] + strings.Repeat(" ", max(0, m.width-rw.StringWidth(p))))
 
 	// The rest of the new lines
-	for i := 1; i < m.height; i++ {
-		s.WriteRune('\n')
-		prompt := m.getPromptString(i)
-		prompt = m.style.Prompt.Render(prompt)
-		s.WriteString(prompt)
+	for y := 1; y < m.height; y++ {
+		vb = vb.
+			Styled(m.style.Prompt).
+			WriteLine(m.getPromptString(y))
 
 		if m.ShowLineNumbers {
-			eob := m.style.EndOfBuffer.Render((fmt.Sprintf(m.lineNumberFormat, string(m.EndOfBufferCharacter))))
-			s.WriteString(eob)
+			vb = vb.
+				Styled(m.style.EndOfBuffer).
+				WriteLine(fmt.Sprintf(m.lineNumberFormat, string(m.EndOfBufferCharacter)))
 		}
 	}
 
-	m.viewport.SetContent(s.String())
-
-	m.viewport.View(vb.Styled(m.style.Base))
+	// m.viewport.SetContent(s.String())
+	// m.viewport.View(vb.Styled(m.style.Base))
 }
 
 // Blink returns the blink command for the cursor.

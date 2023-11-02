@@ -7,11 +7,46 @@ import (
 	"os"
 	"time"
 
+	"github.com/containerd/console"
 	isatty "github.com/mattn/go-isatty"
 	localereader "github.com/mattn/go-localereader"
 	"github.com/muesli/cancelreader"
 	"golang.org/x/term"
 )
+
+func (p *Program[M]) initInput() error {
+	// If input's a file, use console to manage it
+	if f, ok := p.input.(*os.File); ok {
+		c, err := console.ConsoleFromFile(f)
+		if err != nil {
+			return nil //nolint:nilerr // ignore error, this was just a test
+		}
+		p.console = c
+	}
+
+	return nil
+}
+
+// On unix systems, RestoreInput closes any TTYs we opened for input. Note that
+// we don't do this on Windows as it causes the prompt to not be drawn until
+// the terminal receives a keypress rather than appearing promptly after the
+// program exits.
+func (p *Program[M]) restoreInput() error {
+	if p.console != nil {
+		if err := p.console.Reset(); err != nil {
+			return fmt.Errorf("error restoring console: %w", err)
+		}
+	}
+	return nil
+}
+
+func openInputTTY() (*os.File, error) {
+	f, err := os.Open("/dev/tty")
+	if err != nil {
+		return nil, fmt.Errorf("could not open a new TTY: %w", err)
+	}
+	return f, nil
+}
 
 func (p *Program[M]) initTerminal() error {
 	err := p.initInput()
@@ -31,7 +66,7 @@ func (p *Program[M]) initTerminal() error {
 }
 
 // restoreTerminalState restores the terminal to the state prior to running the
-// Bubble Tea program.
+// Tea program.
 func (p *Program[M]) restoreTerminalState() error {
 	if p.renderer != nil {
 		p.renderer.setCursor(true)

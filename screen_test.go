@@ -20,7 +20,7 @@ func (m *initCmdModel) Update(msg Msg, f func(...Cmd)) {
 }
 
 func (m *initCmdModel) View(vb Viewbox) {
-	vb.WriteLine(0, 0, "success")
+	vb.WriteLine("success")
 }
 
 //nolint:lll // uuh

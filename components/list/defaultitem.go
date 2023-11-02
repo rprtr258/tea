@@ -7,49 +7,44 @@ import (
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/components/box"
 	"github.com/rprtr258/tea/components/key"
-	"github.com/rprtr258/tea/lipgloss"
+	"github.com/rprtr258/tea/styles"
 )
 
 // DefaultItemStyles defines styling for a default list item.
 // See DefaultItemView for when these come into play.
 type DefaultItemStyles struct {
 	// The Normal state.
-	NormalTitle lipgloss.Style
-	NormalDesc  lipgloss.Style
+	NormalTitle styles.Style
+	NormalDesc  styles.Style
 
 	// The selected item state.
-	SelectedTitle lipgloss.Style
-	SelectedDesc  lipgloss.Style
+	SelectedTitle styles.Style
+	SelectedDesc  styles.Style
 
 	// The dimmed state, for when the filter input is initially activated.
-	DimmedTitle lipgloss.Style
-	DimmedDesc  lipgloss.Style
+	DimmedTitle styles.Style
+	DimmedDesc  styles.Style
 
 	// Characters matching the current filter, if any.
-	FilterMatch lipgloss.Style
+	FilterMatch styles.Style
 }
 
 // NewDefaultItemStyles returns style definitions for a default item. See
 // DefaultItemView for when these come into play.
 func NewDefaultItemStyles() DefaultItemStyles {
 	s := DefaultItemStyles{
-		NormalTitle: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#1a1a1a"), Dark: lipgloss.FgRGB("#dddddd")}),
-		SelectedTitle: lipgloss.NewStyle().
-			BorderForeground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#F793FF"), Dark: lipgloss.FgRGB("#AD58B4")}).
-			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#EE6FF8"), Dark: lipgloss.FgRGB("#EE6FF8")}),
-		DimmedTitle: lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#A49FA5"), Dark: lipgloss.FgRGB("#777777")}),
-		FilterMatch: lipgloss.NewStyle().
-			Underline(true),
+		NormalTitle: styles.Style{}.Foreground(styles.FgAdaptiveColor("#1a1a1a", "#dddddd")),
+		SelectedTitle: styles.Style{}.
+			// BorderForeground(styles.FgAdaptiveColor("#F793FF", "#AD58B4")).
+			Foreground(styles.FgAdaptiveColor("#EE6FF8", "#EE6FF8")),
+		DimmedTitle: styles.Style{}.Foreground(styles.FgAdaptiveColor("#A49FA5", "#777777")),
+		FilterMatch: styles.Style{}.Underline(),
 	}
-	s.NormalDesc = s.NormalTitle.Copy().
-		Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#A49FA5"), Dark: lipgloss.FgRGB("#777777")})
-	s.SelectedDesc = s.SelectedTitle.Copy().
-		Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#F793FF"), Dark: lipgloss.FgRGB("#AD58B4")})
-	s.DimmedDesc = s.DimmedTitle.Copy().
-		Foreground(lipgloss.AdaptiveColor{Light: lipgloss.FgRGB("#C2B8C2"), Dark: lipgloss.FgRGB("#4D4D4D")})
+	s.NormalDesc = s.NormalTitle.Copy().Foreground(styles.FgAdaptiveColor("#A49FA5", "#777777"))
+	s.SelectedDesc = s.SelectedTitle.Copy().Foreground(styles.FgAdaptiveColor("#F793FF", "#AD58B4"))
+	s.DimmedDesc = s.DimmedTitle.Copy().Foreground(styles.FgAdaptiveColor("#C2B8C2", "#4D4D4D"))
 
 	return s
 }
@@ -162,47 +157,46 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 
 	switch {
 	case emptyFilter:
-		vb = vb.Padding(tea.PaddingOptions{Left: 2})
+		vb = vb.PaddingLeft(2)
 
-		vb.Styled(s.DimmedTitle).WriteLine(0, 0, title)
+		vb.Styled(s.DimmedTitle).WriteLine(title)
 
 		if d.ShowDescription {
-			vb.Styled(s.DimmedDesc).WriteLine(1, 0, desc)
+			vb = vb.PaddingTop(1)
+			vb.Styled(s.DimmedDesc).WriteLine(desc)
 		}
 	case isSelected && m.FilterState() != Filtering:
-		vb = vb.Padding(tea.PaddingOptions{Left: 1})
-
-		vb.Styled(s.SelectedTitle).WriteLine(0, 0, lipgloss.NormalBorder.Left)
-
+		vb.Styled(s.SelectedTitle).Set(0, 0, box.NormalBorder.Left)
 		if isFiltered {
 			// Highlight matches
 			// unmatched := s.SelectedTitle.Inline(true)
 			// matched := unmatched.Copy().Inherit(s.FilterMatch)
-			// title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
-			vb.WriteLine(0, 1, title)
+			// title = styles.StyleRunes(title, matchedRunes, matched, unmatched)
+			vb.PaddingLeft(2).WriteLine(title)
 		} else {
-			vb.Styled(s.SelectedTitle).WriteLine(0, 1, title)
+			vb.PaddingLeft(2).Styled(s.SelectedTitle).WriteLine(title)
 		}
 
 		if d.ShowDescription {
-			vb.Styled(s.SelectedTitle).WriteLine(1, 0, lipgloss.NormalBorder.Left)
-			vb.Styled(s.SelectedDesc).WriteLine(1, 1, desc)
+			vb = vb.PaddingTop(1)
+			vb.Styled(s.SelectedTitle).Set(0, 0, box.NormalBorder.Left)
+			vb.PaddingLeft(2).Styled(s.SelectedDesc).WriteLine(desc)
 		}
 	default:
-		vb = vb.Padding(tea.PaddingOptions{Left: 2})
+		vb = vb.PaddingLeft(2)
 
 		if isFiltered {
 			// Highlight matches
 			// unmatched := s.NormalTitle.Inline(true)
 			// matched := unmatched.Copy().Inherit(s.FilterMatch)
-			// title = lipgloss.StyleRunes(title, matchedRunes, matched, unmatched)
-			vb.WriteLine(0, 0, title)
+			// title = styles.StyleRunes(title, matchedRunes, matched, unmatched)
+			vb.WriteLine(title)
 		} else {
-			vb.Styled(s.NormalTitle).WriteLine(0, 0, title)
+			vb.Styled(s.NormalTitle).WriteLine(title)
 		}
 
 		if d.ShowDescription {
-			vb.Styled(s.NormalDesc).WriteLine(1, 0, desc)
+			vb.PaddingTop(1).Styled(s.NormalDesc).WriteLine(desc)
 		}
 	}
 }

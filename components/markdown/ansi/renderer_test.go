@@ -2,7 +2,6 @@ package ansi
 
 import (
 	"bytes"
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,17 +33,15 @@ func TestRenderer(t *testing.T) {
 		sn := filepath.Join(_examplesDir, bn+".style")
 		tn := filepath.Join("../testdata", bn+".test")
 
-		in, err := os.ReadFile(f)
-		assert.NoError(t, err)
+		in := assert.UseFileContent(t, f)
 
-		b, err := os.ReadFile(sn)
-		assert.NoError(t, err)
+		b := assert.UseFileContent(t, sn)
 
 		options := Options{
 			WordWrap:     80,
 			ColorProfile: termenv.TrueColor,
+			Styles:       assert.UseJSON[StyleConfig](t, b),
 		}
-		assert.NoError(t, json.Unmarshal(b, &options.Styles))
 
 		md := goldmark.New(
 			goldmark.WithExtensions(
@@ -73,8 +70,7 @@ func TestRenderer(t *testing.T) {
 		}
 
 		// verify
-		td, err := os.ReadFile(tn)
-		assert.NoError(t, err)
+		td := assert.UseFileContent(t, tn)
 
 		assert.Equal(t, td, buf.Bytes())
 	}
@@ -89,17 +85,15 @@ func TestRendererIssues(t *testing.T) {
 		t.Run(bn, func(t *testing.T) {
 			tn := filepath.Join(_issuesDir, bn+".test")
 
-			in, err := os.ReadFile(f)
-			assert.NoError(t, err)
+			in := assert.UseFileContent(t, f)
 
-			b, err := os.ReadFile("../styles/dark.json")
-			assert.NoError(t, err)
+			b := assert.UseFileContent(t, "../styles/dark.json")
 
 			options := Options{
 				WordWrap:     80,
 				ColorProfile: termenv.TrueColor,
+				Styles:       assert.UseJSON[StyleConfig](t, b),
 			}
-			assert.NoError(t, json.Unmarshal(b, &options.Styles))
 
 			md := goldmark.New(
 				goldmark.WithExtensions(
@@ -127,10 +121,9 @@ func TestRendererIssues(t *testing.T) {
 			}
 
 			// verify
-			td, err := os.ReadFile(tn)
-			assert.NoError(t, err)
+			actual := assert.UseFileContent(t, tn)
 
-			assert.Equal(t, td, buf.Bytes())
+			assert.Equal(t, string(actual), buf.String())
 		})
 	}
 }

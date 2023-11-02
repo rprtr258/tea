@@ -6,14 +6,16 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unsafe"
 
 	"github.com/charmbracelet/harmonica"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/reflow/ansi"
-
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/scuf"
+
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/lipgloss"
+	"github.com/rprtr258/tea/styles"
 )
 
 // Internal ID management. Used during animating to assure that frame messages
@@ -22,14 +24,6 @@ var (
 	lastID int
 	idMtx  sync.Mutex
 )
-
-// Return the next ID we should use on the model.
-func nextID() int {
-	idMtx.Lock()
-	defer idMtx.Unlock()
-	lastID++
-	return lastID
-}
 
 const (
 	fps              = 60
@@ -115,16 +109,12 @@ func WithSpringOptions(frequency, damping float64) Option {
 
 // MsgFrame indicates that an animation step should occur.
 type MsgFrame struct {
-	id  int
+	id  uintptr
 	tag int
 }
 
 // Model stores values we'll use when rendering the progress bar.
 type Model struct {
-	// An identifier to keep us from receiving messages intended for other
-	// progress bars.
-	id int
-
 	// An identifier to keep us from receiving frame messages too quickly.
 	tag int
 
@@ -142,7 +132,7 @@ type Model struct {
 	// Settings for rendering the numeric percentage.
 	ShowPercentage  bool
 	PercentFormat   string // a fmt string for a float
-	PercentageStyle lipgloss.Style
+	PercentageStyle styles.Style
 
 	// Members for animated transitions.
 	spring           harmonica.Spring
@@ -165,7 +155,6 @@ type Model struct {
 // New returns a model with default values.
 func New(opts ...Option) Model {
 	m := Model{
-		id:             nextID(),
 		Width:          defaultWidth,
 		Full:           '█',
 		FullColor:      "#7571F9",
@@ -196,7 +185,7 @@ func (m *Model) Init() tea.Cmd {
 func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	switch msg := msg.(type) {
 	case MsgFrame:
-		if msg.id != m.id || msg.tag != m.tag {
+		if msg.id != uintptr(unsafe.Pointer(m)) || msg.tag != m.tag {
 			return nil
 		}
 
@@ -257,26 +246,28 @@ func (m *Model) DecrPercent(v float64) tea.Cmd {
 
 // View renders an animated progress bar in its current state. To render
 // a static progress bar based on your own calculations use ViewAs instead.
-func (m *Model) View() string {
-	return m.ViewAs(m.percentShown)
+func (m *Model) View(vb tea.Viewbox) {
+	m.ViewAs(vb, m.percentShown)
 }
 
 // ViewAs renders the progress bar with a given percentage.
-func (m *Model) ViewAs(percent float64) string {
-	b := strings.Builder{}
+func (m *Model) ViewAs(vb tea.Viewbox, percent float64) {
 	percentView := m.percentageView(percent)
-	m.barView(&b, percent, ansi.PrintableRuneWidth(percentView))
-	b.WriteString(percentView)
-	return b.String()
+	textWidth := ansi.PrintableRuneWidth(percentView)
+	m.barView(vb, percent, textWidth)
+	vb.PaddingLeft(m.Width - textWidth).WriteLine(percentView)
 }
 
 func (m *Model) nextFrame() tea.Cmd {
 	return tea.Tick(time.Second/time.Duration(fps), func(time.Time) tea.Msg {
-		return MsgFrame{id: m.id, tag: m.tag}
+		return MsgFrame{
+			id:  uintptr(unsafe.Pointer(m)),
+			tag: m.tag,
+		}
 	})
 }
 
-func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
+func (m *Model) barView(vb tea.Viewbox, percent float64, textWidth int) {
 	tw := max(0, m.Width-textWidth)              // total width
 	fw := int(math.Round(float64(tw) * percent)) // filled width
 
@@ -285,31 +276,32 @@ func (m *Model) barView(b *strings.Builder, percent float64, textWidth int) {
 	if m.useRamp {
 		// Gradient fill
 		for i := 0; i < fw; i++ {
-			var p float64
-			switch {
-			case fw == 1:
+			p := fun.Switch(true, float64(i)/float64(tw-1)).
 				// this is up for debate: in a gradient of width=1, should the
 				// single character rendered be the first color, the last color
 				// or exactly 50% in between? I opted for 50%
-				p = 0.5
-			case m.scaleRamp:
-				p = float64(i) / float64(fw-1)
-			default:
-				p = float64(i) / float64(tw-1)
-			}
+				Case(fw == 1, 0.5).
+				Case(m.scaleRamp, float64(i)/float64(fw-1)).
+				End()
 
-			b.WriteString(scuf.String(string(m.Full), scuf.FgRGB(m.rampColorA.BlendLuv(m.rampColorB, p).RGB255())))
+			vb = vb.
+				PaddingLeft(i).
+				Styled(styles.Style{}.Foreground(styles.Raw(scuf.FgRGB(m.rampColorA.BlendLuv(m.rampColorB, p).RGB255())))).
+				WriteLine(string(m.Full))
 		}
 	} else {
 		// Solid fill
-		s := scuf.String(string(m.Full), scuf.FgRGB(scuf.MustParseHexRGB(m.FullColor)))
-		b.WriteString(strings.Repeat(s, fw))
+		vb.
+			Styled(styles.Style{}.Foreground(styles.Raw(scuf.FgRGB(scuf.MustParseHexRGB(m.FullColor))))).
+			WriteLine(strings.Repeat(string(m.Full), fw))
 	}
 
 	// Empty fill
-	e := scuf.String(string(m.Empty), scuf.FgRGB(scuf.MustParseHexRGB(m.EmptyColor)))
 	n := max(0, tw-fw)
-	b.WriteString(strings.Repeat(e, n))
+	vb.
+		PaddingLeft(fw).
+		Styled(styles.Style{}.Foreground(styles.Raw(scuf.FgRGB(scuf.MustParseHexRGB(m.EmptyColor))))).
+		WriteLine(strings.Repeat(string(m.Empty), n))
 }
 
 func (m *Model) percentageView(percent float64) string {

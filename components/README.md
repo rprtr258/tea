@@ -10,7 +10,7 @@ Bubbles
 [![Build Status](https://github.com/rprtr258/tea/bubbles/workflows/build/badge.svg)](https://github.com/rprtr258/tea/bubbles/actions)
 [![Go ReportCard](https://goreportcard.com/badge/charmbracelet/bubbles)](https://goreportcard.com/report/charmbracelet/bubbles)
 
-Some components for [Bubble Tea](https://github.com/rprtr258/tea)
+Some components for [Tea](https://github.com/rprtr258/tea)
 applications. These components are used in production in [Glow][glow],
 [Charm][charm] and [many other applications][otherstuff].
 
@@ -213,7 +213,7 @@ func (m *model) Update(msg tea.Msg) tea.Cmd {
 * [evertras/bubble-table](https://github.com/Evertras/bubble-table): Interactive,
   customizable, paginated tables.
 * [knipferrc/teacup](https://github.com/knipferrc/teacup): Various handy
-  bubbles and utilities for building Bubble Tea applications.
+  bubbles and utilities for building Tea applications.
 * [mritd/bubbles](https://github.com/mritd/bubbles): Some general-purpose
   bubbles. Inputs with validation, menu selection, a modified progressbar, and
   so on.

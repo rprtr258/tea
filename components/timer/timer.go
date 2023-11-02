@@ -2,23 +2,10 @@
 package timer
 
 import (
-	"sync"
 	"time"
 
 	"github.com/rprtr258/tea"
 )
-
-var (
-	lastID int
-	idMtx  sync.Mutex
-)
-
-func nextID() int {
-	idMtx.Lock()
-	defer idMtx.Unlock()
-	lastID++
-	return lastID
-}
 
 // Authors note with regard to start and stop commands:
 //
@@ -71,43 +58,40 @@ type MsgTick struct {
 
 // MsgTimeout is a message that is sent once when the timer times out.
 //
-// It's a convenience message sent alongside a MsgTick with the Timeout value
-// set to true.
+// It's a convenience message sent alongside a MsgTick with the Timeout value set to true.
 type MsgTimeout struct {
 	ID int
 }
 
+var _id = 0
+
 // Model of the timer component.
 type Model struct {
+	id int
+
 	// How long until the timer expires.
 	Timeout time.Duration
 
 	// How long to wait before every tick. Defaults to 1 second.
 	Interval time.Duration
 
-	id      int
 	running bool
 }
 
 // NewWithInterval creates a new timer with the given timeout and tick interval.
 func NewWithInterval(timeout, interval time.Duration) Model {
+	_id++
 	return Model{
+		id:       _id,
 		Timeout:  timeout,
 		Interval: interval,
 		running:  true,
-		id:       nextID(),
 	}
 }
 
 // New creates a new timer with the given timeout and default 1s interval.
 func New(timeout time.Duration) Model {
 	return NewWithInterval(timeout, time.Second)
-}
-
-// ID returns the model's identifier. This can be used to determine if messages
-// belong to this timer instance when there are multiple timers.
-func (m *Model) ID() int {
-	return m.id
 }
 
 // Running returns whether or not the timer is running. If the timer has timed
@@ -125,34 +109,33 @@ func (m *Model) Timedout() bool {
 }
 
 // Init starts the timer.
-func (m *Model) Init() []tea.Cmd {
-	return []tea.Cmd{m.tick()}
+func (m *Model) Init(f func(...tea.Cmd)) {
+	f(m.tick())
 }
 
 // Update handles the timer tick.
-func (m *Model) Update(msg tea.Msg) []tea.Cmd {
+func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case MsgStartStop:
 		if msg.ID != 0 && msg.ID != m.id {
-			return nil
+			return
 		}
 		m.running = msg.running
-		return []tea.Cmd{m.tick()}
+		f(m.tick())
 	case MsgTick:
-		if !m.Running() || (msg.ID != 0 && msg.ID != m.id) {
+		if !m.Running() || msg.ID != 0 && msg.ID != m.id {
 			break
 		}
 
 		m.Timeout -= m.Interval
-		return append(m.timedout(), m.tick())
+		f(m.timedout()...)
+		f(m.tick())
 	}
-
-	return nil
 }
 
 // View of the timer component.
-func (m *Model) View() string {
-	return m.Timeout.String()
+func (m *Model) View(vb tea.Viewbox) {
+	vb.WriteLine(m.Timeout.String())
 }
 
 // CmdStart resumes the timer. Has no effect if the timer has timed out.
@@ -171,8 +154,9 @@ func (m *Model) CmdToggle() tea.Cmd {
 }
 
 func (m *Model) tick() tea.Cmd {
+	id := m.id
 	return tea.Tick(m.Interval, func(_ time.Time) tea.Msg {
-		return MsgTick{ID: m.id, Timeout: m.Timedout()}
+		return MsgTick{ID: id, Timeout: m.Timedout()}
 	})
 }
 
