@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/muesli/ansi/compressor"
+	// "github.com/muesli/ansi/compressor"
 	"github.com/muesli/reflow/truncate"
 	"github.com/muesli/termenv"
 	"github.com/rprtr258/fun"
@@ -68,7 +68,8 @@ func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) Renderer 
 	return &standardRenderer{
 		out: fun.IF(
 			useANSICompressor,
-			termenv.NewOutput(&compressor.Writer{Forward: out}),
+			// termenv.NewOutput(&compressor.Writer{Forward: out}),
+			termenv.NewOutput(out),
 			out,
 		),
 		mu:                 &sync.Mutex{},
