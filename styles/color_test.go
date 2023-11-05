@@ -90,63 +90,51 @@ func TestRGBA(t *testing.T) {
 		// CompleteColor
 		{
 			true,
-			CompleteColor{TrueColor: FgColor("#FF0000")},
+			CompleteColor(FgColor("#FF0000")),
 			"FF0000",
 		},
 		{
 			true,
-			CompleteColor{TrueColor: FgColor("#FFFFFF")},
+			CompleteColor(FgColor("#FFFFFF")),
 			"FFFFFF",
 		},
 		{
 			true,
-			CompleteColor{TrueColor: FgColor("#0000FF")},
+			CompleteColor(FgColor("#0000FF")),
 			"0000FF",
 		},
 		{
 			true,
-			CompleteColor{TrueColor: FgColor("#000000")},
+			CompleteColor(FgColor("#000000")),
 			"000000",
 		},
 		// styles.CompleteAdaptiveColor
 		// dark
 		{
 			true,
-			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: FgColor("#0000FF")},
-				Dark:  CompleteColor{TrueColor: FgColor("#FF0000")},
-			},
+			CompleteAdaptiveColor(FgColor("#0000FF"), FgColor("#FF0000")),
 			"FF0000",
 		},
 		{
 			true,
-			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: FgColor("#FF0000")},
-				Dark:  CompleteColor{TrueColor: FgColor("#FFFFFF")},
-			},
+			CompleteAdaptiveColor(FgColor("#FF0000"), FgColor("#FFFFFF")),
 			"FFFFFF",
 		},
 		{
 			true,
-			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: FgColor("#FF0000")},
-				Dark:  CompleteColor{TrueColor: FgColor("#0000FF")},
-			},
+			CompleteAdaptiveColor(FgColor("#FF0000"), FgColor("#0000FF")),
 			"0000FF",
 		},
 		{
 			false,
-			CompleteAdaptiveColor{
-				Light: CompleteColor{TrueColor: FgColor("#0000FF")},
-				Dark:  CompleteColor{TrueColor: FgColor("#FF0000")},
-			},
+			CompleteAdaptiveColor(FgColor("#0000FF"), FgColor("#FF0000")),
 			"0000FF",
 		},
 	}, func(t *testing.T, test testcase) {
 		_renderer.SetHasDarkBackground(test.darkBg)
 
-		c, err := colorful.Hex(scuf.ToHex(test.input.color()))
-		log.Println(scuf.ToHex(test.input.color()))
+		c, err := colorful.Hex(scuf.ToHex(test.input()))
+		log.Println(scuf.ToHex(test.input()))
 		assert.NoError(t, err)
 		r, g, b, _ := c.RGBA()
 		assert.Equal(t, test.expected, fmt.Sprintf("%02X%02X%02X", r/256, g/256, b/256))

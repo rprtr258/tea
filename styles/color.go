@@ -8,9 +8,7 @@ import (
 )
 
 // TerminalColor is a color intended to be rendered in the terminal.
-type TerminalColor interface {
-	color() scuf.Modifier
-}
+type TerminalColor func() scuf.Modifier
 
 func FgRGB(hex string) TerminalColor {
 	return Raw(scuf.FgRGB(scuf.MustParseHexRGB(hex)))
@@ -20,18 +18,22 @@ func BgRGB(hex string) TerminalColor {
 	return Raw(scuf.BgRGB(scuf.MustParseHexRGB(hex)))
 }
 
-// TODO: remove, just to deal with cringe
-type Raw scuf.Modifier
+var NoColor = func() scuf.Modifier {
+	return nil
+}
 
-func (r Raw) color() scuf.Modifier {
-	return scuf.Modifier(r)
+// TODO: remove, just to deal with cringe
+func Raw(m scuf.Modifier) TerminalColor {
+	return func() scuf.Modifier {
+		return scuf.Modifier(m)
+	}
 }
 
 // FgColor specifies a color by hex or ANSI value. For example:
 //
 //	ansiColor := styles.FgColor("21")
 //	hexColor := styles.FgColor("#0000ff")
-func FgColor(s string) Raw {
+func FgColor(s string) TerminalColor {
 	if s == "" {
 		return Raw(nil)
 	}
@@ -52,7 +54,7 @@ func FgColor(s string) Raw {
 	return Raw(scuf.FgANSI256(x))
 }
 
-func BgColor(s string) Raw {
+func BgColor(s string) TerminalColor {
 	if s[0] == '#' {
 		return Raw(scuf.BgRGB(scuf.MustParseHexRGB(s)))
 	}
@@ -84,47 +86,33 @@ func ANSIColor(x uint) TerminalColor {
 // Example usage:
 //
 //	color := styles.FgAdaptiveColor("#0000ff", "#000099")
-type AdaptiveColor struct {
-	Light TerminalColor
-	Dark  TerminalColor
-}
-
-func FgAdaptiveColor(light, dark string) AdaptiveColor {
-	return AdaptiveColor{
-		Light: FgColor(light),
-		Dark:  FgColor(dark),
+func AdaptiveColor(Light, Dark TerminalColor) TerminalColor {
+	return func() scuf.Modifier {
+		return fun.IF(_renderer.HasDarkBackground(), Dark, Light)()
 	}
 }
 
-func BgAdaptiveColor(light, dark string) AdaptiveColor {
-	return AdaptiveColor{
-		Light: BgColor(light),
-		Dark:  BgColor(dark),
-	}
+func FgAdaptiveColor(light, dark string) TerminalColor {
+	return AdaptiveColor(FgColor(light), FgColor(dark))
 }
 
-func (ac AdaptiveColor) color() scuf.Modifier {
-	return fun.IF(_renderer.HasDarkBackground(), ac.Dark, ac.Light).color()
+func BgAdaptiveColor(light, dark string) TerminalColor {
+	return AdaptiveColor(BgColor(light), BgColor(dark))
 }
 
+// TODO: remove
 // CompleteColor specifies exact values for truecolor, ANSI256, and ANSI color
 // profiles. Automatic color degradation will not be performed.
-type CompleteColor struct {
-	TrueColor TerminalColor
+func CompleteColor(TrueColor TerminalColor) TerminalColor {
+	return TrueColor
 }
 
-func (c CompleteColor) color() scuf.Modifier {
-	return c.TrueColor.color()
-}
-
+// TODO: replace with AdaptiveColor
 // CompleteAdaptiveColor specifies exact values for truecolor, ANSI256, and ANSI color
 // profiles, with separate options for light and dark backgrounds. Automatic
 // color degradation will not be performed.
-type CompleteAdaptiveColor struct {
-	Light CompleteColor
-	Dark  CompleteColor
-}
-
-func (cac CompleteAdaptiveColor) color() scuf.Modifier {
-	return fun.IF(_renderer.HasDarkBackground(), cac.Dark, cac.Light).color()
+func CompleteAdaptiveColor(Light, Dark TerminalColor) TerminalColor {
+	return func() scuf.Modifier {
+		return fun.IF(_renderer.HasDarkBackground(), Dark, Light)()
+	}
 }

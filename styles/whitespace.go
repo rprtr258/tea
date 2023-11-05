@@ -56,7 +56,9 @@ func (w whitespace) render(width int) string {
 		b.WriteString(strings.Repeat(" ", short))
 	}
 
-	return scuf.String(b.String(), fun.Map[scuf.Modifier](w.style, (TerminalColor).color)...)
+	return scuf.String(b.String(), fun.Map[scuf.Modifier](w.style, func(c TerminalColor) scuf.Modifier {
+		return c()
+	})...)
 }
 
 // WhitespaceOption sets a styling rule for rendering whitespace.

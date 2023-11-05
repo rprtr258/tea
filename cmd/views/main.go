@@ -31,7 +31,7 @@ const (
 // Return a function that will colorize the foreground of a given string.
 func makeFgStyle(color string) func(string) string {
 	return func(s string) string {
-		return scuf.String(s, scuf.Modifier(styles.FgColor(color)))
+		return scuf.String(s, scuf.Modifier(styles.FgColor(color)()))
 	}
 }
 

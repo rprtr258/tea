@@ -58,10 +58,10 @@ func Colors(cols ...styles.TerminalColor) [4]styles.TerminalColor {
 		}
 	}
 	return [4]styles.TerminalColor{
-		styles.Raw{},
-		styles.Raw{},
-		styles.Raw{},
-		styles.Raw{},
+		styles.NoColor,
+		styles.NoColor,
+		styles.NoColor,
+		styles.NoColor,
 	}
 }
 

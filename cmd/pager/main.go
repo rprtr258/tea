@@ -84,8 +84,8 @@ func (m *model) headerView(vb tea.Viewbox) {
 		},
 		box.RoundedBorder,
 		box.BorderMaskAll,
-		box.Colors(styles.Raw{}),
-		box.Colors(styles.Raw{}),
+		box.Colors(styles.NoColor),
+		box.Colors(styles.NoColor),
 	)
 	vb = vb.PaddingLeft(1 + 1 + len(title) + 1).Row(1)
 	vb.Set(0, 0, '├')
@@ -108,8 +108,8 @@ func (m *model) footerView(vb tea.Viewbox) {
 		},
 		box.RoundedBorder,
 		box.BorderMaskAll,
-		box.Colors(styles.Raw{}),
-		box.Colors(styles.Raw{}),
+		box.Colors(styles.NoColor),
+		box.Colors(styles.NoColor),
 	)
 	vb = vb.Padding(tea.PaddingOptions{Right: 1 + 1 + len(info) + 1}).Row(1)
 	vb.Set(0, vb.Width-1, '┤')

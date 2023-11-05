@@ -162,23 +162,23 @@ func (s Style) Render(strs ...string) string {
 	styleWhitespace := reverse
 
 	teSpace := []scuf.Modifier{}
-	if len(fg.color()) != 0 {
-		te = append(te, fg.color())
+	if len(fg()) != 0 {
+		te = append(te, fg())
 		if styleWhitespace {
-			teWhitespace = append(teWhitespace, fg.color())
+			teWhitespace = append(teWhitespace, fg())
 		}
 		if useSpaceStyler {
-			teSpace = append(teSpace, fg.color())
+			teSpace = append(teSpace, fg())
 		}
 	}
 
-	if len(bg.color()) != 0 {
-		te = append(te, bg.color())
+	if len(bg()) != 0 {
+		te = append(te, bg())
 		if colorWhitespace {
-			teWhitespace = append(teWhitespace, bg.color())
+			teWhitespace = append(teWhitespace, bg())
 		}
 		if useSpaceStyler {
-			teSpace = append(teSpace, bg.color())
+			teSpace = append(teSpace, bg())
 		}
 	}
 
