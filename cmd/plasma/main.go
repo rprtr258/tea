@@ -42,11 +42,11 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 			for x := 0; x < m.width; x++ {
 				// Calculate the pixel's coordinates in the plasma space
 				xf := float64(x+t) / float64(m.width)
-				yf := float64(y-t) / float64(m.height)
+				yf := float64(y+t) / float64(m.height)
 
 				// Calculate the plasma effect based on the current time
 				// You can modify this formula to achieve different effects
-				noise := (xf*5 + yf*7) * 4
+				noise := math.Sin(xf*5+yf*7) * 8
 
 				// Calculate the color based on the calculated noise
 				red := uint8((math.Sin(noise) + 1) * 127)
