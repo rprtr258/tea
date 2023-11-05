@@ -8,12 +8,14 @@ import (
 	"maps"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/muesli/ansi/compressor"
 	"github.com/muesli/reflow/truncate"
 	"github.com/muesli/termenv"
 	"github.com/rprtr258/fun"
+	"github.com/samber/lo"
 )
 
 const (
@@ -153,7 +155,13 @@ func (r *standardRenderer) flush() {
 		return
 	}
 
-	r.out.Write(r.buf.Bytes())
+	// r.out.MoveCursor(0, 0)
+	// r.out.Write(r.buf.Bytes())
+	// os.Stdout.Write(r.buf.Bytes())
+	syscall.Write(1, []byte("\x1b[0;0H"))
+	for _, chunk := range lo.Chunk(r.buf.Bytes(), 16*1024) {
+		syscall.Write(1, chunk)
+	}
 	return
 
 	newLines := strings.Split(r.buf.String(), "\n")
@@ -268,7 +276,8 @@ func (r *standardRenderer) Write(s []byte) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	_, _ = r.buf.Write(s)
+	// _, _ = r.buf.Write(s)
+	r.buf = *bytes.NewBuffer(s)
 }
 
 func (r *standardRenderer) repaint() {

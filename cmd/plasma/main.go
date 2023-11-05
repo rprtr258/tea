@@ -37,24 +37,26 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 		m.height = msg.Height
 		m.width = msg.Width
 	case msgFrame:
-		t := int(time.Now().UnixMilli() / 100 % 10000)
+		t := float64(time.Now().UnixMilli()) / 1000
 		for y := 0; y < m.height; y++ {
 			for x := 0; x < m.width; x++ {
-				// Calculate the pixel's coordinates in the plasma space
-				xf := float64(x+t) / float64(m.width)
-				yf := float64(y+t) / float64(m.height)
+				uvx := float64(x) / float64(m.width)
+				uvy := float64(y) / float64(m.height)
 
-				// Calculate the plasma effect based on the current time
-				// You can modify this formula to achieve different effects
-				noise := math.Sin(xf*5+yf*7) * 8
+				v1 := math.Sin(uvx*5 + t)
+				v2 := math.Sin(5*(uvx*math.Sin(t/12)+uvy*math.Cos(t/13)) + t)
 
-				// Calculate the color based on the calculated noise
-				red := uint8((math.Sin(noise) + 1) * 127)
-				green := uint8((math.Cos(noise) + 1) * 127)
-				blue := uint8((math.Sin(noise+math.Pi/2) + 1) * 127)
+				cx := uvx + math.Sin(t/15)*5
+				cy := uvy + math.Sin(t/13)*5
+				v3 := math.Sin(math.Sqrt(100*(cx*cx+cy*cy)) + t)
+
+				vf := v1 + v2 + v3
+				r := uint8(max(0, math.Cos(vf*math.Pi+0*math.Pi/1)-0.5) * 2 * 255)
+				g := uint8(max(0, math.Sin(vf*math.Pi+6*math.Pi/3)-0.5) * 2 * 255)
+				b := uint8(max(0, math.Sin(vf*math.Pi+4*math.Pi/3)-0.5) * 2 * 255)
 
 				i := y*m.width + x
-				m.cells[i] = scuf.BgRGB(red, green, blue)
+				m.cells[i] = scuf.BgRGB(r, g, b)
 			}
 		}
 		yield(animate)
