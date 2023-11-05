@@ -79,33 +79,23 @@ func ANSIColor(x uint) TerminalColor {
 	return Raw(scuf.FgANSI256(int(x)))
 }
 
-// AdaptiveColor provides color options for light and dark backgrounds. The
+// adaptiveColor provides color options for light and dark backgrounds. The
 // appropriate color will be returned at runtime based on the darkness of the
 // terminal background color.
 //
 // Example usage:
 //
 //	color := styles.FgAdaptiveColor("#0000ff", "#000099")
-func AdaptiveColor(Light, Dark TerminalColor) TerminalColor {
+func adaptiveColor(Light, Dark TerminalColor) TerminalColor {
 	return func() scuf.Modifier {
 		return fun.IF(_renderer.HasDarkBackground(), Dark, Light)()
 	}
 }
 
 func FgAdaptiveColor(light, dark string) TerminalColor {
-	return AdaptiveColor(FgColor(light), FgColor(dark))
+	return adaptiveColor(FgColor(light), FgColor(dark))
 }
 
 func BgAdaptiveColor(light, dark string) TerminalColor {
-	return AdaptiveColor(BgColor(light), BgColor(dark))
-}
-
-// TODO: replace with AdaptiveColor
-// CompleteAdaptiveColor specifies exact values for truecolor, ANSI256, and ANSI color
-// profiles, with separate options for light and dark backgrounds. Automatic
-// color degradation will not be performed.
-func CompleteAdaptiveColor(Light, Dark TerminalColor) TerminalColor {
-	return func() scuf.Modifier {
-		return fun.IF(_renderer.HasDarkBackground(), Dark, Light)()
-	}
+	return adaptiveColor(BgColor(light), BgColor(dark))
 }
