@@ -66,6 +66,21 @@ func TestRGBA(t *testing.T) {
 			FgColor("21"),
 			"0000FF",
 		},
+		{
+			true,
+			FgColor("#FFFFFF"),
+			"FFFFFF",
+		},
+		{
+			true,
+			FgColor("#0000FF"),
+			"0000FF",
+		},
+		{
+			true,
+			FgColor("#000000"),
+			"000000",
+		},
 		// styles.AdaptiveColor
 		{
 			true,
@@ -86,27 +101,6 @@ func TestRGBA(t *testing.T) {
 			false,
 			FgAdaptiveColor("21", "9"),
 			"0000FF",
-		},
-		// CompleteColor
-		{
-			true,
-			CompleteColor(FgColor("#FF0000")),
-			"FF0000",
-		},
-		{
-			true,
-			CompleteColor(FgColor("#FFFFFF")),
-			"FFFFFF",
-		},
-		{
-			true,
-			CompleteColor(FgColor("#0000FF")),
-			"0000FF",
-		},
-		{
-			true,
-			CompleteColor(FgColor("#000000")),
-			"000000",
 		},
 		// styles.CompleteAdaptiveColor
 		// dark

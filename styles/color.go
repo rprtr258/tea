@@ -100,13 +100,6 @@ func BgAdaptiveColor(light, dark string) TerminalColor {
 	return AdaptiveColor(BgColor(light), BgColor(dark))
 }
 
-// TODO: remove
-// CompleteColor specifies exact values for truecolor, ANSI256, and ANSI color
-// profiles. Automatic color degradation will not be performed.
-func CompleteColor(TrueColor TerminalColor) TerminalColor {
-	return TrueColor
-}
-
 // TODO: replace with AdaptiveColor
 // CompleteAdaptiveColor specifies exact values for truecolor, ANSI256, and ANSI color
 // profiles, with separate options for light and dark backgrounds. Automatic
