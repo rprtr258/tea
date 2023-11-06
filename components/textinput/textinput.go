@@ -63,22 +63,22 @@ type KeyMap struct {
 // DefaultKeyMap is the default set of key bindings for navigating and acting
 // upon the textinput.
 var DefaultKeyMap = KeyMap{
-	CharacterForward:        key.NewBinding(key.WithKeys("right", "ctrl+f")),
-	CharacterBackward:       key.NewBinding(key.WithKeys("left", "ctrl+b")),
-	WordForward:             key.NewBinding(key.WithKeys("alt+right", "alt+f")),
-	WordBackward:            key.NewBinding(key.WithKeys("alt+left", "alt+b")),
-	DeleteWordBackward:      key.NewBinding(key.WithKeys("alt+backspace", "ctrl+w")),
-	DeleteWordForward:       key.NewBinding(key.WithKeys("alt+delete", "alt+d")),
-	DeleteAfterCursor:       key.NewBinding(key.WithKeys("ctrl+k")),
-	DeleteBeforeCursor:      key.NewBinding(key.WithKeys("ctrl+u")),
-	DeleteCharacterBackward: key.NewBinding(key.WithKeys("backspace", "ctrl+h")),
-	DeleteCharacterForward:  key.NewBinding(key.WithKeys("delete", "ctrl+d")),
-	LineStart:               key.NewBinding(key.WithKeys("home", "ctrl+a")),
-	LineEnd:                 key.NewBinding(key.WithKeys("end", "ctrl+e")),
-	Paste:                   key.NewBinding(key.WithKeys("ctrl+v")),
-	AcceptSuggestion:        key.NewBinding(key.WithKeys("tab")),
-	NextSuggestion:          key.NewBinding(key.WithKeys("down", "ctrl+n")),
-	PrevSuggestion:          key.NewBinding(key.WithKeys("up", "ctrl+p")),
+	CharacterForward:        key.NewBinding([]string{"right", "ctrl+f"}),
+	CharacterBackward:       key.NewBinding([]string{"left", "ctrl+b"}),
+	WordForward:             key.NewBinding([]string{"alt+right", "alt+f"}),
+	WordBackward:            key.NewBinding([]string{"alt+left", "alt+b"}),
+	DeleteWordBackward:      key.NewBinding([]string{"alt+backspace", "ctrl+w"}),
+	DeleteWordForward:       key.NewBinding([]string{"alt+delete", "alt+d"}),
+	DeleteAfterCursor:       key.NewBinding([]string{"ctrl+k"}),
+	DeleteBeforeCursor:      key.NewBinding([]string{"ctrl+u"}),
+	DeleteCharacterBackward: key.NewBinding([]string{"backspace", "ctrl+h"}),
+	DeleteCharacterForward:  key.NewBinding([]string{"delete", "ctrl+d"}),
+	LineStart:               key.NewBinding([]string{"home", "ctrl+a"}),
+	LineEnd:                 key.NewBinding([]string{"end", "ctrl+e"}),
+	Paste:                   key.NewBinding([]string{"ctrl+v"}),
+	AcceptSuggestion:        key.NewBinding([]string{"tab"}),
+	NextSuggestion:          key.NewBinding([]string{"down", "ctrl+n"}),
+	PrevSuggestion:          key.NewBinding([]string{"up", "ctrl+p"}),
 }
 
 // Model is the Tea model for this text input element.

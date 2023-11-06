@@ -53,19 +53,14 @@ type Binding struct {
 type BindingOpt func(*Binding)
 
 // NewBinding returns a new keybinding from a set of BindingOpt options.
-func NewBinding(opts ...BindingOpt) Binding {
-	b := &Binding{}
+func NewBinding(keys []string, opts ...BindingOpt) Binding {
+	b := &Binding{
+		keys: keys,
+	}
 	for _, opt := range opts {
 		opt(b)
 	}
 	return *b
-}
-
-// WithKeys initializes a keybinding with the given keystrokes.
-func WithKeys(keys ...string) BindingOpt {
-	return func(b *Binding) {
-		b.keys = keys
-	}
 }
 
 // WithHelp initializes a keybinding with the given help text.

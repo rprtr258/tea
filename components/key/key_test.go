@@ -8,7 +8,7 @@ import (
 
 func TestBinding_Enabled(t *testing.T) {
 	binding := NewBinding(
-		WithKeys("k", "up"),
+		[]string{"k", "up"},
 		WithHelp("↑/k", "move up"),
 	)
 	assert.True(t, binding.Enabled())

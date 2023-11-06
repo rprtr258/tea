@@ -77,11 +77,11 @@ func (d delegateKeyMap) FullHelp() [][]key.Binding {
 
 var delegateKeys = &delegateKeyMap{
 	choose: key.NewBinding(
-		key.WithKeys("enter"),
+		[]string{"enter"},
 		key.WithHelp("enter", "choose"),
 	),
 	remove: key.NewBinding(
-		key.WithKeys("x", "backspace"),
+		[]string{"x", "backspace"},
 		key.WithHelp("x", "delete"),
 	),
 }

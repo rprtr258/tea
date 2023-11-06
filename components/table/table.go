@@ -51,35 +51,35 @@ type KeyMap struct {
 // DefaultKeyMap returns a default set of keybindings.
 var DefaultKeyMap = KeyMap{
 	LineUp: key.NewBinding(
-		key.WithKeys("up", "k"),
+		[]string{"up", "k"},
 		key.WithHelp("↑/k", "up"),
 	),
 	LineDown: key.NewBinding(
-		key.WithKeys("down", "j"),
+		[]string{"down", "j"},
 		key.WithHelp("↓/j", "down"),
 	),
 	PageUp: key.NewBinding(
-		key.WithKeys("b", "pgup"),
+		[]string{"b", "pgup"},
 		key.WithHelp("b/pgup", "page up"),
 	),
 	PageDown: key.NewBinding(
-		key.WithKeys("f", "pgdown", " "),
+		[]string{"f", "pgdown", " "},
 		key.WithHelp("f/pgdn", "page down"),
 	),
 	HalfPageUp: key.NewBinding(
-		key.WithKeys("u", "ctrl+u"),
+		[]string{"u", "ctrl+u"},
 		key.WithHelp("u", "½ page up"),
 	),
 	HalfPageDown: key.NewBinding(
-		key.WithKeys("d", "ctrl+d"),
+		[]string{"d", "ctrl+d"},
 		key.WithHelp("d", "½ page down"),
 	),
 	GotoTop: key.NewBinding(
-		key.WithKeys("home", "g"),
+		[]string{"home", "g"},
 		key.WithHelp("g/home", "go to start"),
 	),
 	GotoBottom: key.NewBinding(
-		key.WithKeys("end", "G"),
+		[]string{"end", "G"},
 		key.WithHelp("G/end", "go to end"),
 	),
 }

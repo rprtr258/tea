@@ -206,7 +206,7 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 		itemNameSingular:      "item",
 		itemNamePlural:        "items",
 		filteringEnabled:      true,
-		KeyMap:                DefaultKeyMap(),
+		KeyMap:                DefaultKeyMap,
 		Filter:                DefaultFilter,
 		Styles:                DefaultStyle,
 		Title:                 "List",

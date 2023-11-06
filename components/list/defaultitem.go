@@ -33,7 +33,7 @@ type DefaultItemStyles struct {
 
 // NewDefaultItemStyles returns style definitions for a default item. See
 // DefaultItemView for when these come into play.
-func NewDefaultItemStyles() DefaultItemStyles {
+var NewDefaultItemStyles = func() DefaultItemStyles {
 	s := DefaultItemStyles{
 		NormalTitle: styles.Style{}.Foreground(styles.FgAdaptiveColor("#1a1a1a", "#dddddd")),
 		SelectedTitle: styles.Style{}.
@@ -47,7 +47,7 @@ func NewDefaultItemStyles() DefaultItemStyles {
 	s.DimmedDesc = s.DimmedTitle.Copy().Foreground(styles.FgAdaptiveColor("#C2B8C2", "#4D4D4D"))
 
 	return s
-}
+}()
 
 // DefaultItem describes an items designed to work with DefaultDelegate.
 type DefaultItem interface {
@@ -83,7 +83,7 @@ type DefaultDelegate[I DefaultItem] struct {
 func NewDefaultDelegate[I DefaultItem]() DefaultDelegate[I] {
 	return DefaultDelegate[I]{
 		ShowDescription: true,
-		Styles:          NewDefaultItemStyles(),
+		Styles:          NewDefaultItemStyles,
 		height:          2,
 		spacing:         1,
 	}

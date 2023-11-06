@@ -70,19 +70,19 @@ func Main(ctx context.Context) error {
 		stopwatch: stopwatch.NewWithInterval(time.Millisecond),
 		keymap: keymap{
 			start: key.NewBinding(
-				key.WithKeys("s"),
+				[]string{"s"},
 				key.WithHelp("s", "start"),
 			),
 			stop: key.NewBinding(
-				key.WithKeys("s"),
+				[]string{"s"},
 				key.WithHelp("s", "stop"),
 			),
 			reset: key.NewBinding(
-				key.WithKeys("r"),
+				[]string{"r"},
 				key.WithHelp("r", "reset"),
 			),
 			quit: key.NewBinding(
-				key.WithKeys("ctrl+c", "q"),
+				[]string{"ctrl+c", "q"},
 				key.WithHelp("q", "quit"),
 			),
 		},

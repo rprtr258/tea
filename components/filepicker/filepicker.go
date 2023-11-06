@@ -59,15 +59,15 @@ type KeyMap struct {
 
 // DefaultKeyMap defines the default keybindings.
 var DefaultKeyMap = KeyMap{
-	GoToTop:  key.NewBinding(key.WithKeys("g"), key.WithHelp("g", "first")),
-	GoToLast: key.NewBinding(key.WithKeys("G"), key.WithHelp("G", "last")),
-	Down:     key.NewBinding(key.WithKeys("j", "down", "ctrl+n"), key.WithHelp("j", "down")),
-	Up:       key.NewBinding(key.WithKeys("k", "up", "ctrl+p"), key.WithHelp("k", "up")),
-	PageUp:   key.NewBinding(key.WithKeys("K", "pgup"), key.WithHelp("pgup", "page up")),
-	PageDown: key.NewBinding(key.WithKeys("J", "pgdown"), key.WithHelp("pgdown", "page down")),
-	Back:     key.NewBinding(key.WithKeys("h", "backspace", "left", "esc"), key.WithHelp("h", "back")),
-	Open:     key.NewBinding(key.WithKeys("l", "right", "enter"), key.WithHelp("l", "open")),
-	Select:   key.NewBinding(key.WithKeys("enter"), key.WithHelp("enter", "select")),
+	GoToTop:  key.NewBinding([]string{"g"}, key.WithHelp("g", "first")),
+	GoToLast: key.NewBinding([]string{"G"}, key.WithHelp("G", "last")),
+	Down:     key.NewBinding([]string{"j", "down", "ctrl+n"}, key.WithHelp("j", "down")),
+	Up:       key.NewBinding([]string{"k", "up", "ctrl+p"}, key.WithHelp("k", "up")),
+	PageUp:   key.NewBinding([]string{"K", "pgup"}, key.WithHelp("pgup", "page up")),
+	PageDown: key.NewBinding([]string{"J", "pgdown"}, key.WithHelp("pgdown", "page down")),
+	Back:     key.NewBinding([]string{"h", "backspace", "left", "esc"}, key.WithHelp("h", "back")),
+	Open:     key.NewBinding([]string{"l", "right", "enter"}, key.WithHelp("l", "open")),
+	Select:   key.NewBinding([]string{"enter"}, key.WithHelp("enter", "select")),
 }
 
 // Styles defines the possible customizations for styles in the file picker.

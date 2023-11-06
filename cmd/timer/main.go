@@ -88,20 +88,20 @@ func Main(ctx context.Context) error {
 		timer: timer.NewWithInterval(timeout, time.Millisecond),
 		keymap: keymap{
 			start: key.NewBinding(
-				key.WithKeys("s"),
+				[]string{"s"},
 				key.WithHelp("s", "start"),
 				key.WithDisabled(),
 			),
 			stop: key.NewBinding(
-				key.WithKeys("s"),
+				[]string{"s"},
 				key.WithHelp("s", "stop"),
 			),
 			reset: key.NewBinding(
-				key.WithKeys("r"),
+				[]string{"r"},
 				key.WithHelp("r", "reset"),
 			),
 			quit: key.NewBinding(
-				key.WithKeys("q", "ctrl+c"),
+				[]string{"q", "ctrl+c"},
 				key.WithHelp("q", "quit"),
 			),
 		},

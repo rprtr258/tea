@@ -49,27 +49,27 @@ type listKeyMap struct {
 func newListKeyMap() *listKeyMap {
 	return &listKeyMap{
 		insertItem: key.NewBinding(
-			key.WithKeys("a"),
+			[]string{"a"},
 			key.WithHelp("a", "add item"),
 		),
 		toggleSpinner: key.NewBinding(
-			key.WithKeys("s"),
+			[]string{"s"},
 			key.WithHelp("s", "toggle spinner"),
 		),
 		toggleTitleBar: key.NewBinding(
-			key.WithKeys("T"),
+			[]string{"T"},
 			key.WithHelp("T", "toggle title"),
 		),
 		toggleStatusBar: key.NewBinding(
-			key.WithKeys("S"),
+			[]string{"S"},
 			key.WithHelp("S", "toggle status"),
 		),
 		togglePagination: key.NewBinding(
-			key.WithKeys("P"),
+			[]string{"P"},
 			key.WithHelp("P", "toggle pagination"),
 		),
 		toggleHelpMenu: key.NewBinding(
-			key.WithKeys("H"),
+			[]string{"H"},
 			key.WithHelp("H", "toggle help"),
 		),
 	}

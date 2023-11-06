@@ -9,8 +9,6 @@ import (
 	"github.com/samber/lo"
 )
 
-const _spacebar = " "
-
 // KeyMap defines the keybindings for the viewport. Note that you don't
 // necessary need to use keybindings at all; the viewport can be controlled
 // programmatically with methods like Model.LineDown(1). See the GoDocs for
@@ -27,27 +25,27 @@ type KeyMap struct {
 // DefaultKeyMap returns a set of pager-like default keybindings.
 var DefaultKeyMap = KeyMap{
 	PageDown: key.NewBinding(
-		key.WithKeys("pgdown", _spacebar, "f"),
+		[]string{"pgdown", " ", "f"},
 		key.WithHelp("f/pgdn", "page down"),
 	),
 	PageUp: key.NewBinding(
-		key.WithKeys("pgup", "b"),
+		[]string{"pgup", "b"},
 		key.WithHelp("b/pgup", "page up"),
 	),
 	HalfPageUp: key.NewBinding(
-		key.WithKeys("u", "ctrl+u"),
+		[]string{"u", "ctrl+u"},
 		key.WithHelp("u", "½ page up"),
 	),
 	HalfPageDown: key.NewBinding(
-		key.WithKeys("d", "ctrl+d"),
+		[]string{"d", "ctrl+d"},
 		key.WithHelp("d", "½ page down"),
 	),
 	Up: key.NewBinding(
-		key.WithKeys("up", "k"),
+		[]string{"up", "k"},
 		key.WithHelp("↑/k", "up"),
 	),
 	Down: key.NewBinding(
-		key.WithKeys("down", "j"),
+		[]string{"down", "j"},
 		key.WithHelp("↓/j", "down"),
 	),
 }

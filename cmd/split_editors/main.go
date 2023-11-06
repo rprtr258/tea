@@ -59,8 +59,8 @@ func newTextarea() textarea.Model {
 	t.FocusedStyle.EndOfBuffer = endOfBufferStyle
 	t.BlurredStyle.EndOfBuffer = endOfBufferStyle
 	t.KeyMap.DeleteWordBackward.SetEnabled(false)
-	t.KeyMap.LineNext = key.NewBinding(key.WithKeys("down"))
-	t.KeyMap.LinePrevious = key.NewBinding(key.WithKeys("up"))
+	t.KeyMap.LineNext = key.NewBinding([]string{"down"})
+	t.KeyMap.LinePrevious = key.NewBinding([]string{"up"})
 	t.Blur()
 	return t
 }
@@ -80,23 +80,23 @@ func newModel() *model {
 		help:   help.New(),
 		keymap: keymap{
 			next: key.NewBinding(
-				key.WithKeys("tab"),
+				[]string{"tab"},
 				key.WithHelp("tab", "next"),
 			),
 			prev: key.NewBinding(
-				key.WithKeys("shift+tab"),
+				[]string{"shift+tab"},
 				key.WithHelp("shift+tab", "prev"),
 			),
 			add: key.NewBinding(
-				key.WithKeys("ctrl+n"),
+				[]string{"ctrl+n"},
 				key.WithHelp("ctrl+n", "add an editor"),
 			),
 			remove: key.NewBinding(
-				key.WithKeys("ctrl+w"),
+				[]string{"ctrl+w"},
 				key.WithHelp("ctrl+w", "remove an editor"),
 			),
 			quit: key.NewBinding(
-				key.WithKeys("esc", "ctrl+c"),
+				[]string{"esc", "ctrl+c"},
 				key.WithHelp("esc", "quit"),
 			),
 		},

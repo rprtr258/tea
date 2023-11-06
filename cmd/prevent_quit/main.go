@@ -43,11 +43,11 @@ func initialModel() *model {
 		help:     help.New(),
 		keymap: keymap{
 			save: key.NewBinding(
-				key.WithKeys("ctrl+s"),
+				[]string{"ctrl+s"},
 				key.WithHelp("ctrl+s", "save"),
 			),
 			quit: key.NewBinding(
-				key.WithKeys("esc", "ctrl+c"),
+				[]string{"esc", "ctrl+c"},
 				key.WithHelp("esc", "quit"),
 			),
 		},

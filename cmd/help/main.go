@@ -41,27 +41,27 @@ func (k keyMap) FullHelp() [][]key.Binding {
 
 var keys = keyMap{
 	Up: key.NewBinding(
-		key.WithKeys("up", "k"),
+		[]string{"up", "k"},
 		key.WithHelp("↑/k", "move up"),
 	),
 	Down: key.NewBinding(
-		key.WithKeys("down", "j"),
+		[]string{"down", "j"},
 		key.WithHelp("↓/j", "move down"),
 	),
 	Left: key.NewBinding(
-		key.WithKeys("left", "h"),
+		[]string{"left", "h"},
 		key.WithHelp("←/h", "move left"),
 	),
 	Right: key.NewBinding(
-		key.WithKeys("right", "l"),
+		[]string{"right", "l"},
 		key.WithHelp("→/l", "move right"),
 	),
 	Help: key.NewBinding(
-		key.WithKeys("?"),
+		[]string{"?"},
 		key.WithHelp("?", "toggle help"),
 	),
 	Quit: key.NewBinding(
-		key.WithKeys("q", "esc", "ctrl+c"),
+		[]string{"q", "esc", "ctrl+c"},
 		key.WithHelp("q", "quit"),
 	),
 }
