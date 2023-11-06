@@ -23,7 +23,7 @@ func (m Model) View(vb tea.Viewbox) {
 	for y := 0; y < vb.Height; y++ {
 		for x := 0; x < vb.Width; x++ {
 			r, color := m.Shader(y, x, vb.Height, vb.Width, t)
-			vb.Styled(styles.Style{}.Background(styles.Raw(color))).Set(y, x, r)
+			vb.Styled(styles.Style{}.Background(color)).Set(y, x, r)
 		}
 	}
 }

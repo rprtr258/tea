@@ -87,17 +87,17 @@ type Styles struct {
 
 // DefaultStyles is default styling for the file picker, with a given Lip Gloss renderer.
 var DefaultStyles = Styles{
-	DisabledCursor:   styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(247))),
-	Cursor:           styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(212))),
-	Symlink:          styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(36))),
-	Directory:        styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(99))),
+	DisabledCursor:   styles.Style{}.Foreground(scuf.FgANSI256(247)),
+	Cursor:           styles.Style{}.Foreground(scuf.FgANSI256(212)),
+	Symlink:          styles.Style{}.Foreground(scuf.FgANSI256(36)),
+	Directory:        styles.Style{}.Foreground(scuf.FgANSI256(99)),
 	File:             styles.Style{},
-	DisabledFile:     styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(243))),
-	DisabledSelected: styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(247))),
-	Permission:       styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(244))),
-	Selected:         styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(212))).Bold(true),
-	FileSize:         styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(240))).Align(styles.Right),
-	EmptyDirectory:   styles.Style{}.Foreground(styles.Raw(scuf.FgANSI256(240))),
+	DisabledFile:     styles.Style{}.Foreground(scuf.FgANSI256(243)),
+	DisabledSelected: styles.Style{}.Foreground(scuf.FgANSI256(247)),
+	Permission:       styles.Style{}.Foreground(scuf.FgANSI256(244)),
+	Selected:         styles.Style{}.Foreground(scuf.FgANSI256(212)).Bold(true),
+	FileSize:         styles.Style{}.Foreground(scuf.FgANSI256(240)).Align(styles.Right),
+	EmptyDirectory:   styles.Style{}.Foreground(scuf.FgANSI256(240)),
 }
 
 // Model represents a file picker.

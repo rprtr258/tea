@@ -208,7 +208,7 @@ func TestStyleUnset(t *testing.T) {
 	assert.False(t, s.GetInline())
 
 	// colors
-	colcol := TerminalColor(Raw(scuf.FgRGB(scuf.MustParseHexRGB("#ffffff"))))
+	colcol := TerminalColor(scuf.FgRGB(scuf.MustParseHexRGB("#ffffff")))
 	s = Style{}.Foreground(colcol)
 	assert.Equal(t, colcol, s.GetForeground())
 	s.UnsetForeground()

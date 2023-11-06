@@ -11,7 +11,6 @@ import (
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/box"
 	"github.com/rprtr258/tea/components/viewport"
-	"github.com/rprtr258/tea/styles"
 )
 
 type model struct {
@@ -84,8 +83,8 @@ func (m *model) headerView(vb tea.Viewbox) {
 		},
 		box.RoundedBorder,
 		box.BorderMaskAll,
-		box.Colors(styles.NoColor),
-		box.Colors(styles.NoColor),
+		box.Colors(nil),
+		box.Colors(nil),
 	)
 	vb = vb.PaddingLeft(1 + 1 + len(title) + 1).Row(1)
 	vb.Set(0, 0, '├')
@@ -108,8 +107,8 @@ func (m *model) footerView(vb tea.Viewbox) {
 		},
 		box.RoundedBorder,
 		box.BorderMaskAll,
-		box.Colors(styles.NoColor),
-		box.Colors(styles.NoColor),
+		box.Colors(nil),
+		box.Colors(nil),
 	)
 	vb = vb.Padding(tea.PaddingOptions{Right: 1 + 1 + len(info) + 1}).Row(1)
 	vb.Set(0, vb.Width-1, '┤')

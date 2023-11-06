@@ -123,8 +123,8 @@ func (m *mainModel) View(vb tea.Viewbox) {
 		},
 		fun.IF(focusedTimer, box.NormalBorder, box.HiddenBorder),
 		box.BorderMaskAll,
-		box.Colors(fun.IF(focusedTimer, styles.FgColor("69"), styles.NoColor)),
-		box.Colors(styles.NoColor),
+		box.Colors(fun.IF(focusedTimer, styles.FgColor("69"), nil)),
+		box.Colors(nil),
 	)
 	box.Box(vbSpinner.Styled(_styleModel),
 		func(vb tea.Viewbox) {
@@ -133,8 +133,8 @@ func (m *mainModel) View(vb tea.Viewbox) {
 		},
 		fun.IF(focusedTimer, box.HiddenBorder, box.NormalBorder),
 		box.BorderMaskAll,
-		box.Colors(fun.IF(focusedTimer, styles.NoColor, styles.FgColor("69"))),
-		box.Colors(styles.NoColor),
+		box.Colors(fun.IF(focusedTimer, nil, styles.FgColor("69"))),
+		box.Colors(nil),
 	)
 	vbHelp.
 		Styled(_styleHelp).

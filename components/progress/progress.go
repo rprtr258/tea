@@ -286,13 +286,13 @@ func (m *Model) barView(vb tea.Viewbox, percent float64, textWidth int) {
 
 			vb = vb.
 				PaddingLeft(i).
-				Styled(styles.Style{}.Foreground(styles.Raw(scuf.FgRGB(m.rampColorA.BlendLuv(m.rampColorB, p).RGB255())))).
+				Styled(styles.Style{}.Foreground(scuf.FgRGB(m.rampColorA.BlendLuv(m.rampColorB, p).RGB255()))).
 				WriteLine(string(m.Full))
 		}
 	} else {
 		// Solid fill
 		vb.
-			Styled(styles.Style{}.Foreground(styles.Raw(scuf.FgRGB(scuf.MustParseHexRGB(m.FullColor))))).
+			Styled(styles.Style{}.Foreground(scuf.FgRGB(scuf.MustParseHexRGB(m.FullColor)))).
 			WriteLine(strings.Repeat(string(m.Full), fw))
 	}
 
@@ -300,7 +300,7 @@ func (m *Model) barView(vb tea.Viewbox, percent float64, textWidth int) {
 	n := max(0, tw-fw)
 	vb.
 		PaddingLeft(fw).
-		Styled(styles.Style{}.Foreground(styles.Raw(scuf.FgRGB(scuf.MustParseHexRGB(m.EmptyColor))))).
+		Styled(styles.Style{}.Foreground(scuf.FgRGB(scuf.MustParseHexRGB(m.EmptyColor)))).
 		WriteLine(strings.Repeat(string(m.Empty), n))
 }
 

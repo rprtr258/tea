@@ -18,24 +18,17 @@ func BgRGB(hex string) TerminalColor {
 	return scuf.BgRGB(scuf.MustParseHexRGB(hex))
 }
 
-var NoColor = scuf.Modifier(nil)
-
-// TODO: remove, just to deal with cringe
-func Raw(m scuf.Modifier) TerminalColor {
-	return m
-}
-
 // FgColor specifies a color by hex or ANSI value. For example:
 //
 //	ansiColor := styles.FgColor("21")
 //	hexColor := styles.FgColor("#0000ff")
 func FgColor(s string) TerminalColor {
 	if s == "" {
-		return Raw(nil)
+		return nil
 	}
 
 	if s[0] == '#' {
-		return Raw(scuf.FgRGB(scuf.MustParseHexRGB(s)))
+		return scuf.FgRGB(scuf.MustParseHexRGB(s))
 	}
 
 	x, err := strconv.Atoi(s)
@@ -44,22 +37,22 @@ func FgColor(s string) TerminalColor {
 	}
 
 	if x < 16 {
-		return Raw(scuf.FgANSI(x))
+		return scuf.FgANSI(x)
 	}
 
-	return Raw(scuf.FgANSI256(x))
+	return scuf.FgANSI256(x)
 }
 
 func BgColor(s string) TerminalColor {
 	if s[0] == '#' {
-		return Raw(scuf.BgRGB(scuf.MustParseHexRGB(s)))
+		return scuf.BgRGB(scuf.MustParseHexRGB(s))
 	}
 
 	x, err := strconv.Atoi(s)
 	if err != nil {
 		panic(err.Error())
 	}
-	return Raw(scuf.BgANSI256(x))
+	return scuf.BgANSI256(x)
 }
 
 // ANSIColor is a color specified by an ANSI color value. It's merely syntactic
@@ -72,7 +65,7 @@ func BgColor(s string) TerminalColor {
 //	colorA := styles.ANSIColor(21)
 //	colorB := styles.Color("21")
 func ANSIColor(x uint) TerminalColor {
-	return Raw(scuf.FgANSI256(int(x)))
+	return scuf.FgANSI256(int(x))
 }
 
 // adaptiveColor provides color options for light and dark backgrounds. The
