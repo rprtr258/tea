@@ -22,9 +22,8 @@ type Model struct {
 	focus  bool
 	styles Styles
 
-	viewport viewport.Model
-	start    int
-	end      int
+	viewport   viewport.Model
+	start, end int
 }
 
 // Row represents one line in the table.

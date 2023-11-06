@@ -53,30 +53,11 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	f(m.viewport.Update(msg)...)
 }
 
-func (m *model) View(vb tea.Viewbox) {
-	if !m.ready {
-		vb.WriteLine("  Initializing...")
-		return
-	}
-
-	m.headerView(vb.Sub(tea.Rectangle{
-		Height: 3,
-		Width:  vb.Width,
-	}))
-	vb = vb.PaddingTop(3)
-	m.viewport.View(vb.Sub(tea.Rectangle{
-		Height: m.viewport.Height,
-		Width:  vb.Width,
-	}))
-	m.footerView(vb.PaddingTop(m.viewport.Height))
-}
-
 func (m *model) headerView(vb tea.Viewbox) {
 	title := "Mr. Pager"
 	box.Box(
 		vb.Sub(tea.Rectangle{
-			Height: 3,
-			Width:  len(title) + 2 + 2,
+			Width: len(title) + 2 + 2,
 		}),
 		func(vb tea.Viewbox) {
 			vb.PaddingLeft(1).WriteLine(title)
@@ -116,6 +97,24 @@ func (m *model) footerView(vb tea.Viewbox) {
 	for i := 0; i < vb.Width; i++ {
 		vb.Set(0, i, '─')
 	}
+}
+
+func (m *model) View(vb tea.Viewbox) {
+	if !m.ready {
+		vb.WriteLine("  Initializing...")
+		return
+	}
+
+	m.headerView(vb.Sub(tea.Rectangle{
+		Height: 3,
+		Width:  vb.Width,
+	}))
+	vb = vb.PaddingTop(3)
+	m.viewport.View(vb.Sub(tea.Rectangle{
+		Height: m.viewport.Height,
+		Width:  vb.Width,
+	}))
+	m.footerView(vb.PaddingTop(m.viewport.Height))
 }
 
 func Main(ctx context.Context) error {

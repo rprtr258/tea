@@ -1,4 +1,4 @@
-package box
+package tablebox
 
 import (
 	"github.com/rprtr258/scuf"
@@ -14,7 +14,11 @@ const (
 	BorderMaskBottom
 	BorderMaskLeft
 	BorderMaskRight
-	BorderMaskAll = BorderMaskTop | BorderMaskBottom | BorderMaskLeft | BorderMaskRight
+	BorderMaskHorizontals
+	BorderMaskVerticals
+	BorderMaskAll = BorderMaskTop | BorderMaskBottom |
+		BorderMaskLeft | BorderMaskRight |
+		BorderMaskHorizontals | BorderMaskVerticals
 )
 
 func (mask BorderMask) GetTop() bool {
@@ -72,19 +76,30 @@ func Colors(cols ...scuf.Modifier) [4]scuf.Modifier {
 // Box draws model inside a box
 func Box(
 	vb tea.Viewbox,
-	inside func(tea.Viewbox),
-	border Border,
+	h, w int,
+	inside func(vb tea.Viewbox, y, x int),
+	border FullBorder,
 	borders BorderMask,
 	fg [4]scuf.Modifier,
 	bg [4]scuf.Modifier,
 ) {
-	if inside != nil {
-		inside(vb.Padding(tea.PaddingOptions{
-			Top:    1,
-			Left:   1,
-			Bottom: 1,
-			Right:  1,
-		}))
+	u := make([]tea.Layout, h) // TODO: remove this cringe
+	for i := range u {
+		u[i] = 1
+	}
+
+	hs := tea.EvalLayout(vb.Height-h-1, u...)
+	ws := tea.EvalLayout(vb.Width-w-1, u...)
+
+	for iy := 0; iy < h; iy++ {
+		for ix := 0; ix < w; ix++ {
+			inside(vb.Sub(tea.Rectangle{
+				Top:    iy + 1,
+				Left:   ix + 1,
+				Height: hs[iy],
+				Width:  ws[ix],
+			}), iy, ix)
+		}
 	}
 
 	// If no border is set or all borders are been disabled, abort.
@@ -96,6 +111,7 @@ func Box(
 	topBG, rightBG, bottomBG, leftBG := bg[0], bg[1], bg[2], bg[3]
 
 	// Figure out which corners we should actually be using based on which sides are set to show.
+	// TODO: support other options
 	if borders.GetTop() {
 		if !borders.GetLeft() {
 			border.TopLeft = 0

@@ -293,7 +293,7 @@ func Flex(n int) Layout {
 	return Layout(n)
 }
 
-func evalLayout(x int, ls ...Layout) []int {
+func EvalLayout(x int, ls ...Layout) []int {
 	res := make([]int, len(ls))
 	totalFlex := 0
 	flexes := 0
@@ -324,7 +324,7 @@ func evalLayout(x int, ls ...Layout) []int {
 }
 
 func (vb Viewbox) SplitY(ls ...Layout) []Viewbox {
-	heights := evalLayout(vb.Height, ls...)
+	heights := EvalLayout(vb.Height, ls...)
 	res := make([]Viewbox, len(heights))
 	y := 0
 	for i, h := range heights {
@@ -357,7 +357,7 @@ func (vb Viewbox) SplitY5(l1, l2, l3, l4, l5 Layout) (_, _, _, _, _ Viewbox) {
 }
 
 func (vb Viewbox) SplitX(ls ...Layout) []Viewbox {
-	widths := evalLayout(vb.Width, ls...)
+	widths := EvalLayout(vb.Width, ls...)
 	res := make([]Viewbox, len(widths))
 	x := 0
 	for i, w := range widths {
