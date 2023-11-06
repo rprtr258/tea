@@ -2,7 +2,6 @@ package styles
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
 	"github.com/lucasb-eyer/go-colorful"
@@ -127,8 +126,7 @@ func TestRGBA(t *testing.T) {
 	}, func(t *testing.T, test testcase) {
 		_renderer.SetHasDarkBackground(test.darkBg)
 
-		c, err := colorful.Hex(scuf.ToHex(test.input()))
-		log.Println(scuf.ToHex(test.input()))
+		c, err := colorful.Hex(scuf.ToHex(test.input))
 		assert.NoError(t, err)
 		r, g, b, _ := c.RGBA()
 		assert.Equal(t, test.expected, fmt.Sprintf("%02X%02X%02X", r/256, g/256, b/256))

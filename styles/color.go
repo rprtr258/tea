@@ -8,25 +8,21 @@ import (
 )
 
 // TerminalColor is a color intended to be rendered in the terminal.
-type TerminalColor func() scuf.Modifier
+type TerminalColor = scuf.Modifier
 
 func FgRGB(hex string) TerminalColor {
-	return Raw(scuf.FgRGB(scuf.MustParseHexRGB(hex)))
+	return scuf.FgRGB(scuf.MustParseHexRGB(hex))
 }
 
 func BgRGB(hex string) TerminalColor {
-	return Raw(scuf.BgRGB(scuf.MustParseHexRGB(hex)))
+	return scuf.BgRGB(scuf.MustParseHexRGB(hex))
 }
 
-var NoColor = func() scuf.Modifier {
-	return nil
-}
+var NoColor = scuf.Modifier(nil)
 
 // TODO: remove, just to deal with cringe
 func Raw(m scuf.Modifier) TerminalColor {
-	return func() scuf.Modifier {
-		return scuf.Modifier(m)
-	}
+	return m
 }
 
 // FgColor specifies a color by hex or ANSI value. For example:
@@ -87,9 +83,7 @@ func ANSIColor(x uint) TerminalColor {
 //
 //	color := styles.FgAdaptiveColor("#0000ff", "#000099")
 func adaptiveColor(Light, Dark TerminalColor) TerminalColor {
-	return func() scuf.Modifier {
-		return fun.IF(_renderer.HasDarkBackground(), Dark, Light)()
-	}
+	return fun.IF(_renderer.HasDarkBackground(), Dark, Light)
 }
 
 func FgAdaptiveColor(light, dark string) TerminalColor {

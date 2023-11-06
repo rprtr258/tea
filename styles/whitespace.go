@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/muesli/reflow/ansi"
-	"github.com/rprtr258/fun"
 	"github.com/rprtr258/scuf"
 )
 
@@ -56,9 +55,7 @@ func (w whitespace) render(width int) string {
 		b.WriteString(strings.Repeat(" ", short))
 	}
 
-	return scuf.String(b.String(), fun.Map[scuf.Modifier](w.style, func(c TerminalColor) scuf.Modifier {
-		return c()
-	})...)
+	return scuf.String(b.String(), w.style...)
 }
 
 // WhitespaceOption sets a styling rule for rendering whitespace.
