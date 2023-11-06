@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/mattn/go-runewidth"
+	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/key"
@@ -49,42 +50,39 @@ type KeyMap struct {
 }
 
 // DefaultKeyMap returns a default set of keybindings.
-func DefaultKeyMap() KeyMap {
-	const spacebar = " "
-	return KeyMap{
-		LineUp: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("↑/k", "up"),
-		),
-		LineDown: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("↓/j", "down"),
-		),
-		PageUp: key.NewBinding(
-			key.WithKeys("b", "pgup"),
-			key.WithHelp("b/pgup", "page up"),
-		),
-		PageDown: key.NewBinding(
-			key.WithKeys("f", "pgdown", spacebar),
-			key.WithHelp("f/pgdn", "page down"),
-		),
-		HalfPageUp: key.NewBinding(
-			key.WithKeys("u", "ctrl+u"),
-			key.WithHelp("u", "½ page up"),
-		),
-		HalfPageDown: key.NewBinding(
-			key.WithKeys("d", "ctrl+d"),
-			key.WithHelp("d", "½ page down"),
-		),
-		GotoTop: key.NewBinding(
-			key.WithKeys("home", "g"),
-			key.WithHelp("g/home", "go to start"),
-		),
-		GotoBottom: key.NewBinding(
-			key.WithKeys("end", "G"),
-			key.WithHelp("G/end", "go to end"),
-		),
-	}
+var DefaultKeyMap = KeyMap{
+	LineUp: key.NewBinding(
+		key.WithKeys("up", "k"),
+		key.WithHelp("↑/k", "up"),
+	),
+	LineDown: key.NewBinding(
+		key.WithKeys("down", "j"),
+		key.WithHelp("↓/j", "down"),
+	),
+	PageUp: key.NewBinding(
+		key.WithKeys("b", "pgup"),
+		key.WithHelp("b/pgup", "page up"),
+	),
+	PageDown: key.NewBinding(
+		key.WithKeys("f", "pgdown", " "),
+		key.WithHelp("f/pgdn", "page down"),
+	),
+	HalfPageUp: key.NewBinding(
+		key.WithKeys("u", "ctrl+u"),
+		key.WithHelp("u", "½ page up"),
+	),
+	HalfPageDown: key.NewBinding(
+		key.WithKeys("d", "ctrl+d"),
+		key.WithHelp("d", "½ page down"),
+	),
+	GotoTop: key.NewBinding(
+		key.WithKeys("home", "g"),
+		key.WithHelp("g/home", "go to start"),
+	),
+	GotoBottom: key.NewBinding(
+		key.WithKeys("end", "G"),
+		key.WithHelp("G/end", "go to end"),
+	),
 }
 
 // Styles contains style definitions for this list component. By default, these
@@ -96,12 +94,10 @@ type Styles struct {
 }
 
 // DefaultStyles returns a set of default style definitions for this table.
-func DefaultStyles() Styles {
-	return Styles{
-		Selected: styles.Style{}.Bold(true).Foreground(styles.FgColor("212")),
-		Header:   styles.Style{}.Bold(true), /*.Padding(0, 1)*/
-		Cell:     styles.Style{},            /*.Padding(0, 1)*/
-	}
+var DefaultStyles = Styles{
+	Selected: styles.Style{}.Bold(true).Foreground(styles.FgColor("212")),
+	Header:   styles.Style{}.Bold(true), /*.Padding(0, 1)*/
+	Cell:     styles.Style{},            /*.Padding(0, 1)*/
 }
 
 // SetStyles sets the table styles.
@@ -120,14 +116,12 @@ func New(opts ...Option) Model {
 		cursor:   0,
 		viewport: viewport.New(0, 20),
 
-		KeyMap: DefaultKeyMap(),
-		styles: DefaultStyles(),
+		KeyMap: DefaultKeyMap,
+		styles: DefaultStyles,
 	}
-
 	for _, opt := range opts {
 		opt(&m)
 	}
-
 	return m
 }
 
@@ -227,32 +221,6 @@ func (m *Model) Unfocus() {
 	m.focus = false
 }
 
-// View renders the component.
-func (m *Model) View(vb tea.Viewbox) {
-	m.headersView(vb)
-
-	renderedRows := make([]string, 0, len(m.rows))
-
-	// Render only rows from: m.cursor-m.viewport.Height to: m.cursor+m.viewport.Height
-	// Constant runtime, independent of number of rows in a table.
-	// Limits the number of renderedRows to a maximum of 2*m.viewport.Height
-	if m.cursor >= 0 {
-		m.start = clamp(m.cursor-m.viewport.Height, 0, m.cursor)
-	} else {
-		m.start = 0
-	}
-	m.end = clamp(m.cursor+m.viewport.Height, m.cursor, len(m.rows))
-	for i := m.start; i < m.end; i++ {
-		// m.renderRow(i)
-	}
-
-	m.viewport.SetContent(strings.Split(
-		styles.JoinVertical(styles.Left, renderedRows...),
-		"\n"))
-
-	m.viewport.View(vb.PaddingTop(len(m.cols) + 1))
-}
-
 // SelectedRow returns the selected row.
 // You can cast it to your own implementation.
 func (m *Model) SelectedRow() Row {
@@ -305,36 +273,36 @@ func (m *Model) Cursor() int {
 
 // SetCursor sets the cursor position in the table.
 func (m *Model) SetCursor(n int) {
-	m.cursor = clamp(n, 0, len(m.rows)-1)
+	m.cursor = fun.Clamp(n, 0, len(m.rows)-1)
 }
 
 // MoveUp moves the selection up by any number of rows.
 // It can not go above the first row.
 func (m *Model) MoveUp(n int) {
-	m.cursor = clamp(m.cursor-n, 0, len(m.rows)-1)
+	m.cursor = max(m.cursor-n, 0)
 	switch {
 	case m.start == 0:
-		m.viewport.SetYOffset(clamp(m.viewport.YOffset, 0, m.cursor))
+		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset, 0, m.cursor))
 	case m.start < m.viewport.Height:
-		m.viewport.SetYOffset(clamp(m.viewport.YOffset+n, 0, m.cursor))
+		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset+n, 0, m.cursor))
 	case m.viewport.YOffset >= 1:
-		m.viewport.YOffset = clamp(m.viewport.YOffset+n, 1, m.viewport.Height)
+		m.viewport.YOffset = fun.Clamp(m.viewport.YOffset+n, 1, m.viewport.Height)
 	}
 }
 
 // MoveDown moves the selection down by any number of rows.
 // It can not go below the last row.
 func (m *Model) MoveDown(n int) {
-	m.cursor = clamp(m.cursor+n, 0, len(m.rows)-1)
+	m.cursor = min(m.cursor+n, len(m.rows)-1)
 
 	switch {
 	case m.end == len(m.rows):
-		m.viewport.SetYOffset(clamp(m.viewport.YOffset-n, 1, m.viewport.Height))
+		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset-n, 1, m.viewport.Height))
 	case m.cursor > (m.end-m.start)/2:
-		m.viewport.SetYOffset(clamp(m.viewport.YOffset-n, 1, m.cursor))
+		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset-n, 1, m.cursor))
 	case m.viewport.YOffset > 1:
 	case m.cursor > m.viewport.YOffset+m.viewport.Height-1:
-		m.viewport.SetYOffset(clamp(m.viewport.YOffset+1, 0, 1))
+		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset+1, 0, 1))
 	}
 }
 
@@ -351,17 +319,10 @@ func (m *Model) GotoBottom() {
 // FromValues create the table rows from a simple string. It uses `\n` by
 // default for getting all the rows and the given separator for the fields on
 // each row.
-func (m *Model) FromValues(value, separator string) {
-	rows := []Row{}
-	for _, line := range strings.Split(value, "\n") {
-		r := Row{}
-		for _, field := range strings.Split(line, separator) {
-			r = append(r, field)
-		}
-		rows = append(rows, r)
-	}
-
-	m.SetRows(rows)
+func (m *Model) FromValues(rows [][]string) {
+	m.SetRows(fun.Map[Row](rows, func(row []string) Row {
+		return row
+	}))
 }
 
 func (m *Model) headersView(vb tea.Viewbox) {
@@ -372,9 +333,9 @@ func (m *Model) headersView(vb tea.Viewbox) {
 	}
 }
 
-func (m *Model) renderRow(vb tea.Viewbox, rowID int) {
+func (m *Model) renderRow(vb tea.Viewbox, roww Row) {
 	s := make([][]string, 0, len(m.cols))
-	for i, value := range m.rows[rowID] {
+	for i, value := range roww {
 		style := styles.Style{}. /*.Width(m.cols[i].Width).MaxWidth(m.cols[i].Width)*/ Inline(true)
 		renderedCell := m.styles.Cell.Render(style.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
 		s = append(s, strings.Split(renderedCell, "\n"))
@@ -382,13 +343,34 @@ func (m *Model) renderRow(vb tea.Viewbox, rowID int) {
 
 	row := styles.JoinHorizontal(styles.Left, s...)
 
-	if rowID == m.cursor {
-		vb = vb.Styled(m.styles.Selected)
-	}
-
 	vb.WriteLine(row)
 }
 
-func clamp(v, low, high int) int {
-	return min(max(v, low), high)
+// View renders the component.
+func (m *Model) View(vb tea.Viewbox) {
+	m.headersView(vb)
+
+	// Render only rows from: m.cursor-m.viewport.Height to: m.cursor+m.viewport.Height
+	// Constant runtime, independent of number of rows in a table.
+	// Limits the number of renderedRows to a maximum of 2*m.viewport.Height
+	if m.cursor >= 0 {
+		m.start = fun.Clamp(m.cursor-m.viewport.Height, 0, m.cursor)
+	} else {
+		m.start = 0
+	}
+	m.end = fun.Clamp(m.cursor+m.viewport.Height, m.cursor, len(m.rows))
+	for i := m.start; i < m.end; i++ {
+		vbRow := vb.Row(i - m.start)
+		if i == m.cursor {
+			vbRow = vbRow.Styled(m.styles.Selected)
+		}
+
+		m.renderRow(vbRow, m.rows[i])
+	}
+
+	// m.viewport.SetContent(strings.Split(
+	// 	styles.JoinVertical(styles.Left, renderedRows...),
+	// 	"\n"))
+
+	m.viewport.View(vb.PaddingTop(len(m.cols) + 1))
 }

@@ -162,7 +162,7 @@ func Main(ctx context.Context) error {
 		table.WithHeight(7),
 	)
 
-	s := table.DefaultStyles()
+	s := table.DefaultStyles
 	s.Header = s.Header.
 		// BorderStyle(box.NormalBorder).
 		// BorderForeground(styles.FgColor("240")).
