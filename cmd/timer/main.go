@@ -87,23 +87,23 @@ func Main(ctx context.Context) error {
 	m := &model{
 		timer: timer.NewWithInterval(timeout, time.Millisecond),
 		keymap: keymap{
-			start: key.NewBinding(
-				[]string{"s"},
-				key.WithHelp("s", "start"),
-				key.WithDisabled(),
-			),
-			stop: key.NewBinding(
-				[]string{"s"},
-				key.WithHelp("s", "stop"),
-			),
-			reset: key.NewBinding(
-				[]string{"r"},
-				key.WithHelp("r", "reset"),
-			),
-			quit: key.NewBinding(
-				[]string{"q", "ctrl+c"},
-				key.WithHelp("q", "quit"),
-			),
+			start: key.Binding{
+				Keys:     []string{"s"},
+				Help:     key.Help{"s", "start"},
+				Disabled: true,
+			},
+			stop: key.Binding{
+				Keys: []string{"s"},
+				Help: key.Help{"s", "stop"},
+			},
+			reset: key.Binding{
+				Keys: []string{"r"},
+				Help: key.Help{"r", "reset"},
+			},
+			quit: key.Binding{
+				Keys: []string{"q", "ctrl+c"},
+				Help: key.Help{"q", "quit"},
+			},
 		},
 		help: help.New(),
 	}

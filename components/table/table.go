@@ -50,38 +50,38 @@ type KeyMap struct {
 
 // DefaultKeyMap returns a default set of keybindings.
 var DefaultKeyMap = KeyMap{
-	LineUp: key.NewBinding(
-		[]string{"up", "k"},
-		key.WithHelp("↑/k", "up"),
-	),
-	LineDown: key.NewBinding(
-		[]string{"down", "j"},
-		key.WithHelp("↓/j", "down"),
-	),
-	PageUp: key.NewBinding(
-		[]string{"b", "pgup"},
-		key.WithHelp("b/pgup", "page up"),
-	),
-	PageDown: key.NewBinding(
-		[]string{"f", "pgdown", " "},
-		key.WithHelp("f/pgdn", "page down"),
-	),
-	HalfPageUp: key.NewBinding(
-		[]string{"u", "ctrl+u"},
-		key.WithHelp("u", "½ page up"),
-	),
-	HalfPageDown: key.NewBinding(
-		[]string{"d", "ctrl+d"},
-		key.WithHelp("d", "½ page down"),
-	),
-	GotoTop: key.NewBinding(
-		[]string{"home", "g"},
-		key.WithHelp("g/home", "go to start"),
-	),
-	GotoBottom: key.NewBinding(
-		[]string{"end", "G"},
-		key.WithHelp("G/end", "go to end"),
-	),
+	LineUp: key.Binding{
+		Keys: []string{"up", "k"},
+		Help: key.Help{"↑/k", "up"},
+	},
+	LineDown: key.Binding{
+		Keys: []string{"down", "j"},
+		Help: key.Help{"↓/j", "down"},
+	},
+	PageUp: key.Binding{
+		Keys: []string{"b", "pgup"},
+		Help: key.Help{"b/pgup", "page up"},
+	},
+	PageDown: key.Binding{
+		Keys: []string{"f", "pgdown", " "},
+		Help: key.Help{"f/pgdn", "page down"},
+	},
+	HalfPageUp: key.Binding{
+		Keys: []string{"u", "ctrl+u"},
+		Help: key.Help{"u", "½ page up"},
+	},
+	HalfPageDown: key.Binding{
+		Keys: []string{"d", "ctrl+d"},
+		Help: key.Help{"d", "½ page down"},
+	},
+	GotoTop: key.Binding{
+		Keys: []string{"home", "g"},
+		Help: key.Help{"g/home", "go to start"},
+	},
+	GotoBottom: key.Binding{
+		Keys: []string{"end", "G"},
+		Help: key.Help{"G/end", "go to end"},
+	},
 }
 
 // Styles contains style definitions for this list component. By default, these

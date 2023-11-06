@@ -42,14 +42,14 @@ func initialModel() *model {
 		textarea: ti,
 		help:     help.New(),
 		keymap: keymap{
-			save: key.NewBinding(
-				[]string{"ctrl+s"},
-				key.WithHelp("ctrl+s", "save"),
-			),
-			quit: key.NewBinding(
-				[]string{"esc", "ctrl+c"},
-				key.WithHelp("esc", "quit"),
-			),
+			save: key.Binding{
+				Keys: []string{"ctrl+s"},
+				Help: key.Help{"ctrl+s", "save"},
+			},
+			quit: key.Binding{
+				Keys: []string{"esc", "ctrl+c"},
+				Help: key.Help{"esc", "quit"},
+			},
 		},
 	}
 }

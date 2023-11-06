@@ -40,30 +40,30 @@ func (k keyMap) FullHelp() [][]key.Binding {
 }
 
 var keys = keyMap{
-	Up: key.NewBinding(
-		[]string{"up", "k"},
-		key.WithHelp("↑/k", "move up"),
-	),
-	Down: key.NewBinding(
-		[]string{"down", "j"},
-		key.WithHelp("↓/j", "move down"),
-	),
-	Left: key.NewBinding(
-		[]string{"left", "h"},
-		key.WithHelp("←/h", "move left"),
-	),
-	Right: key.NewBinding(
-		[]string{"right", "l"},
-		key.WithHelp("→/l", "move right"),
-	),
-	Help: key.NewBinding(
-		[]string{"?"},
-		key.WithHelp("?", "toggle help"),
-	),
-	Quit: key.NewBinding(
-		[]string{"q", "esc", "ctrl+c"},
-		key.WithHelp("q", "quit"),
-	),
+	Up: key.Binding{
+		Keys: []string{"up", "k"},
+		Help: key.Help{"↑/k", "move up"},
+	},
+	Down: key.Binding{
+		Keys: []string{"down", "j"},
+		Help: key.Help{"↓/j", "move down"},
+	},
+	Left: key.Binding{
+		Keys: []string{"left", "h"},
+		Help: key.Help{"←/h", "move left"},
+	},
+	Right: key.Binding{
+		Keys: []string{"right", "l"},
+		Help: key.Help{"→/l", "move right"},
+	},
+	Help: key.Binding{
+		Keys: []string{"?"},
+		Help: key.Help{"?", "toggle help"},
+	},
+	Quit: key.Binding{
+		Keys: []string{"q", "esc", "ctrl+c"},
+		Help: key.Help{"q", "quit"},
+	},
 }
 
 type model struct {

@@ -40,94 +40,45 @@ import (
 	"github.com/rprtr258/tea"
 )
 
+// Help is help information for a given keybinding.
+type Help [2]string // Key, Desc
+
+func (h Help) Key() string  { return h[0] }
+func (h Help) Desc() string { return h[1] }
+
 // Binding describes a set of keybindings and, optionally, their associated
 // help text.
 type Binding struct {
-	keys     []string
-	help     Help
-	disabled bool
+	Keys     []string
+	Help     Help
+	Disabled bool
 }
 
-// BindingOpt is an initialization option for a keybinding. It's used as an
-// argument to NewBinding.
-type BindingOpt func(*Binding)
-
-// NewBinding returns a new keybinding from a set of BindingOpt options.
-func NewBinding(keys []string, opts ...BindingOpt) Binding {
-	b := &Binding{
-		keys: keys,
-	}
-	for _, opt := range opts {
-		opt(b)
-	}
-	return *b
-}
-
-// WithHelp initializes a keybinding with the given help text.
-func WithHelp(key, desc string) BindingOpt {
-	return func(b *Binding) {
-		b.help = Help{Key: key, Desc: desc}
-	}
-}
-
-// WithDisabled initializes a disabled keybinding.
-func WithDisabled() BindingOpt {
-	return func(b *Binding) {
-		b.disabled = true
-	}
-}
-
-// SetKeys sets the keys for the keybinding.
-func (b *Binding) SetKeys(keys ...string) {
-	b.keys = keys
-}
-
-// Keys returns the keys for the keybinding.
-func (b Binding) Keys() []string {
-	return b.keys
-}
-
-// SetHelp sets the help text for the keybinding.
-func (b *Binding) SetHelp(key, desc string) {
-	b.help = Help{Key: key, Desc: desc}
-}
-
-// Help returns the Help information for the keybinding.
-func (b Binding) Help() Help {
-	return b.help
-}
-
-// Enabled returns whether or not the keybinding is enabled. Disabled
-// keybindings won't be activated and won't show up in help. Keybindings are
-// enabled by default.
+// Enabled returns whether or not the keybinding is enabled.
+// Disabled keybindings won't be activated and won't show up in help.
+// Keybindings are enabled by default.
 func (b Binding) Enabled() bool {
-	return !b.disabled && b.keys != nil
+	return !b.Disabled && len(b.Keys) != 0
 }
 
 // SetEnabled enables or disables the keybinding.
 func (b *Binding) SetEnabled(v bool) {
-	b.disabled = !v
+	b.Disabled = !v
 }
 
 // Unbind removes the keys and help from this binding, effectively nullifying
 // it. This is a step beyond disabling it, since applications can enable
 // or disable key bindings based on application state.
 func (b *Binding) Unbind() {
-	b.keys = nil
-	b.help = Help{}
-}
-
-// Help is help information for a given keybinding.
-type Help struct {
-	Key  string
-	Desc string
+	b.Keys = nil
+	b.Help = Help{}
 }
 
 // Matches checks if the given MsgKey matches the given bindings.
 func Matches(key tea.MsgKey, bindings ...Binding) bool {
 	keys := key.String()
 	for _, binding := range bindings {
-		for _, bindingKey := range binding.keys {
+		for _, bindingKey := range binding.Keys {
 			if keys == bindingKey && binding.Enabled() {
 				return true
 			}

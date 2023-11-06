@@ -48,30 +48,30 @@ type listKeyMap struct {
 
 func newListKeyMap() *listKeyMap {
 	return &listKeyMap{
-		insertItem: key.NewBinding(
-			[]string{"a"},
-			key.WithHelp("a", "add item"),
-		),
-		toggleSpinner: key.NewBinding(
-			[]string{"s"},
-			key.WithHelp("s", "toggle spinner"),
-		),
-		toggleTitleBar: key.NewBinding(
-			[]string{"T"},
-			key.WithHelp("T", "toggle title"),
-		),
-		toggleStatusBar: key.NewBinding(
-			[]string{"S"},
-			key.WithHelp("S", "toggle status"),
-		),
-		togglePagination: key.NewBinding(
-			[]string{"P"},
-			key.WithHelp("P", "toggle pagination"),
-		),
-		toggleHelpMenu: key.NewBinding(
-			[]string{"H"},
-			key.WithHelp("H", "toggle help"),
-		),
+		insertItem: key.Binding{
+			Keys: []string{"a"},
+			Help: key.Help{"a", "add item"},
+		},
+		toggleSpinner: key.Binding{
+			Keys: []string{"s"},
+			Help: key.Help{"s", "toggle spinner"},
+		},
+		toggleTitleBar: key.Binding{
+			Keys: []string{"T"},
+			Help: key.Help{"T", "toggle title"},
+		},
+		toggleStatusBar: key.Binding{
+			Keys: []string{"S"},
+			Help: key.Help{"S", "toggle status"},
+		},
+		togglePagination: key.Binding{
+			Keys: []string{"P"},
+			Help: key.Help{"P", "toggle pagination"},
+		},
+		toggleHelpMenu: key.Binding{
+			Keys: []string{"H"},
+			Help: key.Help{"H", "toggle help"},
+		},
 	}
 }
 

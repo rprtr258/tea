@@ -107,9 +107,9 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 			vb = vb.Styled(m.Styles.ShortSeparator).WriteLine(m.ShortSeparator)
 		}
 
-		vb = vb.Styled(m.Styles.ShortKey).WriteLine(kb.Help().Key)
+		vb = vb.Styled(m.Styles.ShortKey).WriteLine(kb.Help.Key())
 		vb = vb.PaddingLeft(1)
-		vb = vb.Styled(m.Styles.ShortDesc).WriteLine(kb.Help().Desc)
+		vb = vb.Styled(m.Styles.ShortDesc).WriteLine(kb.Help.Desc())
 	}
 }
 
@@ -137,8 +137,8 @@ func (m *Model) FullHelpView(vb tea.Viewbox, groups [][]key.Binding) {
 				continue
 			}
 
-			keys = append(keys, kb.Help().Key)
-			descriptions = append(descriptions, kb.Help().Desc)
+			keys = append(keys, kb.Help.Key())
+			descriptions = append(descriptions, kb.Help.Desc())
 		}
 
 		maxKeyLength := maxFunc(keys, ansi.PrintableRuneWidth)

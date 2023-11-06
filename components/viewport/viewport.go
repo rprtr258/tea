@@ -24,30 +24,30 @@ type KeyMap struct {
 
 // DefaultKeyMap returns a set of pager-like default keybindings.
 var DefaultKeyMap = KeyMap{
-	PageDown: key.NewBinding(
-		[]string{"pgdown", " ", "f"},
-		key.WithHelp("f/pgdn", "page down"),
-	),
-	PageUp: key.NewBinding(
-		[]string{"pgup", "b"},
-		key.WithHelp("b/pgup", "page up"),
-	),
-	HalfPageUp: key.NewBinding(
-		[]string{"u", "ctrl+u"},
-		key.WithHelp("u", "½ page up"),
-	),
-	HalfPageDown: key.NewBinding(
-		[]string{"d", "ctrl+d"},
-		key.WithHelp("d", "½ page down"),
-	),
-	Up: key.NewBinding(
-		[]string{"up", "k"},
-		key.WithHelp("↑/k", "up"),
-	),
-	Down: key.NewBinding(
-		[]string{"down", "j"},
-		key.WithHelp("↓/j", "down"),
-	),
+	PageDown: key.Binding{
+		Keys: []string{"pgdown", " ", "f"},
+		Help: key.Help{"f/pgdn", "page down"},
+	},
+	PageUp: key.Binding{
+		Keys: []string{"pgup", "b"},
+		Help: key.Help{"b/pgup", "page up"},
+	},
+	HalfPageUp: key.Binding{
+		Keys: []string{"u", "ctrl+u"},
+		Help: key.Help{"u", "½ page up"},
+	},
+	HalfPageDown: key.Binding{
+		Keys: []string{"d", "ctrl+d"},
+		Help: key.Help{"d", "½ page down"},
+	},
+	Up: key.Binding{
+		Keys: []string{"up", "k"},
+		Help: key.Help{"↑/k", "up"},
+	},
+	Down: key.Binding{
+		Keys: []string{"down", "j"},
+		Help: key.Help{"↓/j", "down"},
+	},
 }
 
 // Model is Tea model for this viewport element.

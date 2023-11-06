@@ -30,8 +30,8 @@ type KeyMap struct {
 // DefaultKeyMap is the default set of key bindings for navigating and acting
 // upon the paginator.
 var DefaultKeyMap = KeyMap{
-	PrevPage: key.NewBinding([]string{"pgup", "left", "h"}),
-	NextPage: key.NewBinding([]string{"pgdown", "right", "l"}),
+	PrevPage: key.Binding{Keys: []string{"pgup", "left", "h"}},
+	NextPage: key.Binding{Keys: []string{"pgdown", "right", "l"}},
 }
 
 // Model is the Tea model for this user interface.

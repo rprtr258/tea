@@ -69,22 +69,22 @@ func Main(ctx context.Context) error {
 	m := &model{
 		stopwatch: stopwatch.NewWithInterval(time.Millisecond),
 		keymap: keymap{
-			start: key.NewBinding(
-				[]string{"s"},
-				key.WithHelp("s", "start"),
-			),
-			stop: key.NewBinding(
-				[]string{"s"},
-				key.WithHelp("s", "stop"),
-			),
-			reset: key.NewBinding(
-				[]string{"r"},
-				key.WithHelp("r", "reset"),
-			),
-			quit: key.NewBinding(
-				[]string{"ctrl+c", "q"},
-				key.WithHelp("q", "quit"),
-			),
+			start: key.Binding{
+				Keys: []string{"s"},
+				Help: key.Help{"s", "start"},
+			},
+			stop: key.Binding{
+				Keys: []string{"s"},
+				Help: key.Help{"s", "stop"},
+			},
+			reset: key.Binding{
+				Keys: []string{"r"},
+				Help: key.Help{"r", "reset"},
+			},
+			quit: key.Binding{
+				Keys: []string{"ctrl+c", "q"},
+				Help: key.Help{"q", "quit"},
+			},
 		},
 		help: help.New(),
 	}
