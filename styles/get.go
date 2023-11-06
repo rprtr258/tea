@@ -2,6 +2,7 @@ package styles
 
 import (
 	"github.com/muesli/reflow/ansi"
+	"github.com/rprtr258/scuf"
 )
 
 // GetBold returns the style's bold value. If no value is set false is returned.
@@ -47,13 +48,13 @@ func (s Style) GetFaint() bool {
 
 // GetForeground returns the style's foreground color. If no value is set
 // NoColor{} is returned.
-func (s Style) GetForeground() TerminalColor {
+func (s Style) GetForeground() scuf.Modifier {
 	return s.getAsColor(_keyForeground)
 }
 
 // GetBackground returns the style's background color. If no value is set
 // NoColor{} is returned.
-func (s Style) GetBackground() TerminalColor {
+func (s Style) GetBackground() scuf.Modifier {
 	return s.getAsColor(_keyBackground)
 }
 
@@ -124,13 +125,13 @@ func (s Style) getAsBool(k propKey, defaultVal bool) bool {
 	return defaultVal
 }
 
-func (s Style) getAsColor(k propKey) TerminalColor {
+func (s Style) getAsColor(k propKey) scuf.Modifier {
 	v, ok := s.rules[k]
 	if !ok {
 		return nil
 	}
 
-	c, ok := v.(TerminalColor)
+	c, ok := v.(scuf.Modifier)
 	if !ok {
 		return nil
 	}

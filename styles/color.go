@@ -7,14 +7,11 @@ import (
 	"github.com/rprtr258/scuf"
 )
 
-// TerminalColor is a color intended to be rendered in the terminal.
-type TerminalColor = scuf.Modifier
-
-func FgRGB(hex string) TerminalColor {
+func FgRGB(hex string) scuf.Modifier {
 	return scuf.FgRGB(scuf.MustParseHexRGB(hex))
 }
 
-func BgRGB(hex string) TerminalColor {
+func BgRGB(hex string) scuf.Modifier {
 	return scuf.BgRGB(scuf.MustParseHexRGB(hex))
 }
 
@@ -22,7 +19,7 @@ func BgRGB(hex string) TerminalColor {
 //
 //	ansiColor := styles.FgColor("21")
 //	hexColor := styles.FgColor("#0000ff")
-func FgColor(s string) TerminalColor {
+func FgColor(s string) scuf.Modifier {
 	if s == "" {
 		return nil
 	}
@@ -43,7 +40,7 @@ func FgColor(s string) TerminalColor {
 	return scuf.FgANSI256(x)
 }
 
-func BgColor(s string) TerminalColor {
+func BgColor(s string) scuf.Modifier {
 	if s[0] == '#' {
 		return scuf.BgRGB(scuf.MustParseHexRGB(s))
 	}
@@ -64,7 +61,7 @@ func BgColor(s string) TerminalColor {
 //	// These two statements are equivalent.
 //	colorA := styles.ANSIColor(21)
 //	colorB := styles.Color("21")
-func ANSIColor(x uint) TerminalColor {
+func ANSIColor(x uint) scuf.Modifier {
 	return scuf.FgANSI256(int(x))
 }
 
@@ -75,14 +72,14 @@ func ANSIColor(x uint) TerminalColor {
 // Example usage:
 //
 //	color := styles.FgAdaptiveColor("#0000ff", "#000099")
-func adaptiveColor(Light, Dark TerminalColor) TerminalColor {
-	return fun.IF(_renderer.HasDarkBackground(), Dark, Light)
+func adaptiveColor(light, dark scuf.Modifier) scuf.Modifier {
+	return fun.IF(_renderer.HasDarkBackground(), dark, light)
 }
 
-func FgAdaptiveColor(light, dark string) TerminalColor {
+func FgAdaptiveColor(light, dark string) scuf.Modifier {
 	return adaptiveColor(FgColor(light), FgColor(dark))
 }
 
-func BgAdaptiveColor(light, dark string) TerminalColor {
+func BgAdaptiveColor(light, dark string) scuf.Modifier {
 	return adaptiveColor(BgColor(light), BgColor(dark))
 }

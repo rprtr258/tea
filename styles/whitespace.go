@@ -10,7 +10,7 @@ import (
 // whitespace is a whitespace renderer.
 type whitespace struct {
 	re    *Renderer
-	style []TerminalColor
+	style []scuf.Modifier
 	chars string
 }
 
@@ -62,14 +62,14 @@ func (w whitespace) render(width int) string {
 type WhitespaceOption func(*whitespace)
 
 // WithWhitespaceForeground sets the color of the characters in the whitespace.
-func WithWhitespaceForeground(fg TerminalColor) WhitespaceOption {
+func WithWhitespaceForeground(fg scuf.Modifier) WhitespaceOption {
 	return func(w *whitespace) {
 		w.style = append(w.style, fg)
 	}
 }
 
 // WithWhitespaceBackground sets the background color of the whitespace.
-func WithWhitespaceBackground(bg TerminalColor) WhitespaceOption {
+func WithWhitespaceBackground(bg scuf.Modifier) WhitespaceOption {
 	return WithWhitespaceForeground(bg)
 }
 

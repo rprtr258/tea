@@ -1,6 +1,7 @@
 package box
 
 import (
+	"github.com/rprtr258/scuf"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/styles"
 )
@@ -26,38 +27,38 @@ func GetBorder(mask BorderMask) (top, right, bottom, left bool) { //nolint:nonam
 		mask&BorderMaskLeft != 0
 }
 
-func Colors(cols ...styles.TerminalColor) [4]styles.TerminalColor {
+func Colors(cols ...scuf.Modifier) [4]scuf.Modifier {
 	switch len(cols) {
 	case 1:
-		return [4]styles.TerminalColor{
+		return [4]scuf.Modifier{
 			cols[0],
 			cols[0],
 			cols[0],
 			cols[0],
 		}
 	case 2:
-		return [4]styles.TerminalColor{
+		return [4]scuf.Modifier{
 			cols[0],
 			cols[1],
 			cols[0],
 			cols[1],
 		}
 	case 3:
-		return [4]styles.TerminalColor{
+		return [4]scuf.Modifier{
 			cols[0],
 			cols[1],
 			cols[2],
 			cols[1],
 		}
 	case 4:
-		return [4]styles.TerminalColor{
+		return [4]scuf.Modifier{
 			cols[0],
 			cols[1],
 			cols[2],
 			cols[3],
 		}
 	}
-	return [4]styles.TerminalColor{
+	return [4]scuf.Modifier{
 		nil,
 		nil,
 		nil,
@@ -71,8 +72,8 @@ func Box(
 	inside func(tea.Viewbox),
 	border Border,
 	borders BorderMask,
-	fg [4]styles.TerminalColor,
-	bg [4]styles.TerminalColor,
+	fg [4]scuf.Modifier,
+	bg [4]scuf.Modifier,
 ) {
 	if inside != nil {
 		inside(vb.Padding(tea.PaddingOptions{

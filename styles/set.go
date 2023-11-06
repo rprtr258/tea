@@ -1,5 +1,7 @@
 package styles
 
+import "github.com/rprtr258/scuf"
+
 // Set a value on the underlying rules map.
 func (s *Style) set(key propKey, value any) Style {
 	if s.rules == nil {
@@ -65,12 +67,12 @@ func (s Style) Faint() Style {
 //
 //	// Removes the foreground color
 //	s.Foreground(styles.NoColor)
-func (s Style) Foreground(c TerminalColor) Style {
+func (s Style) Foreground(c scuf.Modifier) Style {
 	return s.set(_keyForeground, c)
 }
 
 // Background sets a background color.
-func (s Style) Background(c TerminalColor) Style {
+func (s Style) Background(c scuf.Modifier) Style {
 	return s.set(_keyBackground, c)
 }
 
@@ -184,7 +186,7 @@ func whichSidesInt(i ...int) (top, right, bottom, left int, ok bool) { //nolint:
 // whichSidesColor is like whichSides, except it operates on a series of
 // boolean values. See the comment on whichSidesInt for details on how this
 // works.
-func whichSidesColor(i ...TerminalColor) (top, right, bottom, left TerminalColor, ok bool) { //nolint:nonamedreturns
+func whichSidesColor(i ...scuf.Modifier) (top, right, bottom, left scuf.Modifier, ok bool) { //nolint:nonamedreturns
 	switch len(i) {
 	case 1:
 		top = i[0]

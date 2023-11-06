@@ -45,7 +45,7 @@ func TestSetColorProfile(t *testing.T) {
 func TestRGBA(t *testing.T) {
 	type testcase struct {
 		darkBg   bool
-		input    TerminalColor
+		input    scuf.Modifier
 		expected string
 	}
 	assert.TableSlice(t, []testcase{
