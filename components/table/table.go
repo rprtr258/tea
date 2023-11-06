@@ -107,7 +107,6 @@ func DefaultStyles() Styles {
 // SetStyles sets the table styles.
 func (m *Model) SetStyles(s Styles) {
 	m.styles = s
-	m.UpdateViewport()
 }
 
 // Option is used to set options in New. For example:
@@ -128,8 +127,6 @@ func New(opts ...Option) Model {
 	for _, opt := range opts {
 		opt(&m)
 	}
-
-	m.UpdateViewport()
 
 	return m
 }
@@ -223,24 +220,17 @@ func (m *Model) Focused() bool {
 // interact.
 func (m *Model) Focus() {
 	m.focus = true
-	m.UpdateViewport()
 }
 
-// Blur blurs the table, preventing selection or movement.
-func (m *Model) Blur() {
+// Unfocus blurs the table, preventing selection or movement.
+func (m *Model) Unfocus() {
 	m.focus = false
-	m.UpdateViewport()
 }
 
 // View renders the component.
 func (m *Model) View(vb tea.Viewbox) {
 	m.headersView(vb)
-	m.viewport.View(vb.Padding(tea.PaddingOptions{Top: len(m.cols) + 1}))
-}
 
-// UpdateViewport updates the list content based on the previously defined
-// columns and rows.
-func (m *Model) UpdateViewport() {
 	renderedRows := make([]string, 0, len(m.rows))
 
 	// Render only rows from: m.cursor-m.viewport.Height to: m.cursor+m.viewport.Height
@@ -253,12 +243,14 @@ func (m *Model) UpdateViewport() {
 	}
 	m.end = clamp(m.cursor+m.viewport.Height, m.cursor, len(m.rows))
 	for i := m.start; i < m.end; i++ {
-		renderedRows = append(renderedRows, m.renderRow(i))
+		// m.renderRow(i)
 	}
 
 	m.viewport.SetContent(strings.Split(
 		styles.JoinVertical(styles.Left, renderedRows...),
 		"\n"))
+
+	m.viewport.View(vb.PaddingTop(len(m.cols) + 1))
 }
 
 // SelectedRow returns the selected row.
@@ -279,25 +271,21 @@ func (m *Model) Rows() []Row {
 // SetRows sets a new rows state.
 func (m *Model) SetRows(r []Row) {
 	m.rows = r
-	m.UpdateViewport()
 }
 
 // SetColumns sets a new columns state.
 func (m *Model) SetColumns(c []Column) {
 	m.cols = c
-	m.UpdateViewport()
 }
 
 // SetWidth sets the width of the viewport of the table.
 func (m *Model) SetWidth(w int) {
 	m.viewport.Width = w
-	m.UpdateViewport()
 }
 
 // SetHeight sets the height of the viewport of the table.
 func (m *Model) SetHeight(h int) {
 	m.viewport.Height = h
-	m.UpdateViewport()
 }
 
 // Height returns the viewport height of the table.
@@ -318,7 +306,6 @@ func (m *Model) Cursor() int {
 // SetCursor sets the cursor position in the table.
 func (m *Model) SetCursor(n int) {
 	m.cursor = clamp(n, 0, len(m.rows)-1)
-	m.UpdateViewport()
 }
 
 // MoveUp moves the selection up by any number of rows.
@@ -333,14 +320,12 @@ func (m *Model) MoveUp(n int) {
 	case m.viewport.YOffset >= 1:
 		m.viewport.YOffset = clamp(m.viewport.YOffset+n, 1, m.viewport.Height)
 	}
-	m.UpdateViewport()
 }
 
 // MoveDown moves the selection down by any number of rows.
 // It can not go below the last row.
 func (m *Model) MoveDown(n int) {
 	m.cursor = clamp(m.cursor+n, 0, len(m.rows)-1)
-	m.UpdateViewport()
 
 	switch {
 	case m.end == len(m.rows):
@@ -380,16 +365,14 @@ func (m *Model) FromValues(value, separator string) {
 }
 
 func (m *Model) headersView(vb tea.Viewbox) {
-	s := make([][]string, 0, len(m.cols))
+	vb = vb.Styled(m.styles.Header)
 	for _, col := range m.cols {
-		style := styles.Style{}. /*.Width(col.Width).MaxWidth(col.Width)*/ Inline(true)
-		renderedCell := style.Render(runewidth.Truncate(col.Title, col.Width, "…"))
-		s = append(s, strings.Split(m.styles.Header.Render(renderedCell), "\n"))
+		vb.WriteLine(runewidth.Truncate(col.Title, col.Width, "…"))
+		vb = vb.PaddingLeft(col.Width)
 	}
-	vb.WriteText(0, 0, styles.JoinHorizontal(styles.Left, s...))
 }
 
-func (m *Model) renderRow(rowID int) string {
+func (m *Model) renderRow(vb tea.Viewbox, rowID int) {
 	s := make([][]string, 0, len(m.cols))
 	for i, value := range m.rows[rowID] {
 		style := styles.Style{}. /*.Width(m.cols[i].Width).MaxWidth(m.cols[i].Width)*/ Inline(true)
@@ -400,10 +383,10 @@ func (m *Model) renderRow(rowID int) string {
 	row := styles.JoinHorizontal(styles.Left, s...)
 
 	if rowID == m.cursor {
-		return m.styles.Selected.Render(row)
+		vb = vb.Styled(m.styles.Selected)
 	}
 
-	return row
+	vb.WriteLine(row)
 }
 
 func clamp(v, low, high int) int {

@@ -25,7 +25,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		switch msg.String() {
 		case "esc":
 			if m.table.Focused() {
-				m.table.Blur()
+				m.table.Unfocus()
 			} else {
 				m.table.Focus()
 			}
