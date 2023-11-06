@@ -3,7 +3,6 @@ package tea
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"log"
 	"maps"
 	"strings"
@@ -21,19 +20,19 @@ import (
 const (
 	// defaultFramerate specifies the maximum interval at which we should
 	// update the view.
-	defaultFPS = 60
-	maxFPS     = 120
+	_fpsDefault = 60
+	_fpsMax     = 120
 )
 
 // msgRepaint forces a full repaint.
 type msgRepaint struct{}
 
-// standardRenderer is a framerate-based terminal renderer, updating the view
+// Renderer is a framerate-based terminal renderer, updating the view
 // at a given framerate to avoid overloading the terminal emulator.
 //
 // In cases where very high performance is needed the renderer can be told
 // to exclude ranges of lines, allowing them to be written to directly.
-type standardRenderer struct {
+type Renderer struct {
 	mu  *sync.Mutex
 	out *termenv.Output
 
@@ -44,7 +43,6 @@ type standardRenderer struct {
 	done               chan struct{}
 	lastRender         string
 	linesRendered      int
-	useANSICompressor  bool
 	once               sync.Once
 
 	// cursor visibility state
@@ -63,25 +61,19 @@ type standardRenderer struct {
 
 // newRenderer creates a new renderer. Normally you'll want to initialize it
 // with os.Stdout as the first argument.
-func newRenderer(out *termenv.Output, useANSICompressor bool, fps int) Renderer {
-	fps = min(fun.IF(fps >= 1, fps, defaultFPS), maxFPS)
-	return &standardRenderer{
-		out: fun.IF(
-			useANSICompressor,
-			// termenv.NewOutput(&compressor.Writer{Forward: out}),
-			termenv.NewOutput(out),
-			out,
-		),
+func newRenderer(out *termenv.Output, fps int) *Renderer {
+	fps = min(fun.IF(fps >= 1, fps, _fpsDefault), _fpsMax)
+	return &Renderer{
+		out:                out,
 		mu:                 &sync.Mutex{},
 		done:               make(chan struct{}),
 		frameDuration:      time.Second / time.Duration(fps),
-		useANSICompressor:  useANSICompressor,
 		queuedMessageLines: []string{},
 	}
 }
 
 // start starts the renderer.
-func (r *standardRenderer) start() {
+func (r *Renderer) start() {
 	if r.ticker == nil {
 		r.ticker = time.NewTicker(r.frameDuration)
 	} else {
@@ -98,7 +90,7 @@ func (r *standardRenderer) start() {
 }
 
 // stop permanently halts the renderer, rendering the final frame.
-func (r *standardRenderer) stop() {
+func (r *Renderer) stop() {
 	// Stop the renderer before acquiring the mutex to avoid a deadlock.
 	r.once.Do(func() {
 		r.done <- struct{}{}
@@ -111,16 +103,10 @@ func (r *standardRenderer) stop() {
 	defer r.mu.Unlock()
 
 	r.out.ClearLine()
-
-	if r.useANSICompressor {
-		if w, ok := r.out.TTY().(io.WriteCloser); ok {
-			_ = w.Close()
-		}
-	}
 }
 
 // kill halts the renderer. The final frame will not be rendered.
-func (r *standardRenderer) kill() {
+func (r *Renderer) kill() {
 	// Stop the renderer before acquiring the mutex to avoid a deadlock.
 	r.once.Do(func() {
 		r.done <- struct{}{}
@@ -133,7 +119,7 @@ func (r *standardRenderer) kill() {
 }
 
 // listen waits for ticks on the ticker, or a signal to stop the renderer.
-func (r *standardRenderer) listen() {
+func (r *Renderer) listen() {
 	for {
 		select {
 		case <-r.done:
@@ -147,7 +133,7 @@ func (r *standardRenderer) listen() {
 }
 
 // flush renders the buffer.
-func (r *standardRenderer) flush() {
+func (r *Renderer) flush() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -267,13 +253,13 @@ func (r *standardRenderer) flush() {
 	r.reset()
 }
 
-func (r *standardRenderer) reset() {
+func (r *Renderer) reset() {
 	r.buf.Reset()
 }
 
 // write writes to the internal buffer. The buffer will be outputted via the
 // ticker which calls flush().
-func (r *standardRenderer) Write(s []byte) {
+func (r *Renderer) Write(s []byte) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -281,11 +267,11 @@ func (r *standardRenderer) Write(s []byte) {
 	r.buf = *bytes.NewBuffer(s)
 }
 
-func (r *standardRenderer) repaint() {
+func (r *Renderer) repaint() {
 	r.lastRender = ""
 }
 
-func (r *standardRenderer) clearScreen() {
+func (r *Renderer) clearScreen() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -295,14 +281,14 @@ func (r *standardRenderer) clearScreen() {
 	r.repaint()
 }
 
-func (r *standardRenderer) altScreen() bool {
+func (r *Renderer) altScreen() bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	return r.altScreenActive
 }
 
-func (r *standardRenderer) enterAltScreen() {
+func (r *Renderer) enterAltScreen() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -334,7 +320,7 @@ func (r *standardRenderer) enterAltScreen() {
 	r.repaint()
 }
 
-func (r *standardRenderer) exitAltScreen() {
+func (r *Renderer) exitAltScreen() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -357,7 +343,7 @@ func (r *standardRenderer) exitAltScreen() {
 	r.repaint()
 }
 
-func (r *standardRenderer) setCursor(show bool) {
+func (r *Renderer) setCursor(show bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -369,7 +355,7 @@ func (r *standardRenderer) setCursor(show bool) {
 	}
 }
 
-func (r *standardRenderer) setMouseCellMotion(enabled bool) {
+func (r *Renderer) setMouseCellMotion(enabled bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -380,7 +366,7 @@ func (r *standardRenderer) setMouseCellMotion(enabled bool) {
 	}
 }
 
-func (r *standardRenderer) setMouseAllMotion(enabled bool) {
+func (r *Renderer) setMouseAllMotion(enabled bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -392,7 +378,7 @@ func (r *standardRenderer) setMouseAllMotion(enabled bool) {
 }
 
 // setIgnoredLines specifies lines not to be touched by the standard Tea renderer.
-func (r *standardRenderer) setIgnoredLines(from, to int) {
+func (r *Renderer) setIgnoredLines(from, to int) {
 	// Lock if we're going to be clearing some lines since we don't want
 	// anything jacking our cursor.
 	if r.linesRendered > 0 {
@@ -426,7 +412,7 @@ func (r *standardRenderer) setIgnoredLines(from, to int) {
 // clearIgnoredLines returns control of any ignored lines to the standard
 // Tea renderer. That is, any lines previously set to be ignored can be
 // rendered to again.
-func (r *standardRenderer) clearIgnoredLines() {
+func (r *Renderer) clearIgnoredLines() {
 	r.ignoreLines = nil
 }
 
@@ -448,7 +434,7 @@ func (r *standardRenderer) clearIgnoredLines() {
 // use in high-performance rendering, such as a pager that could potentially
 // be rendering very complicated ansi. In cases where the content is simpler
 // standard Tea rendering should suffice.
-func (r *standardRenderer) insertTop(lines []string, topBoundary, bottomBoundary int) {
+func (r *Renderer) insertTop(lines []string, topBoundary, bottomBoundary int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -476,7 +462,7 @@ func (r *standardRenderer) insertTop(lines []string, topBoundary, bottomBoundary
 // See note in insertTop() for caveats, how this function only makes sense for
 // full-window applications, and how it differs from the normal way we do
 // rendering in Tea.
-func (r *standardRenderer) insertBottom(lines []string, topBoundary, bottomBoundary int) {
+func (r *Renderer) insertBottom(lines []string, topBoundary, bottomBoundary int) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -495,7 +481,7 @@ func (r *standardRenderer) insertBottom(lines []string, topBoundary, bottomBound
 }
 
 // handleMessages handles internal messages for the renderer.
-func (r *standardRenderer) handleMessages(msg Msg) {
+func (r *Renderer) handleMessages(msg Msg) {
 	switch msg := msg.(type) {
 	case msgRepaint:
 		// Force a repaint by clearing the render cache as we slide into a

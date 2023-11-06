@@ -68,17 +68,15 @@ func (p *Program[M]) initTerminal() error {
 // restoreTerminalState restores the terminal to the state prior to running the
 // Tea program.
 func (p *Program[M]) restoreTerminalState() error {
-	if p.renderer != nil {
-		p.renderer.setCursor(true)
-		p.renderer.setMouseCellMotion(false)
-		p.renderer.setMouseAllMotion(false)
+	p.renderer.setCursor(true)
+	p.renderer.setMouseCellMotion(false)
+	p.renderer.setMouseAllMotion(false)
 
-		if p.renderer.altScreen() {
-			p.renderer.exitAltScreen()
+	if p.renderer.altScreen() {
+		p.renderer.exitAltScreen()
 
-			// give the terminal a moment to catch up
-			time.Sleep(10 * time.Millisecond)
-		}
+		// give the terminal a moment to catch up
+		time.Sleep(10 * time.Millisecond)
 	}
 
 	if p.console != nil {

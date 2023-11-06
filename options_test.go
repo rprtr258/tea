@@ -22,11 +22,6 @@ func TestOptions(t *testing.T) {
 		assert.Equal(t, customInput, p.inputType)
 	})
 
-	t.Run("renderer", func(t *testing.T) {
-		p := NewProgram[*testModel](context.Background(), nil).WithoutRenderer()
-		_ = p.renderer.(*nilRenderer)
-	})
-
 	t.Run("without signals", func(t *testing.T) {
 		p := NewProgram[*testModel](context.Background(), nil).WithoutSignals()
 		assert.True(t, p.ignoreSignals)
@@ -54,11 +49,6 @@ func TestOptions(t *testing.T) {
 		t.Run("alt screen", func(t *testing.T) {
 			p := NewProgram[*testModel](context.Background(), nil).WithAltScreen()
 			assert.True(t, p.startupOptions.has(withAltScreen))
-		})
-
-		t.Run("ansi compression", func(t *testing.T) {
-			p := NewProgram[*testModel](context.Background(), nil).WithANSICompressor()
-			assert.True(t, p.startupOptions.has(withANSICompressor))
 		})
 
 		t.Run("without catch panics", func(t *testing.T) {

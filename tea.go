@@ -83,7 +83,6 @@ const (
 	withAltScreen startupOptions = 1 << iota
 	withMouseCellMotion
 	withMouseAllMotion
-	withANSICompressor
 	withoutSignalHandler
 
 	// Catching panics is incredibly useful for restoring the terminal to a
@@ -140,7 +139,7 @@ type Program[M Model] struct {
 	// where to send output, this will usually be os.Stdout.
 	output        *termenv.Output
 	restoreOutput func() error
-	renderer      Renderer
+	renderer      *Renderer
 	vb            Viewbox
 
 	// where to read inputs from, this will usually be os.Stdin.
@@ -196,6 +195,7 @@ func NewProgram[M Model](ctx context.Context, model M) *Program[M] {
 		ctx:           ctx,
 		cancel:        cancel,
 		restoreOutput: restoreOutput,
+		renderer:      newRenderer(output /*p.fps*/, _fpsDefault),
 	}
 }
 
@@ -443,11 +443,6 @@ func (p *Program[M]) Run() (M, error) {
 				return
 			}
 		}()
-	}
-
-	// If no renderer is set use the standard one.
-	if p.renderer == nil {
-		p.renderer = newRenderer(p.output, p.startupOptions.has(withANSICompressor), p.fps)
 	}
 
 	// Check if output is a TTY before entering raw mode, hiding the cursor and so on.

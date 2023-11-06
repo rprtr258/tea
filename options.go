@@ -106,29 +106,6 @@ func (p *Program[M]) WithMouseAllMotion() *Program[M] {
 	return p
 }
 
-// WithoutRenderer disables the renderer. When this is set output and log
-// statements will be plainly sent to stdout (or another output if one is set)
-// without any rendering and redrawing logic. In other words, printing and
-// logging will behave the same way it would in a non-TUI commandline tool.
-// This can be useful if you want to use the Tea framework for a non-TUI
-// application, or to provide an additional non-TUI mode to your Tea
-// programs. For example, your program could behave like a daemon if output is
-// not a TTY.
-func (p *Program[M]) WithoutRenderer() *Program[M] {
-	p.renderer = &nilRenderer{}
-	return p
-}
-
-// WithANSICompressor removes redundant ANSI sequences to produce potentially
-// smaller output, at the cost of some processing overhead.
-//
-// This feature is provisional, and may be changed or removed in a future version
-// of this package.
-func (p *Program[M]) WithANSICompressor() *Program[M] {
-	p.startupOptions |= withANSICompressor
-	return p
-}
-
 // WithFilter supplies an event filter that will be invoked before Tea
 // processes a tea.Msg. The event filter can return any tea.Msg which will then
 // get handled by Tea instead of the original event. If the event filter
