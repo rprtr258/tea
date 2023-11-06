@@ -15,6 +15,7 @@ import (
 type model struct {
 	viewport    viewport.Model
 	messages    []string
+	lines       []string
 	textarea    textarea.Model
 	senderStyle styles.Style
 	err         error
@@ -37,10 +38,6 @@ func initialModel() *model {
 	ta.ShowLineNumbers = false
 
 	vp := viewport.New(30, 5)
-	vp.SetContent([]string{
-		`Welcome to the chat room!`,
-		`Type a message and press Enter to send.`,
-	})
 
 	ta.KeyMap.InsertNewline.SetEnabled(false)
 
@@ -50,6 +47,10 @@ func initialModel() *model {
 		viewport:    vp,
 		senderStyle: styles.Style{}.Foreground(styles.FgColor("5")),
 		err:         nil,
+		lines: []string{
+			`Welcome to the chat room!`,
+			`Type a message and press Enter to send.`,
+		},
 	}
 }
 
@@ -67,9 +68,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			return
 		case tea.KeyEnter:
 			m.messages = append(m.messages, m.senderStyle.Render("You: ")+m.textarea.Value())
-			m.viewport.SetContent(m.messages)
+			m.lines = m.messages
 			m.textarea.Reset()
-			m.viewport.GotoBottom()
+			// m.viewport.GotoBottom()
 		}
 	}
 
@@ -78,7 +79,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	m.viewport.View(vb)
+	m.viewport.View(vb, func(vb tea.Viewbox, i int) {
+		vb.WriteLine(m.lines[i])
+	})
 	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: m.viewport.Height}))
 }
 

@@ -66,21 +66,6 @@ func newExample() (*model, error) {
 	// BorderForeground(styles.FgColor("62"))
 	// PaddingRight(2)
 
-	renderer, err := markdown.NewTermRenderer(
-		markdown.WithAutoStyle(),
-		markdown.WithWordWrap(width),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	str, err := renderer.Render(content)
-	if err != nil {
-		return nil, err
-	}
-
-	vp.SetContent(strings.Split(str, "\n"))
-
 	return &model{
 		viewport: vp,
 	}, nil
@@ -101,7 +86,25 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	m.viewport.View(vb)
+	renderer, err := markdown.NewTermRenderer(
+		markdown.WithAutoStyle(),
+		markdown.WithWordWrap(vb.Width),
+	)
+	if err != nil {
+		return
+		// return nil, err
+	}
+
+	str, err := renderer.Render(content)
+	if err != nil {
+		return
+		// return nil, err
+	}
+
+	lines := strings.Split(str, "\n")
+	m.viewport.View(vb, func(v tea.Viewbox, i int) {
+		v.WriteLine(lines[i])
+	})
 	// TODO: right after viewport
 	vb.PaddingTop(vb.Height - 1).WriteLine(helpStyle("  ↑/↓: Navigate • q: Quit"))
 }

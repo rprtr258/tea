@@ -24,11 +24,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "esc":
-			if m.table.Focused() {
-				m.table.Unfocus()
-			} else {
-				m.table.Focus()
-			}
+			m.table.IsFocused = !m.table.IsFocused
 		case "q", "ctrl+c":
 			f(tea.Quit)
 			return
@@ -37,7 +33,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			return
 		}
 	}
-	f(m.table.Update(msg)...)
+	m.table.Update(msg)
 }
 
 func (m *model) View(vb tea.Viewbox) {
@@ -45,14 +41,24 @@ func (m *model) View(vb tea.Viewbox) {
 }
 
 func Main(ctx context.Context) error {
+	s := table.DefaultStyles
+	s.Header = s.Header.
+		// BorderStyle(box.NormalBorder).
+		// BorderForeground(styles.FgColor("240")).
+		// BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(styles.FgColor("229")).
+		Background(styles.BgColor("57")).
+		Bold(false)
+
 	columns := []table.Column{
 		{Title: "Rank", Width: 4},
 		{Title: "City", Width: 10},
 		{Title: "Country", Width: 10},
 		{Title: "Population", Width: 10},
 	}
-
-	rows := []table.Row{
+	rows := [][]string{
 		{"1", "Tokyo", "Japan", "37,274,000"},
 		{"2", "Delhi", "India", "32,065,760"},
 		{"3", "Shanghai", "China", "28,516,904"},
@@ -154,25 +160,13 @@ func Main(ctx context.Context) error {
 		{"99", "Shijiazhuang", "China", "4,285,135"},
 		{"100", "Montreal", "Canada", "4,276,526"},
 	}
-
 	t := table.New(
 		table.WithColumns(columns),
-		table.WithRows(rows),
+		table.WithRows(rows...),
 		table.WithFocused(true),
 		table.WithHeight(7),
+		table.WithStyles(s),
 	)
-
-	s := table.DefaultStyles
-	s.Header = s.Header.
-		// BorderStyle(box.NormalBorder).
-		// BorderForeground(styles.FgColor("240")).
-		// BorderBottom(true).
-		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(styles.FgColor("229")).
-		Background(styles.BgColor("57")).
-		Bold(false)
-	t.SetStyles(s)
 
 	_, err := tea.NewProgram(ctx, &model{t}).Run()
 	return err

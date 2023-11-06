@@ -1,12 +1,9 @@
 package viewport
 
 import (
-	"cmp"
-
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/styles"
-	"github.com/samber/lo"
 )
 
 // KeyMap defines the keybindings for the viewport. Note that you don't
@@ -70,8 +67,6 @@ type Model struct {
 	// Style applies a styles style to the viewport. Realistically, it's most
 	// useful for setting borders, margins and padding.
 	Style styles.Style
-
-	lines []string
 }
 
 // New create model with given width, height and default key mappings.
@@ -82,7 +77,6 @@ func New(width, height int) Model {
 		KeyMap:            DefaultKeyMap,
 		MouseWheelEnabled: true,
 		MouseWheelDelta:   3,
-		lines:             nil,
 		YOffset:           0,
 		Style:             styles.Style{},
 	}
@@ -97,60 +91,14 @@ func (m *Model) AtTop() bool {
 	return m.YOffset <= 0
 }
 
-// AtBottom returns whether or not the viewport is at or past the very bottom position.
-func (m *Model) AtBottom() bool {
-	return m.YOffset >= m.maxYOffset()
-}
-
-// PastBottom returns whether or not the viewport is scrolled beyond the last line.
-// This can happen when adjusting the viewport height.
-func (m *Model) PastBottom() bool {
-	return m.YOffset > m.maxYOffset()
-}
-
-// ScrollPercent returns the amount scrolled as a float between 0 and 1.
-func (m *Model) ScrollPercent() float64 {
-	if m.Height >= len(m.lines) {
-		return 1.0
-	}
-
-	v := float64(m.YOffset) / float64(len(m.lines)-1-m.Height)
-	return clamp(v, 0, 1)
-}
-
-// SetContent set the pager's text content.
-func (m *Model) SetContent(lines []string) {
-	m.lines = lines
-
-	if m.YOffset > len(m.lines)-1 {
-		m.GotoBottom()
-	}
-}
-
-// maxYOffset returns the maximum possible value of the y-offset based on the
-// viewport's content and set height.
-func (m *Model) maxYOffset() int {
-	return max(0, len(m.lines)-m.Height)
-}
-
-// visibleLines returns the lines that should currently be visible in the
-// viewport.
-func (m *Model) visibleLines() []string {
-	if len(m.lines) == 0 {
-		return nil
-	}
-
-	return lo.Slice(m.lines, m.YOffset, m.YOffset+m.Height)
-}
-
 // SetYOffset sets the Y offset.
 func (m *Model) SetYOffset(n int) {
-	m.YOffset = clamp(n, 0, m.maxYOffset())
+	m.YOffset = max(n, 0)
 }
 
 // LineDown moves the view down by the given number of lines.
 func (m *Model) LineDown(n int) {
-	if m.AtBottom() || n == 0 || len(m.lines) == 0 {
+	if n == 0 {
 		return
 	}
 
@@ -162,7 +110,7 @@ func (m *Model) LineDown(n int) {
 // LineUp moves the view down by the given number of lines. Returns the new
 // lines to show.
 func (m *Model) LineUp(n int) {
-	if m.AtTop() || n == 0 || len(m.lines) == 0 {
+	if m.AtTop() || n == 0 {
 		return
 	}
 
@@ -171,26 +119,9 @@ func (m *Model) LineUp(n int) {
 	m.SetYOffset(m.YOffset - n)
 }
 
-// TotalLineCount returns the total number of lines (both hidden and visible) within the viewport.
-func (m *Model) TotalLineCount() int {
-	return len(m.lines)
-}
-
-// VisibleLineCount returns the number of the visible lines within the viewport.
-func (m *Model) VisibleLineCount() int {
-	return len(m.visibleLines())
-}
-
 // GotoTop sets the viewport to the top position.
 func (m *Model) GotoTop() {
 	m.SetYOffset(0)
-	m.visibleLines()
-}
-
-// GotoBottom sets the viewport to the bottom position.
-func (m *Model) GotoBottom() {
-	m.SetYOffset(m.maxYOffset())
-	m.visibleLines()
 }
 
 // Update handles standard message-based viewport updates.
@@ -232,16 +163,8 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 }
 
 // View renders the viewport into a string.
-func (m *Model) View(vb tea.Viewbox) {
-	for _, line := range m.visibleLines() {
-		vb.WriteLine(line)
-		vb = vb.PaddingTop(1)
+func (m *Model) View(vb tea.Viewbox, lines func(tea.Viewbox, int)) {
+	for i := max(0, m.YOffset); i <= m.YOffset+m.Height; i++ {
+		lines(vb.Row(i), i)
 	}
-}
-
-func clamp[T cmp.Ordered](v, low, high T) T {
-	if high < low {
-		low, high = high, low
-	}
-	return min(max(v, low), high)
 }

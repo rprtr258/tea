@@ -17,6 +17,7 @@ type model struct {
 	content  string
 	ready    bool
 	viewport viewport.Model
+	lines    []string
 }
 
 func (m *model) Init(func(...tea.Cmd)) {}
@@ -41,7 +42,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			// The initial dimensions come in quickly, though asynchronously,
 			// which is why we wait for them here.
 			m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
-			m.viewport.SetContent(strings.Split(m.content, "\n"))
+			m.lines = strings.Split(m.content, "\n")
 			m.ready = true
 		} else {
 			m.viewport.Width = msg.Width
@@ -76,7 +77,7 @@ func (m *model) headerView(vb tea.Viewbox) {
 }
 
 func (m *model) footerView(vb tea.Viewbox) {
-	info := fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100)
+	info := fmt.Sprintf("%3.f%%", float64(m.viewport.YOffset)/float64(len(m.lines))*100)
 	box.Box(
 		vb.Sub(tea.Rectangle{
 			Left:   vb.Width - 2 - len(info) - 2,
@@ -113,7 +114,9 @@ func (m *model) View(vb tea.Viewbox) {
 	m.viewport.View(vb.Sub(tea.Rectangle{
 		Height: m.viewport.Height,
 		Width:  vb.Width,
-	}))
+	}), func(vb tea.Viewbox, i int) {
+		vb.WriteLine(m.lines[i])
+	})
 	m.footerView(vb.PaddingTop(m.viewport.Height))
 }
 

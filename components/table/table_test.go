@@ -12,9 +12,9 @@ func TestFromValues(t *testing.T) {
 		{"foo1", "bar1"},
 		{"foo2", "bar2"},
 		{"foo3", "bar3"},
-	})
+	}...)
 
-	assert.Equal(t, []Row{
+	assert.Equal(t, [][]string{
 		{"foo1", "bar1"},
 		{"foo2", "bar2"},
 		{"foo3", "bar3"},
@@ -26,9 +26,9 @@ func TestFromValuesWithTabSeparator(t *testing.T) {
 	table.FromValues([][]string{
 		{"foo1.", "bar1"},
 		{"foo,bar,baz", "bar,2"},
-	})
+	}...)
 
-	assert.Equal(t, []Row{
+	assert.Equal(t, [][]string{
 		{"foo1.", "bar1"},
 		{"foo,bar,baz", "bar,2"},
 	}, table.rows)
