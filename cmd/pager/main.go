@@ -15,7 +15,6 @@ import (
 
 type model struct {
 	content  string
-	ready    bool
 	viewport viewport.Model
 	lines    []string
 }
@@ -33,21 +32,15 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	case tea.MsgWindowSize:
 		const headerHeight = 3
 		const footerHeight = 3
-		verticalMarginHeight := headerHeight + footerHeight
+		const verticalMarginHeight = headerHeight + footerHeight
 
-		if !m.ready {
-			// Since this program is using the full size of the viewport we
-			// need to wait until we've received the window dimensions before
-			// we can initialize the viewport.
-			// The initial dimensions come in quickly, though asynchronously,
-			// which is why we wait for them here.
-			m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
-			m.lines = strings.Split(m.content, "\n")
-			m.ready = true
-		} else {
-			m.viewport.Width = msg.Width
-			m.viewport.Height = msg.Height - verticalMarginHeight
-		}
+		// Since this program is using the full size of the viewport we
+		// need to wait until we've received the window dimensions before
+		// we can initialize the viewport.
+		// The initial dimensions come in quickly, though asynchronously,
+		// which is why we wait for them here.
+		m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
+		m.lines = strings.Split(m.content, "\n")
 	}
 
 	// Handle keyboard and mouse events in the viewport
@@ -101,11 +94,6 @@ func (m *model) footerView(vb tea.Viewbox) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	if !m.ready {
-		vb.WriteLine("  Initializing...")
-		return
-	}
-
 	m.headerView(vb.Sub(tea.Rectangle{
 		Height: 3,
 		Width:  vb.Width,
