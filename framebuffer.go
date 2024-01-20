@@ -202,7 +202,7 @@ func (vb Viewbox) MaxWidth(width int) Viewbox {
 }
 
 func (vb Viewbox) Styled(style styles.Style) Viewbox {
-	return Viewbox{
+	vb = Viewbox{
 		fb:     vb.fb,
 		Height: vb.Height,
 		Width:  vb.Width,
@@ -210,6 +210,14 @@ func (vb Viewbox) Styled(style styles.Style) Viewbox {
 		X:      vb.X,
 		style:  style.Inherit(vb.style),
 	}
+	if style.GetBackground() != nil {
+		for y := 0; y < vb.Height; y++ {
+			for x := 0; x < vb.Width; x++ {
+				vb.Set(y, x, ' ')
+			}
+		}
+	}
+	return vb
 }
 
 // WriteLine starting from x=offset without wrapping, returns end offset
