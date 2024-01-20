@@ -300,10 +300,13 @@ func (m *Model) FromValues(rows ...[]string) {
 // View renders the component
 func (m *Model) View(vb tea.Viewbox) {
 	// header
-	vb = vb.Styled(m.styles.Header)
-	for _, col := range m.cols {
-		vb.WriteLine(runewidth.Truncate(col.Title, col.Width, "…"))
-		vb = vb.PaddingLeft(col.Width)
+	{
+		vbh := vb.Styled(m.styles.Header)
+		for _, col := range m.cols {
+			vbh = vbh.
+				WriteLine(runewidth.Truncate(col.Title, col.Width, "…")).
+				PaddingLeft(col.Width)
+		}
 	}
 
 	// Render only rows from: m.cursor-m.viewport.Height to: m.cursor+m.viewport.Height
@@ -322,9 +325,8 @@ func (m *Model) View(vb tea.Viewbox) {
 			vbRow = vbRow.Styled(m.styles.Selected)
 		}
 
-		row := m.rows[i]
 		s := make([][]string, 0, len(m.cols))
-		for i, value := range row {
+		for i, value := range m.rows[i] {
 			style := styles.Style{}. /*.Width(m.cols[i].Width).MaxWidth(m.cols[i].Width)*/ Inline(true)
 			renderedCell := m.styles.Cell.Render(style.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
 			s = append(s, strings.Split(renderedCell, "\n"))
