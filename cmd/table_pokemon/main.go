@@ -3,6 +3,7 @@ package table_pokemon
 import (
 	"context"
 
+	"github.com/rprtr258/scuf"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/tablebox"
 	"github.com/rprtr258/tea/styles"
@@ -37,60 +38,64 @@ func (m *model) View(vb tea.Viewbox) {
 				return
 			}
 
-			// data := [][]string{
-			// 	{"1", "Bulbasaur", "Grass", "Poison", "フシギダネ", "Bulbasaur"},
-			// 	{"2", "Ivysaur", "Grass", "Poison", "フシギソウ", "Ivysaur"},
-			// 	{"3", "Venusaur", "Grass", "Poison", "フシギバナ", "Venusaur"},
-			// 	{"4", "Charmander", "Fire", "", "ヒトカゲ", "Hitokage"},
-			// 	{"5", "Charmeleon", "Fire", "", "リザード", "Lizardo"},
-			// 	{"6", "Charizard", "Fire", "Flying", "リザードン", "Lizardon"},
-			// 	{"7", "Squirtle", "Water", "", "ゼニガメ", "Zenigame"},
-			// 	{"8", "Wartortle", "Water", "", "カメール", "Kameil"},
-			// 	{"9", "Blastoise", "Water", "", "カメックス", "Kamex"},
-			// 	{"10", "Caterpie", "Bug", "", "キャタピー", "Caterpie"},
-			// 	{"11", "Metapod", "Bug", "", "トランセル", "Trancell"},
-			// 	{"12", "Butterfree", "Bug", "Flying", "バタフリー", "Butterfree"},
-			// 	{"13", "Weedle", "Bug", "Poison", "ビードル", "Beedle"},
-			// 	{"14", "Kakuna", "Bug", "Poison", "コクーン", "Cocoon"},
-			// 	{"15", "Beedrill", "Bug", "Poison", "スピアー", "Spear"},
-			// 	{"16", "Pidgey", "Normal", "Flying", "ポッポ", "Poppo"},
-			// 	{"17", "Pidgeotto", "Normal", "Flying", "ピジョン", "Pigeon"},
-			// 	{"18", "Pidgeot", "Normal", "Flying", "ピジョット", "Pigeot"},
-			// 	{"19", "Rattata", "Normal", "", "コラッタ", "Koratta"},
-			// 	{"20", "Raticate", "Normal", "", "ラッタ", "Ratta"},
-			// 	{"21", "Spearow", "Normal", "Flying", "オニスズメ", "Onisuzume"},
-			// 	{"22", "Fearow", "Normal", "Flying", "オニドリル", "Onidrill"},
-			// 	{"23", "Ekans", "Poison", "", "アーボ", "Arbo"},
-			// 	{"24", "Arbok", "Poison", "", "アーボック", "Arbok"},
-			// 	{"25", "Pikachu", "Electric", "", "ピカチュウ", "Pikachu"},
-			// 	{"26", "Raichu", "Electric", "", "ライチュウ", "Raichu"},
-			// 	{"27", "Sandshrew", "Ground", "", "サンド", "Sand"},
-			// 	{"28", "Sandslash", "Ground", "", "サンドパン", "Sandpan"},
-			// }
+			selectedStyle := styles.Style{}.Foreground(styles.FgRGB("#01BE85")).Background(styles.BgRGB("#00432F"))
+			typeColors := map[string][2]scuf.Modifier{ // normal, dimmed
+				"Bug":      {styles.FgRGB("#D7FF87"), styles.FgRGB("#97AD64")},
+				"Electric": {styles.FgRGB("#FDFF90"), styles.FgRGB("#FCFF5F")},
+				"Fire":     {styles.FgRGB("#FF7698"), styles.FgRGB("#BA5F75")},
+				"Flying":   {styles.FgRGB("#FF87D7"), styles.FgRGB("#C97AB2")},
+				"Grass":    {styles.FgRGB("#75FBAB"), styles.FgRGB("#59B980")},
+				"Ground":   {styles.FgRGB("#FF875F"), styles.FgRGB("#C77252")},
+				"Normal":   {styles.FgRGB("#929292"), styles.FgRGB("#727272")},
+				"Poison":   {styles.FgRGB("#7D5AFC"), styles.FgRGB("#634BD0")},
+				"Water":    {styles.FgRGB("#00E2C7"), styles.FgRGB("#439F8E")},
+			}
+			textColor := [2]scuf.Modifier{styles.ANSIColor(245), styles.ANSIColor(252)}
 
-			// selectedStyle := baseStyle.Copy().Foreground(lipgloss.Color("#01BE85")).Background(lipgloss.Color("#00432F"))
-			// typeColors := map[string]lipgloss.Color{
-			// 	"Bug":      lipgloss.Color("#D7FF87"),
-			// 	"Electric": lipgloss.Color("#FDFF90"),
-			// 	"Fire":     lipgloss.Color("#FF7698"),
-			// 	"Flying":   lipgloss.Color("#FF87D7"),
-			// 	"Grass":    lipgloss.Color("#75FBAB"),
-			// 	"Ground":   lipgloss.Color("#FF875F"),
-			// 	"Normal":   lipgloss.Color("#929292"),
-			// 	"Poison":   lipgloss.Color("#7D5AFC"),
-			// 	"Water":    lipgloss.Color("#00E2C7"),
-			// }
-			// dimTypeColors := map[string]lipgloss.Color{
-			// 	"Bug":      lipgloss.Color("#97AD64"),
-			// 	"Electric": lipgloss.Color("#FCFF5F"),
-			// 	"Fire":     lipgloss.Color("#BA5F75"),
-			// 	"Flying":   lipgloss.Color("#C97AB2"),
-			// 	"Grass":    lipgloss.Color("#59B980"),
-			// 	"Ground":   lipgloss.Color("#C77252"),
-			// 	"Normal":   lipgloss.Color("#727272"),
-			// 	"Poison":   lipgloss.Color("#634BD0"),
-			// 	"Water":    lipgloss.Color("#439F8E"),
-			// }
+			for y, cur := range [][]string{
+				{"1", "Bulbasaur", "Grass", "Poison", "フシギダネ", "Bulbasaur"},
+				{"2", "Ivysaur", "Grass", "Poison", "フシギソウ", "Ivysaur"},
+				{"3", "Venusaur", "Grass", "Poison", "フシギバナ", "Venusaur"},
+				{"4", "Charmander", "Fire", "", "ヒトカゲ", "Hitokage"},
+				{"5", "Charmeleon", "Fire", "", "リザード", "Lizardo"},
+				{"6", "Charizard", "Fire", "Flying", "リザードン", "Lizardon"},
+				{"7", "Squirtle", "Water", "", "ゼニガメ", "Zenigame"},
+				{"8", "Wartortle", "Water", "", "カメール", "Kameil"},
+				{"9", "Blastoise", "Water", "", "カメックス", "Kamex"},
+				{"10", "Caterpie", "Bug", "", "キャタピー", "Caterpie"},
+				{"11", "Metapod", "Bug", "", "トランセル", "Trancell"},
+				{"12", "Butterfree", "Bug", "Flying", "バタフリー", "Butterfree"},
+				{"13", "Weedle", "Bug", "Poison", "ビードル", "Beedle"},
+				{"14", "Kakuna", "Bug", "Poison", "コクーン", "Cocoon"},
+				{"15", "Beedrill", "Bug", "Poison", "スピアー", "Spear"},
+				{"16", "Pidgey", "Normal", "Flying", "ポッポ", "Poppo"},
+				{"17", "Pidgeotto", "Normal", "Flying", "ピジョン", "Pigeon"},
+				{"18", "Pidgeot", "Normal", "Flying", "ピジョット", "Pigeot"},
+				{"19", "Rattata", "Normal", "", "コラッタ", "Koratta"},
+				{"20", "Raticate", "Normal", "", "ラッタ", "Ratta"},
+				{"21", "Spearow", "Normal", "Flying", "オニスズメ", "Onisuzume"},
+				{"22", "Fearow", "Normal", "Flying", "オニドリル", "Onidrill"},
+				{"23", "Ekans", "Poison", "", "アーボ", "Arbo"},
+				{"24", "Arbok", "Poison", "", "アーボック", "Arbok"},
+				{"25", "Pikachu", "Electric", "", "ピカチュウ", "Pikachu"},
+				{"26", "Raichu", "Electric", "", "ライチュウ", "Raichu"},
+				{"27", "Sandshrew", "Ground", "", "サンド", "Sand"},
+				{"28", "Sandslash", "Ground", "", "サンドパン", "Sandpan"},
+			} {
+				vbRow := vb.Row(y)
+				switch x {
+				case 2, 3:
+					vbRow = vbRow.Styled(styles.Style{}.Foreground(typeColors[cur[x]][1-y%2]))
+				default:
+					vbRow = vbRow.Styled(styles.Style{}.Foreground(typeColors[cur[x]][1-y%2]))
+				}
+
+				if cur[0] == "Pikachu" {
+					vbRow = vbRow.Styled(selectedStyle).PaddingLeft(1).WriteLine(cur[x])
+				} else {
+					vbRow.Styled(styles.Style{}.Foreground(textColor[1-y%2])).PaddingLeft(1).WriteLine(cur[x])
+				}
+			}
 		},
 		tablebox.NormalBorder,
 		styles.Style{}.Foreground(styles.ANSIColor(238)),
