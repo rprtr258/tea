@@ -260,7 +260,7 @@ func (m *Model) MoveUp(n int) {
 // MoveDown moves the selection down by any number of rows.
 // It can not go below the last row.
 func (m *Model) MoveDown(n int) {
-	newCursor := max(m.cursor+n, 0)
+	newCursor := min(m.cursor+n, len(m.rows)-1)
 	if newCursor-m.viewport.Height >= m.viewport.YOffset || newCursor-m.cursor >= m.viewport.Height {
 		m.viewport.SetYOffset(newCursor - m.viewport.Height)
 	}
