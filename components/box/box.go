@@ -87,7 +87,7 @@ func Box(
 		}))
 	}
 
-	// If no border is set or all borders are been disabled, abort.
+	// If no border is set or all borders are disabled, abort
 	if border == noBorder || borders == 0 {
 		return
 	}
@@ -117,38 +117,58 @@ func Box(
 	styleBottom := styles.Style{}.Foreground(bottomFG).Background(bottomBG)
 	// angles
 	if borders.GetTop() && borders.GetLeft() {
-		vb.Styled(styleTop).Set(0, 0, border.TopLeft)
+		vb.Pixel(0, 0).Styled(styleTop).Set(0, 0, border.TopLeft)
 	}
 	if borders.GetTop() && borders.GetRight() {
-		vb.Styled(styleTop).Set(0, vb.Width-1, border.TopRight)
+		vb.Pixel(0, vb.Width-1).Styled(styleTop).Set(0, 0, border.TopRight)
 	}
 	if borders.GetBottom() && borders.GetLeft() {
-		vb.Styled(styleBottom).Set(vb.Height-1, 0, border.BottomLeft)
+		vb.Pixel(vb.Height-1, 0).Styled(styleBottom).Set(0, 0, border.BottomLeft)
 	}
 	if borders.GetBottom() && borders.GetRight() {
-		vb.Styled(styleBottom).Set(vb.Height-1, vb.Width-1, border.BottomRight)
+		vb.Pixel(vb.Height-1, vb.Width-1).Styled(styleBottom).Set(0, 0, border.BottomRight)
 	}
 	// borders
 	if borders.GetTop() {
-		for i := 1; i < vb.Width-1; i++ {
-			vb.Styled(styleTop).Set(0, i, border.Top)
+		vbu := vb.Sub(tea.Rectangle{
+			Left:   1,
+			Height: 1,
+			Width:  vb.Width - 2,
+		}).Styled(styleTop)
+		for i := 0; i < vbu.Width; i++ {
+			vbu.Set(0, i, border.Top)
 		}
 	}
 	if borders.GetBottom() {
-		for i := 1; i < vb.Width-1; i++ {
-			vb.Styled(styleBottom).Set(vb.Height-1, i, border.Bottom)
+		vbd := vb.Sub(tea.Rectangle{
+			Top:    vb.Height - 1,
+			Left:   1,
+			Height: 1,
+			Width:  vb.Width - 2,
+		}).Styled(styleBottom)
+		for i := 0; i < vbd.Width; i++ {
+			vbd.Set(0, i, border.Bottom)
 		}
 	}
 	if borders.GetLeft() {
-		styleLeft := styles.Style{}.Foreground(leftFG).Background(leftBG)
-		for i := 1; i < vb.Height-1; i++ {
-			vb.Styled(styleLeft).Set(i, 0, border.Left)
+		vbl := vb.Sub(tea.Rectangle{
+			Top:    1,
+			Height: vb.Height - 2,
+			Width:  1,
+		}).Styled(styles.Style{}.Foreground(leftFG).Background(leftBG))
+		for i := 0; i < vbl.Height; i++ {
+			vbl.Set(i, 0, border.Left)
 		}
 	}
 	if borders.GetRight() {
-		styleRight := styles.Style{}.Foreground(rightFG).Background(rightBG)
-		for i := 1; i < vb.Height-1; i++ {
-			vb.Styled(styleRight).Set(i, vb.Width-1, border.Right)
+		vbr := vb.Sub(tea.Rectangle{
+			Left:   vb.Width - 1,
+			Top:    1,
+			Height: vb.Height - 2,
+			Width:  1,
+		}).Styled(styles.Style{}.Foreground(rightFG).Background(rightBG))
+		for i := 0; i < vbr.Height; i++ {
+			vbr.Set(i, 0, border.Right)
 		}
 	}
 }

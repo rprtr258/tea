@@ -157,6 +157,15 @@ func (vb Viewbox) Sub(rect Rectangle) Viewbox {
 	}
 }
 
+func (vb Viewbox) Pixel(y, x int) Viewbox {
+	return vb.Sub(Rectangle{
+		Top:    y,
+		Left:   x,
+		Height: fun.IF(vb.Width == 0, 0, 1),
+		Width:  fun.IF(vb.Height == 0, 0, 1),
+	})
+}
+
 func (vb Viewbox) PaddingTop(top int) Viewbox {
 	return Viewbox{
 		fb:     vb.fb,
@@ -213,8 +222,8 @@ func (vb Viewbox) Styled(style styles.Style) Viewbox {
 	if bg := style.GetBackground(); bg != nil {
 		for y := 0; y < vb.Height; y++ {
 			for x := 0; x < vb.Width; x++ {
-				// i := (vb.Y+y)*vb.fb.Width + vb.X + x
-				// vb.fb.styles[i] = vb.fb.styles[i].Background(bg)
+				i := (vb.Y+y)*vb.fb.Width + vb.X + x
+				vb.fb.styles[i] = vb.fb.styles[i].Background(bg)
 			}
 		}
 	}
