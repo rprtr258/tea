@@ -32,7 +32,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	case tea.MsgWindowSize:
 		const headerHeight = 3
 		const footerHeight = 3
-		m.viewport = viewport.New(msg.Width, msg.Height-headerHeight-footerHeight)
+		m.viewport.Width = msg.Width
+		m.viewport.Height = msg.Height - headerHeight - footerHeight
 		m.lines = strings.Split(m.content, "\n")
 	}
 
