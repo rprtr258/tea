@@ -19,6 +19,9 @@ var (
 		Border: box.NormalBorder,
 		TRB:    '├',
 		TLB:    '┤',
+		LRT:    '┬',
+		LRB:    '┴',
+		LRTB:   '┼',
 	}
 
 	// RoundedBorder is a border with rounded corners.
@@ -26,6 +29,9 @@ var (
 		Border: box.RoundedBorder,
 		TRB:    '├',
 		TLB:    '┤',
+		LRT:    '┬',
+		LRB:    '┴',
+		LRTB:   '┼',
 	}
 
 	// BlockBorder is a border that takes the whole block.

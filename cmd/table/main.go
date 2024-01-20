@@ -12,7 +12,7 @@ type model struct {
 	table table.Model
 }
 
-func (m *model) Init(func(...tea.Cmd)) {}
+func (*model) Init(func(...tea.Cmd)) {}
 
 func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) { //nolint:gocritic

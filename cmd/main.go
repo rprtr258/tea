@@ -51,6 +51,7 @@ import (
 	"github.com/rprtr258/tea/cmd/styles/layout"
 	"github.com/rprtr258/tea/cmd/styles/ssh"
 	"github.com/rprtr258/tea/cmd/table"
+	"github.com/rprtr258/tea/cmd/table_pokemon"
 	"github.com/rprtr258/tea/cmd/tabs"
 	"github.com/rprtr258/tea/cmd/textarea"
 	"github.com/rprtr258/tea/cmd/textinput"
@@ -103,6 +104,7 @@ var (
 		"split-editors":     split_editors.Main,
 		"stopwatch":         stopwatch.Main,
 		"table":             table.Main,
+		"tablebox/pokemon":  table_pokemon.Main,
 		"tabs":              tabs.Main,
 		"textarea":          textarea.Main,
 		"textinput":         textinput.Main,

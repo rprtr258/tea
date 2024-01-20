@@ -1,77 +1,9 @@
 package tablebox
 
 import (
-	"github.com/rprtr258/scuf"
-
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/styles"
 )
-
-type BorderMask int8
-
-const (
-	BorderMaskTop = 1 << iota
-	BorderMaskBottom
-	BorderMaskLeft
-	BorderMaskRight
-	BorderMaskHorizontals
-	BorderMaskVerticals
-	BorderMaskAll = BorderMaskTop | BorderMaskBottom |
-		BorderMaskLeft | BorderMaskRight |
-		BorderMaskHorizontals | BorderMaskVerticals
-)
-
-func (mask BorderMask) GetTop() bool {
-	return mask&BorderMaskTop != 0
-}
-func (mask BorderMask) GetBottom() bool {
-	return mask&BorderMaskBottom != 0
-}
-func (mask BorderMask) GetLeft() bool {
-	return mask&BorderMaskLeft != 0
-}
-func (mask BorderMask) GetRight() bool {
-	return mask&BorderMaskRight != 0
-}
-
-func Colors(cols ...scuf.Modifier) [4]scuf.Modifier {
-	switch len(cols) {
-	case 1:
-		return [4]scuf.Modifier{
-			cols[0],
-			cols[0],
-			cols[0],
-			cols[0],
-		}
-	case 2:
-		return [4]scuf.Modifier{
-			cols[0],
-			cols[1],
-			cols[0],
-			cols[1],
-		}
-	case 3:
-		return [4]scuf.Modifier{
-			cols[0],
-			cols[1],
-			cols[2],
-			cols[1],
-		}
-	case 4:
-		return [4]scuf.Modifier{
-			cols[0],
-			cols[1],
-			cols[2],
-			cols[3],
-		}
-	}
-	return [4]scuf.Modifier{
-		nil,
-		nil,
-		nil,
-		nil,
-	}
-}
 
 // Box draws model inside a box
 func Box(
@@ -79,87 +11,93 @@ func Box(
 	h, w []tea.Layout,
 	inside func(vb tea.Viewbox, y, x int),
 	border FullBorder,
-	borders BorderMask,
-	fg [4]scuf.Modifier,
-	bg [4]scuf.Modifier,
+	style styles.Style,
 ) {
 	hs := tea.EvalLayout(vb.Height-len(h)-1, h...)
 	ws := tea.EvalLayout(vb.Width-len(w)-1, w...)
 
+	keypointsX := make([]int, len(ws)+1)
+	for i, w := range ws {
+		keypointsX[i+1] = keypointsX[i] + w + 1
+	}
+	keypointsY := make([]int, len(hs)+1)
+	for i, h := range hs {
+		keypointsY[i+1] = keypointsY[i] + h + 1
+	}
+
 	for iy, h := range hs {
 		for ix, w := range ws {
 			inside(vb.Sub(tea.Rectangle{
-				Top:    iy + 1,
-				Left:   ix + 1,
+				Top:    keypointsY[iy] + 1,
+				Left:   keypointsX[ix] + 1,
 				Height: h,
 				Width:  w,
 			}), iy, ix)
 		}
 	}
 
-	// If no border is set or all borders are been disabled, abort.
-	if border == noBorder || borders == 0 {
+	if border == noBorder {
 		return
 	}
 
-	topFG, rightFG, bottomFG, leftFG := fg[0], fg[1], fg[2], fg[3]
-	topBG, rightBG, bottomBG, leftBG := bg[0], bg[1], bg[2], bg[3]
+	// borders: LR, TB
+	/// LR
+	for _, y := range keypointsY {
+		vb.
+			Sub(tea.Rectangle{
+				Top:    y,
+				Left:   1,
+				Height: 1,
+				Width:  vb.Width - 2,
+			}).
+			Styled(style).
+			Fill(border.Top) // TODO: on bottom should be border.Bottom, in the middle should be what?
+	}
+	/// LR
+	for _, x := range keypointsX {
+		vb.
+			Sub(tea.Rectangle{
+				Top:    1,
+				Left:   x,
+				Height: vb.Height - 2,
+				Width:  1,
+			}).
+			Styled(style).
+			Fill(border.Left) // TODO: analogical problem as with Top-Middle-Bottom
+	}
 
-	// Figure out which corners we should actually be using based on which sides are set to show.
-	// TODO: support other options
-	if borders.GetTop() {
-		if !borders.GetLeft() {
-			border.TopLeft = 0
-		}
-		if !borders.GetRight() {
-			border.TopRight = 0
-		}
-	}
-	if borders.GetBottom() {
-		if !borders.GetLeft() {
-			border.BottomLeft = 0
-		}
-		if !borders.GetRight() {
-			border.BottomRight = 0
+	// 4 way conjunctions (full crosses): LRTB
+	for iy := 0; iy < len(hs)-1; iy++ {
+		for ix := 0; ix < len(ws)-1; ix++ {
+			vb.Pixel(keypointsY[iy+1], keypointsX[ix+1]).Styled(style).Fill(border.LRTB)
 		}
 	}
 
-	styleTop := styles.Style{}.Foreground(topFG).Background(topBG)
-	styleBottom := styles.Style{}.Foreground(bottomFG).Background(bottomBG)
-	// angles
-	if borders.GetTop() && borders.GetLeft() {
-		vb.Styled(styleTop).Set(0, 0, border.TopLeft)
+	// 3 way conjunctions: LRT, LRB, TLB, TRB
+	/// LRT
+	for ix := 0; ix < len(ws)-1; ix++ {
+		vb.Pixel(0, keypointsX[ix+1]).Styled(style).Fill(border.LRT)
 	}
-	if borders.GetTop() && borders.GetRight() {
-		vb.Styled(styleTop).Set(0, vb.Width-1, border.TopRight)
+	/// LRB
+	for ix := 0; ix < len(ws)-1; ix++ {
+		vb.Pixel(vb.Height-1, keypointsX[ix+1]).Styled(style).Fill(border.LRB)
 	}
-	if borders.GetBottom() && borders.GetLeft() {
-		vb.Styled(styleBottom).Set(vb.Height-1, 0, border.BottomLeft)
+	/// TRB
+	for iy := 0; iy < len(hs)-1; iy++ {
+		vb.Pixel(keypointsY[iy+1], 0).Styled(style).Fill(border.TRB)
 	}
-	if borders.GetBottom() && borders.GetRight() {
-		vb.Styled(styleBottom).Set(vb.Height-1, vb.Width-1, border.BottomRight)
+	/// TLB
+	for iy := 0; iy < len(hs)-1; iy++ {
+		vb.Pixel(keypointsY[iy+1], vb.Width-1).Styled(style).Fill(border.TLB)
 	}
-	// borders
-	if borders.GetTop() {
-		for i := 1; i < vb.Width-1; i++ {
-			vb.Styled(styleTop).Set(0, i, border.Top)
-		}
-	}
-	if borders.GetBottom() {
-		for i := 1; i < vb.Width-1; i++ {
-			vb.Styled(styleBottom).Set(vb.Height-1, i, border.Bottom)
-		}
-	}
-	if borders.GetLeft() {
-		styleLeft := styles.Style{}.Foreground(leftFG).Background(leftBG)
-		for i := 1; i < vb.Height-1; i++ {
-			vb.Styled(styleLeft).Set(i, 0, border.Left)
-		}
-	}
-	if borders.GetRight() {
-		styleRight := styles.Style{}.Foreground(rightFG).Background(rightBG)
-		for i := 1; i < vb.Height-1; i++ {
-			vb.Styled(styleRight).Set(i, vb.Width-1, border.Right)
-		}
-	}
+
+	// 2 way conjuntions (angles): TL, TR, BL, BR
+	/// top left
+	vb.Pixel(0, 0).Styled(style).Fill(border.TopLeft)
+	/// top right
+	vb.Pixel(0, vb.Width-1).Styled(style).Fill(border.TopRight)
+	/// bottom left
+	vb.Pixel(vb.Height-1, 0).Styled(style).Fill(border.BottomLeft)
+	/// bottom right
+	vb.Pixel(vb.Height-1, vb.Width-1).Styled(style).Fill(border.BottomRight)
 }
