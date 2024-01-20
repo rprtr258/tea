@@ -35,7 +35,7 @@ func JoinHorizontal(pos Alignment, blocks ...[]string) string { // TODO: instead
 	}
 
 	// Max line widths for the above text blocks
-	maxWidths := fun.Map[int](blocks, getWidestWidth)
+	maxWidths := fun.Map[int](getWidestWidth, blocks...)
 
 	// Height of the tallest block
 	var maxHeight int
@@ -113,10 +113,9 @@ func JoinVertical(alignment Alignment, strs ...string) string {
 	}
 
 	blocks := fun.Map[[]string](
-		strs,
 		func(str string) []string {
 			return strings.Split(str, "\n")
-		})
+		}, strs...)
 
 	var maxWidth int
 	for _, block := range blocks {

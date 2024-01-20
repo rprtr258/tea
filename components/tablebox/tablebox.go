@@ -76,28 +76,23 @@ func Colors(cols ...scuf.Modifier) [4]scuf.Modifier {
 // Box draws model inside a box
 func Box(
 	vb tea.Viewbox,
-	h, w int,
+	h, w []tea.Layout,
 	inside func(vb tea.Viewbox, y, x int),
 	border FullBorder,
 	borders BorderMask,
 	fg [4]scuf.Modifier,
 	bg [4]scuf.Modifier,
 ) {
-	u := make([]tea.Layout, h) // TODO: remove this cringe
-	for i := range u {
-		u[i] = 1
-	}
+	hs := tea.EvalLayout(vb.Height-len(h)-1, h...)
+	ws := tea.EvalLayout(vb.Width-len(w)-1, w...)
 
-	hs := tea.EvalLayout(vb.Height-h-1, u...)
-	ws := tea.EvalLayout(vb.Width-w-1, u...)
-
-	for iy := 0; iy < h; iy++ {
-		for ix := 0; ix < w; ix++ {
+	for iy, h := range hs {
+		for ix, w := range ws {
 			inside(vb.Sub(tea.Rectangle{
 				Top:    iy + 1,
 				Left:   ix + 1,
-				Height: hs[iy],
-				Width:  ws[ix],
+				Height: h,
+				Width:  w,
 			}), iy, ix)
 		}
 	}

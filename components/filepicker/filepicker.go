@@ -173,10 +173,9 @@ func (m *Model) cmdReadDir(path string, showHidden bool) tea.Cmd {
 				If(showHidden, dirEntries).
 				ElseF(func() []fs.DirEntry {
 					return fun.Filter(
-						dirEntries,
 						func(dirEntry os.DirEntry) bool {
 							return !isHidden(dirEntry.Name())
-						})
+						}, dirEntries...)
 				}),
 		}
 	}

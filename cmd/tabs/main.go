@@ -62,7 +62,6 @@ var (
 
 func (m *model) View(vb tea.Viewbox) {
 	renderedTabs := fun.Map[[]string](
-		m.Tabs,
 		func(t string, i int) []string {
 			isActive := i == m.activeTab
 			style := fun.IF(isActive, activeTabStyle, inactiveTabStyle).Copy()
@@ -75,7 +74,7 @@ func (m *model) View(vb tea.Viewbox) {
 			// }
 			// style = style.Border(border)
 			return strings.Split(style.Render(t), "\n")
-		})
+		}, m.Tabs...)
 
 	row := styles.JoinHorizontal(styles.Top, renderedTabs...)
 	vb.Styled(docStyle).WriteText(0, 0,

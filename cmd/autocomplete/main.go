@@ -69,9 +69,9 @@ func (m model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 			return
 		}
 	case gotReposSuccessMsg:
-		m.textInput.SetSuggestions(fun.Map[string](msg, func(r repo) string {
+		m.textInput.SetSuggestions(fun.Map[string](func(r repo) string {
 			return r.Name
-		}))
+		}, msg...))
 	}
 
 	m.textInput.Update(msg, yield)

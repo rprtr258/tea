@@ -61,10 +61,10 @@ type filteredItems[I Item] []filteredItem[I]
 
 func (f filteredItems[I]) items() []I {
 	return fun.Map[I](
-		f,
 		func(v filteredItem[I]) I {
 			return v.item
-		})
+		},
+		f...)
 }
 
 // MsgFilterMatches contains data about items matched during filtering. The
@@ -92,13 +92,13 @@ func DefaultFilter(term string, targets []string) []Rank {
 		return j.Score - i.Score
 	})
 	return fun.Map[Rank](
-		ranks,
 		func(r fuzzy.Match) Rank {
 			return Rank{
 				Index:          r.Index,
 				MatchedIndexes: r.MatchedIndexes,
 			}
-		})
+		},
+		ranks...)
 }
 
 type msgStatusMessageTimeout struct{}

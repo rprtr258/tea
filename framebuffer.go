@@ -313,6 +313,10 @@ func (vb Viewbox) Fill(c rune) {
 
 type Layout int
 
+func Auto() Layout { // TODO: implement
+	return 0
+}
+
 func Fixed(n int) Layout {
 	return Layout(-n)
 }
