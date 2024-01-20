@@ -125,7 +125,7 @@ func (m *Model) GotoTop() {
 }
 
 // Update handles standard message-based viewport updates.
-func (m *Model) Update(msg tea.Msg) []tea.Cmd {
+func (m *Model) Update(msg tea.Msg) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch {
@@ -158,8 +158,6 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			m.LineDown(m.MouseWheelDelta)
 		}
 	}
-
-	return nil
 }
 
 // View renders the viewport into a string.

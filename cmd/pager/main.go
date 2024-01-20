@@ -37,7 +37,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 
 	// Handle keyboard and mouse events in the viewport
-	f(m.viewport.Update(msg)...)
+	m.viewport.Update(msg)
 }
 
 func (m *model) headerView(vb tea.Viewbox) {

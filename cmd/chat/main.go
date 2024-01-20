@@ -75,7 +75,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 
 	m.textarea.Update(msg, f)
-	f(m.viewport.Update(msg)...)
+	m.viewport.Update(msg)
 }
 
 func (m *model) View(vb tea.Viewbox) {

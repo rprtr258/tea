@@ -1006,7 +1006,7 @@ func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		m.Err = msg
 	}
 
-	f(m.viewport.Update(msg)...)
+	m.viewport.Update(msg)
 
 	newRow, newCol := m.cursorLineNumber(), m.col
 	m.Cursor.Update(msg, f)

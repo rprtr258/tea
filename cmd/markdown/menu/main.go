@@ -80,7 +80,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		case "q", "ctrl+c", "esc":
 			f(tea.Quit)
 		default:
-			f(m.viewport.Update(msg)...)
+			m.viewport.Update(msg)
 		}
 	}
 }
