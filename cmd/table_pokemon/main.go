@@ -83,7 +83,7 @@ func (m *model) View(vb tea.Viewbox) {
 				{"28", "Sandslash", "Ground", "", "サンドパン", "Sandpan"},
 			} {
 				vbRow := vb.Row(y)
-				switch x {
+				switch y {
 				case 2, 3:
 					vbRow = vbRow.Styled(styles.Style{}.Foreground(typeColors[cur[x]][1-y%2]))
 				default:
@@ -91,9 +91,9 @@ func (m *model) View(vb tea.Viewbox) {
 				}
 
 				if cur[0] == "Pikachu" {
-					vbRow = vbRow.Styled(selectedStyle).PaddingLeft(1).WriteLine(cur[x])
+					vbRow = vbRow.Styled(selectedStyle).PaddingLeft(1).WriteLine(cur[y])
 				} else {
-					vbRow.Styled(styles.Style{}.Foreground(textColor[1-y%2])).PaddingLeft(1).WriteLine(cur[x])
+					vbRow.Styled(styles.Style{}.Foreground(textColor[1-y%2])).PaddingLeft(1).WriteLine(cur[y])
 				}
 			}
 		},
