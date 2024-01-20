@@ -32,8 +32,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	case tea.MsgWindowSize:
 		const headerHeight = 3
 		const footerHeight = 3
-		m.viewport.Width = msg.Width
-		m.viewport.Height = msg.Height - headerHeight - footerHeight
+		m.viewport = viewport.New(msg.Width, msg.Height-headerHeight-footerHeight)
 		m.lines = strings.Split(m.content, "\n")
 	}
 
@@ -41,11 +40,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) headerView(vb tea.Viewbox) {
-	title := "Mr. Pager"
+	const title = "Mr. Pager"
 	box.Box(
-		vb.Sub(tea.Rectangle{
-			Width: len(title) + 2 + 2,
-		}),
+		vb.MaxWidth(len(title)+2+2),
 		func(vb tea.Viewbox) {
 			vb.PaddingLeft(1).WriteLine(title)
 		},
@@ -56,10 +53,7 @@ func (m *model) headerView(vb tea.Viewbox) {
 	)
 	vb = vb.PaddingLeft(1 + 1 + len(title) + 1).Row(1)
 	vb.Set(0, 0, '├')
-	vb = vb.PaddingLeft(1)
-	for i := 0; i < vb.Width; i++ {
-		vb.Set(0, i, '─')
-	}
+	vb.PaddingLeft(1).Fill('─')
 }
 
 func (m *model) footerView(vb tea.Viewbox) {
@@ -98,7 +92,7 @@ func (m *model) View(vb tea.Viewbox) {
 	}), func(vb tea.Viewbox, i int) {
 		vb.WriteLine(m.lines[i])
 	})
-	m.footerView(vb.PaddingTop(m.viewport.Height))
+	m.footerView(vb.PaddingTop(m.viewport.Height - 4))
 }
 
 func Main(ctx context.Context) error {
