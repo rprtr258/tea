@@ -84,6 +84,7 @@ func (m *model) View(vb tea.Viewbox) {
 		Width:  vb.Width,
 	}))
 	vb = vb.PaddingTop(3)
+	panic(m.lines)
 	m.viewport.View(
 		vb.MaxHeight(m.viewport.Height),
 		func(vb tea.Viewbox, i int) {
