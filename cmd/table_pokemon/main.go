@@ -43,16 +43,17 @@ func (m *model) View(vb tea.Viewbox) {
 				"Bug":      {styles.FgRGB("#D7FF87"), styles.FgRGB("#97AD64")},
 				"Electric": {styles.FgRGB("#FDFF90"), styles.FgRGB("#FCFF5F")},
 				"Fire":     {styles.FgRGB("#FF7698"), styles.FgRGB("#BA5F75")},
-				"Flying":   {styles.FgRGB("#FF87D7"), styles.FgRGB("#C97AB2")},
 				"Grass":    {styles.FgRGB("#75FBAB"), styles.FgRGB("#59B980")},
 				"Ground":   {styles.FgRGB("#FF875F"), styles.FgRGB("#C77252")},
-				"Normal":   {styles.FgRGB("#929292"), styles.FgRGB("#727272")},
 				"Poison":   {styles.FgRGB("#7D5AFC"), styles.FgRGB("#634BD0")},
 				"Water":    {styles.FgRGB("#00E2C7"), styles.FgRGB("#439F8E")},
-			}
-			textColor := [2]scuf.Modifier{styles.ANSIColor(245), styles.ANSIColor(252)}
 
-			for y, cur := range [][]string{
+				"Normal": {styles.FgRGB("#929292"), styles.FgRGB("#727272")},
+				"Flying": {styles.FgRGB("#FF87D7"), styles.FgRGB("#C97AB2")},
+			}
+			textColors := [2]scuf.Modifier{styles.ANSIColor(245), styles.ANSIColor(252)}
+
+			for y, cur := range [][6]string{
 				{"1", "Bulbasaur", "Grass", "Poison", "フシギダネ", "Bulbasaur"},
 				{"2", "Ivysaur", "Grass", "Poison", "フシギソウ", "Ivysaur"},
 				{"3", "Venusaur", "Grass", "Poison", "フシギバナ", "Venusaur"},
@@ -83,18 +84,18 @@ func (m *model) View(vb tea.Viewbox) {
 				{"28", "Sandslash", "Ground", "", "サンドパン", "Sandpan"},
 			} {
 				vbRow := vb.Row(y)
-				switch y {
+				switch x {
 				case 2, 3:
 					vbRow = vbRow.Styled(styles.Style{}.Foreground(typeColors[cur[x]][1-y%2]))
 				default:
-					vbRow = vbRow.Styled(styles.Style{}.Foreground(typeColors[cur[x]][1-y%2]))
+					vbRow = vbRow.Styled(styles.Style{}.Foreground(textColors[1-y%2]))
 				}
 
-				if cur[0] == "Pikachu" {
-					vbRow = vbRow.Styled(selectedStyle).PaddingLeft(1).WriteLine(cur[y])
-				} else {
-					vbRow.Styled(styles.Style{}.Foreground(textColor[1-y%2])).PaddingLeft(1).WriteLine(cur[y])
+				if cur[1] == "Pikachu" {
+					vbRow = vbRow.Styled(selectedStyle)
 				}
+
+				vbRow.PaddingLeft(1).WriteLine(cur[x])
 			}
 		},
 		tablebox.NormalBorder,
