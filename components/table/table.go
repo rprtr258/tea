@@ -261,7 +261,7 @@ func (m *Model) MoveUp(n int) {
 // It can not go below the last row.
 func (m *Model) MoveDown(n int) {
 	newCursor := max(m.cursor+n, 0)
-	if newCursor >= m.viewport.YOffset || newCursor-m.cursor >= m.viewport.Height {
+	if newCursor-m.viewport.Height >= m.viewport.YOffset || newCursor-m.cursor >= m.viewport.Height {
 		m.viewport.SetYOffset(newCursor - m.viewport.Height)
 	}
 	m.cursor = newCursor
