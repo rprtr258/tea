@@ -164,7 +164,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 
 // View renders the viewport into a string.
 func (m *Model) View(vb tea.Viewbox, lines func(tea.Viewbox, int)) {
-	for i := max(0, m.YOffset); i <= m.YOffset+m.Height; i++ {
-		lines(vb.Row(i), i)
+	for i := 0; i <= m.Height; i++ {
+		lines(vb.Row(i), m.YOffset+i)
 	}
 }

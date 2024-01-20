@@ -1,8 +1,6 @@
 package table
 
 import (
-	"strings"
-
 	"github.com/mattn/go-runewidth"
 	"github.com/rprtr258/fun"
 
@@ -261,7 +259,7 @@ func (m *Model) MoveUp(n int) {
 	case m.start < m.viewport.Height:
 		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset+n, 0, m.cursor))
 	case m.viewport.YOffset >= 1:
-		m.viewport.YOffset = fun.Clamp(m.viewport.YOffset+n, 1, m.viewport.Height)
+		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset+n, 1, m.viewport.Height))
 	}
 }
 
@@ -299,36 +297,32 @@ func (m *Model) FromValues(rows ...[]string) {
 
 // View renders the component
 func (m *Model) View(vb tea.Viewbox) {
+	const _gap = 2
+
 	// header
-	{
-		vbh := vb.Styled(m.styles.Header)
-		for _, col := range m.cols {
-			vbh = vbh.
-				WriteLine(runewidth.Truncate(col.Title, col.Width, "…")).
-				PaddingLeft(col.Width)
-		}
+	vbh := vb.Styled(m.styles.Header)
+	for _, col := range m.cols {
+		vbh.WriteLine(runewidth.Truncate(col.Title, col.Width, "…"))
+		vbh = vbh.PaddingLeft(col.Width).PaddingLeft(_gap)
 	}
 
-	// Render only rows from: m.cursor-m.viewport.Height to: m.cursor+m.viewport.Height
+	// Render only rows
+	// 	from: m.cursor-m.viewport.Height
+	// 	to: m.cursor+m.viewport.Height
 	// Constant runtime, independent of number of rows in a table.
 	// Limits the number of renderedRows to a maximum of 2*m.viewport.Height
-	if m.cursor >= 0 {
-		m.start = fun.Clamp(m.cursor-m.viewport.Height, 0, m.cursor)
-	} else {
-		m.start = 0
-	}
+	m.start = fun.IF(m.cursor >= 0, fun.Clamp(m.cursor-m.viewport.Height, 0, m.cursor), 0)
 	m.end = fun.Clamp(m.cursor+m.viewport.Height, m.cursor, len(m.rows))
-	m.viewport.View(vb.PaddingTop(len(m.cols)+1), func(vbRow tea.Viewbox, i int) {
+	m.viewport.View(vb.PaddingTop(1), func(vbRow tea.Viewbox, i int) {
 		if i == m.cursor {
 			vbRow = vbRow.Styled(m.styles.Selected)
 		}
 
-		s := make([][]string, 0, len(m.cols))
 		for i, value := range m.rows[i] {
 			style := styles.Style{} /*.Width(m.cols[i].Width).MaxWidth(m.cols[i].Width)*/
 			renderedCell := m.styles.Cell.Render(style.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
-			s = append(s, strings.Split(renderedCell, "\n"))
+			vbRow.WriteLine(renderedCell)
+			vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(2)
 		}
-		vbRow.WriteLine(styles.JoinHorizontal(styles.Left, s...))
 	})
 }
