@@ -285,6 +285,14 @@ func (vb Viewbox) Set(y, x int, c rune) {
 	}
 }
 
+func (vb Viewbox) Fill(c rune) {
+	for y := 0; y < vb.Height; y++ {
+		for x := 0; x < vb.Width; x++ {
+			vb.Set(y, x, c)
+		}
+	}
+}
+
 // // background colors y'th row bacground to given color from x1 to x2 with
 // // coordinates relative to viewbox
 // func (vb Viewbox) background(y, x1, x2 int, background termenv.Color) {
