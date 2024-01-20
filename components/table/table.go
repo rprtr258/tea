@@ -331,6 +331,6 @@ func (m *Model) View(vb tea.Viewbox) {
 			renderedCell := m.styles.Cell.Render(style.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
 			s = append(s, strings.Split(renderedCell, "\n"))
 		}
-		vb.WriteLine(styles.JoinHorizontal(styles.Left, s...))
+		vbRow.WriteLine(styles.JoinHorizontal(styles.Left, s...))
 	})
 }
