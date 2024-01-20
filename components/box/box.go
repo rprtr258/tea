@@ -130,14 +130,14 @@ func Box(
 	}
 	// borders
 	if borders.GetTop() {
-		vbu := vb.Sub(tea.Rectangle{
-			Left:   1,
-			Height: 1,
-			Width:  vb.Width - 2,
-		}).Styled(styleTop)
-		for i := 0; i < vbu.Width; i++ {
-			vbu.Set(0, i, border.Top)
-		}
+		vb.
+			Sub(tea.Rectangle{
+				Left:   1,
+				Height: 1,
+				Width:  vb.Width - 2,
+			}).
+			Styled(styleTop).
+			Fill(border.Top)
 	}
 	if borders.GetBottom() {
 		vb.
