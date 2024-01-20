@@ -301,6 +301,9 @@ func (m *Model) View(vb tea.Viewbox) {
 				vbh = vbh.PaddingLeft(col.Width).PaddingLeft(_gap)
 			}
 
+			// split line
+			vb.Row(1).Styled(styles.Style{}.Foreground(styles.FgColor("240"))).Fill(box.NormalBorder.Top)
+
 			// rows
 			m.viewport.View(vb.PaddingTop(2), func(vbRow tea.Viewbox, i int) {
 				if i == m.cursor {
