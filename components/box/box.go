@@ -117,16 +117,16 @@ func Box(
 	styleBottom := styles.Style{}.Foreground(bottomFG).Background(bottomBG)
 	// angles
 	if borders.GetTop() && borders.GetLeft() {
-		vb.Pixel(0, 0).Styled(styleTop).Set(0, 0, border.TopLeft)
+		vb.Pixel(0, 0).Styled(styleTop).Fill(border.TopLeft)
 	}
 	if borders.GetTop() && borders.GetRight() {
-		vb.Pixel(0, vb.Width-1).Styled(styleTop).Set(0, 0, border.TopRight)
+		vb.Pixel(0, vb.Width-1).Styled(styleTop).Fill(border.TopRight)
 	}
 	if borders.GetBottom() && borders.GetLeft() {
-		vb.Pixel(vb.Height-1, 0).Styled(styleBottom).Set(0, 0, border.BottomLeft)
+		vb.Pixel(vb.Height-1, 0).Styled(styleBottom).Fill(border.BottomLeft)
 	}
 	if borders.GetBottom() && borders.GetRight() {
-		vb.Pixel(vb.Height-1, vb.Width-1).Styled(styleBottom).Set(0, 0, border.BottomRight)
+		vb.Pixel(vb.Height-1, vb.Width-1).Styled(styleBottom).Fill(border.BottomRight)
 	}
 	// borders
 	if borders.GetTop() {
