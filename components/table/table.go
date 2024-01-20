@@ -289,12 +289,6 @@ func (m *Model) GotoBottom() {
 	m.MoveDown(len(m.rows))
 }
 
-// FromValues create the table rows from a simple string. It uses `\n` by default
-// for getting all the rows and the given separator for the fields on each row.
-func (m *Model) FromValues(rows ...[]string) {
-	m.SetRows(rows...)
-}
-
 // View renders the component
 func (m *Model) View(vb tea.Viewbox) {
 	const _gap = 2
@@ -319,9 +313,7 @@ func (m *Model) View(vb tea.Viewbox) {
 		}
 
 		for i, value := range m.rows[i] {
-			style := styles.Style{} /*.Width(m.cols[i].Width).MaxWidth(m.cols[i].Width)*/
-			renderedCell := m.styles.Cell.Render(style.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
-			vbRow.WriteLine(renderedCell)
+			vbRow.WriteLine(m.styles.Cell.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
 			vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(2)
 		}
 	})
