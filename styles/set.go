@@ -110,25 +110,6 @@ func (s Style) ColorWhitespace(v bool) Style {
 	return s.set(_keyColorWhitespace, v)
 }
 
-// Inline makes rendering output one line and disables the rendering of
-// margins, padding and borders. This is useful when you need a style to apply
-// only to font rendering and don't want it to change any physical dimensions.
-// It works well with Style.MaxWidth.
-//
-// Because this in intended to be used at the time of render, this method will
-// not mutate the style and instead return a copy.
-//
-// Example:
-//
-//	var userInput string = "..."
-//	var userStyle = text.Style{ /* ... */ }
-//	fmt.Println(userStyle.Inline(true).Render(userInput))
-func (s Style) Inline(v bool) Style {
-	o := s.Copy()
-	o.set(_keyInline, v)
-	return o
-}
-
 // UnderlineSpaces determines whether to underline spaces between words. By
 // default, this is true. Spaces can also be underlined without underlining the
 // text itself.

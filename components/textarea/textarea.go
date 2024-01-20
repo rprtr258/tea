@@ -1142,7 +1142,7 @@ func (m *Model) placeholderView(vb tea.Viewbox) {
 	vb = vb.Styled(m.style.Base)
 
 	p := rw.Truncate(m.Placeholder, m.width, "...")
-	style := m.style.Placeholder.Inline(true)
+	style := m.style.Placeholder
 
 	vb = vb.
 		Styled(m.style.Prompt).

@@ -311,7 +311,7 @@ func (m *Model) percentageView(percent float64) string {
 
 	percent = max(0, min(1, percent))
 	percentage := fmt.Sprintf(m.PercentFormat, percent*100) //nolint:gomnd
-	return m.PercentageStyle.Inline(true).Render(percentage)
+	return m.PercentageStyle.Render(percentage)
 }
 
 func (m *Model) setRamp(colorA, colorB colorful.Color, scaled bool) {

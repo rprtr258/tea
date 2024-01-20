@@ -79,12 +79,6 @@ func (s Style) UnsetColorWhitespace() Style {
 	return s
 }
 
-// UnsetInline removes the inline style rule, if set.
-func (s Style) UnsetInline() Style {
-	delete(s.rules, _keyInline)
-	return s
-}
-
 // UnsetUnderlineSpaces removes the value set by UnderlineSpaces.
 func (s Style) UnsetUnderlineSpaces() Style {
 	delete(s.rules, _keyUnderlineSpaces)

@@ -28,7 +28,6 @@ const (
 
 	_keyColorWhitespace
 
-	_keyInline
 	_keyUnderlineSpaces
 	_keyStrikethroughSpaces
 )
@@ -116,7 +115,6 @@ func (s Style) Render(strs ...string) string {
 		// verticalAlign   = s.GetAlignVertical()
 
 		colorWhitespace = s.getAsBool(_keyColorWhitespace, true)
-		inline          = s.GetInline()
 
 		underlineSpaces     = underline && s.getAsBool(_keyUnderlineSpaces, true)
 		strikethroughSpaces = strikethrough && s.getAsBool(_keyStrikethroughSpaces, true)
@@ -197,9 +195,7 @@ func (s Style) Render(strs ...string) string {
 	}
 
 	// Strip newlines in single line mode
-	if inline {
-		str = strings.ReplaceAll(str, "\n", "")
-	}
+	str = strings.ReplaceAll(str, "\n", "")
 
 	// Word wrap
 	// if !inline && width > 0 {

@@ -319,15 +319,13 @@ func (m *Model) View(vb tea.Viewbox) {
 	}
 	m.end = fun.Clamp(m.cursor+m.viewport.Height, m.cursor, len(m.rows))
 	m.viewport.View(vb.PaddingTop(len(m.cols)+1), func(vbRow tea.Viewbox, i int) {
-		// for i := m.start; i < m.end; i++ {
-		// vbRow := vb.Row(i - m.start)
 		if i == m.cursor {
 			vbRow = vbRow.Styled(m.styles.Selected)
 		}
 
 		s := make([][]string, 0, len(m.cols))
 		for i, value := range m.rows[i] {
-			style := styles.Style{}. /*.Width(m.cols[i].Width).MaxWidth(m.cols[i].Width)*/ Inline(true)
+			style := styles.Style{} /*.Width(m.cols[i].Width).MaxWidth(m.cols[i].Width)*/
 			renderedCell := m.styles.Cell.Render(style.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
 			s = append(s, strings.Split(renderedCell, "\n"))
 		}

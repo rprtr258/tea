@@ -90,12 +90,6 @@ func (s Style) GetColorWhitespace() bool {
 	return s.getAsBool(_keyColorWhitespace, false)
 }
 
-// GetInline returns the style's inline setting. If no value is set false is
-// returned.
-func (s Style) GetInline() bool {
-	return s.getAsBool(_keyInline, false)
-}
-
 // GetUnderlineSpaces returns whether or not the style is set to underline
 // spaces. If not value is set false is returned.
 func (s Style) GetUnderlineSpaces() bool {

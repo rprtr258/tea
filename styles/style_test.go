@@ -202,11 +202,6 @@ func TestStyleUnset(t *testing.T) {
 	s.UnsetFaint()
 	assert.False(t, s.GetFaint())
 
-	s = Style{}.Inline(true)
-	assert.True(t, s.GetInline())
-	s.UnsetInline()
-	assert.False(t, s.GetInline())
-
 	// colors
 	colcol := scuf.Modifier(scuf.FgRGB(scuf.MustParseHexRGB("#ffffff")))
 	s = Style{}.Foreground(colcol)

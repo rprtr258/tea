@@ -781,7 +781,7 @@ func (m *Model) SetCursorMode(mode CursorMode) []tea.Cmd {
 func (m Model) completionView(offset int) string {
 	var (
 		value = m.value
-		style = m.PlaceholderStyle.Inline(true).Render
+		style = m.PlaceholderStyle.Render
 	)
 
 	if m.canAcceptSuggestion() {
