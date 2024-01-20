@@ -280,6 +280,11 @@ func (m *Model) GotoBottom() {
 // View renders the component
 func (m *Model) View(vb tea.Viewbox) {
 	const _gap = 2
+	totalWidth := _gap * (len(m.cols) - 1)
+	for _, col := range m.cols {
+		totalWidth += col.Width
+	}
+	vb = vb.MaxWidth(totalWidth)
 
 	// header
 	vbh := vb.Styled(m.styles.Header)
