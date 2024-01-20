@@ -24,11 +24,11 @@ func (m *model) Init(func(...tea.Cmd)) {}
 func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		if k := msg.String(); k == "ctrl+c" || k == "q" || k == "esc" {
+		switch msg.String() {
+		case "ctrl+c", "q", "esc":
 			f(tea.Quit)
 			return
 		}
-
 	case tea.MsgWindowSize:
 		const headerHeight = 3
 		const footerHeight = 3
@@ -37,7 +37,6 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		m.lines = strings.Split(m.content, "\n")
 	}
 
-	// Handle keyboard and mouse events in the viewport
 	m.viewport.Update(msg)
 }
 
