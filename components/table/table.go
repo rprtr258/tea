@@ -21,7 +21,6 @@ type Model struct {
 	styles    Styles
 
 	viewport viewport.Model
-	start    int
 }
 
 // Column defines the table structure
@@ -251,33 +250,23 @@ func (m *Model) SetCursor(n int) {
 // MoveUp moves the selection up by any number of rows.
 // It can not go above the first row.
 func (m *Model) MoveUp(n int) {
-	m.cursor = max(m.cursor-n, 0)
-
-	switch {
-	case m.start == 0:
-		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset, 0, m.cursor))
-	case m.start < m.viewport.Height:
-		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset+n, 0, m.cursor))
-	case m.viewport.YOffset >= 1:
-		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset+n, 1, m.viewport.Height))
+	newCursor := max(m.cursor-n, 0)
+	if newCursor >= m.viewport.YOffset && m.cursor-newCursor < m.viewport.Height {
+	} else {
+		m.viewport.SetYOffset(newCursor)
 	}
+	m.cursor = newCursor
 }
 
 // MoveDown moves the selection down by any number of rows.
 // It can not go below the last row.
 func (m *Model) MoveDown(n int) {
-	m.cursor = min(m.cursor+n, len(m.rows)-1)
-
-	end := m.viewport.YOffset + m.viewport.Height
-	switch {
-	case end == len(m.rows):
-		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset-n, 1, m.viewport.Height))
-	case m.cursor > (end-m.start)/2:
-		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset-n, 1, m.cursor))
-	case m.viewport.YOffset > 1:
-	case m.cursor > m.viewport.YOffset+m.viewport.Height-1:
-		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset+1, 0, 1))
+	newCursor := max(m.cursor+n, 0)
+	if newCursor < m.viewport.YOffset && newCursor-m.cursor < m.viewport.Height {
+	} else {
+		m.viewport.SetYOffset(newCursor - m.viewport.Height)
 	}
+	m.cursor = newCursor
 }
 
 // GotoTop moves the selection to the first row
@@ -301,12 +290,7 @@ func (m *Model) View(vb tea.Viewbox) {
 		vbh = vbh.PaddingLeft(col.Width).PaddingLeft(_gap)
 	}
 
-	// Render only rows
-	// 	from: m.cursor-m.viewport.Height
-	// 	to: m.cursor+m.viewport.Height
-	// Constant runtime, independent of number of rows in a table.
-	// Limits the number of renderedRows to a maximum of 2*m.viewport.Height
-	m.start = fun.IF(m.cursor >= 0, fun.Clamp(m.cursor-m.viewport.Height, 0, m.cursor), 0)
+	// rows
 	m.viewport.View(vb.PaddingTop(1), func(vbRow tea.Viewbox, i int) {
 		if i == m.cursor {
 			vbRow = vbRow.Styled(m.styles.Selected)
@@ -314,7 +298,7 @@ func (m *Model) View(vb tea.Viewbox) {
 
 		for i, value := range m.rows[i] {
 			vbRow.WriteLine(m.styles.Cell.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
-			vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(2)
+			vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(_gap)
 		}
 	})
 }
