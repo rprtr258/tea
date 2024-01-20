@@ -14,7 +14,6 @@ import (
 )
 
 type model struct {
-	content  string
 	viewport viewport.Model
 	lines    []string
 }
@@ -33,7 +32,6 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		const headerHeight = 3
 		const footerHeight = 3
 		m.viewport = viewport.New(msg.Width, msg.Height-headerHeight-footerHeight)
-		m.lines = strings.Split(m.content, "\n")
 	}
 
 	m.viewport.Update(msg)
@@ -86,13 +84,12 @@ func (m *model) View(vb tea.Viewbox) {
 		Width:  vb.Width,
 	}))
 	vb = vb.PaddingTop(3)
-	m.viewport.View(vb.Sub(tea.Rectangle{
-		Height: m.viewport.Height,
-		Width:  vb.Width,
-	}), func(vb tea.Viewbox, i int) {
-		vb.WriteLine(m.lines[i])
-	})
-	m.footerView(vb.PaddingTop(m.viewport.Height - 4))
+	m.viewport.View(
+		vb.MaxHeight(m.viewport.Height),
+		func(vb tea.Viewbox, i int) {
+			vb.WriteLine(m.lines[i])
+		})
+	m.footerView(vb.PaddingTop(m.viewport.Height))
 }
 
 func Main(ctx context.Context) error {
@@ -102,7 +99,9 @@ func Main(ctx context.Context) error {
 		return fmt.Errorf("load file: %w", err)
 	}
 
-	_, err = tea.NewProgram(ctx, &model{content: string(content)}).
+	_, err = tea.NewProgram(ctx, &model{
+		lines: strings.Split(string(content), "\n"),
+	}).
 		WithAltScreen().       // use the full size of the terminal in its "alternate screen buffer"
 		WithMouseCellMotion(). // turn on mouse support so we can track the mouse wheel
 		Run()
