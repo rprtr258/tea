@@ -85,7 +85,10 @@ func (m *model) View(vb tea.Viewbox) {
 	}))
 	vb = vb.PaddingTop(3)
 	m.viewport.View(
-		vb.MaxHeight(m.viewport.Height),
+		vb.Sub(tea.Rectangle{
+			Height: m.viewport.Height,
+			Width:  vb.Width,
+		}),
 		func(vb tea.Viewbox, i int) {
 			vb.WriteLine(m.lines[i])
 		})

@@ -238,8 +238,7 @@ func (vb Viewbox) WriteLine(line string) Viewbox {
 			return vb.PaddingLeft(x)
 		}
 
-		vb.Set(0, x, c)
-		x++
+		x += vb.Set(0, x, c)
 	}
 	return vb.PaddingLeft(x)
 }
@@ -265,9 +264,9 @@ func (vb Viewbox) WriteText(y, x int, text string) (int, int) {
 
 // Set writes a rune to the framebuffer in position relative to viewbox
 // 0 <= y < height, 0 <= x < width
-func (vb Viewbox) Set(y, x int, c rune) {
+func (vb Viewbox) Set(y, x int, c rune) int {
 	if y < 0 || y >= vb.Height || x < 0 || x >= vb.Width || len(vb.fb.B) == 0 {
-		return
+		return 0
 	}
 
 	if c == '\n' {
@@ -282,7 +281,10 @@ func (vb Viewbox) Set(y, x int, c rune) {
 		i++
 		vb.fb.B[i] = 0
 		vb.fb.styles[i] = styles.Style{}
+		return 2
 	}
+
+	return 1
 }
 
 func (vb Viewbox) Fill(c rune) {
