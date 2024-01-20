@@ -31,8 +31,8 @@ func (m *model) View(vb tea.Viewbox) {
 		func(vb tea.Viewbox, y, x int) {
 			if y == 0 { // header
 				headerStyle := styles.Style{}.Foreground(styles.ANSIColor(252)).Bold(true)
-				headers := []string{"#", "Name", "Type 1", "Type 2", "Japanese", "Official Rom."}
-				vb.Styled(headerStyle).WriteLine(headers[x])
+				headers := []string{"#", "NAME", "TYPE 1", "TYPE 2", "JAPANESE", "OFFICIAL ROM."}
+				vb.PaddingLeft(1).Styled(headerStyle).WriteLine(headers[x])
 
 				return
 			}
