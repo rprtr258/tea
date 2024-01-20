@@ -69,7 +69,7 @@ func Colors(cols ...scuf.Modifier) [4]scuf.Modifier {
 	}
 }
 
-// Box draws model inside a box
+// Box draws `inside` inside a box(border)
 func Box(
 	vb tea.Viewbox,
 	inside func(tea.Viewbox),

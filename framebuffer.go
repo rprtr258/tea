@@ -59,7 +59,7 @@ func NewViewbox(height, width int) Viewbox {
 	}
 }
 
-func (vb *Viewbox) Clear() {
+func (vb *Viewbox) clear() {
 	for i := range vb.fb.B {
 		vb.fb.B[i] = ' '
 	}
@@ -210,10 +210,11 @@ func (vb Viewbox) Styled(style styles.Style) Viewbox {
 		X:      vb.X,
 		style:  style.Inherit(vb.style),
 	}
-	if style.GetBackground() != nil {
+	if bg := style.GetBackground(); bg != nil {
 		for y := 0; y < vb.Height; y++ {
 			for x := 0; x < vb.Width; x++ {
-				vb.Set(y, x, ' ')
+				i := (vb.Y+y)*vb.fb.Width + vb.X + x
+				vb.fb.styles[i] = vb.fb.styles[i].Background(bg)
 			}
 		}
 	}

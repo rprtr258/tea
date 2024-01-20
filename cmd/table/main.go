@@ -32,8 +32,6 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	// BorderStyle(box.NormalBorder).
-	// BorderForeground(styles.FgColor("240"))
 	m.table.View(vb)
 }
 

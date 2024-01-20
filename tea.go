@@ -372,7 +372,7 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 				cmds <- c
 			}) // run update, process command (if any)
 			p.renderer.reset()
-			p.vb.Clear()
+			p.vb.clear()
 			model.View(p.vb)
 			p.renderer.Write(p.vb.Render())
 		}
@@ -485,7 +485,7 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Render the initial view.
 	p.renderer.reset()
-	p.vb.Clear()
+	p.vb.clear()
 	model.View(p.vb)
 	p.renderer.Write(p.vb.Render())
 
@@ -510,7 +510,7 @@ func (p *Program[M]) Run() (M, error) {
 	} else {
 		// Ensure we rendered the final state of the model.
 		p.renderer.reset()
-		p.vb.Clear()
+		p.vb.clear()
 		model.View(p.vb)
 		p.renderer.Write(p.vb.Render())
 	}

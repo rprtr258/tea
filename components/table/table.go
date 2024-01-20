@@ -5,6 +5,7 @@ import (
 	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/components/box"
 	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/components/viewport"
 	"github.com/rprtr258/tea/styles"
@@ -280,29 +281,42 @@ func (m *Model) GotoBottom() {
 // View renders the component
 func (m *Model) View(vb tea.Viewbox) {
 	const _gap = 2
-	totalWidth := 2 + _gap*(len(m.cols)-1)
+	// 2 for borders, 2 for margin
+	totalWidth := 2 + 2 + _gap*(len(m.cols)-1)
 	for _, col := range m.cols {
 		totalWidth += col.Width
 	}
-	vb = vb.MaxWidth(totalWidth)
 
-	// header
-	vbh := vb.Styled(m.styles.Header).PaddingLeft(1)
-	for _, col := range m.cols {
-		vbh.WriteLine(runewidth.Truncate(col.Title, col.Width, "…"))
-		vbh = vbh.PaddingLeft(col.Width).PaddingLeft(_gap)
-	}
+	vb = vb.
+		MaxWidth(totalWidth).
+		// 2 for borders, 1 for header, 1 for split line
+		MaxHeight(2 + 2 + m.viewport.Height)
+	box.Box(
+		vb,
+		func(vb tea.Viewbox) {
+			// header
+			vbh := vb.Styled(m.styles.Header).PaddingLeft(1)
+			for _, col := range m.cols {
+				vbh.WriteLine(runewidth.Truncate(col.Title, col.Width, "…"))
+				vbh = vbh.PaddingLeft(col.Width).PaddingLeft(_gap)
+			}
 
-	// rows
-	m.viewport.View(vb.PaddingTop(2), func(vbRow tea.Viewbox, i int) {
-		if i == m.cursor {
-			vbRow = vbRow.Styled(m.styles.Selected)
-		}
+			// rows
+			m.viewport.View(vb.PaddingTop(2), func(vbRow tea.Viewbox, i int) {
+				if i == m.cursor {
+					vbRow = vbRow.Styled(m.styles.Selected)
+				}
 
-		vbRow = vbRow.PaddingLeft(1)
-		for i, value := range m.rows[i] {
-			vbRow.WriteLine(m.styles.Cell.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
-			vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(_gap)
-		}
-	})
+				vbRow = vbRow.PaddingLeft(1)
+				for i, value := range m.rows[i] {
+					vbRow.WriteLine(m.styles.Cell.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
+					vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(_gap)
+				}
+			})
+		},
+		box.NormalBorder,
+		box.BorderMaskAll,
+		box.Colors(nil),
+		box.Colors(styles.FgColor("240")),
+	)
 }
