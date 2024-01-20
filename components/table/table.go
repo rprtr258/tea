@@ -20,8 +20,8 @@ type Model struct {
 	IsFocused bool
 	styles    Styles
 
-	viewport   viewport.Model
-	start, end int
+	viewport viewport.Model
+	start    int
 }
 
 // Column defines the table structure
@@ -268,10 +268,11 @@ func (m *Model) MoveUp(n int) {
 func (m *Model) MoveDown(n int) {
 	m.cursor = min(m.cursor+n, len(m.rows)-1)
 
+	end := m.viewport.YOffset + m.viewport.Height
 	switch {
-	case m.end == len(m.rows):
+	case end == len(m.rows):
 		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset-n, 1, m.viewport.Height))
-	case m.cursor > (m.end-m.start)/2:
+	case m.cursor > (end-m.start)/2:
 		m.viewport.SetYOffset(fun.Clamp(m.viewport.YOffset-n, 1, m.cursor))
 	case m.viewport.YOffset > 1:
 	case m.cursor > m.viewport.YOffset+m.viewport.Height-1:
@@ -306,7 +307,6 @@ func (m *Model) View(vb tea.Viewbox) {
 	// Constant runtime, independent of number of rows in a table.
 	// Limits the number of renderedRows to a maximum of 2*m.viewport.Height
 	m.start = fun.IF(m.cursor >= 0, fun.Clamp(m.cursor-m.viewport.Height, 0, m.cursor), 0)
-	m.end = fun.Clamp(m.cursor+m.viewport.Height, m.cursor, len(m.rows))
 	m.viewport.View(vb.PaddingTop(1), func(vbRow tea.Viewbox, i int) {
 		if i == m.cursor {
 			vbRow = vbRow.Styled(m.styles.Selected)
