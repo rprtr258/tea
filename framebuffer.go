@@ -222,8 +222,8 @@ func (vb Viewbox) Styled(style styles.Style) Viewbox {
 	if bg := style.GetBackground(); bg != nil {
 		for y := 0; y < vb.Height; y++ {
 			for x := 0; x < vb.Width; x++ {
-				// i := (vb.Y+y)*vb.fb.Width + vb.X + x
-				// vb.fb.styles[i] = vb.fb.styles[i].Background(bg)
+				i := (vb.Y+y)*vb.fb.Width + vb.X + x
+				vb.fb.styles[i] = vb.fb.styles[i].Background(bg)
 			}
 		}
 	}
