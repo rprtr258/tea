@@ -151,24 +151,29 @@ func Box(
 		}
 	}
 	if borders.GetLeft() {
-		vbl := vb.Sub(tea.Rectangle{
-			Top:    1,
-			Height: vb.Height - 2,
-			Width:  1,
-		}).Styled(styles.Style{}.Foreground(leftFG).Background(leftBG))
-		for i := 0; i < vbl.Height; i++ {
-			vbl.Set(i, 0, border.Left)
-		}
+		vb.
+			Sub(tea.Rectangle{
+				Top:    1,
+				Height: vb.Height - 2,
+				Width:  1,
+			}).
+			Styled(styles.
+				Style{}.
+				Foreground(leftFG).
+				Background(leftBG)).
+			Fill(border.Left)
 	}
 	if borders.GetRight() {
-		vbr := vb.Sub(tea.Rectangle{
+		vb.Sub(tea.Rectangle{
 			Left:   vb.Width - 1,
 			Top:    1,
 			Height: vb.Height - 2,
 			Width:  1,
-		}).Styled(styles.Style{}.Foreground(rightFG).Background(rightBG))
-		for i := 0; i < vbr.Height; i++ {
-			vbr.Set(i, 0, border.Right)
-		}
+		}).
+			Styled(styles.
+				Style{}.
+				Foreground(rightFG).
+				Background(rightBG)).
+			Fill(border.Right)
 	}
 }
