@@ -8,11 +8,6 @@ import (
 	"github.com/rprtr258/tea/styles"
 )
 
-var baseStyle = styles.Style{}
-
-// BorderStyle(box.NormalBorder).
-// BorderForeground(styles.FgColor("240"))
-
 type model struct {
 	table table.Model
 }
@@ -37,7 +32,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	m.table.View(vb.Styled(baseStyle))
+	// BorderStyle(box.NormalBorder).
+	// BorderForeground(styles.FgColor("240"))
+	m.table.View(vb)
 }
 
 func Main(ctx context.Context) error {

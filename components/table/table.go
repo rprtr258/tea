@@ -280,25 +280,26 @@ func (m *Model) GotoBottom() {
 // View renders the component
 func (m *Model) View(vb tea.Viewbox) {
 	const _gap = 2
-	totalWidth := _gap * (len(m.cols) - 1)
+	totalWidth := 2 + _gap*(len(m.cols)-1)
 	for _, col := range m.cols {
 		totalWidth += col.Width
 	}
 	vb = vb.MaxWidth(totalWidth)
 
 	// header
-	vbh := vb.Styled(m.styles.Header)
+	vbh := vb.Styled(m.styles.Header).PaddingLeft(1)
 	for _, col := range m.cols {
 		vbh.WriteLine(runewidth.Truncate(col.Title, col.Width, "…"))
 		vbh = vbh.PaddingLeft(col.Width).PaddingLeft(_gap)
 	}
 
 	// rows
-	m.viewport.View(vb.PaddingTop(1), func(vbRow tea.Viewbox, i int) {
+	m.viewport.View(vb.PaddingTop(2), func(vbRow tea.Viewbox, i int) {
 		if i == m.cursor {
 			vbRow = vbRow.Styled(m.styles.Selected)
 		}
 
+		vbRow = vbRow.PaddingLeft(1)
 		for i, value := range m.rows[i] {
 			vbRow.WriteLine(m.styles.Cell.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
 			vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(_gap)
