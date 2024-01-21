@@ -170,8 +170,7 @@ func (m *Model) Update(msg tea.Msg) {
 		return
 	}
 
-	switch msg := msg.(type) { //nolint:gocritic
-	case tea.MsgKey:
+	if msg, ok := msg.(tea.MsgKey); ok {
 		switch {
 		case key.Matches(msg, m.KeyMap.LineUp):
 			m.MoveUp(1)
