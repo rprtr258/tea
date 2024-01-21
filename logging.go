@@ -40,7 +40,7 @@ func LogToFileWith(path, prefix string, logger LogOptionsSetter) (*os.File, erro
 
 	// Add a space after the prefix if a prefix is being specified and it
 	// doesn't already have a trailing space.
-	if len(prefix) > 0 {
+	if prefix != "" {
 		finalChar := prefix[len(prefix)-1]
 		if !unicode.IsSpace(rune(finalChar)) {
 			prefix += " "

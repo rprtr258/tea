@@ -47,6 +47,16 @@ func Render(in string, stylePath string) (string, error) {
 	return string(b), err
 }
 
+// TODO: remove wtf
+func getEnvironmentStyle() string {
+	glamourStyle := os.Getenv("GLAMOUR_STYLE")
+	if glamourStyle == "" {
+		return AutoStyle
+	}
+
+	return glamourStyle
+}
+
 // RenderWithEnvironmentConfig initializes a new TermRenderer and renders a
 // markdown with a specific style defined by the GLAMOUR_STYLE environment variable.
 func RenderWithEnvironmentConfig(in string) (string, error) {
@@ -155,6 +165,7 @@ func WithStylePath(stylePath string) TermRendererOption {
 
 			return json.Unmarshal(jsonBytes, &tr.ansiOptions.Styles)
 		}
+
 		tr.ansiOptions.Styles = *styles
 		return nil
 	}
@@ -242,16 +253,6 @@ func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	err := tr.md.Convert(in, &buf)
 	return buf.Bytes(), err
-}
-
-// TODO: remove wtf
-func getEnvironmentStyle() string {
-	glamourStyle := os.Getenv("GLAMOUR_STYLE")
-	if glamourStyle == "" {
-		return AutoStyle
-	}
-
-	return glamourStyle
 }
 
 func getDefaultStyle(style string) (*ansi.StyleConfig, error) {

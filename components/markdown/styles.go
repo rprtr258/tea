@@ -3,6 +3,8 @@ package markdown
 //go:generate go run ./internal/generate-style-json
 
 import (
+	. "github.com/rprtr258/fun"
+
 	"github.com/rprtr258/tea/components/markdown/ansi"
 )
 
@@ -14,12 +16,12 @@ var (
 				BlockPrefix: "\n",
 				BlockSuffix: "\n",
 			},
-			Margin: ptr[uint](2),
+			Margin: Ptr[uint](2),
 		},
 		BlockQuote: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{},
-			Indent:         ptr[uint](1),
-			IndentToken:    ptr("| "),
+			Indent:         Ptr[uint](1),
+			IndentToken:    Ptr("| "),
 		},
 		Paragraph: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{},
@@ -101,13 +103,13 @@ var (
 		},
 		CodeBlock: ansi.StyleCodeBlock{
 			StyleBlock: ansi.StyleBlock{
-				Margin: ptr[uint](2),
+				Margin: Ptr[uint](2),
 			},
 		},
 		Table: ansi.StyleTable{
-			CenterSeparator: ptr("+"),
-			ColumnSeparator: ptr("|"),
-			RowSeparator:    ptr("-"),
+			CenterSeparator: Ptr("+"),
+			ColumnSeparator: Ptr("|"),
+			RowSeparator:    Ptr("-"),
 		},
 		DefinitionDescription: ansi.StylePrimitive{
 			BlockPrefix: "\n* ",
@@ -120,14 +122,14 @@ var (
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix:     "\n",
 				BlockSuffix:     "\n",
-				ForegroundColor: ptr("252"),
+				ForegroundColor: Ptr("252"),
 			},
-			Margin: ptr[uint](2),
+			Margin: Ptr[uint](2),
 		},
 		BlockQuote: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{},
-			Indent:         ptr[uint](1),
-			IndentToken:    ptr("│ "),
+			Indent:         Ptr[uint](1),
+			IndentToken:    Ptr("│ "),
 		},
 		List: ansi.StyleList{
 			LevelIndent: 2,
@@ -135,17 +137,17 @@ var (
 		Heading: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockSuffix:     "\n",
-				ForegroundColor: ptr("39"),
-				Bold:            ptr(true),
+				ForegroundColor: Ptr("39"),
+				Bold:            Ptr(true),
 			},
 		},
 		H1: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				Prefix:          " ",
 				Suffix:          " ",
-				ForegroundColor: ptr("228"),
-				BackgroundColor: ptr("63"),
-				Bold:            ptr(true),
+				ForegroundColor: Ptr("228"),
+				BackgroundColor: Ptr("63"),
+				Bold:            Ptr(true),
 			},
 		},
 		H2: ansi.StyleBlock{
@@ -171,21 +173,21 @@ var (
 		H6: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				Prefix:          "###### ",
-				ForegroundColor: ptr("35"),
-				Bold:            ptr(false),
+				ForegroundColor: Ptr("35"),
+				Bold:            Ptr(false),
 			},
 		},
 		Strikethrough: ansi.StylePrimitive{
-			CrossedOut: ptr(true),
+			CrossedOut: Ptr(true),
 		},
 		Emph: ansi.StylePrimitive{
-			Italic: ptr(true),
+			Italic: Ptr(true),
 		},
 		Strong: ansi.StylePrimitive{
-			Bold: ptr(true),
+			Bold: Ptr(true),
 		},
 		HorizontalRule: ansi.StylePrimitive{
-			ForegroundColor: ptr("240"),
+			ForegroundColor: Ptr("240"),
 			Format:          "\n--------\n",
 		},
 		Item: ansi.StylePrimitive{
@@ -200,117 +202,117 @@ var (
 			Unticked:       "[ ] ",
 		},
 		Link: ansi.StylePrimitive{
-			ForegroundColor: ptr("30"),
-			Underline:       ptr(true),
+			ForegroundColor: Ptr("30"),
+			Underline:       Ptr(true),
 		},
 		LinkText: ansi.StylePrimitive{
-			ForegroundColor: ptr("35"),
-			Bold:            ptr(true),
+			ForegroundColor: Ptr("35"),
+			Bold:            Ptr(true),
 		},
 		Image: ansi.StylePrimitive{
-			ForegroundColor: ptr("212"),
-			Underline:       ptr(true),
+			ForegroundColor: Ptr("212"),
+			Underline:       Ptr(true),
 		},
 		ImageText: ansi.StylePrimitive{
-			ForegroundColor: ptr("243"),
+			ForegroundColor: Ptr("243"),
 			Format:          "Image: {{.text}} →",
 		},
 		Code: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				Prefix:          " ",
 				Suffix:          " ",
-				ForegroundColor: ptr("203"),
-				BackgroundColor: ptr("236"),
+				ForegroundColor: Ptr("203"),
+				BackgroundColor: Ptr("236"),
 			},
 		},
 		CodeBlock: ansi.StyleCodeBlock{
 			StyleBlock: ansi.StyleBlock{
 				StylePrimitive: ansi.StylePrimitive{
-					ForegroundColor: ptr("244"),
+					ForegroundColor: Ptr("244"),
 				},
-				Margin: ptr[uint](2),
+				Margin: Ptr[uint](2),
 			},
 			Chroma: &ansi.Chroma{
 				Text: ansi.StylePrimitive{
-					ForegroundColor: ptr("#C4C4C4"),
+					ForegroundColor: Ptr("#C4C4C4"),
 				},
 				Error: ansi.StylePrimitive{
-					ForegroundColor: ptr("#F1F1F1"),
-					BackgroundColor: ptr("#F05B5B"),
+					ForegroundColor: Ptr("#F1F1F1"),
+					BackgroundColor: Ptr("#F05B5B"),
 				},
 				Comment: ansi.StylePrimitive{
-					ForegroundColor: ptr("#676767"),
+					ForegroundColor: Ptr("#676767"),
 				},
 				CommentPreproc: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FF875F"),
+					ForegroundColor: Ptr("#FF875F"),
 				},
 				Keyword: ansi.StylePrimitive{
-					ForegroundColor: ptr("#00AAFF"),
+					ForegroundColor: Ptr("#00AAFF"),
 				},
 				KeywordReserved: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FF5FD2"),
+					ForegroundColor: Ptr("#FF5FD2"),
 				},
 				KeywordNamespace: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FF5F87"),
+					ForegroundColor: Ptr("#FF5F87"),
 				},
 				KeywordType: ansi.StylePrimitive{
-					ForegroundColor: ptr("#6E6ED8"),
+					ForegroundColor: Ptr("#6E6ED8"),
 				},
 				Operator: ansi.StylePrimitive{
-					ForegroundColor: ptr("#EF8080"),
+					ForegroundColor: Ptr("#EF8080"),
 				},
 				Punctuation: ansi.StylePrimitive{
-					ForegroundColor: ptr("#E8E8A8"),
+					ForegroundColor: Ptr("#E8E8A8"),
 				},
 				Name: ansi.StylePrimitive{
-					ForegroundColor: ptr("#C4C4C4"),
+					ForegroundColor: Ptr("#C4C4C4"),
 				},
 				NameBuiltin: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FF8EC7"),
+					ForegroundColor: Ptr("#FF8EC7"),
 				},
 				NameTag: ansi.StylePrimitive{
-					ForegroundColor: ptr("#B083EA"),
+					ForegroundColor: Ptr("#B083EA"),
 				},
 				NameAttribute: ansi.StylePrimitive{
-					ForegroundColor: ptr("#7A7AE6"),
+					ForegroundColor: Ptr("#7A7AE6"),
 				},
 				NameClass: ansi.StylePrimitive{
-					ForegroundColor: ptr("#F1F1F1"),
-					Underline:       ptr(true),
-					Bold:            ptr(true),
+					ForegroundColor: Ptr("#F1F1F1"),
+					Underline:       Ptr(true),
+					Bold:            Ptr(true),
 				},
 				NameDecorator: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FFFF87"),
+					ForegroundColor: Ptr("#FFFF87"),
 				},
 				NameFunction: ansi.StylePrimitive{
-					ForegroundColor: ptr("#00D787"),
+					ForegroundColor: Ptr("#00D787"),
 				},
 				LiteralNumber: ansi.StylePrimitive{
-					ForegroundColor: ptr("#6EEFC0"),
+					ForegroundColor: Ptr("#6EEFC0"),
 				},
 				LiteralString: ansi.StylePrimitive{
-					ForegroundColor: ptr("#C69669"),
+					ForegroundColor: Ptr("#C69669"),
 				},
 				LiteralStringEscape: ansi.StylePrimitive{
-					ForegroundColor: ptr("#AFFFD7"),
+					ForegroundColor: Ptr("#AFFFD7"),
 				},
 				GenericDeleted: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FD5B5B"),
+					ForegroundColor: Ptr("#FD5B5B"),
 				},
 				GenericEmph: ansi.StylePrimitive{
-					Italic: ptr(true),
+					Italic: Ptr(true),
 				},
 				GenericInserted: ansi.StylePrimitive{
-					ForegroundColor: ptr("#00D787"),
+					ForegroundColor: Ptr("#00D787"),
 				},
 				GenericStrong: ansi.StylePrimitive{
-					Bold: ptr(true),
+					Bold: Ptr(true),
 				},
 				GenericSubheading: ansi.StylePrimitive{
-					ForegroundColor: ptr("#777777"),
+					ForegroundColor: Ptr("#777777"),
 				},
 				Background: ansi.StylePrimitive{
-					BackgroundColor: ptr("#373737"),
+					BackgroundColor: Ptr("#373737"),
 				},
 			},
 		},
@@ -318,9 +320,9 @@ var (
 			StyleBlock: ansi.StyleBlock{
 				StylePrimitive: ansi.StylePrimitive{},
 			},
-			CenterSeparator: ptr("┼"),
-			ColumnSeparator: ptr("│"),
-			RowSeparator:    ptr("─"),
+			CenterSeparator: Ptr("┼"),
+			ColumnSeparator: Ptr("│"),
+			RowSeparator:    Ptr("─"),
 		},
 		DefinitionDescription: ansi.StylePrimitive{
 			BlockPrefix: "\n🠶 ",
@@ -333,14 +335,14 @@ var (
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix:     "\n",
 				BlockSuffix:     "\n",
-				ForegroundColor: ptr("234"),
+				ForegroundColor: Ptr("234"),
 			},
-			Margin: ptr[uint](2),
+			Margin: Ptr[uint](2),
 		},
 		BlockQuote: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{},
-			Indent:         ptr[uint](1),
-			IndentToken:    ptr("│ "),
+			Indent:         Ptr[uint](1),
+			IndentToken:    Ptr("│ "),
 		},
 		List: ansi.StyleList{
 			LevelIndent: 2,
@@ -348,17 +350,17 @@ var (
 		Heading: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockSuffix:     "\n",
-				ForegroundColor: ptr("27"),
-				Bold:            ptr(true),
+				ForegroundColor: Ptr("27"),
+				Bold:            Ptr(true),
 			},
 		},
 		H1: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				Prefix:          " ",
 				Suffix:          " ",
-				ForegroundColor: ptr("228"),
-				BackgroundColor: ptr("63"),
-				Bold:            ptr(true),
+				ForegroundColor: Ptr("228"),
+				BackgroundColor: Ptr("63"),
+				Bold:            Ptr(true),
 			},
 		},
 		H2: ansi.StyleBlock{
@@ -384,20 +386,20 @@ var (
 		H6: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				Prefix: "###### ",
-				Bold:   ptr(false),
+				Bold:   Ptr(false),
 			},
 		},
 		Strikethrough: ansi.StylePrimitive{
-			CrossedOut: ptr(true),
+			CrossedOut: Ptr(true),
 		},
 		Emph: ansi.StylePrimitive{
-			Italic: ptr(true),
+			Italic: Ptr(true),
 		},
 		Strong: ansi.StylePrimitive{
-			Bold: ptr(true),
+			Bold: Ptr(true),
 		},
 		HorizontalRule: ansi.StylePrimitive{
-			ForegroundColor: ptr("249"),
+			ForegroundColor: Ptr("249"),
 			Format:          "\n--------\n",
 		},
 		Item: ansi.StylePrimitive{
@@ -412,117 +414,117 @@ var (
 			Unticked:       "[ ] ",
 		},
 		Link: ansi.StylePrimitive{
-			ForegroundColor: ptr("36"),
-			Underline:       ptr(true),
+			ForegroundColor: Ptr("36"),
+			Underline:       Ptr(true),
 		},
 		LinkText: ansi.StylePrimitive{
-			ForegroundColor: ptr("29"),
-			Bold:            ptr(true),
+			ForegroundColor: Ptr("29"),
+			Bold:            Ptr(true),
 		},
 		Image: ansi.StylePrimitive{
-			ForegroundColor: ptr("205"),
-			Underline:       ptr(true),
+			ForegroundColor: Ptr("205"),
+			Underline:       Ptr(true),
 		},
 		ImageText: ansi.StylePrimitive{
-			ForegroundColor: ptr("243"),
+			ForegroundColor: Ptr("243"),
 			Format:          "Image: {{.text}} →",
 		},
 		Code: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				Prefix:          " ",
 				Suffix:          " ",
-				ForegroundColor: ptr("203"),
-				BackgroundColor: ptr("254"),
+				ForegroundColor: Ptr("203"),
+				BackgroundColor: Ptr("254"),
 			},
 		},
 		CodeBlock: ansi.StyleCodeBlock{
 			StyleBlock: ansi.StyleBlock{
 				StylePrimitive: ansi.StylePrimitive{
-					ForegroundColor: ptr("242"),
+					ForegroundColor: Ptr("242"),
 				},
-				Margin: ptr[uint](2),
+				Margin: Ptr[uint](2),
 			},
 			Chroma: &ansi.Chroma{
 				Text: ansi.StylePrimitive{
-					ForegroundColor: ptr("#2A2A2A"),
+					ForegroundColor: Ptr("#2A2A2A"),
 				},
 				Error: ansi.StylePrimitive{
-					ForegroundColor: ptr("#F1F1F1"),
-					BackgroundColor: ptr("#FF5555"),
+					ForegroundColor: Ptr("#F1F1F1"),
+					BackgroundColor: Ptr("#FF5555"),
 				},
 				Comment: ansi.StylePrimitive{
-					ForegroundColor: ptr("#8D8D8D"),
+					ForegroundColor: Ptr("#8D8D8D"),
 				},
 				CommentPreproc: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FF875F"),
+					ForegroundColor: Ptr("#FF875F"),
 				},
 				Keyword: ansi.StylePrimitive{
-					ForegroundColor: ptr("#279EFC"),
+					ForegroundColor: Ptr("#279EFC"),
 				},
 				KeywordReserved: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FF5FD2"),
+					ForegroundColor: Ptr("#FF5FD2"),
 				},
 				KeywordNamespace: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FB406F"),
+					ForegroundColor: Ptr("#FB406F"),
 				},
 				KeywordType: ansi.StylePrimitive{
-					ForegroundColor: ptr("#7049C2"),
+					ForegroundColor: Ptr("#7049C2"),
 				},
 				Operator: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FF2626"),
+					ForegroundColor: Ptr("#FF2626"),
 				},
 				Punctuation: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FA7878"),
+					ForegroundColor: Ptr("#FA7878"),
 				},
 				NameBuiltin: ansi.StylePrimitive{
-					ForegroundColor: ptr("#0A1BB1"),
+					ForegroundColor: Ptr("#0A1BB1"),
 				},
 				NameTag: ansi.StylePrimitive{
-					ForegroundColor: ptr("#581290"),
+					ForegroundColor: Ptr("#581290"),
 				},
 				NameAttribute: ansi.StylePrimitive{
-					ForegroundColor: ptr("#8362CB"),
+					ForegroundColor: Ptr("#8362CB"),
 				},
 				NameClass: ansi.StylePrimitive{
-					ForegroundColor: ptr("#212121"),
-					Underline:       ptr(true),
-					Bold:            ptr(true),
+					ForegroundColor: Ptr("#212121"),
+					Underline:       Ptr(true),
+					Bold:            Ptr(true),
 				},
 				NameConstant: ansi.StylePrimitive{
-					ForegroundColor: ptr("#581290"),
+					ForegroundColor: Ptr("#581290"),
 				},
 				NameDecorator: ansi.StylePrimitive{
-					ForegroundColor: ptr("#A3A322"),
+					ForegroundColor: Ptr("#A3A322"),
 				},
 				NameFunction: ansi.StylePrimitive{
-					ForegroundColor: ptr("#019F57"),
+					ForegroundColor: Ptr("#019F57"),
 				},
 				LiteralNumber: ansi.StylePrimitive{
-					ForegroundColor: ptr("#22CCAE"),
+					ForegroundColor: Ptr("#22CCAE"),
 				},
 				LiteralString: ansi.StylePrimitive{
-					ForegroundColor: ptr("#7E5B38"),
+					ForegroundColor: Ptr("#7E5B38"),
 				},
 				LiteralStringEscape: ansi.StylePrimitive{
-					ForegroundColor: ptr("#00AEAE"),
+					ForegroundColor: Ptr("#00AEAE"),
 				},
 				GenericDeleted: ansi.StylePrimitive{
-					ForegroundColor: ptr("#FD5B5B"),
+					ForegroundColor: Ptr("#FD5B5B"),
 				},
 				GenericEmph: ansi.StylePrimitive{
-					Italic: ptr(true),
+					Italic: Ptr(true),
 				},
 				GenericInserted: ansi.StylePrimitive{
-					ForegroundColor: ptr("#00D787"),
+					ForegroundColor: Ptr("#00D787"),
 				},
 				GenericStrong: ansi.StylePrimitive{
-					Bold: ptr(true),
+					Bold: Ptr(true),
 				},
 				GenericSubheading: ansi.StylePrimitive{
-					ForegroundColor: ptr("#777777"),
+					ForegroundColor: Ptr("#777777"),
 				},
 				Background: ansi.StylePrimitive{
-					BackgroundColor: ptr("#373737"),
+					BackgroundColor: Ptr("#373737"),
 				},
 			},
 		},
@@ -530,9 +532,9 @@ var (
 			StyleBlock: ansi.StyleBlock{
 				StylePrimitive: ansi.StylePrimitive{},
 			},
-			CenterSeparator: ptr("┼"),
-			ColumnSeparator: ptr("│"),
-			RowSeparator:    ptr("─"),
+			CenterSeparator: Ptr("┼"),
+			ColumnSeparator: Ptr("│"),
+			RowSeparator:    Ptr("─"),
 		},
 		DefinitionDescription: ansi.StylePrimitive{
 			BlockPrefix: "\n🠶 ",
@@ -542,11 +544,11 @@ var (
 	// PinkStyleConfig is the default pink style.
 	PinkStyleConfig = ansi.StyleConfig{
 		Document: ansi.StyleBlock{
-			Margin: ptr[uint](2),
+			Margin: Ptr[uint](2),
 		},
 		BlockQuote: ansi.StyleBlock{
-			Indent:      ptr[uint](1),
-			IndentToken: ptr("│ "),
+			Indent:      Ptr[uint](1),
+			IndentToken: Ptr("│ "),
 		},
 		List: ansi.StyleList{
 			LevelIndent: 2,
@@ -554,8 +556,8 @@ var (
 		Heading: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockSuffix:     "\n",
-				ForegroundColor: ptr("212"),
-				Bold:            ptr(true),
+				ForegroundColor: Ptr("212"),
+				Bold:            Ptr(true),
 			},
 		},
 		H1: ansi.StyleBlock{
@@ -588,21 +590,21 @@ var (
 		H6: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				Prefix: "┊ ",
-				Bold:   ptr(false),
+				Bold:   Ptr(false),
 			},
 		},
 		Text: ansi.StylePrimitive{},
 		Strikethrough: ansi.StylePrimitive{
-			CrossedOut: ptr(true),
+			CrossedOut: Ptr(true),
 		},
 		Emph: ansi.StylePrimitive{
-			Italic: ptr(true),
+			Italic: Ptr(true),
 		},
 		Strong: ansi.StylePrimitive{
-			Bold: ptr(true),
+			Bold: Ptr(true),
 		},
 		HorizontalRule: ansi.StylePrimitive{
-			ForegroundColor: ptr("212"),
+			ForegroundColor: Ptr("212"),
 			Format:          "\n──────\n",
 		},
 		Item: ansi.StylePrimitive{
@@ -616,30 +618,30 @@ var (
 			Unticked: "[ ] ",
 		},
 		Link: ansi.StylePrimitive{
-			ForegroundColor: ptr("99"),
-			Underline:       ptr(true),
+			ForegroundColor: Ptr("99"),
+			Underline:       Ptr(true),
 		},
 		LinkText: ansi.StylePrimitive{
-			Bold: ptr(true),
+			Bold: Ptr(true),
 		},
 		Image: ansi.StylePrimitive{
-			Underline: ptr(true),
+			Underline: Ptr(true),
 		},
 		ImageText: ansi.StylePrimitive{
 			Format: "Image: {{.text}}",
 		},
 		Code: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
-				ForegroundColor: ptr("212"),
-				BackgroundColor: ptr("236"),
+				ForegroundColor: Ptr("212"),
+				BackgroundColor: Ptr("236"),
 				Prefix:          " ",
 				Suffix:          " ",
 			},
 		},
 		Table: ansi.StyleTable{
-			CenterSeparator: ptr("┼"),
-			ColumnSeparator: ptr("│"),
-			RowSeparator:    ptr("─"),
+			CenterSeparator: Ptr("┼"),
+			ColumnSeparator: Ptr("│"),
+			RowSeparator:    Ptr("─"),
 		},
 		DefinitionList: ansi.StyleBlock{},
 		DefinitionTerm: ansi.StylePrimitive{},
@@ -657,12 +659,12 @@ var (
 				BlockPrefix: "\n",
 				BlockSuffix: "\n",
 			},
-			Margin: ptr[uint](2),
+			Margin: Ptr[uint](2),
 		},
 		BlockQuote: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{},
-			Indent:         ptr[uint](1),
-			IndentToken:    ptr("│ "),
+			Indent:         Ptr[uint](1),
+			IndentToken:    Ptr("│ "),
 		},
 		Paragraph: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{},
@@ -744,13 +746,13 @@ var (
 		},
 		CodeBlock: ansi.StyleCodeBlock{
 			StyleBlock: ansi.StyleBlock{
-				Margin: ptr[uint](2),
+				Margin: Ptr[uint](2),
 			},
 		},
 		Table: ansi.StyleTable{
-			CenterSeparator: ptr("┼"),
-			ColumnSeparator: ptr("│"),
-			RowSeparator:    ptr("─"),
+			CenterSeparator: Ptr("┼"),
+			ColumnSeparator: Ptr("│"),
+			RowSeparator:    Ptr("─"),
 		},
 		DefinitionDescription: ansi.StylePrimitive{
 			BlockPrefix: "\n🠶 ",
@@ -767,5 +769,3 @@ var (
 		PinkStyle:    &PinkStyleConfig,
 	}
 )
-
-func ptr[T any](t T) *T { return &t }

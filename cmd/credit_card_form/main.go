@@ -41,7 +41,7 @@ func ccnValidator(s string) error {
 		return fmt.Errorf("CCN is too long")
 	}
 
-	if len(s) == 0 || len(s)%5 != 0 && (s[len(s)-1] < '0' || s[len(s)-1] > '9') {
+	if s == "" || len(s)%5 != 0 && (s[len(s)-1] < '0' || s[len(s)-1] > '9') {
 		return fmt.Errorf("CCN is invalid")
 	}
 

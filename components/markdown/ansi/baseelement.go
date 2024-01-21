@@ -33,7 +33,7 @@ func formatToken(format string, token string) (string, error) {
 }
 
 func renderText(w io.Writer, rules StylePrimitive, s string) {
-	if len(s) == 0 {
+	if s == "" {
 		return
 	}
 
@@ -101,7 +101,7 @@ func (e *BaseElement) Render(w io.Writer, ctx RenderContext) error {
 	}()
 
 	s := e.Token
-	if len(rules.Format) > 0 {
+	if rules.Format != "" {
 		var err error
 		s, err = formatToken(rules.Format, s)
 		if err != nil {
