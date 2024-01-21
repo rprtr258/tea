@@ -17,7 +17,7 @@ const (
 
 func TestTermRendererWriter(t *testing.T) {
 	r, err := NewTermRenderer(
-		WithStandardStyle(DarkStyle),
+		WithStyles(DarkStyle),
 	)
 	assert.NoError(t, err)
 
@@ -115,7 +115,7 @@ func TestRenderHelpers(t *testing.T) {
 
 func TestCapitalization(t *testing.T) {
 	p := true
-	style := DarkStyleConfig
+	style := DarkStyle
 	style.H1.Upper = &p
 	style.H2.Title = &p
 	style.H3.Lower = &p

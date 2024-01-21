@@ -19,13 +19,7 @@ import (
 
 // Default styles.
 const (
-	ASCIIStyle   = "ascii"
-	AutoStyle    = "auto"
-	DarkStyle    = "dark"
-	DraculaStyle = "dracula"
-	LightStyle   = "light"
-	NoTTYStyle   = "notty"
-	PinkStyle    = "pink"
+	AutoStyle = "auto"
 )
 
 // A TermRendererOption sets an option on a TermRenderer.
@@ -258,10 +252,10 @@ func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 func getDefaultStyle(style string) (ansi.StyleConfig, error) {
 	if style == AutoStyle {
 		if termenv.HasDarkBackground() {
-			return DarkStyleConfig, nil
+			return DarkStyle, nil
 		}
 
-		return LightStyleConfig, nil
+		return LightStyle, nil
 	}
 
 	styles, ok := DefaultStyles[style]

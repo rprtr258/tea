@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	// ASCIIStyleConfig uses only ASCII characters.
-	ASCIIStyleConfig = ansi.StyleConfig{ //nolint:dupl
+	// ASCIIStyle uses only ASCII characters.
+	ASCIIStyle = ansi.StyleConfig{ //nolint:dupl
 		Document: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix: "\n",
@@ -116,8 +116,8 @@ var (
 		},
 	}
 
-	// DarkStyleConfig is the default dark style.
-	DarkStyleConfig = ansi.StyleConfig{
+	// DarkStyle is the default dark style.
+	DarkStyle = ansi.StyleConfig{
 		Document: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix:     "\n",
@@ -329,8 +329,8 @@ var (
 		},
 	}
 
-	// LightStyleConfig is the default light style.
-	LightStyleConfig = ansi.StyleConfig{
+	// LightStyle is the default light style.
+	LightStyle = ansi.StyleConfig{
 		Document: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix:     "\n",
@@ -541,8 +541,8 @@ var (
 		},
 	}
 
-	// PinkStyleConfig is the default pink style.
-	PinkStyleConfig = ansi.StyleConfig{
+	// PinkStyle is the default pink style.
+	PinkStyle = ansi.StyleConfig{
 		Document: ansi.StyleBlock{
 			Margin: Ptr[uint](2),
 		},
@@ -652,8 +652,8 @@ var (
 		HTMLSpan:  ansi.StyleBlock{},
 	}
 
-	// NoTTYStyleConfig is the default notty style.
-	NoTTYStyleConfig = ansi.StyleConfig{ //nolint:dupl
+	// NoTTYStyle is the default notty style.
+	NoTTYStyle = ansi.StyleConfig{ //nolint:dupl
 		Document: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
 				BlockPrefix: "\n",
@@ -760,12 +760,5 @@ var (
 	}
 
 	// DefaultStyles are the default styles.
-	DefaultStyles = map[string]ansi.StyleConfig{
-		ASCIIStyle:   ASCIIStyleConfig,
-		DarkStyle:    DarkStyleConfig,
-		DraculaStyle: DraculaStyleConfig,
-		LightStyle:   LightStyleConfig,
-		NoTTYStyle:   NoTTYStyleConfig,
-		PinkStyle:    PinkStyleConfig,
-	}
+	DefaultStyles = map[string]ansi.StyleConfig{}
 )

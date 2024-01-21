@@ -6,7 +6,7 @@ import (
 	"github.com/rprtr258/tea/components/markdown/ansi"
 )
 
-var DraculaStyleConfig = ansi.StyleConfig{
+var DraculaStyle = ansi.StyleConfig{
 	Document: ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			BlockPrefix:     "\n",
