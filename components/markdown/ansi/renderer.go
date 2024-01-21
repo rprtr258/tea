@@ -144,19 +144,18 @@ func isChild(node ast.Node) bool {
 	return false
 }
 
-func resolveRelativeURL(baseURL string, rel string) string {
+func resolveRelativeURL(baseURL, rel string) string {
 	u, err := url.Parse(rel)
-	if err != nil {
+	if err != nil || u.IsAbs() {
 		return rel
 	}
-	if u.IsAbs() {
-		return rel
-	}
+
 	u.Path = strings.TrimPrefix(u.Path, "/")
 
 	base, err := url.Parse(baseURL)
 	if err != nil {
 		return rel
 	}
+
 	return base.ResolveReference(u).String()
 }

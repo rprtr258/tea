@@ -146,7 +146,7 @@ func cascadeStyles(toBlock bool, s ...StyleBlock) StyleBlock {
 	return r
 }
 
-func cascadeStyle(parent StyleBlock, child StyleBlock, toBlock bool) StyleBlock {
+func cascadeStyle(parent, child StyleBlock, toBlock bool) StyleBlock {
 	s := child
 
 	s.ForegroundColor = parent.ForegroundColor

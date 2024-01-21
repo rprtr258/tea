@@ -32,14 +32,12 @@ func (s *BlockStack) Pop() {
 // Indent returns the current indentation level of all elements in the stack.
 func (s BlockStack) Indent() uint {
 	var i uint
-
 	for _, v := range s {
 		if v.Style.Indent == nil {
 			continue
 		}
 		i += *v.Style.Indent
 	}
-
 	return i
 }
 
