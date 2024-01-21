@@ -122,7 +122,7 @@ func (e *CodeBlockElement) Render(w io.Writer, ctx RenderContext) error {
 		renderText(w, bs.Current().Style.StylePrimitive, " ")
 	})
 
-	if len(theme) > 0 {
+	if theme != "" {
 		renderText(iw, bs.Current().Style.StylePrimitive, rules.BlockPrefix)
 		err := quick.Highlight(iw, e.Code, e.Language, "terminal256", theme)
 		if err != nil {

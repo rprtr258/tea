@@ -14,7 +14,7 @@ type LinkElement struct {
 }
 
 func (e *LinkElement) Render(w io.Writer, ctx RenderContext) error {
-	textRendered := len(e.Text) > 0 && e.Text != e.URL
+	textRendered := e.Text != "" && e.Text != e.URL
 	if textRendered {
 		el := &BaseElement{
 			Token: e.Text,

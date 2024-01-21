@@ -11,7 +11,7 @@ type ImageElement struct {
 }
 
 func (e *ImageElement) Render(w io.Writer, ctx RenderContext) error {
-	if len(e.Text) > 0 {
+	if e.Text != "" {
 		el := &BaseElement{
 			Token: e.Text,
 			Style: ctx.options.Styles.ImageText,
@@ -22,7 +22,7 @@ func (e *ImageElement) Render(w io.Writer, ctx RenderContext) error {
 		}
 	}
 
-	if len(e.URL) > 0 {
+	if e.URL != "" {
 		el := &BaseElement{
 			Token:  resolveRelativeURL(e.BaseURL, e.URL),
 			Prefix: " ",

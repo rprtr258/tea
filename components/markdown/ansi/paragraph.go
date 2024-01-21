@@ -36,7 +36,7 @@ func (e *ParagraphElement) Finish(w io.Writer, ctx RenderContext) error {
 	rules := bs.Current().Style
 
 	mw := NewMarginWriter(ctx, w, rules)
-	if len(strings.TrimSpace(bs.Current().Block.String())) > 0 {
+	if strings.TrimSpace(bs.Current().Block.String()) != "" {
 		flow := wordwrap.NewWriter(int(bs.Width(ctx)))
 		flow.KeepNewlines = ctx.options.PreserveNewLines
 		_, _ = flow.Write(bs.Current().Block.Bytes())
