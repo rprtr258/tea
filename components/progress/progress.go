@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"strings"
-	"sync"
 	"time"
 	"unsafe"
 
@@ -16,13 +15,6 @@ import (
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/styles"
-)
-
-// Internal ID management. Used during animating to assure that frame messages
-// can only be received by progress components that sent them.
-var (
-	lastID int
-	idMtx  sync.Mutex
 )
 
 const (
