@@ -116,16 +116,15 @@ func NewTermRenderer(options ...TermRendererOption) (*TermRenderer, error) {
 			ColorProfile: termenv.TrueColor,
 		},
 	}
-	for _, o := range options {
-		if err := o(tr); err != nil {
+	for _, opt := range options {
+		if err := opt(tr); err != nil {
 			return nil, err
 		}
 	}
-	ar := ansi.NewRenderer(tr.ansiOptions)
 	tr.md.SetRenderer(
 		renderer.NewRenderer(
 			renderer.WithNodeRenderers(
-				util.Prioritized(ar, 1000),
+				util.Prioritized(ansi.NewRenderer(tr.ansiOptions), 1000),
 			),
 		),
 	)
