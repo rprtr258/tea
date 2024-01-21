@@ -154,29 +154,17 @@ func (tr *TermRenderer) Close() error {
 
 // Render returns the markdown rendered into a string.
 func (tr *TermRenderer) Render(in string) (string, error) {
-	b, err := tr.RenderBytes([]byte(in))
-	return string(b), err
-}
-
-// RenderBytes returns the markdown rendered into a byte slice.
-func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 	var buf bytes.Buffer
-	err := tr.md.Convert(in, &buf)
-	return buf.Bytes(), err
-}
-
-// RenderBytes initializes a new TermRenderer and renders a markdown with a specific style.
-func RenderBytes(in []byte, style ansi.StyleConfig) ([]byte, error) {
-	r, err := NewTermRenderer(WithStyles(style))
-	if err != nil {
-		return nil, err
-	}
-
-	return r.RenderBytes(in)
+	err := tr.md.Convert([]byte(in), &buf)
+	return string(buf.Bytes()), err
 }
 
 // Render initializes new TermRenderer and renders markdown with a specific style
 func Render(in string, style ansi.StyleConfig) (string, error) {
-	b, err := RenderBytes([]byte(in), style)
-	return string(b), err
+	r, err := NewTermRenderer(WithStyles(style))
+	if err != nil {
+		return "", err
+	}
+
+	return r.Render(in)
 }
