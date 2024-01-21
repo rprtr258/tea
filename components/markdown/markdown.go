@@ -44,20 +44,59 @@ func parseStyleFile(stylePath string) (ansi.StyleConfig, error) {
 	return res, nil
 }
 
-// RenderBytes initializes a new TermRenderer and renders a markdown with a specific style.
-func RenderBytes(in []byte, style ansi.StyleConfig) ([]byte, error) {
-	r, err := NewTermRenderer(WithStyles(style))
-	if err != nil {
-		return nil, err
+// WithBaseURL sets a TermRenderer's base URL.
+func WithBaseURL(baseURL string) TermRendererOption {
+	return func(tr *TermRenderer) error {
+		tr.ansiOptions.BaseURL = baseURL
+		return nil
 	}
-
-	return r.RenderBytes(in)
 }
 
-// Render initializes new TermRenderer and renders markdown with a specific style
-func Render(in string, style ansi.StyleConfig) (string, error) {
-	b, err := RenderBytes([]byte(in), style)
-	return string(b), err
+// WithColorProfile sets the TermRenderer's color profile
+// (TrueColor / ANSI256 / ANSI).
+func WithColorProfile(profile termenv.Profile) TermRendererOption {
+	return func(tr *TermRenderer) error {
+		tr.ansiOptions.ColorProfile = profile
+		return nil
+	}
+}
+
+// WithAutoStyle sets a TermRenderer's styles with either the standard dark
+// or light style, depending on the terminal's background color at run-time.
+func WithAutoStyle() TermRendererOption {
+	return WithStyles(fun.IF(termenv.HasDarkBackground(), DarkStyle, LightStyle))
+}
+
+// WithStyles sets a TermRenderer's styles.
+func WithStyles(styles ansi.StyleConfig) TermRendererOption {
+	return func(tr *TermRenderer) error {
+		tr.ansiOptions.Styles = styles
+		return nil
+	}
+}
+
+// WithWordWrap sets a TermRenderer's word wrap.
+func WithWordWrap(wordWrap int) TermRendererOption {
+	return func(tr *TermRenderer) error {
+		tr.ansiOptions.WordWrap = wordWrap
+		return nil
+	}
+}
+
+// WithPreservedNewlines preserves newlines from being replaced.
+func WithPreservedNewLines() TermRendererOption {
+	return func(tr *TermRenderer) error {
+		tr.ansiOptions.PreserveNewLines = true
+		return nil
+	}
+}
+
+// WithEmoji sets a TermRenderer's emoji rendering.
+func WithEmoji() TermRendererOption {
+	return func(tr *TermRenderer) error {
+		emoji.New().Extend(tr.md)
+		return nil
+	}
 }
 
 // NewTermRenderer returns a new TermRenderer the given options.
@@ -93,61 +132,6 @@ func NewTermRenderer(options ...TermRendererOption) (*TermRenderer, error) {
 	return tr, nil
 }
 
-// WithBaseURL sets a TermRenderer's base URL.
-func WithBaseURL(baseURL string) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		tr.ansiOptions.BaseURL = baseURL
-		return nil
-	}
-}
-
-// WithColorProfile sets the TermRenderer's color profile
-// (TrueColor / ANSI256 / ANSI).
-func WithColorProfile(profile termenv.Profile) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		tr.ansiOptions.ColorProfile = profile
-		return nil
-	}
-}
-
-// WithAutoStyle sets a TermRenderer's styles with either the standard dark
-// or light style, depending on the terminal's background color at run-time.
-func WithAutoStyle() TermRendererOption {
-	return WithStyles(AutoStyle())
-}
-
-// WithStyles sets a TermRenderer's styles.
-func WithStyles(styles ansi.StyleConfig) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		tr.ansiOptions.Styles = styles
-		return nil
-	}
-}
-
-// WithWordWrap sets a TermRenderer's word wrap.
-func WithWordWrap(wordWrap int) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		tr.ansiOptions.WordWrap = wordWrap
-		return nil
-	}
-}
-
-// WithPreservedNewlines preserves newlines from being replaced.
-func WithPreservedNewLines() TermRendererOption {
-	return func(tr *TermRenderer) error {
-		tr.ansiOptions.PreserveNewLines = true
-		return nil
-	}
-}
-
-// WithEmoji sets a TermRenderer's emoji rendering.
-func WithEmoji() TermRendererOption {
-	return func(tr *TermRenderer) error {
-		emoji.New().Extend(tr.md)
-		return nil
-	}
-}
-
 func (tr *TermRenderer) Read(b []byte) (int, error) {
 	return tr.renderBuf.Read(b)
 }
@@ -181,6 +165,18 @@ func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 	return buf.Bytes(), err
 }
 
-func AutoStyle() ansi.StyleConfig {
-	return fun.IF(termenv.HasDarkBackground(), DarkStyle, LightStyle)
+// RenderBytes initializes a new TermRenderer and renders a markdown with a specific style.
+func RenderBytes(in []byte, style ansi.StyleConfig) ([]byte, error) {
+	r, err := NewTermRenderer(WithStyles(style))
+	if err != nil {
+		return nil, err
+	}
+
+	return r.RenderBytes(in)
+}
+
+// Render initializes new TermRenderer and renders markdown with a specific style
+func Render(in string, style ansi.StyleConfig) (string, error) {
+	b, err := RenderBytes([]byte(in), style)
+	return string(b), err
 }
