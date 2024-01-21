@@ -34,7 +34,6 @@ type TestModelOptions struct {
 // TestOption is a functional option.
 type TestOption func(opts *TestModelOptions)
 
-// WithInitialTermSize ...
 func WithInitialTermSize(x, y int) TestOption {
 	return func(opts *TestModelOptions) {
 		opts.size = tea.MsgWindowSize{
