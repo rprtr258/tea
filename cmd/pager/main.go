@@ -36,7 +36,6 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 	m.viewport.Update(msg)
 	if m.viewport.YOffset > len(m.lines)-m.viewport.Height {
-		panic(fmt.Sprint(m.viewport.YOffset, len(m.lines), m.viewport.Height))
 		m.viewport.YOffset = max(0, len(m.lines)-m.viewport.Height)
 	}
 }
@@ -59,7 +58,7 @@ func (m *model) headerView(vb tea.Viewbox) {
 }
 
 func (m *model) footerView(vb tea.Viewbox) {
-	info := fmt.Sprintf("%3.f%%", float64(m.viewport.YOffset)/float64(len(m.lines))*100)
+	info := fmt.Sprintf("%3.f%%", float64(m.viewport.YOffset)/float64(len(m.lines)-m.viewport.Height)*100)
 	box.Box(
 		vb.Sub(tea.Rectangle{
 			Left:   vb.Width - 2 - len(info) - 2,
