@@ -24,8 +24,19 @@ func (*model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
+	labelsY, vbLabelsX := vb.SplitX2(tea.Fixed(3), tea.Fixed(8*3+8+1))
+	vbBoard, labelsX := vbLabelsX.SplitY2(tea.Fixed(8*1+8+1), tea.Fixed(2))
+
+	labelStyle := styles.Style{}.Foreground(styles.ANSIColor(241))
+	labelsY = labelsY.Styled(labelStyle)
+	labelsX = labelsX.Styled(labelStyle)
+	for i := 0; i < 8; i++ {
+		labelsY.Set(i*2+1, 1, []rune("12345678")[i])
+		labelsX.Set(0, i*4+2, []rune("ABCDEFGH")[i])
+	}
+
 	tablebox.Box(
-		vb.MaxWidth(33).MaxHeight(17),
+		vbBoard,
 		[]tea.Layout{tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1)},
 		[]tea.Layout{tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3)}, // TODO: all flex(1)
 		func(vb tea.Viewbox, y, x int) {
