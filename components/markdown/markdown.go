@@ -124,25 +124,6 @@ func WithStyles(styles ansi.StyleConfig) TermRendererOption {
 	}
 }
 
-// WithStylesFromJSONBytes sets a TermRenderer's styles by parsing styles from
-// jsonBytes.
-func WithStylesFromJSONBytes(jsonBytes []byte) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		return json.Unmarshal(jsonBytes, &tr.ansiOptions.Styles)
-	}
-}
-
-// WithStylesFromJSONFile sets a TermRenderer's styles from a JSON file.
-func WithStylesFromJSONFile(filename string) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		jsonBytes, err := os.ReadFile(filename)
-		if err != nil {
-			return err
-		}
-		return json.Unmarshal(jsonBytes, &tr.ansiOptions.Styles)
-	}
-}
-
 // WithWordWrap sets a TermRenderer's word wrap.
 func WithWordWrap(wordWrap int) TermRendererOption {
 	return func(tr *TermRenderer) error {
