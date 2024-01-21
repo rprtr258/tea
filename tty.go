@@ -49,14 +49,12 @@ func openInputTTY() (*os.File, error) {
 }
 
 func (p *Program[M]) initTerminal() error {
-	err := p.initInput()
-	if err != nil {
+	if err := p.initInput(); err != nil {
 		return err
 	}
 
 	if p.console != nil {
-		err = p.console.SetRaw()
-		if err != nil {
+		if err := p.console.SetRaw(); err != nil {
 			return fmt.Errorf("error entering raw mode: %w", err)
 		}
 	}
