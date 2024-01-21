@@ -32,11 +32,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			m.quitting = true
 			f(tea.Quit)
 		case " ":
-			if m.altscreen {
-				f(tea.ExitAltScreen)
-			} else {
-				f(tea.EnterAltScreen)
-			}
+			f(fun.IF(m.altscreen, tea.ExitAltScreen, tea.EnterAltScreen))
 			m.altscreen = !m.altscreen
 		}
 	}
