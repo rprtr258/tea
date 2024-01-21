@@ -169,7 +169,7 @@ func (vb Viewbox) Pixel(y, x int) Viewbox {
 func (vb Viewbox) PaddingTop(top int) Viewbox {
 	return vb.Sub(Rectangle{
 		Top:    top,
-		Height: vb.Height,
+		Height: vb.Height - top,
 		Width:  vb.Width,
 	})
 }
@@ -178,7 +178,7 @@ func (vb Viewbox) PaddingLeft(left int) Viewbox {
 	return vb.Sub(Rectangle{
 		Left:   left,
 		Height: vb.Height,
-		Width:  vb.Width,
+		Width:  vb.Width - left,
 	})
 }
 
