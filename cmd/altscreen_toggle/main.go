@@ -26,8 +26,7 @@ type model struct {
 func (m *model) Init(func(...tea.Cmd)) {}
 
 func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
-	switch msg := msg.(type) { //nolint:gocritic
-	case tea.MsgKey:
+	if msg, ok := msg.(tea.MsgKey); ok { //nolint:gocritic
 		switch msg.String() {
 		case "q", "ctrl+c", "esc":
 			m.quitting = true
