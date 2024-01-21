@@ -122,7 +122,7 @@ func (r *Renderer) renderNode(w util.BufWriter, source []byte, node ast.Node, en
 				return ast.WalkStop, err
 			}
 		}
-		_, _ = bs.Current().Block.Write([]byte(e.Exiting))
+		_, _ = bs.Current().Block.WriteString(e.Exiting)
 	}
 
 	return ast.WalkContinue, nil

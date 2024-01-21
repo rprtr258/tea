@@ -229,10 +229,10 @@ func (r *Renderer) flush() {
 				line = truncate.String(line, uint(r.width))
 			}
 
-			_, _ = r.out.Write([]byte(line))
+			_, _ = r.out.WriteString(line)
 
 			if i < len(newLines)-1 {
-				_, _ = r.out.Write([]byte("\r\n"))
+				_, _ = r.out.WriteString("\r\n")
 			}
 		}
 	}
@@ -444,7 +444,7 @@ func (r *Renderer) insertTop(lines []string, topBoundary, bottomBoundary int) {
 	out.ChangeScrollingRegion(topBoundary, bottomBoundary)
 	out.MoveCursor(topBoundary, 0)
 	out.InsertLines(len(lines))
-	_, _ = out.Write([]byte(strings.Join(lines, "\r\n")))
+	_, _ = out.WriteString(strings.Join(lines, "\r\n"))
 	out.ChangeScrollingRegion(0, r.height)
 
 	// Move cursor back to where the main rendering routine expects it to be
@@ -471,7 +471,7 @@ func (r *Renderer) insertBottom(lines []string, topBoundary, bottomBoundary int)
 
 	out.ChangeScrollingRegion(topBoundary, bottomBoundary)
 	out.MoveCursor(bottomBoundary, 0)
-	_, _ = out.Write([]byte("\r\n" + strings.Join(lines, "\r\n")))
+	_, _ = out.WriteString("\r\n" + strings.Join(lines, "\r\n"))
 	out.ChangeScrollingRegion(0, r.height)
 
 	// Move cursor back to where the main rendering routine expects it to be
