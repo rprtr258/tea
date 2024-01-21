@@ -19,7 +19,7 @@ import (
 )
 
 // A TermRendererOption sets an option on a TermRenderer.
-type TermRendererOption func(*TermRenderer) error
+type TermRendererOption func(*TermRenderer)
 
 // TermRenderer can be used to render markdown content, posing a depth of
 // customization and styles to fit your needs.
@@ -46,18 +46,15 @@ func parseStyleFile(stylePath string) (ansi.StyleConfig, error) {
 
 // WithBaseURL sets a TermRenderer's base URL.
 func WithBaseURL(baseURL string) TermRendererOption {
-	return func(tr *TermRenderer) error {
+	return func(tr *TermRenderer) {
 		tr.ansiOptions.BaseURL = baseURL
-		return nil
 	}
 }
 
-// WithColorProfile sets the TermRenderer's color profile
-// (TrueColor / ANSI256 / ANSI).
+// WithColorProfile sets the TermRenderer's color profile (TrueColor / ANSI256 / ANSI)
 func WithColorProfile(profile termenv.Profile) TermRendererOption {
-	return func(tr *TermRenderer) error {
+	return func(tr *TermRenderer) {
 		tr.ansiOptions.ColorProfile = profile
-		return nil
 	}
 }
 
@@ -67,35 +64,31 @@ func WithAutoStyle() TermRendererOption {
 	return WithStyles(fun.IF(termenv.HasDarkBackground(), DarkStyle, LightStyle))
 }
 
-// WithStyles sets a TermRenderer's styles.
+// WithStyles sets a TermRenderer's styles
 func WithStyles(styles ansi.StyleConfig) TermRendererOption {
-	return func(tr *TermRenderer) error {
+	return func(tr *TermRenderer) {
 		tr.ansiOptions.Styles = styles
-		return nil
 	}
 }
 
-// WithWordWrap sets a TermRenderer's word wrap.
+// WithWordWrap sets a TermRenderer's word wrap
 func WithWordWrap(wordWrap int) TermRendererOption {
-	return func(tr *TermRenderer) error {
+	return func(tr *TermRenderer) {
 		tr.ansiOptions.WordWrap = wordWrap
-		return nil
 	}
 }
 
 // WithPreservedNewlines preserves newlines from being replaced.
 func WithPreservedNewLines() TermRendererOption {
-	return func(tr *TermRenderer) error {
+	return func(tr *TermRenderer) {
 		tr.ansiOptions.PreserveNewLines = true
-		return nil
 	}
 }
 
 // WithEmoji sets a TermRenderer's emoji rendering.
 func WithEmoji() TermRendererOption {
-	return func(tr *TermRenderer) error {
+	return func(tr *TermRenderer) {
 		emoji.New().Extend(tr.md)
-		return nil
 	}
 }
 
@@ -117,9 +110,7 @@ func NewTermRenderer(options ...TermRendererOption) (*TermRenderer, error) {
 		},
 	}
 	for _, opt := range options {
-		if err := opt(tr); err != nil {
-			return nil, err
-		}
+		opt(tr)
 	}
 	tr.md.SetRenderer(
 		renderer.NewRenderer(
