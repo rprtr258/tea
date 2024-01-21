@@ -15,11 +15,10 @@ import (
 type Model struct {
 	KeyMap KeyMap
 
-	cols      []Column
-	rows      [][]string
-	cursor    int
-	IsFocused bool
-	styles    Styles
+	cols   []Column
+	rows   [][]string
+	cursor int
+	styles Styles
 
 	viewport viewport.Model
 }
@@ -123,13 +122,6 @@ func WithWidth(w int) Option {
 	}
 }
 
-// WithFocused sets the focus state of the table
-func WithFocused(f bool) Option {
-	return func(m *Model) {
-		m.IsFocused = f
-	}
-}
-
 // WithStyles sets the table styles
 func WithStyles(s Styles) Option {
 	return func(m *Model) {
@@ -166,10 +158,6 @@ func (m *Model) SetStyles(s Styles) {
 
 // Update is the Tea update loop
 func (m *Model) Update(msg tea.Msg) {
-	if !m.IsFocused {
-		return
-	}
-
 	if msg, ok := msg.(tea.MsgKey); ok {
 		switch {
 		case key.Matches(msg, m.KeyMap.LineUp):

@@ -18,9 +18,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch msg.String() {
-		case "esc":
-			m.table.IsFocused = !m.table.IsFocused
-		case "q", "ctrl+c":
+		case "esc", "q", "ctrl+c":
 			f(tea.Quit)
 			return
 		case "enter":
@@ -158,7 +156,6 @@ func Main(ctx context.Context) error {
 	t := table.New(
 		table.WithColumns(columns),
 		table.WithRows(rows...),
-		table.WithFocused(true),
 		table.WithHeight(7),
 		table.WithStyles(s),
 	)
