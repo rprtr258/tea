@@ -149,10 +149,10 @@ type Rectangle struct {
 func (vb Viewbox) Sub(rect Rectangle) Viewbox {
 	return Viewbox{
 		fb:     vb.fb,
-		Height: fun.IF(rect.Height == 0, vb.Height, rect.Height),
-		Width:  fun.IF(rect.Width == 0, vb.Width, rect.Width),
-		Y:      vb.Y + rect.Top,
-		X:      vb.X + rect.Left,
+		Height: fun.Clamp(fun.IF(rect.Height == 0, vb.Height, rect.Height), 0, vb.Height),
+		Width:  fun.Clamp(fun.IF(rect.Width == 0, vb.Width, rect.Width), 0, vb.Width),
+		Y:      vb.Y + fun.Clamp(rect.Top, 0, vb.Height-1),
+		X:      vb.X + fun.Clamp(rect.Left, 0, vb.Width-1),
 		style:  vb.style,
 	}
 }
@@ -161,53 +161,39 @@ func (vb Viewbox) Pixel(y, x int) Viewbox {
 	return vb.Sub(Rectangle{
 		Top:    y,
 		Left:   x,
-		Height: fun.IF(vb.Width == 0, 0, 1),
-		Width:  fun.IF(vb.Height == 0, 0, 1),
+		Height: 1,
+		Width:  1,
 	})
 }
 
 func (vb Viewbox) PaddingTop(top int) Viewbox {
-	return Viewbox{
-		fb:     vb.fb,
-		Height: vb.Height - top,
+	return vb.Sub(Rectangle{
+		Top:    top,
+		Height: vb.Height,
 		Width:  vb.Width,
-		Y:      vb.Y + top,
-		X:      vb.X,
-		style:  vb.style,
-	}
+	})
 }
 
 func (vb Viewbox) PaddingLeft(left int) Viewbox {
-	return Viewbox{
-		fb:     vb.fb,
+	return vb.Sub(Rectangle{
+		Left:   left,
 		Height: vb.Height,
-		Width:  vb.Width - left,
-		Y:      vb.Y,
-		X:      vb.X + left,
-		style:  vb.style,
-	}
+		Width:  vb.Width,
+	})
 }
 
 func (vb Viewbox) MaxHeight(height int) Viewbox {
-	return Viewbox{
-		fb:     vb.fb,
+	return vb.Sub(Rectangle{
 		Height: min(vb.Height, height),
 		Width:  vb.Width,
-		Y:      vb.Y,
-		X:      vb.X,
-		style:  vb.style,
-	}
+	})
 }
 
 func (vb Viewbox) MaxWidth(width int) Viewbox {
-	return Viewbox{
-		fb:     vb.fb,
+	return vb.Sub(Rectangle{
 		Height: vb.Height,
 		Width:  min(vb.Width, width),
-		Y:      vb.Y,
-		X:      vb.X,
-		style:  vb.style,
-	}
+	})
 }
 
 func (vb Viewbox) Styled(style styles.Style) Viewbox {
