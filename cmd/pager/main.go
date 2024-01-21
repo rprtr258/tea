@@ -90,7 +90,7 @@ func (m *model) View(vb tea.Viewbox) {
 			Width:  vb.Width,
 		}),
 		func(vb tea.Viewbox, i int) {
-			if i > len(m.lines) {
+			if i >= len(m.lines) {
 				return
 			}
 			vb.WriteLine(m.lines[i])
