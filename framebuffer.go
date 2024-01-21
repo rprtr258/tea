@@ -364,6 +364,11 @@ func (vb Viewbox) SplitY2(l1, l2 Layout) (_, _ Viewbox) {
 	return r[0], r[1]
 }
 
+func (vb Viewbox) SplitY3(l1, l2, l3 Layout) (_, _, _ Viewbox) {
+	r := vb.SplitY(l1, l2, l3)
+	return r[0], r[1], r[2]
+}
+
 func (vb Viewbox) SplitY4(l1, l2, l3, l4 Layout) (_, _, _, _ Viewbox) {
 	r := vb.SplitY(l1, l2, l3, l4)
 	return r[0], r[1], r[2], r[3]

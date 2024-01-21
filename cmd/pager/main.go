@@ -82,23 +82,18 @@ func (m *model) footerView(vb tea.Viewbox) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	m.headerView(vb.Sub(tea.Rectangle{
-		Height: 3,
-		Width:  vb.Width,
-	}))
-	vb = vb.PaddingTop(3)
+	vbHeader, vbViewport, vbFooter := vb.SplitY3(tea.Fixed(3), tea.Flex(1), tea.Fixed(3)) // TODO: second is auto
+
+	m.headerView(vbHeader)
 	m.viewport.View(
-		vb.Sub(tea.Rectangle{
-			Height: m.viewport.Height,
-			Width:  vb.Width,
-		}),
+		vbViewport,
 		func(vb tea.Viewbox, i int) {
 			if i >= len(m.lines) {
 				return
 			}
 			vb.WriteLine(m.lines[i])
 		})
-	m.footerView(vb.PaddingTop(m.viewport.Height))
+	m.footerView(vbFooter)
 }
 
 func Main(ctx context.Context) error {
