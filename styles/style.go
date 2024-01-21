@@ -236,14 +236,14 @@ func (s Style) Render(strs ...string) string {
 	// Set alignment. This will also pad short lines with spaces so that all
 	// lines are the same length, so we run it under a few different conditions
 	// beyond alignment.
-	{
-		// numLines := strings.Count(str, "\n")
+	// {
+	// 	numLines := strings.Count(str, "\n")
 
-		// if numLines != 0 || width != 0 {
-		// 	st := fun.IF(colorWhitespace || styleWhitespace, teWhitespace, nil)
-		// 	str = alignTextHorizontal(str, horizontalAlign, width, st)
-		// }
-	}
+	// 	if numLines != 0 || width != 0 {
+	// 		st := fun.IF(colorWhitespace || styleWhitespace, teWhitespace, nil)
+	// 		str = alignTextHorizontal(str, horizontalAlign, width, st)
+	// 	}
+	// }
 
 	// Truncate according to MaxHeight
 	// if maxHeight > 0 {

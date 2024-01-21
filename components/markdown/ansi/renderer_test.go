@@ -31,7 +31,7 @@ func TestRenderer(t *testing.T) {
 	for _, f := range files {
 		bn := strings.TrimSuffix(filepath.Base(f), ".md")
 		sn := filepath.Join(_examplesDir, bn+".style")
-		tn := filepath.Join("../testdata", bn+".test")
+		tn := filepath.Join("..", "testdata", bn+".test")
 
 		in := assert.UseFileContent(t, f)
 
