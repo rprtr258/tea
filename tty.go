@@ -14,17 +14,15 @@ import (
 	"golang.org/x/term"
 )
 
-func (p *Program[M]) initInput() error {
+func (p *Program[M]) initInput() {
 	// If input's a file, use console to manage it
 	if f, ok := p.input.(*os.File); ok {
 		c, err := console.ConsoleFromFile(f)
 		if err != nil {
-			return nil //nolint:nilerr // ignore error, this was just a test
+			return //nolint:nilerr // ignore error, this was just a test
 		}
 		p.console = c
 	}
-
-	return nil
 }
 
 // On unix systems, RestoreInput closes any TTYs we opened for input. Note that
@@ -49,9 +47,7 @@ func openInputTTY() (*os.File, error) {
 }
 
 func (p *Program[M]) initTerminal() error {
-	if err := p.initInput(); err != nil {
-		return err
-	}
+	p.initInput()
 
 	if p.console != nil {
 		if err := p.console.SetRaw(); err != nil {
