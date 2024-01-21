@@ -43,7 +43,7 @@ func (m *model) View(vb tea.Viewbox) {
 			vb.Set(0, vb.Width/2, board[y][x])
 		},
 		tablebox.NormalBorder,
-		styles.Style{}.Foreground(styles.ANSIColor(238)),
+		styles.Style{},
 	)
 }
 
