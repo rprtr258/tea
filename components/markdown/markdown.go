@@ -134,7 +134,7 @@ func WithStandardStyle(style string) TermRendererOption {
 		if err != nil {
 			return err
 		}
-		tr.ansiOptions.Styles = *styles
+		tr.ansiOptions.Styles = styles
 		return nil
 	}
 }
@@ -166,7 +166,7 @@ func WithStylePath(stylePath string) TermRendererOption {
 			return json.Unmarshal(jsonBytes, &tr.ansiOptions.Styles)
 		}
 
-		tr.ansiOptions.Styles = *styles
+		tr.ansiOptions.Styles = styles
 		return nil
 	}
 }
@@ -255,18 +255,18 @@ func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 	return buf.Bytes(), err
 }
 
-func getDefaultStyle(style string) (*ansi.StyleConfig, error) {
+func getDefaultStyle(style string) (ansi.StyleConfig, error) {
 	if style == AutoStyle {
 		if termenv.HasDarkBackground() {
-			return &DarkStyleConfig, nil
+			return DarkStyleConfig, nil
 		}
 
-		return &LightStyleConfig, nil
+		return LightStyleConfig, nil
 	}
 
 	styles, ok := DefaultStyles[style]
 	if !ok {
-		return nil, fmt.Errorf("%s: style not found", style)
+		return ansi.StyleConfig{}, fmt.Errorf("%s: style not found", style)
 	}
 
 	return styles, nil

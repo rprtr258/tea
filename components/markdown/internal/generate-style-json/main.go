@@ -10,7 +10,7 @@ import (
 	"github.com/rprtr258/tea/components/markdown/ansi"
 )
 
-func writeStyleJSON(filename string, styleConfig *ansi.StyleConfig) error {
+func writeStyleJSON(filename string, styleConfig ansi.StyleConfig) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
