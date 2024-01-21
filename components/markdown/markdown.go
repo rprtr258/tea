@@ -14,12 +14,8 @@ import (
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/util"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea/components/markdown/ansi"
-)
-
-// Default styles.
-const (
-	AutoStyle = "auto"
 )
 
 // A TermRendererOption sets an option on a TermRenderer.
@@ -34,40 +30,34 @@ type TermRenderer struct {
 	renderBuf   bytes.Buffer
 }
 
-// Render initializes a new TermRenderer and renders a markdown with a specific
-// style.
-func Render(in string, stylePath string) (string, error) {
-	b, err := RenderBytes([]byte(in), stylePath)
-	return string(b), err
-}
-
-// TODO: remove wtf
-func getEnvironmentStyle() string {
-	glamourStyle := os.Getenv("GLAMOUR_STYLE")
-	if glamourStyle == "" {
-		return AutoStyle
+func parseStyleFile(stylePath string) (ansi.StyleConfig, error) {
+	jsonBytes, err := os.ReadFile(stylePath)
+	if err != nil {
+		return ansi.StyleConfig{}, fmt.Errorf("read style file: %w", err)
 	}
 
-	return glamourStyle
+	var res ansi.StyleConfig
+	if err := json.Unmarshal(jsonBytes, &res); err != nil {
+		return ansi.StyleConfig{}, fmt.Errorf("parse style json spec: %w", err)
+	}
+
+	return res, nil
 }
 
-// RenderWithEnvironmentConfig initializes a new TermRenderer and renders a
-// markdown with a specific style defined by the GLAMOUR_STYLE environment variable.
-func RenderWithEnvironmentConfig(in string) (string, error) {
-	b, err := RenderBytes([]byte(in), getEnvironmentStyle())
-	return string(b), err
-}
-
-// RenderBytes initializes a new TermRenderer and renders a markdown with a
-// specific style.
-func RenderBytes(in []byte, stylePath string) ([]byte, error) {
-	r, err := NewTermRenderer(
-		WithStylePath(stylePath),
-	)
+// RenderBytes initializes a new TermRenderer and renders a markdown with a specific style.
+func RenderBytes(in []byte, style ansi.StyleConfig) ([]byte, error) {
+	r, err := NewTermRenderer(WithStyles(style))
 	if err != nil {
 		return nil, err
 	}
+
 	return r.RenderBytes(in)
+}
+
+// Render initializes new TermRenderer and renders markdown with a specific style
+func Render(in string, style ansi.StyleConfig) (string, error) {
+	b, err := RenderBytes([]byte(in), style)
+	return string(b), err
 }
 
 // NewTermRenderer returns a new TermRenderer the given options.
@@ -120,49 +110,10 @@ func WithColorProfile(profile termenv.Profile) TermRendererOption {
 	}
 }
 
-// WithStandardStyle sets a TermRenderer's styles with a standard (builtin)
-// style.
-func WithStandardStyle(style string) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		styles, err := getDefaultStyle(style)
-		if err != nil {
-			return err
-		}
-		tr.ansiOptions.Styles = styles
-		return nil
-	}
-}
-
 // WithAutoStyle sets a TermRenderer's styles with either the standard dark
 // or light style, depending on the terminal's background color at run-time.
 func WithAutoStyle() TermRendererOption {
-	return WithStandardStyle(AutoStyle)
-}
-
-// WithEnvironmentConfig sets a TermRenderer's styles based on the
-// GLAMOUR_STYLE environment variable.
-func WithEnvironmentConfig() TermRendererOption {
-	return WithStylePath(getEnvironmentStyle())
-}
-
-// WithStylePath sets a TermRenderer's style from stylePath. stylePath is first
-// interpreted as a filename. If no such file exists, it is re-interpreted as a
-// standard style.
-func WithStylePath(stylePath string) TermRendererOption {
-	return func(tr *TermRenderer) error {
-		styles, err := getDefaultStyle(stylePath)
-		if err != nil {
-			jsonBytes, err := os.ReadFile(stylePath)
-			if err != nil {
-				return err
-			}
-
-			return json.Unmarshal(jsonBytes, &tr.ansiOptions.Styles)
-		}
-
-		tr.ansiOptions.Styles = styles
-		return nil
-	}
+	return WithStyles(AutoStyle())
 }
 
 // WithStyles sets a TermRenderer's styles.
@@ -249,19 +200,6 @@ func (tr *TermRenderer) RenderBytes(in []byte) ([]byte, error) {
 	return buf.Bytes(), err
 }
 
-func getDefaultStyle(style string) (ansi.StyleConfig, error) {
-	if style == AutoStyle {
-		if termenv.HasDarkBackground() {
-			return DarkStyle, nil
-		}
-
-		return LightStyle, nil
-	}
-
-	styles, ok := DefaultStyles[style]
-	if !ok {
-		return ansi.StyleConfig{}, fmt.Errorf("%s: style not found", style)
-	}
-
-	return styles, nil
+func AutoStyle() ansi.StyleConfig {
+	return fun.IF(termenv.HasDarkBackground(), DarkStyle, LightStyle)
 }

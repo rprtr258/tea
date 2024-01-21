@@ -26,7 +26,7 @@ func main() {
 Bye!
 `
 
-	out, _ := markdown.Render(in, "dark")
+	out, _ := markdown.Render(in, markdown.DarkStyle)
 	fmt.Print(out)
 	return nil
 }

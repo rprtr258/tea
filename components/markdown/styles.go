@@ -758,7 +758,4 @@ var (
 			BlockPrefix: "\n🠶 ",
 		},
 	}
-
-	// DefaultStyles are the default styles.
-	DefaultStyles = map[string]ansi.StyleConfig{}
 )

@@ -44,7 +44,7 @@ func TestTermRendererWriter(t *testing.T) {
 }
 
 func TestTermRenderer(t *testing.T) {
-	r, err := NewTermRenderer(WithStandardStyle("dark"))
+	r, err := NewTermRenderer(WithStyles(DarkStyle))
 	assert.NoError(t, err)
 
 	in := assert.UseFileContent(t, markdown)
@@ -94,17 +94,14 @@ func TestStyles(t *testing.T) {
 	_, err := NewTermRenderer(WithAutoStyle())
 	assert.NoError(t, err)
 
-	_, err = NewTermRenderer(WithStandardStyle(AutoStyle))
-	assert.NoError(t, err)
-
-	_, err = NewTermRenderer(WithEnvironmentConfig())
+	_, err = NewTermRenderer(WithAutoStyle())
 	assert.NoError(t, err)
 }
 
 func TestRenderHelpers(t *testing.T) {
 	in := assert.UseFileContent(t, markdown)
 
-	b, err := Render(string(in), "dark")
+	b, err := Render(string(in), DarkStyle)
 	assert.NoError(t, err)
 
 	// verify

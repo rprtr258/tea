@@ -14,7 +14,7 @@ Word-wrapping will occur when lines exceed the limit of 40 characters.
 `
 
 	r, _ := markdown.NewTermRenderer(
-		markdown.WithStandardStyle("dark"),
+		markdown.WithStyles(markdown.DarkStyle),
 		markdown.WithWordWrap(40),
 	)
 

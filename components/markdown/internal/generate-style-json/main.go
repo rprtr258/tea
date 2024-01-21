@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"path/filepath"
 
-	"github.com/rprtr258/tea/components/markdown"
+	// "github.com/rprtr258/tea/components/markdown"
 	"github.com/rprtr258/tea/components/markdown/ansi"
 )
 
@@ -23,12 +22,12 @@ func writeStyleJSON(filename string, styleConfig ansi.StyleConfig) error {
 }
 
 func run() error {
-	for style, styleConfig := range markdown.DefaultStyles {
-		filename := filepath.Join("styles", style+".json")
-		if err := writeStyleJSON(filename, styleConfig); err != nil {
-			return err
-		}
-	}
+	// TODO: what for?
+	// for style, styleConfig := range markdown.DefaultStyles {
+	// 	if err := writeStyleJSON(filepath.Join("styles", style+".json"), styleConfig); err != nil {
+	// 		return err
+	// 	}
+	// }
 	return nil
 }
 
