@@ -108,6 +108,7 @@ func (e *BaseElement) Render(w io.Writer, ctx RenderContext) error {
 			return err
 		}
 	}
+
 	renderText(w, rules, s)
 	return nil
 }
