@@ -61,7 +61,6 @@ func newExample() (*model, error) {
 	const width = 78
 
 	vp := viewport.New(width, 20)
-	vp.Style = styles.Style{}
 	// BorderStyle(styles.RoundedBorder).
 	// BorderForeground(styles.FgColor("62"))
 	// PaddingRight(2)

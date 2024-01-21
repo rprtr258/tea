@@ -35,6 +35,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 
 	m.viewport.Update(msg)
+	if m.viewport.YOffset > len(m.lines)-m.viewport.Height {
+		m.viewport.YOffset = max(0, len(m.lines)-m.viewport.Height)
+	}
 }
 
 func (m *model) headerView(vb tea.Viewbox) {

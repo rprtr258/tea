@@ -3,7 +3,6 @@ package viewport
 import (
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/key"
-	"github.com/rprtr258/tea/styles"
 )
 
 // KeyMap defines the keybindings for the viewport. Note that you don't
@@ -63,10 +62,6 @@ type Model struct {
 
 	// YOffset is the vertical scroll position.
 	YOffset int
-
-	// Style applies a styles style to the viewport. Realistically, it's most
-	// useful for setting borders, margins and padding.
-	Style styles.Style
 }
 
 // New create model with given width, height and default key mappings.
@@ -78,7 +73,6 @@ func New(width, height int) Model {
 		MouseWheelEnabled: true,
 		MouseWheelDelta:   3,
 		YOffset:           0,
-		Style:             styles.Style{},
 	}
 }
 
