@@ -23,7 +23,7 @@ func (p *Program[M]) initInput() {
 
 	c, err := console.ConsoleFromFile(f)
 	if err != nil {
-		return //nolint:nilerr // ignore error, this was just a test
+		return // ignore error, this was just a test
 	}
 
 	p.console = c
