@@ -16,13 +16,17 @@ import (
 
 func (p *Program[M]) initInput() {
 	// If input's a file, use console to manage it
-	if f, ok := p.input.(*os.File); ok {
-		c, err := console.ConsoleFromFile(f)
-		if err != nil {
-			return //nolint:nilerr // ignore error, this was just a test
-		}
-		p.console = c
+	f, ok := p.input.(*os.File)
+	if !ok {
+		return
 	}
+
+	c, err := console.ConsoleFromFile(f)
+	if err != nil {
+		return //nolint:nilerr // ignore error, this was just a test
+	}
+
+	p.console = c
 }
 
 // On unix systems, RestoreInput closes any TTYs we opened for input. Note that
