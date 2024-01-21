@@ -17,18 +17,16 @@ type BaseElement struct {
 	Style  StylePrimitive
 }
 
-func formatToken(format string, token string) (string, error) {
-	var b bytes.Buffer
-
-	v := make(map[string]any)
-	v["text"] = token
-
+func formatToken(format, token string) (string, error) {
 	tmpl, err := template.New(format).Funcs(TemplateFuncMap).Parse(format)
 	if err != nil {
 		return "", err
 	}
 
-	err = tmpl.Execute(&b, v)
+	var b bytes.Buffer
+	err = tmpl.Execute(&b, map[string]any{
+		"text": token,
+	})
 	return b.String(), err
 }
 

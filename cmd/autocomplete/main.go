@@ -25,7 +25,7 @@ type repo struct {
 const reposURL = "https://api.github.com/orgs/charmbracelet/repos"
 
 func getRepos() tea.Msg {
-	req, err := http.NewRequest(http.MethodGet, reposURL, nil) //nolint:noctx
+	req, err := http.NewRequest(http.MethodGet, reposURL, http.NoBody) //nolint:noctx
 	if err != nil {
 		return gotReposErrMsg(err)
 	}
