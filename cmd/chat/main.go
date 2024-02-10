@@ -18,35 +18,27 @@ type model struct {
 	lines       []string
 	textarea    textarea.Model
 	senderStyle styles.Style
-	err         error
 }
 
 func initialModel() *model {
 	ta := textarea.New()
 	ta.Placeholder = "Send a message..."
 	ta.Focus()
-
 	ta.Prompt = "┃ "
 	ta.CharLimit = 280
-
 	ta.SetWidth(30)
 	ta.SetHeight(3)
-
-	// Remove cursor line styling
-	ta.FocusedStyle.CursorLine = styles.Style{}
-
+	ta.FocusedStyle.CursorLine = styles.Style{} // Remove cursor line styling
 	ta.ShowLineNumbers = false
+	ta.KeyMap.InsertNewline.SetEnabled(false)
 
 	vp := viewport.New(30, 5)
-
-	ta.KeyMap.InsertNewline.SetEnabled(false)
 
 	return &model{
 		textarea:    ta,
 		messages:    []string{},
 		viewport:    vp,
 		senderStyle: styles.Style{}.Foreground(styles.FgColor("5")),
-		err:         nil,
 		lines: []string{
 			`Welcome to the chat room!`,
 			`Type a message and press Enter to send.`,
@@ -80,6 +72,10 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 func (m *model) View(vb tea.Viewbox) {
 	m.viewport.View(vb, func(vb tea.Viewbox, i int) {
+		if i >= len(m.lines) {
+			return
+		}
+
 		vb.WriteLine(m.lines[i])
 	})
 	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: m.viewport.Height}))
