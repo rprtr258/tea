@@ -20,7 +20,7 @@ type model struct {
 	senderStyle styles.Style
 }
 
-func initialModel() *model {
+func newModel() *model {
 	ta := textarea.New()
 	ta.Placeholder = "Send a message..."
 	ta.Focus()
@@ -82,6 +82,6 @@ func (m *model) View(vb tea.Viewbox) {
 }
 
 func Main(ctx context.Context) error {
-	_, err := tea.NewProgram(ctx, initialModel()).Run()
+	_, err := tea.NewProgram(ctx, newModel()).Run()
 	return err
 }
