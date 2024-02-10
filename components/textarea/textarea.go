@@ -1022,12 +1022,15 @@ func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 // View renders the text area in its current state.
 func (m *Model) View(vb tea.Viewbox) {
+	vb = vb.
+		MaxHeight(m.height).
+		MaxWidth(m.width).
+		Styled(m.style.Base)
+
 	if m.Value() == "" && m.row == 0 && m.col == 0 && m.Placeholder != "" {
 		m.placeholderView(vb)
 		return
 	}
-
-	vb = vb.Styled(m.style.Base)
 
 	m.Cursor.TextStyle = m.style.CursorLine
 
@@ -1139,11 +1142,6 @@ func (m *Model) getPromptString(displayLine int) string {
 
 // placeholderView returns the prompt and placeholder view, if any
 func (m *Model) placeholderView(vb tea.Viewbox) {
-	vb = vb.
-		MaxHeight(m.height).
-		MaxWidth(m.width).
-		Styled(m.style.Base)
-
 	vb0 := vb.
 		Styled(m.style.Prompt).
 		Styled(m.style.CursorLine).
