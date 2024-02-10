@@ -25,7 +25,6 @@ var (
 type model struct {
 	inputs  []textinput.Model
 	focused int
-	err     error
 }
 
 // Validator functions to ensure valid input
@@ -108,7 +107,6 @@ func initialModel() *model {
 			_cvv: cvvInput,
 		},
 		focused: 0,
-		err:     nil,
 	}
 }
 
