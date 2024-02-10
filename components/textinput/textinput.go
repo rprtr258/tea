@@ -93,21 +93,18 @@ type Model struct {
 	Cursor        cursor.Model
 
 	// Styles. These will be applied as inline styles.
-	//
-	// For an introduction to styling with Lip Gloss see:
-	// https://github.com/charmbracelet/styles
 	PromptStyle      styles.Style
 	TextStyle        styles.Style
 	PlaceholderStyle styles.Style
 	CompletionStyle  styles.Style
 
-	// CharLimit is the maximum amount of characters this input element will
-	// accept. If 0 or less, there's no limit.
+	// CharLimit is the maximum amount of characters this input element will accept.
+	// If 0 or less, there's no limit.
 	CharLimit int
 
 	// Width is the maximum number of characters that can be displayed at once.
-	// It essentially treats the text field like a horizontally scrolling
-	// viewport. If 0 or less this setting is ignored.
+	// It essentially treats the text field like a horizontally scrolling viewport.
+	// If 0 or less this setting is ignored.
 	Width int
 
 	// KeyMap encodes the keybindings recognized by the widget.
@@ -116,8 +113,8 @@ type Model struct {
 	// Underlying text value.
 	value []rune
 
-	// focus indicates whether user input focus should be on this input
-	// component. When false, ignore keyboard input and hide the cursor.
+	// focus indicates whether user input focus should be on this input component.
+	// When false, ignore keyboard input and hide the cursor.
 	focus bool
 
 	// Cursor position.
