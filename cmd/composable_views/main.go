@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"unicode/utf8"
 
 	"github.com/rprtr258/fun"
 
@@ -81,8 +82,10 @@ func (m *mainModel) Update(msg tea.Msg, f func(...tea.Cmd)) {
 				m.timer = timer.New(_defaultTime)
 				m.timer.Init(f)
 			} else {
-				m.Next()
-				m.resetSpinner()
+				m.index = (m.index + 1) % len(spinners)
+				m.spinner = spinner.New()
+				m.spinner.Style = _styleSpinner
+				m.spinner.Spinner = spinners[m.index]
 				f(m.spinner.CmdTick)
 			}
 		}
@@ -113,12 +116,10 @@ func (m *mainModel) View(vb tea.Viewbox) {
 	}).SplitX2(tea.Flex(1), tea.Flex(1))
 
 	focusedTimer := m.state == _timerView
-	model := fun.IF(focusedTimer, "timer", "spinner")
 	_styleModel := styles.Style{}.Align(styles.Center, styles.Center)
 	box.Box(vbTimer.Styled(_styleModel),
 		func(vb tea.Viewbox) {
 			vb = vb.Padding(tea.PaddingOptions{Top: 2, Bottom: 2, Left: (_width - 4) / 2})
-			// WriteText(fmt.Sprintf("%4s", m.timer.View()))
 			m.timer.View(vb)
 		},
 		fun.IF(focusedTimer, box.NormalBorder, box.HiddenBorder),
@@ -128,8 +129,7 @@ func (m *mainModel) View(vb tea.Viewbox) {
 	)
 	box.Box(vbSpinner.Styled(_styleModel),
 		func(vb tea.Viewbox) {
-			// WriteText(m.spinner.View())
-			m.spinner.View(vb.Padding(tea.PaddingOptions{Top: 2, Bottom: 2, Left: (_width - 1) / 2}))
+			m.spinner.View(vb.Padding(tea.PaddingOptions{Top: 2, Bottom: 2, Left: (_width - utf8.RuneCountInString(spinners[m.index].Frames[0])) / 2}))
 		},
 		fun.IF(focusedTimer, box.HiddenBorder, box.NormalBorder),
 		box.BorderMaskAll,
@@ -138,17 +138,7 @@ func (m *mainModel) View(vb tea.Viewbox) {
 	)
 	vbHelp.
 		Styled(_styleHelp).
-		WriteLine(fmt.Sprintf("tab: focus next • n: new %s • q: exit", model))
-}
-
-func (m *mainModel) Next() {
-	m.index = (m.index + 1) % len(spinners)
-}
-
-func (m *mainModel) resetSpinner() {
-	m.spinner = spinner.New()
-	m.spinner.Style = _styleSpinner
-	m.spinner.Spinner = spinners[m.index]
+		WriteLine(fmt.Sprintf("tab: focus next • n: new %s • q: exit", fun.IF(focusedTimer, "timer", "spinner")))
 }
 
 func Main(ctx context.Context) error {
