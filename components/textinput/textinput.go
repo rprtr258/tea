@@ -147,8 +147,7 @@ type Model struct {
 	// Should the input suggest to complete
 	ShowSuggestions bool
 
-	// suggestions is a list of suggestions that may be used to complete the
-	// input.
+	// suggestions is a list of suggestions that may be used to complete the input
 	suggestions            [][]rune
 	matchedSuggestions     [][]rune
 	currentSuggestionIndex int
