@@ -221,7 +221,7 @@ func (m Model) Position() int {
 // SetCursor moves the cursor to the given position. If the position is
 // out of bounds the cursor will be moved to the start or end accordingly.
 func (m *Model) SetCursor(pos int) {
-	m.pos = clamp(pos, 0, len(m.value))
+	m.pos = fun.Clamp(pos, 0, len(m.value))
 	m.handleOverflow()
 }
 
@@ -713,32 +713,6 @@ func Paste() tea.Msg {
 		return pasteErrMsg{err}
 	}
 	return pasteMsg(str)
-}
-
-func clamp(v, low, high int) int {
-	if high < low {
-		low, high = high, low
-	}
-	return min(high, max(low, v))
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-// Deprecated: use cursor.SetMode().
-func (m *Model) SetCursorMode(mode cursor.Mode) []tea.Cmd {
-	return m.Cursor.SetMode(mode)
 }
 
 func (m Model) viewCompletion(offset int) string {
