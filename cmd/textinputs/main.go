@@ -148,8 +148,8 @@ func (m *model) View(vb tea.Viewbox) {
 	vb = vb.PaddingTop(1)
 	vb.WriteLine(fun.IF(m.focusIndex == len(m.inputs), focusedButton, blurredButton))
 	vb = vb.PaddingTop(1)
-	vb = vb.Styled(helpStyle).WriteLine("cursor mode is ")
-	vb = vb.Styled(cursorModeHelpStyle).WriteLine(m.cursorMode.String())
+	vb = vb.Styled(helpStyle).WriteLineX("cursor mode is ")
+	vb = vb.Styled(cursorModeHelpStyle).WriteLineX(m.cursorMode.String())
 	vb.Styled(helpStyle).WriteLine(" (ctrl+r to change style)")
 }
 

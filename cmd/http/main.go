@@ -4,8 +4,8 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rprtr258/tea"
@@ -43,11 +43,19 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	vb = vb.WriteLine("Checking ").WriteLine(_url).WriteLine("...")
+	vb = vb.
+		WriteLineX("Checking ").
+		WriteLineX(_url).
+		WriteLineX("...")
 	if m.err != nil {
-		vb.WriteLine("something went wrong: ").WriteLine(m.err.Error())
+		vb.
+			WriteLineX("something went wrong: ").
+			WriteLineX(m.err.Error())
 	} else if m.status != 0 {
-		vb.WriteLine(fmt.Sprint(m.status)).WriteLine(" ").WriteLine(http.StatusText(m.status))
+		vb.
+			WriteLineX(strconv.Itoa(m.status)).
+			WriteLineX(" ").
+			WriteLineX(http.StatusText(m.status))
 	}
 }
 

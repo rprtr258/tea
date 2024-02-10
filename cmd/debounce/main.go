@@ -52,7 +52,9 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 }
 
 func (m *model) View(vb tea.Viewbox) {
-	vb.WriteLine("Key presses: ").WriteLine(fmt.Sprint(m.tag))
+	vb.
+		WriteLineX("Key presses: ").
+		WriteLineX(fmt.Sprint(m.tag))
 	vb.PaddingTop(1).WriteLine("To exit press any key, then wait for one second without pressing anything.")
 }
 

@@ -279,7 +279,7 @@ func (m *Model) barView(vb tea.Viewbox, percent float64, textWidth int) {
 			vb = vb.
 				PaddingLeft(i).
 				Styled(styles.Style{}.Foreground(scuf.FgRGB(m.rampColorA.BlendLuv(m.rampColorB, p).RGB255()))).
-				WriteLine(string(m.Full))
+				WriteLineX(string(m.Full))
 		}
 	} else {
 		// Solid fill

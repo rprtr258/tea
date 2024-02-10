@@ -69,11 +69,11 @@ func (m *model) View(vb tea.Viewbox) {
 	// For a more detailed timer view you could read m.timer.Timeout to get the
 	// remaining time as a time.Duration and skip calling m.timer.View() entirely.
 	if !m.quitting {
-		vb = vb.WriteLine("Exiting in ")
+		vb = vb.WriteLineX("Exiting in ")
 	}
 	m.timer.View(vb)
 	vb = vb.PaddingLeft(5)
-	vb = vb.WriteLine(fun.IF(
+	vb = vb.WriteLineX(fun.IF(
 		m.timer.Timedout(),
 		"All done!",
 		"",

@@ -104,12 +104,12 @@ func (m *Model) ShortHelpView(vb tea.Viewbox, bindings []key.Binding) {
 		}
 
 		if i > 0 {
-			vb = vb.Styled(m.Styles.ShortSeparator).WriteLine(m.ShortSeparator)
+			vb = vb.Styled(m.Styles.ShortSeparator).WriteLineX(m.ShortSeparator)
 		}
 
-		vb = vb.Styled(m.Styles.ShortKey).WriteLine(kb.Help.Key())
+		vb = vb.Styled(m.Styles.ShortKey).WriteLineX(kb.Help.Key())
 		vb = vb.PaddingLeft(1)
-		vb = vb.Styled(m.Styles.ShortDesc).WriteLine(kb.Help.Desc())
+		vb = vb.Styled(m.Styles.ShortDesc).WriteLineX(kb.Help.Desc())
 	}
 }
 

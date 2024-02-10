@@ -38,9 +38,9 @@ func (m *model) Update(message tea.Msg, f func(...tea.Cmd)) {
 
 func (m *model) View(vb tea.Viewbox) {
 	vb.PaddingTop(2).
-		WriteLine("     Hi. This program will exit in ").
-		WriteLine(fmt.Sprint(*m)).
-		WriteLine(" seconds...")
+		WriteLineX("     Hi. This program will exit in ").
+		WriteLineX(fmt.Sprint(*m)).
+		WriteLineX(" seconds...")
 }
 
 func tick() tea.Cmd {

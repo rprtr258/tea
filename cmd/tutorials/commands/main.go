@@ -54,13 +54,13 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 func (m *model) View(vb tea.Viewbox) {
 	vb = vb.PaddingTop(1)
 	if m.err != nil {
-		vb.WriteLine("We had some trouble: ").WriteLine(m.err.Error())
+		vb.WriteLineX("We had some trouble: ").WriteLineX(m.err.Error())
 		return
 	}
 
-	vb = vb.WriteLine("Checking ").WriteLine(_url).WriteLine(" ... ")
+	vb = vb.WriteLineX("Checking ").WriteLineX(_url).WriteLineX(" ... ")
 	if m.status > 0 {
-		vb.WriteLine(strconv.Itoa(m.status)).WriteLine(" ").WriteLine(http.StatusText(m.status)).WriteLine("!")
+		vb.WriteLineX(strconv.Itoa(m.status)).WriteLineX(" ").WriteLineX(http.StatusText(m.status)).WriteLineX("!")
 	}
 }
 

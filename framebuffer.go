@@ -217,16 +217,20 @@ func (vb Viewbox) Styled(style styles.Style) Viewbox {
 }
 
 // WriteLine starting from x=offset without wrapping, returns end offset
-func (vb Viewbox) WriteLine(line string) Viewbox {
+func (vb Viewbox) WriteLine(line string) int {
 	x := 0
 	for _, c := range line {
 		if x >= vb.Width {
-			return vb.PaddingLeft(x)
+			return x
 		}
 
 		x += vb.Set(0, x, c)
 	}
-	return vb.PaddingLeft(x)
+	return x
+}
+
+func (vb Viewbox) WriteLineX(line string) Viewbox {
+	return vb.PaddingLeft(vb.WriteLine(line))
 }
 
 // WriteText starting from y, x with wrapping, returns end position

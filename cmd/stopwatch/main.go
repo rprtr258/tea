@@ -33,9 +33,9 @@ func (m *model) View(vb tea.Viewbox) {
 	// duration from m.stopwatch.Elapsed(), which returns a time.Duration, and
 	// skip m.stopwatch.View() altogether.
 	if !m.quitting {
-		vb = vb.WriteLine("Elapsed: ")
+		vb = vb.WriteLineX("Elapsed: ")
 	}
-	vb = vb.WriteLine(m.stopwatch.View())
+	vb = vb.WriteLineX(m.stopwatch.View())
 	if !m.quitting {
 		m.help.ShortHelpView(vb.PaddingTop(2), []key.Binding{
 			m.keymap.start,

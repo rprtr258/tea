@@ -1019,7 +1019,7 @@ func (m *Model[I]) titleView(vb tea.Viewbox) {
 		// 	// titleBarStyle = titleBarStyle.PaddingLeft(titleBarGap - spinnerWidth - styles.Width(spinnerLeftGap))
 		// }
 
-		vb.Styled(m.Styles.Title).WriteLine(" ").WriteLine(m.Title).WriteLine(" ")
+		vb.Styled(m.Styles.Title).WriteLineX(" ").WriteLineX(m.Title).WriteLineX(" ")
 
 		// // Status message
 		// if m.filterState != Filtering {
@@ -1053,13 +1053,13 @@ func (m *Model[I]) statusView(vb tea.Viewbox) {
 	case m.filterState == Filtering:
 		// Filter results
 		if visibleItems == 0 {
-			vb = vb.Styled(m.Styles.StatusEmpty).WriteLine("Nothing matched")
+			vb = vb.Styled(m.Styles.StatusEmpty).WriteLineX("Nothing matched")
 		} else {
-			vb = vb.WriteLine(itemsDisplay)
+			vb = vb.WriteLineX(itemsDisplay)
 		}
 	case len(m.items) == 0:
 		// Not filtering: no items.
-		vb = vb.Styled(m.Styles.StatusEmpty).WriteLine("No " + m.itemNamePlural)
+		vb = vb.Styled(m.Styles.StatusEmpty).WriteLineX("No " + m.itemNamePlural)
 	default:
 		// Normal
 		filtered := m.FilterState() == FilterApplied
@@ -1070,12 +1070,12 @@ func (m *Model[I]) statusView(vb tea.Viewbox) {
 		}
 		status += itemsDisplay
 
-		vb = vb.WriteLine(status)
+		vb = vb.WriteLineX(status)
 	}
 
 	totalItems := len(m.items)
 	if numFiltered := totalItems - visibleItems; numFiltered > 0 {
-		vb = vb.Styled(m.Styles.DividerDot).WriteLine(string([]rune{' ', bullet, ' '}))
+		vb = vb.Styled(m.Styles.DividerDot).WriteLineX(string([]rune{' ', bullet, ' '}))
 		vb.Styled(m.Styles.StatusBarFilterCount).WriteLine(fmt.Sprintf("%d filtered", numFiltered))
 	}
 }

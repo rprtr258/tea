@@ -1048,7 +1048,7 @@ func (m *Model) View(vb tea.Viewbox) {
 				PaddingTop(1).
 				Styled(style).
 				Styled(m.style.Prompt).
-				WriteLine(m.getPromptString(displayLine))
+				WriteLineX(m.getPromptString(displayLine))
 			displayLine++
 
 			if m.ShowLineNumbers {
@@ -1056,12 +1056,12 @@ func (m *Model) View(vb tea.Viewbox) {
 					vb = vb.
 						Styled(style).
 						Styled(fun.IF(m.row == l, m.style.CursorLineNumber, m.style.LineNumber)).
-						WriteLine(fmt.Sprintf(m.lineNumberFormat, l+1))
+						WriteLineX(fmt.Sprintf(m.lineNumberFormat, l+1))
 				} else {
 					vb = vb.
 						Styled(style).
 						Styled(m.style.LineNumber).
-						WriteLine("   ")
+						WriteLineX("   ")
 				}
 			}
 
@@ -1081,26 +1081,26 @@ func (m *Model) View(vb tea.Viewbox) {
 			if m.row == l && lineInfo.RowOffset == y {
 				vb = vb.
 					Styled(style).
-					WriteLine(string(wrappedLine[:lineInfo.ColumnOffset]))
+					WriteLineX(string(wrappedLine[:lineInfo.ColumnOffset]))
 				if m.col >= len(line) && lineInfo.CharOffset >= m.width {
 					m.Cursor.SetChar(" ")
 					st, cursor := m.Cursor.View()
-					vb = vb.Styled(st).WriteLine(cursor)
+					vb = vb.Styled(st).WriteLineX(cursor)
 				} else {
 					m.Cursor.SetChar(string(wrappedLine[lineInfo.ColumnOffset]))
 					st, cursor := m.Cursor.View()
 					vb = vb.
 						Styled(style).
 						Styled(st).
-						WriteLine(cursor)
+						WriteLineX(cursor)
 					vb = vb.
 						Styled(style).
-						WriteLine(string(wrappedLine[lineInfo.ColumnOffset+1:]))
+						WriteLineX(string(wrappedLine[lineInfo.ColumnOffset+1:]))
 				}
 			} else {
-				vb = vb.Styled(style).WriteLine(string(wrappedLine))
+				vb = vb.Styled(style).WriteLineX(string(wrappedLine))
 			}
-			vb = vb.Styled(style).WriteLine(strings.Repeat(" ", max(0, padding)))
+			vb = vb.Styled(style).WriteLineX(strings.Repeat(" ", max(0, padding)))
 		}
 	}
 
@@ -1110,7 +1110,7 @@ func (m *Model) View(vb tea.Viewbox) {
 		vb = vb.
 			PaddingTop(1).
 			Styled(m.style.Prompt).
-			WriteLine(m.getPromptString(displayLine))
+			WriteLineX(m.getPromptString(displayLine))
 		displayLine++
 
 		if m.ShowLineNumbers {
@@ -1147,13 +1147,13 @@ func (m *Model) placeholderView(vb tea.Viewbox) {
 	vb = vb.
 		Styled(m.style.Prompt).
 		Styled(m.style.CursorLine).
-		WriteLine(m.getPromptString(0))
+		WriteLineX(m.getPromptString(0))
 
 	if m.ShowLineNumbers {
 		vb = vb.
 			Styled(m.style.CursorLine).
 			Styled(m.style.CursorLineNumber).
-			WriteLine(fmt.Sprintf(m.lineNumberFormat, 1))
+			WriteLineX(fmt.Sprintf(m.lineNumberFormat, 1))
 	}
 
 	m.Cursor.TextStyle = m.style.Placeholder
@@ -1162,24 +1162,24 @@ func (m *Model) placeholderView(vb tea.Viewbox) {
 	vb = vb.
 		Styled(m.style.CursorLine).
 		Styled(st).
-		WriteLine(cursor)
+		WriteLineX(cursor)
 
 	// The rest of the placeholder text
 	vb = vb.
 		Styled(m.style.CursorLine).
 		Styled(style).
-		WriteLine(p[1:] + strings.Repeat(" ", max(0, m.width-rw.StringWidth(p))))
+		WriteLineX(p[1:] + strings.Repeat(" ", max(0, m.width-rw.StringWidth(p))))
 
 	// The rest of the new lines
 	for y := 1; y < m.height; y++ {
 		vb = vb.
 			Styled(m.style.Prompt).
-			WriteLine(m.getPromptString(y))
+			WriteLineX(m.getPromptString(y))
 
 		if m.ShowLineNumbers {
 			vb = vb.
 				Styled(m.style.EndOfBuffer).
-				WriteLine(fmt.Sprintf(m.lineNumberFormat, string(m.EndOfBufferCharacter)))
+				WriteLineX(fmt.Sprintf(m.lineNumberFormat, string(m.EndOfBufferCharacter)))
 		}
 	}
 
