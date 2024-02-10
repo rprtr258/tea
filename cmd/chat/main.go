@@ -59,7 +59,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		case tea.KeyEnter:
 			m.lines = append(m.lines, [2]string{"You", m.textarea.Value()})
 			m.textarea.Reset()
-			m.viewport.SetYOffset(len(m.lines))
+			m.viewport.GotoBottom(len(m.lines))
 		}
 	}
 
