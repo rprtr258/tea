@@ -3,7 +3,6 @@ package textinput
 import (
 	"reflect"
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/atotto/clipboard"
@@ -93,9 +92,6 @@ type Model struct {
 	EchoCharacter rune
 	Cursor        cursor.Model
 
-	// Deprecated: use [cursor.BlinkSpeed] instead.
-	BlinkSpeed time.Duration
-
 	// Styles. These will be applied as inline styles.
 	//
 	// For an introduction to styling with Lip Gloss see:
@@ -104,9 +100,6 @@ type Model struct {
 	TextStyle        styles.Style
 	PlaceholderStyle styles.Style
 	CompletionStyle  styles.Style
-
-	// Deprecated: use Cursor.Style instead.
-	CursorStyle styles.Style
 
 	// CharLimit is the maximum amount of characters this input element will
 	// accept. If 0 or less, there's no limit.
