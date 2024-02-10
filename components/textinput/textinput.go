@@ -135,13 +135,12 @@ type Model struct {
 	offset      int
 	offsetRight int
 
-	// Validate is a function that checks whether or not the text within the
-	// input is valid. If it is not valid, the `Err` field will be set to the
-	// error returned by the function. If the function is not defined, all
-	// input is considered valid.
+	// Validate is a function that checks whether or not the text within the input is valid.
+	// If it is not valid, the `Err` field will be set to the error returned by the function.
+	// If the function is not defined, all input is considered valid.
 	Validate ValidateFunc
 
-	// rune sanitizer for input.
+	// rune sanitizer for input
 	rsan runeutil.Sanitizer
 
 	// Should the input suggest to complete
