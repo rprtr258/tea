@@ -1137,45 +1137,45 @@ func (m *Model) getPromptString(displayLine int) string {
 	return prompt
 }
 
-// placeholderView returns the prompt and placeholder view, if any.
+// placeholderView returns the prompt and placeholder view, if any
 func (m *Model) placeholderView(vb tea.Viewbox) {
-	vb = vb.Styled(m.style.Base)
-
-	p := rw.Truncate(m.Placeholder, m.width, "...")
-	style := m.style.Placeholder
-
 	vb = vb.
+		MaxHeight(m.height).
+		MaxWidth(m.width).
+		Styled(m.style.Base)
+
+	vb0 := vb.
 		Styled(m.style.Prompt).
 		Styled(m.style.CursorLine).
 		WriteLineX(m.getPromptString(0))
 
 	if m.ShowLineNumbers {
-		vb = vb.
+		vb0 = vb0.
 			Styled(m.style.CursorLine).
 			Styled(m.style.CursorLineNumber).
 			WriteLineX(fmt.Sprintf(m.lineNumberFormat, 1))
 	}
 
+	p := rw.Truncate(m.Placeholder, m.width, "...")
 	m.Cursor.TextStyle = m.style.Placeholder
 	m.Cursor.SetChar(string(p[0]))
 	st, cursor := m.Cursor.View()
-	vb = vb.
+	vb0.
 		Styled(m.style.CursorLine).
 		Styled(st).
-		WriteLineX(cursor)
-
-	// The rest of the placeholder text
-	vb = vb.
+		WriteLineX(cursor).
+		// The rest of the placeholder text
 		Styled(m.style.CursorLine).
-		Styled(style).
+		Styled(m.style.Placeholder).
 		WriteLineX(p[1:] + strings.Repeat(" ", max(0, m.width-rw.StringWidth(p))))
 
 	// The rest of the new lines
 	for y := 1; y < m.height; y++ {
-		vb = vb.
+		vb = vb.PaddingTop(1)
+
+		vb := vb.
 			Styled(m.style.Prompt).
 			WriteLineX(m.getPromptString(y))
-
 		if m.ShowLineNumbers {
 			vb = vb.
 				Styled(m.style.EndOfBuffer).
