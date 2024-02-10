@@ -3,7 +3,6 @@ package tea
 import (
 	"bytes"
 	"context"
-	"sync"
 	"testing"
 
 	"github.com/rprtr258/assert"
@@ -69,18 +68,17 @@ func TestMsgClear(t *testing.T) {
 			p := NewProgram(context.Background(), &initCmdModel{}).
 				WithInput(&in).
 				WithOutput(&out)
-			var wg sync.WaitGroup
-			wg.Add(1)
+			ch := make(chan struct{})
 			go func() {
 				for _, cmd := range test.cmds {
 					p.Send(cmd())
 				}
 				p.Send(Quit())
-				wg.Done()
+				ch <- struct{}{}
 			}()
 			_, err := p.Run()
 			assert.NoError(t, err)
-			wg.Wait()
+			<-ch
 
 			assert.Equal(t, test.expected, out.String())
 		})
