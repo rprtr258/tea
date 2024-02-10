@@ -20,12 +20,15 @@ const (
 func (mask BorderMask) GetTop() bool {
 	return mask&BorderMaskTop != 0
 }
+
 func (mask BorderMask) GetBottom() bool {
 	return mask&BorderMaskBottom != 0
 }
+
 func (mask BorderMask) GetLeft() bool {
 	return mask&BorderMaskLeft != 0
 }
+
 func (mask BorderMask) GetRight() bool {
 	return mask&BorderMaskRight != 0
 }
