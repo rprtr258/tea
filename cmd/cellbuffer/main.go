@@ -75,7 +75,7 @@ type cellbuffer struct {
 	width int
 }
 
-func (c *cellbuffer) init(w, h int) {
+func (c *cellbuffer) resize(w, h int) {
 	if w == 0 {
 		return
 	}
@@ -103,7 +103,8 @@ func (c cellbuffer) height() int {
 	if c.width == 0 {
 		return 0
 	}
-	return (len(c.cells) + c.width - 1) / c.width
+
+	return len(c.cells) / c.width
 }
 
 func (c cellbuffer) ready() bool {
@@ -144,7 +145,7 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 		if !m.cells.ready() {
 			m.targetX, m.targetY = float64(msg.Width)/2, float64(msg.Height)/2
 		}
-		m.cells.init(msg.Width, msg.Height)
+		m.cells.resize(msg.Width, msg.Height)
 	case tea.MsgMouse:
 		if !m.cells.ready() {
 			return
