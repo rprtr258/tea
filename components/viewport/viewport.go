@@ -118,6 +118,11 @@ func (m *Model) GotoTop() {
 	m.SetYOffset(0)
 }
 
+// GotoBottom sets the viewport to the bottom position.
+func (m *Model) GotoBottom(contentHeight int) {
+	m.SetYOffset(max(0, contentHeight-m.Height))
+}
+
 // Update handles standard message-based viewport updates.
 func (m *Model) Update(msg tea.Msg) {
 	switch msg := msg.(type) {

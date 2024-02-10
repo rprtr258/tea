@@ -59,7 +59,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		case tea.KeyEnter:
 			m.lines = append(m.lines, [2]string{"You", m.textarea.Value()})
 			m.textarea.Reset()
-			m.viewport.SetYOffset(max(0, len(m.lines)-m.viewport.Height))
+			m.viewport.SetYOffset(len(m.lines))
 		}
 	}
 
@@ -69,7 +69,7 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 func (m *model) View(vb tea.Viewbox) {
 	m.viewport.View(vb, func(vb tea.Viewbox, i int) {
-		if i < 0 || i >= len(m.lines) {
+		if i >= len(m.lines) {
 			return
 		}
 
