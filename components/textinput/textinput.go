@@ -799,7 +799,7 @@ func (m *Model) updateSuggestions() {
 
 // nextSuggestion selects the next suggestion.
 func (m *Model) nextSuggestion() {
-	m.currentSuggestionIndex = (m.currentSuggestionIndex + 1)
+	m.currentSuggestionIndex = m.currentSuggestionIndex + 1
 	if m.currentSuggestionIndex >= len(m.matchedSuggestions) {
 		m.currentSuggestionIndex = 0
 	}
@@ -807,7 +807,7 @@ func (m *Model) nextSuggestion() {
 
 // previousSuggestion selects the previous suggestion.
 func (m *Model) previousSuggestion() {
-	m.currentSuggestionIndex = (m.currentSuggestionIndex - 1)
+	m.currentSuggestionIndex = m.currentSuggestionIndex - 1
 	if m.currentSuggestionIndex < 0 {
 		m.currentSuggestionIndex = len(m.matchedSuggestions) - 1
 	}
