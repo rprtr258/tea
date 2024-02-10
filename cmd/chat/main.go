@@ -78,7 +78,7 @@ func (m *model) View(vb tea.Viewbox) {
 
 		vb.WriteLine(m.lines[i])
 	})
-	m.textarea.View(vb.Padding(tea.PaddingOptions{Top: m.viewport.Height}))
+	m.textarea.View(vb.PaddingTop(m.viewport.Height))
 }
 
 func Main(ctx context.Context) error {
