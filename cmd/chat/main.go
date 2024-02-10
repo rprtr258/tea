@@ -59,7 +59,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			f(tea.Quit)
 			return
 		case tea.KeyEnter:
-			m.messages = append(m.messages, m.senderStyle.Render("You: ")+m.textarea.Value())
+			// m.messages = append(m.messages, m.senderStyle.Render("You: ")+m.textarea.Value())
+			m.messages = append(m.messages, "You: "+m.textarea.Value())
 			m.lines = m.messages
 			m.textarea.Reset()
 			// m.viewport.GotoBottom()
