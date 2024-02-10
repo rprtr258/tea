@@ -202,7 +202,7 @@ func (m *Model) setValueInternal(runes []rune) {
 	} else {
 		m.value = runes
 	}
-	if (m.pos == 0 && empty) || m.pos > len(m.value) {
+	if m.pos == 0 && empty || m.pos > len(m.value) {
 		m.SetCursor(len(m.value))
 	}
 	m.handleOverflow()
@@ -336,7 +336,6 @@ func (m *Model) handleOverflow() {
 		w := 0
 		i := 0
 		runes := m.value[m.offset:]
-
 		for i < len(runes) && w <= m.Width {
 			w += rw.RuneWidth(runes[i])
 			if w <= m.Width+1 {
@@ -351,7 +350,6 @@ func (m *Model) handleOverflow() {
 		w := 0
 		runes := m.value[:m.offsetRight]
 		i := len(runes) - 1
-
 		for i > 0 && w < m.Width {
 			w += rw.RuneWidth(runes[i])
 			if w <= m.Width {
@@ -712,6 +710,7 @@ func Paste() tea.Msg {
 	if err != nil {
 		return pasteErrMsg{err}
 	}
+
 	return pasteMsg(str)
 }
 
