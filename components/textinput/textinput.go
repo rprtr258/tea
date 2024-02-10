@@ -9,6 +9,7 @@ import (
 	"github.com/atotto/clipboard"
 	rw "github.com/mattn/go-runewidth"
 
+	"github.com/rprtr258/fun"
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/cursor"
 	"github.com/rprtr258/tea/components/key"
@@ -760,12 +761,11 @@ func (m Model) viewCompletion(offset int) string {
 
 // AvailableSuggestions returns the list of available suggestions.
 func (m *Model) AvailableSuggestions() []string {
-	suggestions := []string{}
-	for _, s := range m.suggestions {
-		suggestions = append(suggestions, string(s))
-	}
-
-	return suggestions
+	return fun.Map[string](
+		func(s []rune) string {
+			return string(s)
+		},
+		m.suggestions...)
 }
 
 // CurrentSuggestion returns the currently selected suggestion.
