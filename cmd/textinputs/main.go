@@ -78,8 +78,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		// Change cursor mode
 		case "ctrl+r":
 			m.cursorMode++
-			if m.cursorMode > cursor.CursorHide {
-				m.cursorMode = cursor.CursorBlink
+			if m.cursorMode > cursor.ModeHide {
+				m.cursorMode = cursor.ModeBlink
 			}
 			for i := range m.inputs {
 				f(m.inputs[i].Cursor.SetMode(m.cursorMode)...)

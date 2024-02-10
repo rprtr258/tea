@@ -179,16 +179,11 @@ func New() Model {
 	}
 }
 
-// NewModel creates a new model with default settings.
-//
-// Deprecated: Use [New] instead.
-var NewModel = New
-
 // SetValue sets the value of the text input.
 func (m *Model) SetValue(s string) {
 	// Clean up any special characters in the input provided by the
 	// caller. This avoids bugs due to e.g. tab characters and whatnot.
-	runes := m.san().Sanitize([]rune(s))
+	runes := m.rsan.Sanitize([]rune(s))
 	m.setValueInternal(runes)
 }
 
@@ -277,16 +272,11 @@ func (m *Model) SetSuggestions(suggestions []string) {
 	m.updateSuggestions()
 }
 
-// rsan initializes or retrieves the rune sanitizer.
-func (m *Model) san() runeutil.Sanitizer {
-	return m.rsan
-}
-
 func (m *Model) insertRunesFromUserInput(v []rune) {
 	// Clean up any special characters in the input provided by the
 	// clipboard. This avoids bugs due to e.g. tab characters and
 	// whatnot.
-	paste := m.san().Sanitize(v)
+	paste := m.rsan.Sanitize(v)
 
 	var availSpace int
 	if m.CharLimit > 0 {
@@ -638,7 +628,7 @@ func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 	m.Cursor.Update(msg, f)
 
-	if oldPos != m.pos && m.Cursor.Mode() == cursor.CursorBlink {
+	if oldPos != m.pos && m.Cursor.Mode() == cursor.ModeBlink {
 		m.Cursor.Blink = false
 		f(m.Cursor.CmdBlink()...)
 	}
@@ -650,7 +640,7 @@ func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 func (m Model) View(vb tea.Viewbox) {
 	// Placeholder text
 	if len(m.value) == 0 && m.Placeholder != "" {
-		m.placeholderView(vb)
+		m.viewPlaceholder(vb)
 		return
 	}
 
@@ -664,7 +654,7 @@ func (m Model) View(vb tea.Viewbox) {
 		st, cursor := m.Cursor.View()
 		v += st.Render(cursor)                      // cursor and text under it
 		v += m.echoTransform(string(value[pos+1:])) // text after cursor
-		v += m.completionView(0)                    // suggested completion
+		v += m.viewCompletion(0)                    // suggested completion
 	} else {
 		if m.canAcceptSuggestion() {
 			suggestion := m.matchedSuggestions[m.currentSuggestionIndex]
@@ -673,7 +663,7 @@ func (m Model) View(vb tea.Viewbox) {
 				m.Cursor.SetChar(m.echoTransform(string(suggestion[pos])))
 				st, cursor := m.Cursor.View()
 				v += st.Render(cursor)
-				v += m.completionView(1)
+				v += m.viewCompletion(1)
 			} else {
 				m.Cursor.SetChar(" ")
 				st, cursor := m.Cursor.View()
@@ -701,8 +691,8 @@ func (m Model) View(vb tea.Viewbox) {
 	vb.PaddingLeft(len(m.Prompt)).WriteLine(v)
 }
 
-// placeholderView returns the prompt and placeholder view, if any.
-func (m Model) placeholderView(vb tea.Viewbox) {
+// viewPlaceholder returns the prompt and placeholder view, if any.
+func (m Model) viewPlaceholder(vb tea.Viewbox) {
 	vb.Styled(m.PromptStyle).WriteLine(m.Prompt)
 	vb = vb.PaddingLeft(len(m.Prompt))
 
@@ -750,47 +740,22 @@ func max(a, b int) int {
 	return b
 }
 
-// Deprecated.
-
-// Deprecated: use cursor.Mode.
-type CursorMode int
-
-const (
-	// Deprecated: use cursor.CursorBlink.
-	CursorBlink = CursorMode(cursor.CursorBlink)
-	// Deprecated: use cursor.CursorStatic.
-	CursorStatic = CursorMode(cursor.CursorStatic)
-	// Deprecated: use cursor.CursorHide.
-	CursorHide = CursorMode(cursor.CursorHide)
-)
-
-func (c CursorMode) String() string {
-	return cursor.Mode(c).String()
-}
-
-// Deprecated: use cursor.Mode().
-func (m Model) CursorMode() CursorMode {
-	return CursorMode(m.Cursor.Mode())
-}
-
 // Deprecated: use cursor.SetMode().
-func (m *Model) SetCursorMode(mode CursorMode) []tea.Cmd {
-	return m.Cursor.SetMode(cursor.Mode(mode))
+func (m *Model) SetCursorMode(mode cursor.Mode) []tea.Cmd {
+	return m.Cursor.SetMode(mode)
 }
 
-func (m Model) completionView(offset int) string {
-	var (
-		value = m.value
-		style = m.PlaceholderStyle.Render
-	)
-
-	if m.canAcceptSuggestion() {
-		suggestion := m.matchedSuggestions[m.currentSuggestionIndex]
-		if len(value) < len(suggestion) {
-			return style(string(suggestion[len(value)+offset:]))
-		}
+func (m Model) viewCompletion(offset int) string {
+	if !m.canAcceptSuggestion() {
+		return ""
 	}
-	return ""
+
+	suggestion := m.matchedSuggestions[m.currentSuggestionIndex]
+	if len(m.value) >= len(suggestion) {
+		return ""
+	}
+
+	return m.PlaceholderStyle.Render(string(suggestion[len(m.value)+offset:]))
 }
 
 // AvailableSuggestions returns the list of available suggestions.

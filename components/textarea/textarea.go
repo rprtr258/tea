@@ -1010,7 +1010,7 @@ func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 
 	newRow, newCol := m.cursorLineNumber(), m.col
 	m.Cursor.Update(msg, f)
-	if (newRow != oldRow || newCol != oldCol) && m.Cursor.Mode() == cursor.CursorBlink {
+	if (newRow != oldRow || newCol != oldCol) && m.Cursor.Mode() == cursor.ModeBlink {
 		m.Cursor.Blink = false
 		f(m.Cursor.CmdBlink()...)
 	}
