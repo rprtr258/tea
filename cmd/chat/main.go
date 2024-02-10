@@ -61,10 +61,12 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 			m.textarea.Reset()
 			m.viewport.GotoBottom(len(m.lines))
 		}
+	default:
+		// do not update viewport on keys, they must go to textarea
+		m.viewport.Update(msg)
 	}
 
 	m.textarea.Update(msg, f)
-	m.viewport.Update(msg)
 }
 
 func (m *model) View(vb tea.Viewbox) {

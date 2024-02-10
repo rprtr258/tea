@@ -1047,8 +1047,7 @@ func (m *Model) View(vb tea.Viewbox) {
 		)
 
 		for y, wrappedLine := range wrappedLines {
-			vb = vb.
-				PaddingTop(1).
+			vbLine := vb.
 				Styled(style).
 				Styled(m.style.Prompt).
 				WriteLineX(m.getPromptString(displayLine))
@@ -1056,12 +1055,16 @@ func (m *Model) View(vb tea.Viewbox) {
 
 			if m.ShowLineNumbers {
 				if y == 0 {
-					vb = vb.
+					vbLine = vbLine.
 						Styled(style).
-						Styled(fun.IF(m.row == l, m.style.CursorLineNumber, m.style.LineNumber)).
+						Styled(fun.IF(
+							m.row == l,
+							m.style.CursorLineNumber,
+							m.style.LineNumber,
+						)).
 						WriteLineX(fmt.Sprintf(m.lineNumberFormat, l+1))
 				} else {
-					vb = vb.
+					vbLine = vbLine.
 						Styled(style).
 						Styled(m.style.LineNumber).
 						WriteLineX("   ")
@@ -1081,46 +1084,45 @@ func (m *Model) View(vb tea.Viewbox) {
 				wrappedLine = []rune(strings.TrimSuffix(string(wrappedLine), " "))
 				padding -= m.width - strwidth
 			}
+
+			vbLine = vbLine.Styled(style)
 			if m.row == l && lineInfo.RowOffset == y {
-				vb = vb.
-					Styled(style).
-					WriteLineX(string(wrappedLine[:lineInfo.ColumnOffset]))
+				vbLine = vbLine.WriteLineX(string(wrappedLine[:lineInfo.ColumnOffset]))
 				if m.col >= len(line) && lineInfo.CharOffset >= m.width {
 					m.Cursor.SetChar(" ")
 					st, cursor := m.Cursor.View()
-					vb = vb.Styled(st).WriteLineX(cursor)
+					vbLine = vbLine.Styled(st).WriteLineX(cursor)
 				} else {
 					m.Cursor.SetChar(string(wrappedLine[lineInfo.ColumnOffset]))
 					st, cursor := m.Cursor.View()
-					vb = vb.
-						Styled(style).
+					vbLine = vbLine.
 						Styled(st).
-						WriteLineX(cursor)
-					vb = vb.
-						Styled(style).
+						WriteLineX(cursor).
 						WriteLineX(string(wrappedLine[lineInfo.ColumnOffset+1:]))
 				}
 			} else {
-				vb = vb.Styled(style).WriteLineX(string(wrappedLine))
+				vbLine = vbLine.WriteLineX(string(wrappedLine))
 			}
-			vb = vb.Styled(style).WriteLineX(strings.Repeat(" ", max(0, padding)))
+			vbLine = vbLine.WriteLineX(strings.Repeat(" ", max(0, padding)))
+
+			vb = vb.PaddingTop(1)
 		}
 	}
 
 	// Always show at least `m.Height` lines at all times.
 	// To do this we can simply pad out a few extra new lines in the view.
 	for y := 0; y < m.height; y++ {
-		vb = vb.
-			PaddingTop(1).
+		vbLine := vb.
 			Styled(m.style.Prompt).
 			WriteLineX(m.getPromptString(displayLine))
-		displayLine++
-
 		if m.ShowLineNumbers {
-			vb.
+			vbLine.
 				Styled(m.style.EndOfBuffer).
 				WriteLine(fmt.Sprintf(m.lineNumberFormat, string(m.EndOfBufferCharacter)))
 		}
+
+		vb = vb.PaddingTop(1)
+		displayLine++
 	}
 
 	// m.viewport.SetContent(s.String())
