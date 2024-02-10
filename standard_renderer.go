@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"maps"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
 
 	// "github.com/muesli/ansi/compressor"
-	"github.com/muesli/reflow/truncate"
+
 	"github.com/muesli/termenv"
 	"github.com/rprtr258/fun"
 	"github.com/samber/lo"
@@ -149,108 +148,6 @@ func (r *Renderer) flush() {
 	for _, chunk := range lo.Chunk(r.buf.Bytes(), 16*1024) {
 		syscall.Write(1, chunk)
 	}
-	return
-
-	newLines := strings.Split(r.buf.String(), "\n")
-
-	// If we know the output's height, we can use it to determine how many
-	// lines we can render. We drop lines from the top of the render buffer if
-	// necessary, as we can't navigate the cursor into the terminal's scrollback
-	// buffer.
-	if r.height > 0 && len(newLines) > r.height {
-		newLines = newLines[len(newLines)-r.height:]
-	}
-
-	numLinesThisFlush := len(newLines)
-
-	// Add any queued messages to this render
-	if len(r.queuedMessageLines) > 0 && !r.altScreenActive { // flushQueuedMessages
-		newLines = append(r.queuedMessageLines, newLines...)
-		r.queuedMessageLines = []string{}
-	}
-
-	oldLines := strings.Split(r.lastRender, "\n")
-
-	skipLines := make(map[int]struct{})
-	// Clear any lines we painted in the last render.
-	if r.linesRendered > 0 {
-		for i := r.linesRendered - 1; i > 0; i-- {
-			// If the number of lines we want to render hasn't increased and
-			// new line is the same as the old line we can skip rendering for
-			// this line as a performance optimization.
-			if len(newLines) <= len(oldLines) &&
-				len(newLines) > i && len(oldLines) > i &&
-				newLines[i] == oldLines[i] {
-				skipLines[i] = struct{}{}
-			} else if _, exists := r.ignoreLines[i]; !exists {
-				r.out.ClearLine()
-			}
-
-			r.out.CursorUp(1)
-		}
-
-		if _, exists := r.ignoreLines[0]; !exists {
-			// We need to return to the start of the line here to properly
-			// erase it. Going back the entire width of the terminal will
-			// usually be farther than we need to go, but terminal emulators
-			// will stop the cursor at the start of the line as a rule.
-			//
-			// We use this sequence in particular because it's part of the ANSI
-			// standard (whereas others are proprietary to, say, VT100/VT52).
-			// If cursor previous line (ESC[ + <n> + F) were better supported
-			// we could use that above to eliminate this step.
-			r.out.CursorBack(r.width)
-			r.out.ClearLine()
-		}
-	}
-
-	// Merge the set of lines we're skipping as a rendering optimization with
-	// the set of lines we've explicitly asked the renderer to ignore.
-	maps.Copy(skipLines, r.ignoreLines)
-
-	// Paint new lines
-	for i := 0; i < len(newLines); i++ {
-		if _, skip := skipLines[i]; skip {
-			// Unless this is the last line, move the cursor down.
-			if i < len(newLines)-1 {
-				r.out.CursorDown(1)
-			}
-		} else {
-			line := newLines[i]
-
-			// Truncate lines wider than the width of the window to avoid
-			// wrapping, which will mess up rendering. If we don't have the
-			// width of the window this will be ignored.
-			//
-			// Note that on Windows we only get the width of the window on
-			// program initialization, so after a resize this won't perform
-			// correctly (signal SIGWINCH is not supported on Windows).
-			if r.width > 0 {
-				line = truncate.String(line, uint(r.width))
-			}
-
-			_, _ = r.out.WriteString(line)
-
-			if i < len(newLines)-1 {
-				_, _ = r.out.WriteString("\r\n")
-			}
-		}
-	}
-	r.linesRendered = numLinesThisFlush
-
-	// Make sure the cursor is at the start of the last line to keep rendering
-	// behavior consistent.
-	if r.altScreenActive {
-		// This case fixes a bug in macOS terminal. In other terminals the
-		// other case seems to do the job regardless of whether or not we're
-		// using the full terminal window.
-		r.out.MoveCursor(r.linesRendered, 0)
-	} else {
-		r.out.CursorBack(r.width)
-	}
-
-	r.lastRender = r.buf.String()
-	r.reset()
 }
 
 func (r *Renderer) reset() {
