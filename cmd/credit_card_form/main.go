@@ -18,13 +18,8 @@ const (
 )
 
 var (
-	hotPink  = styles.FgColor("#FF06B7")
-	darkGray = styles.FgColor("#767676")
-)
-
-var (
-	inputStyle    = styles.Style{}.Foreground(hotPink)
-	continueStyle = styles.Style{}.Foreground(darkGray)
+	inputStyle    = styles.Style{}.Foreground(styles.FgColor("#FF06B7")) // hot pink
+	continueStyle = styles.Style{}.Foreground(styles.FgColor("#767676")) // dark gray
 )
 
 type model struct {
