@@ -262,12 +262,9 @@ func (m *Model) Reset() {
 
 // SetSuggestions sets the suggestions for the input.
 func (m *Model) SetSuggestions(suggestions []string) {
-	m.suggestions = [][]rune{}
-
-	for _, s := range suggestions {
-		m.suggestions = append(m.suggestions, []rune(s))
-	}
-
+	m.suggestions = fun.Map[[]rune](
+		func(s string) []rune { return []rune(s) },
+		suggestions...)
 	m.updateSuggestions()
 }
 
@@ -760,9 +757,7 @@ func (m Model) viewCompletion(offset int) string {
 // AvailableSuggestions returns the list of available suggestions.
 func (m *Model) AvailableSuggestions() []string {
 	return fun.Map[string](
-		func(s []rune) string {
-			return string(s)
-		},
+		func(s []rune) string { return string(s) },
 		m.suggestions...)
 }
 
@@ -788,14 +783,13 @@ func (m *Model) updateSuggestions() {
 		return
 	}
 
-	matches := [][]rune{}
-	for _, s := range m.suggestions {
-		suggestion := string(s)
-
-		if strings.HasPrefix(strings.ToLower(suggestion), strings.ToLower(string(m.value))) {
-			matches = append(matches, []rune(suggestion))
-		}
-	}
+	matches := fun.FilterMap[[]rune](
+		func(s []rune) ([]rune, bool) {
+			suggestion := string(s)
+			isMatch := strings.HasPrefix(strings.ToLower(suggestion), strings.ToLower(string(m.value)))
+			return []rune(suggestion), isMatch
+		},
+		m.suggestions...)
 	if !reflect.DeepEqual(matches, m.matchedSuggestions) {
 		m.currentSuggestionIndex = 0
 	}
