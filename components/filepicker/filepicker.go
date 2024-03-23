@@ -19,7 +19,11 @@ import (
 	"github.com/rprtr258/tea/styles"
 )
 
-// TODO: accept fs.FS
+func pop(data []int) ([]int, int) {
+	return data[:len(data)-1], data[len(data)-1]
+}
+
+// TODO: accept fs.FS, test w/ S3
 // New returns a new filepicker model with default styling and key bindings.
 func New() Model {
 	return Model{
@@ -40,9 +44,9 @@ type msgReadDir struct {
 }
 
 const (
-	marginBottom   = 5
+	_marginBottom  = 5
 	_fileSizeWidth = 8
-	paddingLeft    = 2
+	_paddingLeft   = 2
 )
 
 // KeyMap defines key bindings for each user action.
@@ -121,12 +125,12 @@ type Model struct {
 
 	fileSelected  string
 	selected      int
-	selectedStack stack
+	selectedStack []int
 
 	min      int
 	max      int
-	maxStack stack
-	minStack stack
+	maxStack []int
+	minStack []int
 
 	Height     int
 	AutoHeight bool
@@ -136,15 +140,15 @@ type Model struct {
 }
 
 func (m *Model) pushView() {
-	m.minStack.data = append(m.minStack.data, m.min)
-	m.maxStack.data = append(m.maxStack.data, m.max)
-	m.selectedStack.data = append(m.selectedStack.data, m.selected)
+	m.minStack = append(m.minStack, m.min)
+	m.maxStack = append(m.maxStack, m.max)
+	m.selectedStack = append(m.selectedStack, m.selected)
 }
 
 func (m *Model) popView() (selected, min, max int) {
-	m.selectedStack.data, selected = Pop(m.selectedStack.data)
-	m.minStack.data, min = Pop(m.selectedStack.data)
-	m.maxStack.data, max = Pop(m.selectedStack.data)
+	m.selectedStack, selected = pop(m.selectedStack)
+	m.minStack, min = pop(m.selectedStack)
+	m.maxStack, max = pop(m.selectedStack)
 	return
 }
 
@@ -201,7 +205,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 		m.max = m.Height - 1
 	case tea.MsgWindowSize:
 		if m.AutoHeight {
-			m.Height = msg.Height - marginBottom
+			m.Height = msg.Height - _marginBottom
 		}
 		m.max = m.Height - 1
 	case tea.MsgKey:
@@ -246,7 +250,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			}
 		case key.Matches(msg, m.KeyMap.Back):
 			m.CurrentDirectory = filepath.Dir(m.CurrentDirectory)
-			if len(m.selectedStack.data) > 0 {
+			if len(m.selectedStack) > 0 {
 				m.selected, m.min, m.max = m.popView()
 			} else {
 				m.selected = 0

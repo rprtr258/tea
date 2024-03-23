@@ -173,9 +173,9 @@ func (s *Selector[T]) HighlightLast() {
 	s.highlightedIndex = len(s.items)
 }
 
-// Filter by prefix, returns list of setters to according items.
+// Filter by predicate, returns list of setters to according items.
 // No filter highlight is supported for now.
-func (s *Selector[T]) Filter(prefix string) []Item[func()] {
+func (s *Selector[T]) FilterBy(predicate func(Item[T]) bool) []Item[func()] {
 	return fun.FilterMap[Item[func()]](
 		func(item Item[T], i int) (Item[func()], bool) {
 			return Item[func()]{
@@ -184,8 +184,16 @@ func (s *Selector[T]) Filter(prefix string) []Item[func()] {
 					s.selectedIndex = i
 					s.highlightedIndex = 0
 				},
-			}, strings.HasPrefix(item.Label, prefix)
+			}, predicate(item)
 		},
 		s.items...,
 	)
+}
+
+// Filter by prefix, returns list of setters to according items.
+// No filter highlight is supported for now.
+func (s *Selector[T]) Filter(prefix string) []Item[func()] {
+	return s.FilterBy(func(item Item[T]) bool {
+		return strings.HasPrefix(item.Label, prefix)
+	})
 }
