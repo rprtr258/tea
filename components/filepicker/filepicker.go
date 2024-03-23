@@ -136,13 +136,16 @@ type Model struct {
 }
 
 func (m *Model) pushView() {
-	m.minStack.Push(m.min)
-	m.maxStack.Push(m.max)
-	m.selectedStack.Push(m.selected)
+	m.minStack.data = append(m.minStack.data, m.min)
+	m.maxStack.data = append(m.maxStack.data, m.max)
+	m.selectedStack.data = append(m.selectedStack.data, m.selected)
 }
 
-func (m *Model) popView() (int, int, int) {
-	return m.selectedStack.Pop(), m.minStack.Pop(), m.maxStack.Pop()
+func (m *Model) popView() (selected, min, max int) {
+	m.selectedStack.data, selected = Pop(m.selectedStack.data)
+	m.minStack.data, min = Pop(m.selectedStack.data)
+	m.maxStack.data, max = Pop(m.selectedStack.data)
+	return
 }
 
 // isHidden reports whether a file is hidden or not.
@@ -243,7 +246,7 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 			}
 		case key.Matches(msg, m.KeyMap.Back):
 			m.CurrentDirectory = filepath.Dir(m.CurrentDirectory)
-			if m.selectedStack.Length() > 0 {
+			if len(m.selectedStack.data) > 0 {
 				m.selected, m.min, m.max = m.popView()
 			} else {
 				m.selected = 0
