@@ -19,6 +19,7 @@ import (
 	"github.com/rprtr258/tea/styles"
 )
 
+// TODO: accept fs.FS
 // New returns a new filepicker model with default styling and key bindings.
 func New() Model {
 	return Model{
