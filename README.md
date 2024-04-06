@@ -42,7 +42,7 @@ By the way, the non-annotated source code for this program is available [on GitH
 ### Enough! Let's get to it.
 For this tutorial, we're making a shopping list.
 
-To start we'll define our package and import some libraries. Our only external import will be the Tea library, which we'll call `tea` for short.
+To start, we'll define our package and import some libraries. Our only external import will be the Tea library, which we'll call `tea` for short.
 
 ```go
 package main
@@ -196,7 +196,7 @@ func main() {
 ```
 
 ## What’s Next?
-This tutorial covers the basics of building an interactive terminal UI, but in the real world you'll also need to perform I/O. To learn about that have a look at the [Command Tutorial][cmd]. It's pretty simple.
+This tutorial covers the basics of building an interactive terminal UI, but in the real world you'll also need to perform I/O. To learn about that, have a look at the [Command Tutorial][cmd]. It's pretty simple.
 
 There are also several [Tea examples][examples] available and, of course, there are [Go Docs][docs].
 
@@ -220,7 +220,7 @@ $ dlv connect 127.0.0.1:34241
 Note that the default port used will vary on your system and per run, so actually watch out what address the first `dlv` run tells you to connect to.
 
 ### Logging Stuff
-You can’t really log to stdout with Tea because your TUI is busy occupying that! You can, however, log to a file by including something like the following prior to starting your Tea program:
+You can’t really log to stdout with Tea because your TUI is busy occupying that! You can, however, log to a file by including something like the following before starting your Tea program:
 
 ```go
 if len(os.Getenv("DEBUG")) > 0 {
@@ -235,18 +235,18 @@ if len(os.Getenv("DEBUG")) > 0 {
 To see what’s being logged in real time, run `tail -f debug.log` while you run your program in another window.
 
 ## Libraries we use with Tea
-* [Bubbles][bubbles]: Common Tea components such as text inputs, viewports, spinners and so on
-* [Lip Gloss][styles]: Style, format and layout tools for terminal applications
+* [Components][components]: Common Tea components such as text inputs, viewports, spinners and so on
+* [Styles][styles]: Style, format and layout tools for terminal applications
 * [Harmonica][harmonica]: A spring animation library for smooth, natural motion
 * [BubbleZone][bubblezone]: Easy mouse event tracking for Tea components
-* [Termenv][termenv]: Advanced ANSI styling for terminal applications
+* [Scuf][scuf]: Advanced ANSI styling for terminal applications
 * [Reflow][reflow]: Advanced ANSI-aware methods for working with text
 
-[bubbles]: https://github.com/rprtr258/tea/bubbles
-[styles]: https://github.com/rprtr258/tea/styles
+[components]: https://github.com/rprtr258/tea/tree/master/components
+[styles]: https://github.com/rprtr258/tea/tree/master/styles
 [harmonica]: https://github.com/charmbracelet/harmonica
 [bubblezone]: https://github.com/lrstanley/bubblezone
-[termenv]: https://github.com/rprtr258/scuf ???
+[scuf]: https://github.com/rprtr258/scuf
 [reflow]: https://github.com/muesli/reflow
 
 ## Tea in the Wild

@@ -13,10 +13,13 @@ func Main(context.Context) error {
 Word-wrapping will occur when lines exceed the limit of 40 characters.
 `
 
-	r, _ := markdown.NewTermRenderer(
+	r, err := markdown.NewTermRenderer(
 		markdown.WithStyles(markdown.DarkStyle),
 		markdown.WithWordWrap(40),
 	)
+	if err != nil {
+		return fmt.Errorf("create renderer: %w", err)
+	}
 
 	out, err := r.Render(in)
 	if err != nil {

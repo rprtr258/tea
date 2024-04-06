@@ -20,16 +20,16 @@ const (
 	_asterisk  = '*'
 )
 
-func sqr(x float64) float64 {
+func square(x float64) float64 {
 	return x * x
 }
 
 func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
 	x, y := 0.0, ry
 
-	d1 := sqr(ry) - sqr(rx)*ry + 0.25*sqr(rx)
-	dx := 2 * sqr(ry) * x
-	dy := 2 * sqr(rx) * y
+	d1 := square(ry) - square(rx)*ry + 0.25*square(rx)
+	dx := 2 * square(ry) * x
+	dy := 2 * square(rx) * y
 
 	for dx < dy {
 		cb.set(int(x+xc), int(y+yc))
@@ -38,18 +38,18 @@ func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
 		cb.set(int(-x+xc), int(-y+yc))
 		if d1 < 0 {
 			x++
-			dx += 2 * sqr(ry)
-			d1 += dx + sqr(ry)
+			dx += 2 * square(ry)
+			d1 += dx + square(ry)
 		} else {
 			x++
 			y--
-			dx += 2 * sqr(ry)
-			dy -= 2 * sqr(rx)
-			d1 += dx - dy + sqr(ry)
+			dx += 2 * square(ry)
+			dy -= 2 * square(rx)
+			d1 += dx - dy + square(ry)
 		}
 	}
 
-	d2 := sqr(ry)*sqr(x+0.5) + sqr(rx)*sqr(y-1) - sqr(rx)*sqr(ry)
+	d2 := square(ry)*square(x+0.5) + square(rx)*square(y-1) - square(rx)*square(ry)
 
 	for y >= 0 {
 		cb.set(int(x+xc), int(y+yc))
@@ -58,14 +58,14 @@ func drawEllipse(cb *cellbuffer, xc, yc, rx, ry float64) {
 		cb.set(int(-x+xc), int(-y+yc))
 		if d2 > 0 {
 			y--
-			dy -= 2 * sqr(rx)
-			d2 += sqr(rx) - dy
+			dy -= 2 * square(rx)
+			d2 += square(rx) - dy
 		} else {
 			y--
 			x++
-			dx += 2 * sqr(ry)
-			dy -= 2 * sqr(rx)
-			d2 += dx - dy + sqr(rx)
+			dx += 2 * square(ry)
+			dy -= 2 * square(rx)
+			d2 += dx - dy + square(rx)
 		}
 	}
 }
@@ -76,7 +76,7 @@ type cellbuffer struct {
 }
 
 func (c *cellbuffer) resize(w, h int) {
-	if w == 0 {
+	if w == 0 || h == 0 {
 		return
 	}
 

@@ -26,7 +26,11 @@ func main() {
 Bye!
 `
 
-	out, _ := markdown.Render(in, markdown.DarkStyle)
+	out, err := markdown.Render(in, markdown.DarkStyle)
+	if err != nil {
+		return err
+	}
+
 	fmt.Print(out)
 	return nil
 }
