@@ -146,7 +146,6 @@ const (
 	KeyBackspace KeyType = _keyDEL
 	KeyTab       KeyType = keyHT
 	KeyEsc       KeyType = _keyESC
-	KeyEscape    KeyType = _keyESC
 
 	KeyCtrlAt           KeyType = _keyNUL // ctrl+@
 	KeyCtrlA            KeyType = keySOH
@@ -627,7 +626,7 @@ func detectOneMsg(b []byte) (int, Msg) {
 	// We didn't find an escape sequence, nor a valid rune. Was this a
 	// lone escape character at the end of the input?
 	if alt && len(b) == 1 {
-		return 1, MsgKey(Key{Type: KeyEscape})
+		return 1, MsgKey(Key{Type: KeyEsc})
 	}
 
 	// The character at the current position is neither an escape

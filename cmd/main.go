@@ -20,6 +20,7 @@ import (
 	"github.com/rprtr258/tea/cmd/debounce"
 	"github.com/rprtr258/tea/cmd/exec"
 	"github.com/rprtr258/tea/cmd/file_picker"
+	"github.com/rprtr258/tea/cmd/file_picker2"
 	"github.com/rprtr258/tea/cmd/fullscreen"
 	"github.com/rprtr258/tea/cmd/help"
 	"github.com/rprtr258/tea/cmd/http"
@@ -79,6 +80,7 @@ var (
 		"debounce":          debounce.Main,
 		"exec":              exec.Main,
 		"file-picker":       file_picker.Main,
+		"file-picker2":      file_picker2.Main,
 		"fullscreen":        fullscreen.Main,
 		"help":              help.Main,
 		"http":              http.Main,
@@ -225,7 +227,7 @@ func runExamplesList(ctx context.Context, title string, examples examples) error
 		defaultWidth = 20
 	)
 
-	l := list.New[item](items, itemDelegate{}, defaultWidth, min(listHeight, len(items)+8))
+	l := list.New(items, itemDelegate{}, defaultWidth, min(listHeight, len(items)+8))
 	l.Title = title
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)

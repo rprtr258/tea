@@ -138,7 +138,7 @@ func TestDetectOneMsg(t *testing.T) {
 		seqTest{[]byte("☃"), MsgKey{Type: KeyRunes, Runes: []rune("☃")}},
 		seqTest{[]byte("\x1b☃"), MsgKey{Type: KeyRunes, Runes: []rune("☃"), Alt: true}},
 		// Standalone control chacters.
-		seqTest{[]byte{'\x1b'}, MsgKey{Type: KeyEscape}},
+		seqTest{[]byte{'\x1b'}, MsgKey{Type: KeyEsc}},
 		seqTest{[]byte{byte(keySOH)}, MsgKey{Type: KeyCtrlA}},
 		seqTest{[]byte{'\x1b', byte(keySOH)}, MsgKey{Type: KeyCtrlA, Alt: true}},
 		seqTest{[]byte{byte(_keyNUL)}, MsgKey{Type: KeyCtrlAt}},

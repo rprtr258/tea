@@ -11,10 +11,10 @@ import (
 
 var (
 	keyword = func(s string) string {
-		return scuf.String(s, scuf.FgANSI256(204), scuf.BgANSI256(235))
+		return scuf.String(s, scuf.FgANSI(204), scuf.BgANSI(235))
 	}
 	help = func(s string) string {
-		return scuf.String(s, scuf.FgANSI256(241))
+		return scuf.String(s, scuf.FgANSI(241))
 	}
 )
 

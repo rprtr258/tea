@@ -25,7 +25,7 @@ func TestSetColorProfile(t *testing.T) {
 			"\x1b[94mhello\x1b[0m",
 		},
 		"ansi256": {
-			scuf.FgANSI256(62),
+			scuf.FgANSI(62),
 			"\x1b[38;5;62mhello\x1b[0m",
 		},
 		"truecolor": {

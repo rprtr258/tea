@@ -11,7 +11,7 @@ var _extSequences = func() map[string]Key {
 	s := map[string]Key{
 		" ":        {Type: KeySpace, Runes: spaceRunes},
 		"\x1b ":    {Type: KeySpace, Alt: true, Runes: spaceRunes},
-		"\x1b\x1b": {Type: KeyEscape, Alt: true},
+		"\x1b\x1b": {Type: KeyEsc, Alt: true},
 	}
 	for seq, key := range _sequences {
 		key := key

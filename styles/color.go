@@ -37,7 +37,7 @@ func FgColor(s string) scuf.Modifier {
 		return scuf.FgANSI(x)
 	}
 
-	return scuf.FgANSI256(x)
+	return scuf.FgANSI(x)
 }
 
 func BgColor(s string) scuf.Modifier {
@@ -49,7 +49,7 @@ func BgColor(s string) scuf.Modifier {
 	if err != nil {
 		panic(err.Error())
 	}
-	return scuf.BgANSI256(x)
+	return scuf.BgANSI(x)
 }
 
 // ANSIColor is a color specified by an ANSI color value. It's merely syntactic
@@ -62,7 +62,7 @@ func BgColor(s string) scuf.Modifier {
 //	colorA := styles.ANSIColor(21)
 //	colorB := styles.Color("21")
 func ANSIColor(x uint) scuf.Modifier {
-	return scuf.FgANSI256(int(x))
+	return scuf.FgANSI(int(x))
 }
 
 // adaptiveColor provides color options for light and dark backgrounds. The
