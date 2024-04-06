@@ -3,7 +3,7 @@ package tea
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestMouseEvent_String(t *testing.T) {

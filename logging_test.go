@@ -2,11 +2,10 @@ package tea
 
 import (
 	"log"
-	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 func TestLogToFile(t *testing.T) {
@@ -19,8 +18,7 @@ func TestLogToFile(t *testing.T) {
 	log.Println("some test log")
 	assert.NoError(t, f.Close())
 
-	out, err := os.ReadFile(path)
-	assert.NoError(t, err)
+	out := assert.UseFileContent(t, path)
 
 	assert.Equal(t, prefix+" some test log\n", string(out))
 }

@@ -33,16 +33,16 @@ func (p *Program[M]) WithInputTTY() *Program[M] {
 	return p
 }
 
-// WithoutSignalHandler disables the signal handler that Bubble Tea sets up for
+// WithoutSignalHandler disables the signal handler that Tea sets up for
 // Programs. This is useful if you want to handle signals yourself.
 func (p *Program[M]) WithoutSignalHandler() *Program[M] {
 	p.startupOptions |= withoutSignalHandler
 	return p
 }
 
-// WithoutCatchPanics disables the panic catching that Bubble Tea does by
+// WithoutCatchPanics disables the panic catching that Tea does by
 // default. If panic catching is disabled the terminal will be in a fairly
-// unusable state after a panic because Bubble Tea will not perform its usual
+// unusable state after a panic because Tea will not perform its usual
 // cleanup on exit.
 func (p *Program[M]) WithoutCatchPanics() *Program[M] {
 	p.startupOptions |= withoutCatchPanics
@@ -106,33 +106,10 @@ func (p *Program[M]) WithMouseAllMotion() *Program[M] {
 	return p
 }
 
-// WithoutRenderer disables the renderer. When this is set output and log
-// statements will be plainly sent to stdout (or another output if one is set)
-// without any rendering and redrawing logic. In other words, printing and
-// logging will behave the same way it would in a non-TUI commandline tool.
-// This can be useful if you want to use the Bubble Tea framework for a non-TUI
-// application, or to provide an additional non-TUI mode to your Bubble Tea
-// programs. For example, your program could behave like a daemon if output is
-// not a TTY.
-func (p *Program[M]) WithoutRenderer() *Program[M] {
-	p.renderer = &nilRenderer{}
-	return p
-}
-
-// WithANSICompressor removes redundant ANSI sequences to produce potentially
-// smaller output, at the cost of some processing overhead.
-//
-// This feature is provisional, and may be changed or removed in a future version
-// of this package.
-func (p *Program[M]) WithANSICompressor() *Program[M] {
-	p.startupOptions |= withANSICompressor
-	return p
-}
-
-// WithFilter supplies an event filter that will be invoked before Bubble Tea
+// WithFilter supplies an event filter that will be invoked before Tea
 // processes a tea.Msg. The event filter can return any tea.Msg which will then
-// get handled by Bubble Tea instead of the original event. If the event filter
-// returns nil, the event will be ignored and Bubble Tea will not process it.
+// get handled by Tea instead of the original event. If the event filter
+// returns nil, the event will be ignored and Tea will not process it.
 //
 // As an example, this could be used to prevent a program from shutting down if
 // there are unsaved changes.

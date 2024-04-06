@@ -7,21 +7,54 @@ import (
 	"os"
 	"time"
 
+	"github.com/containerd/console"
 	isatty "github.com/mattn/go-isatty"
 	localereader "github.com/mattn/go-localereader"
 	"github.com/muesli/cancelreader"
 	"golang.org/x/term"
 )
 
-func (p *Program[M]) initTerminal() error {
-	err := p.initInput()
-	if err != nil {
-		return err
+func (p *Program[M]) initInput() {
+	// If input's a file, use console to manage it
+	f, ok := p.input.(*os.File)
+	if !ok {
+		return
 	}
 
+	c, err := console.ConsoleFromFile(f)
+	if err != nil {
+		return // ignore error, this was just a test
+	}
+
+	p.console = c
+}
+
+// On unix systems, RestoreInput closes any TTYs we opened for input. Note that
+// we don't do this on Windows as it causes the prompt to not be drawn until
+// the terminal receives a keypress rather than appearing promptly after the
+// program exits.
+func (p *Program[M]) restoreInput() error {
 	if p.console != nil {
-		err = p.console.SetRaw()
-		if err != nil {
+		if err := p.console.Reset(); err != nil {
+			return fmt.Errorf("error restoring console: %w", err)
+		}
+	}
+	return nil
+}
+
+func openInputTTY() (*os.File, error) {
+	f, err := os.Open("/dev/tty")
+	if err != nil {
+		return nil, fmt.Errorf("could not open a new TTY: %w", err)
+	}
+	return f, nil
+}
+
+func (p *Program[M]) initTerminal() error {
+	p.initInput()
+
+	if p.console != nil {
+		if err := p.console.SetRaw(); err != nil {
 			return fmt.Errorf("error entering raw mode: %w", err)
 		}
 	}
@@ -31,19 +64,17 @@ func (p *Program[M]) initTerminal() error {
 }
 
 // restoreTerminalState restores the terminal to the state prior to running the
-// Bubble Tea program.
+// Tea program.
 func (p *Program[M]) restoreTerminalState() error {
-	if p.renderer != nil {
-		p.renderer.setCursor(true)
-		p.renderer.setMouseCellMotion(false)
-		p.renderer.setMouseAllMotion(false)
+	p.renderer.setCursor(true)
+	p.renderer.setMouseCellMotion(false)
+	p.renderer.setMouseAllMotion(false)
 
-		if p.renderer.altScreen() {
-			p.renderer.exitAltScreen()
+	if p.renderer.altScreen() {
+		p.renderer.exitAltScreen()
 
-			// give the terminal a moment to catch up
-			time.Sleep(time.Millisecond * 10) //nolint:gomnd
-		}
+		// give the terminal a moment to catch up
+		time.Sleep(10 * time.Millisecond)
 	}
 
 	if p.console != nil {
@@ -87,7 +118,7 @@ func (p *Program[M]) readLoop() {
 func (p *Program[M]) waitForReadLoop() {
 	select {
 	case <-p.readLoopDone:
-	case <-time.After(500 * time.Millisecond): //nolint:gomnd
+	case <-time.After(500 * time.Millisecond):
 		// The read loop hangs, which means the input
 		// cancelReader's cancel function has returned true even
 		// though it was not able to cancel the read.

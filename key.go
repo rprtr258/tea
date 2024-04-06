@@ -63,18 +63,18 @@ type Key struct {
 //	fmt.Println(k)
 //	// Output: enter
 func (k Key) String() string {
-	str := ""
+	prefix := ""
 	if k.Alt {
-		str += "alt+" //nolint:goconst
+		prefix = "alt+" //nolint:goconst // not needed
 	}
+
 	if k.Type == KeyRunes {
-		str += string(k.Runes)
-		return str
+		return prefix + string(k.Runes)
 	} else if s, ok := keyNames[k.Type]; ok {
-		str += s
-		return str
+		return prefix + s
+	} else {
+		return ""
 	}
-	return ""
 }
 
 // KeyType indicates the key pressed, such as KeyEnter or KeyBreak or KeyCtrlC.
@@ -103,52 +103,51 @@ func (k KeyType) String() string {
 // See also:
 // https://en.wikipedia.org/wiki/C0_and_C1_control_codes
 const (
-	keyNUL KeyType = 0   // null, \0
-	keySOH KeyType = 1   // start of heading
-	keySTX KeyType = 2   // start of text
-	keyETX KeyType = 3   // break, ctrl+c
-	keyEOT KeyType = 4   // end of transmission
-	keyENQ KeyType = 5   // enquiry
-	keyACK KeyType = 6   // acknowledge
-	keyBEL KeyType = 7   // bell, \a
-	keyBS  KeyType = 8   // backspace
-	keyHT  KeyType = 9   // horizontal tabulation, \t
-	keyLF  KeyType = 10  // line feed, \n
-	keyVT  KeyType = 11  // vertical tabulation \v
-	keyFF  KeyType = 12  // form feed \f
-	keyCR  KeyType = 13  // carriage return, \r
-	keySO  KeyType = 14  // shift out
-	keySI  KeyType = 15  // shift in
-	keyDLE KeyType = 16  // data link escape
-	keyDC1 KeyType = 17  // device control one
-	keyDC2 KeyType = 18  // device control two
-	keyDC3 KeyType = 19  // device control three
-	keyDC4 KeyType = 20  // device control four
-	keyNAK KeyType = 21  // negative acknowledge
-	keySYN KeyType = 22  // synchronous idle
-	keyETB KeyType = 23  // end of transmission block
-	keyCAN KeyType = 24  // cancel
-	keyEM  KeyType = 25  // end of medium
-	keySUB KeyType = 26  // substitution
-	keyESC KeyType = 27  // escape, \e
-	keyFS  KeyType = 28  // file separator
-	keyGS  KeyType = 29  // group separator
-	keyRS  KeyType = 30  // record separator
-	keyUS  KeyType = 31  // unit separator
-	keyDEL KeyType = 127 // delete. on most systems this is mapped to backspace, I hear
+	_keyNUL KeyType = 0   // null, \0
+	keySOH  KeyType = 1   // start of heading
+	keySTX  KeyType = 2   // start of text
+	keyETX  KeyType = 3   // break, ctrl+c
+	keyEOT  KeyType = 4   // end of transmission
+	keyENQ  KeyType = 5   // enquiry
+	keyACK  KeyType = 6   // acknowledge
+	keyBEL  KeyType = 7   // bell, \a
+	keyBS   KeyType = 8   // backspace
+	keyHT   KeyType = 9   // horizontal tabulation, \t
+	keyLF   KeyType = 10  // line feed, \n
+	keyVT   KeyType = 11  // vertical tabulation \v
+	keyFF   KeyType = 12  // form feed \f
+	keyCR   KeyType = 13  // carriage return, \r
+	keySO   KeyType = 14  // shift out
+	keySI   KeyType = 15  // shift in
+	keyDLE  KeyType = 16  // data link escape
+	keyDC1  KeyType = 17  // device control one
+	keyDC2  KeyType = 18  // device control two
+	keyDC3  KeyType = 19  // device control three
+	keyDC4  KeyType = 20  // device control four
+	keyNAK  KeyType = 21  // negative acknowledge
+	keySYN  KeyType = 22  // synchronous idle
+	keyETB  KeyType = 23  // end of transmission block
+	keyCAN  KeyType = 24  // cancel
+	keyEM   KeyType = 25  // end of medium
+	keySUB  KeyType = 26  // substitution
+	_keyESC KeyType = 27  // escape, \e
+	keyFS   KeyType = 28  // file separator
+	keyGS   KeyType = 29  // group separator
+	keyRS   KeyType = 30  // record separator
+	_keyUS  KeyType = 31  // unit separator
+	_keyDEL KeyType = 127 // delete. on most systems this is mapped to backspace, I hear
 )
 
 // Control key aliases.
 const (
-	KeyNull      KeyType = keyNUL
+	KeyNull      KeyType = _keyNUL
 	KeyBreak     KeyType = keyETX
 	KeyEnter     KeyType = keyCR
-	KeyBackspace KeyType = keyDEL
+	KeyBackspace KeyType = _keyDEL
 	KeyTab       KeyType = keyHT
-	KeyEsc       KeyType = keyESC
-	KeyEscape    KeyType = keyESC
+	KeyEsc       KeyType = _keyESC
 
-	KeyCtrlAt           KeyType = keyNUL // ctrl+@
+	KeyCtrlAt           KeyType = _keyNUL // ctrl+@
 	KeyCtrlA            KeyType = keySOH
 	KeyCtrlB            KeyType = keySTX
 	KeyCtrlC            KeyType = keyETX
@@ -175,17 +174,17 @@ const (
 	KeyCtrlX            KeyType = keyCAN
 	KeyCtrlY            KeyType = keyEM
 	KeyCtrlZ            KeyType = keySUB
-	KeyCtrlOpenBracket  KeyType = keyESC // ctrl+[
-	KeyCtrlBackslash    KeyType = keyFS  // ctrl+\
-	KeyCtrlCloseBracket KeyType = keyGS  // ctrl+]
-	KeyCtrlCaret        KeyType = keyRS  // ctrl+^
-	KeyCtrlUnderscore   KeyType = keyUS  // ctrl+_
-	KeyCtrlQuestionMark KeyType = keyDEL // ctrl+?
+	KeyCtrlOpenBracket  KeyType = _keyESC // ctrl+[
+	KeyCtrlBackslash    KeyType = keyFS   // ctrl+\
+	KeyCtrlCloseBracket KeyType = keyGS   // ctrl+]
+	KeyCtrlCaret        KeyType = keyRS   // ctrl+^
+	KeyCtrlUnderscore   KeyType = _keyUS  // ctrl+_
+	KeyCtrlQuestionMark KeyType = _keyDEL // ctrl+?
 )
 
 // Other keys.
 const (
-	KeyRunes KeyType = -(iota + 1)
+	KeyRunes KeyType = -iota - 1
 	KeyUp
 	KeyDown
 	KeyRight
@@ -243,39 +242,39 @@ const (
 // Mappings for control keys and other special keys to friendly consts.
 var keyNames = map[KeyType]string{
 	// Control keys.
-	keyNUL: "ctrl+@", // also ctrl+` (that's ctrl+backtick)
-	keySOH: "ctrl+a",
-	keySTX: "ctrl+b",
-	keyETX: "ctrl+c",
-	keyEOT: "ctrl+d",
-	keyENQ: "ctrl+e",
-	keyACK: "ctrl+f",
-	keyBEL: "ctrl+g",
-	keyBS:  "ctrl+h",
-	keyHT:  "tab", // also ctrl+i
-	keyLF:  "ctrl+j",
-	keyVT:  "ctrl+k",
-	keyFF:  "ctrl+l",
-	keyCR:  "enter",
-	keySO:  "ctrl+n",
-	keySI:  "ctrl+o",
-	keyDLE: "ctrl+p",
-	keyDC1: "ctrl+q",
-	keyDC2: "ctrl+r",
-	keyDC3: "ctrl+s",
-	keyDC4: "ctrl+t",
-	keyNAK: "ctrl+u",
-	keySYN: "ctrl+v",
-	keyETB: "ctrl+w",
-	keyCAN: "ctrl+x",
-	keyEM:  "ctrl+y",
-	keySUB: "ctrl+z",
-	keyESC: "esc",
-	keyFS:  "ctrl+\\",
-	keyGS:  "ctrl+]",
-	keyRS:  "ctrl+^",
-	keyUS:  "ctrl+_",
-	keyDEL: "backspace",
+	_keyNUL: "ctrl+@", // also ctrl+` (that's ctrl+backtick)
+	keySOH:  "ctrl+a",
+	keySTX:  "ctrl+b",
+	keyETX:  "ctrl+c",
+	keyEOT:  "ctrl+d",
+	keyENQ:  "ctrl+e",
+	keyACK:  "ctrl+f",
+	keyBEL:  "ctrl+g",
+	keyBS:   "ctrl+h",
+	keyHT:   "tab", // also ctrl+i
+	keyLF:   "ctrl+j",
+	keyVT:   "ctrl+k",
+	keyFF:   "ctrl+l",
+	keyCR:   "enter",
+	keySO:   "ctrl+n",
+	keySI:   "ctrl+o",
+	keyDLE:  "ctrl+p",
+	keyDC1:  "ctrl+q",
+	keyDC2:  "ctrl+r",
+	keyDC3:  "ctrl+s",
+	keyDC4:  "ctrl+t",
+	keyNAK:  "ctrl+u",
+	keySYN:  "ctrl+v",
+	keyETB:  "ctrl+w",
+	keyCAN:  "ctrl+x",
+	keyEM:   "ctrl+y",
+	keySUB:  "ctrl+z",
+	_keyESC: "esc",
+	keyFS:   "ctrl+\\",
+	keyGS:   "ctrl+]",
+	keyRS:   "ctrl+^",
+	_keyUS:  "ctrl+_",
+	_keyDEL: "backspace",
 
 	// Other keys.
 	KeyRunes:          "runes",
@@ -334,7 +333,7 @@ var keyNames = map[KeyType]string{
 }
 
 // Sequence mappings.
-var sequences = map[string]Key{
+var _sequences = map[string]Key{
 	// Arrow keys
 	"\x1b[A":    {Type: KeyUp},
 	"\x1b[B":    {Type: KeyDown},
@@ -593,7 +592,7 @@ func detectOneMsg(b []byte) (int, Msg) {
 
 	// Are we seeing a standalone NUL? This is not handled by detectSequence().
 	if i < len(b) && b[i] == 0 {
-		return i + 1, MsgKey{Type: keyNUL, Alt: alt}
+		return i + 1, MsgKey{Type: _keyNUL, Alt: alt}
 	}
 
 	// Find the longest sequence of runes that are not control
@@ -602,7 +601,7 @@ func detectOneMsg(b []byte) (int, Msg) {
 	for rw := 0; i < len(b); i += rw {
 		var r rune
 		r, rw = utf8.DecodeRune(b[i:])
-		if r == utf8.RuneError || r <= rune(keyUS) || r == rune(keyDEL) || r == ' ' {
+		if r == utf8.RuneError || r <= rune(_keyUS) || r == rune(_keyDEL) || r == ' ' {
 			// Rune errors are handled below; control characters and spaces will
 			// be handled by detectSequence in the next call to detectOneMsg.
 			break
@@ -627,7 +626,7 @@ func detectOneMsg(b []byte) (int, Msg) {
 	// We didn't find an escape sequence, nor a valid rune. Was this a
 	// lone escape character at the end of the input?
 	if alt && len(b) == 1 {
-		return 1, MsgKey(Key{Type: KeyEscape})
+		return 1, MsgKey(Key{Type: KeyEsc})
 	}
 
 	// The character at the current position is neither an escape

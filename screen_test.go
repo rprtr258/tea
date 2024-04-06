@@ -3,10 +3,9 @@ package tea
 import (
 	"bytes"
 	"context"
-	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 type initCmdModel struct{}
@@ -14,17 +13,16 @@ type initCmdModel struct{}
 func (m *initCmdModel) Init(func(...Cmd)) {}
 
 func (m *initCmdModel) Update(msg Msg, f func(...Cmd)) {
-	switch msg.(type) { //nolint:gocritic
-	case MsgKey:
+	if _, ok := msg.(MsgKey); ok {
 		f(Quit)
 	}
 }
 
-func (m *initCmdModel) View(r Renderer) {
-	r.Write("success\n")
+func (m *initCmdModel) View(vb Viewbox) {
+	vb.WriteLine("success")
 }
 
-//nolint:lll
+//nolint:lll // uuh
 func TestMsgClear(t *testing.T) {
 	for name, test := range map[string]struct {
 		cmds     []Cmd
@@ -70,18 +68,17 @@ func TestMsgClear(t *testing.T) {
 			p := NewProgram(context.Background(), &initCmdModel{}).
 				WithInput(&in).
 				WithOutput(&out)
-			var wg sync.WaitGroup
-			wg.Add(1)
+			ch := make(chan struct{})
 			go func() {
 				for _, cmd := range test.cmds {
 					p.Send(cmd())
 				}
 				p.Send(Quit())
-				wg.Done()
+				ch <- struct{}{}
 			}()
 			_, err := p.Run()
 			assert.NoError(t, err)
-			wg.Wait()
+			<-ch
 
 			assert.Equal(t, test.expected, out.String())
 		})

@@ -43,7 +43,7 @@ type Model interface {
 	Update(Msg, func(...Cmd))
 
 	// View renders the program's UI. The view is rendered after every Update.
-	View(Renderer)
+	View(Viewbox)
 }
 
 // Cmd is an IO operation that returns a message when it's complete. If it's
@@ -83,11 +83,10 @@ const (
 	withAltScreen startupOptions = 1 << iota
 	withMouseCellMotion
 	withMouseAllMotion
-	withANSICompressor
 	withoutSignalHandler
 
 	// Catching panics is incredibly useful for restoring the terminal to a
-	// usable state after a panic occurs. When this is set, Bubble Tea will
+	// usable state after a panic occurs. When this is set, Tea will
 	// recover from panics, print the stack trace, and disable raw mode. This
 	// feature is on by default.
 	withoutCatchPanics
@@ -130,7 +129,7 @@ type Program[M Model] struct {
 
 	inputType inputType
 
-	ctx    context.Context //nolint:containedctx
+	ctx    context.Context //nolint:containedctx // TODO: remove
 	cancel context.CancelFunc
 
 	msgs     chan Msg
@@ -140,7 +139,8 @@ type Program[M Model] struct {
 	// where to send output, this will usually be os.Stdout.
 	output        *termenv.Output
 	restoreOutput func() error
-	renderer      Renderer
+	renderer      *Renderer
+	vb            Viewbox
 
 	// where to read inputs from, this will usually be os.Stdin.
 	input        io.Reader
@@ -159,7 +159,7 @@ type Program[M Model] struct {
 	// Lint ignore note: the linter will find false positive on unix systems
 	// as this value only comes into play on Windows, hence the ignore comment
 	// below.
-	windowsStdin *os.File //nolint:golint,structcheck,unused
+	windowsStdin *os.File //nolint:golint,structcheck,unused // uuh
 
 	filter func(M, Msg) Msg
 
@@ -172,7 +172,7 @@ type Program[M Model] struct {
 // Quit.
 type MsgQuit struct{}
 
-// Quit is a special command that tells the Bubble Tea program to exit.
+// Quit is a special command that tells the Tea program to exit.
 func Quit() Msg {
 	return MsgQuit{}
 }
@@ -195,6 +195,7 @@ func NewProgram[M Model](ctx context.Context, model M) *Program[M] {
 		ctx:           ctx,
 		cancel:        cancel,
 		restoreOutput: restoreOutput,
+		renderer:      newRenderer(output /*p.fps*/, _fpsDefault),
 	}
 }
 
@@ -232,6 +233,29 @@ func (p *Program[M]) handleSignals() chan struct{} {
 	}()
 
 	return ch
+}
+
+// listenForResize sends messages (or errors) when the terminal resizes.
+// Argument output should be the file descriptor for the terminal; usually
+// os.Stdout.
+func (p *Program[M]) listenForResize(done chan struct{}) {
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGWINCH)
+
+	defer func() {
+		signal.Stop(sig)
+		close(done)
+	}()
+
+	for {
+		select {
+		case <-p.ctx.Done():
+			return
+		case <-sig:
+		}
+
+		p.checkResize()
+	}
 }
 
 // handleResize handles terminal resize events.
@@ -284,7 +308,7 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 }
 
 // eventLoop is the central message loop. It receives and handles the default
-// Bubble Tea messages, update the model and triggers redraws.
+// Tea messages, update the model and triggers redraws.
 func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 	for {
 		select {
@@ -336,6 +360,10 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 			case msgExec:
 				// NB: this blocks.
 				p.exec(msg.cmd, msg.fn)
+
+				// TODO: move to renderer
+			case MsgWindowSize:
+				p.vb = NewViewbox(msg.Height, msg.Width)
 			}
 
 			p.renderer.handleMessages(msg)
@@ -343,7 +371,10 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 			model.Update(msg, func(c ...Cmd) {
 				cmds <- c
 			}) // run update, process command (if any)
-			model.View(p.renderer)
+			p.renderer.reset()
+			p.vb.clear()
+			model.View(p.vb)
+			p.renderer.Write(p.vb.Render())
 		}
 	}
 }
@@ -381,18 +412,18 @@ func (p *Program[M]) Run() (M, error) {
 		if err != nil {
 			return p.initialModel, err
 		}
-		defer f.Close() //nolint:errcheck
-		p.input = f
+		defer f.Close() //nolint:errcheck // uuh
 
+		p.input = f
 	case ttyInput:
 		// Open a new TTY, by request
 		f, err := openInputTTY()
 		if err != nil {
 			return p.initialModel, err
 		}
-		defer f.Close() //nolint:errcheck
-		p.input = f
+		defer f.Close() //nolint:errcheck // uuh
 
+		p.input = f
 	case customInput:
 		// (There is nothing extra to do.)
 	}
@@ -414,11 +445,6 @@ func (p *Program[M]) Run() (M, error) {
 		}()
 	}
 
-	// If no renderer is set use the standard one.
-	if p.renderer == nil {
-		p.renderer = newRenderer(p.output, p.startupOptions.has(withANSICompressor), p.fps)
-	}
-
 	// Check if output is a TTY before entering raw mode, hiding the cursor and so on.
 	if err := p.initTerminal(); err != nil {
 		return p.initialModel, err
@@ -438,7 +464,7 @@ func (p *Program[M]) Run() (M, error) {
 	model := p.initialModel
 	var initCmds []Cmd
 	model.Init(func(cmds ...Cmd) {
-		initCmds = cmds
+		initCmds = append(initCmds, cmds...)
 	})
 	if len(initCmds) > 0 {
 		ch := make(chan struct{})
@@ -458,7 +484,10 @@ func (p *Program[M]) Run() (M, error) {
 	p.renderer.start()
 
 	// Render the initial view.
-	model.View(p.renderer)
+	p.renderer.reset()
+	p.vb.clear()
+	model.View(p.vb)
+	p.renderer.Write(p.vb.Render())
 
 	// Subscribe to user input.
 	if p.input != nil {
@@ -480,7 +509,10 @@ func (p *Program[M]) Run() (M, error) {
 		err = ErrProgramKilled
 	} else {
 		// Ensure we rendered the final state of the model.
-		model.View(p.renderer)
+		p.renderer.reset()
+		p.vb.clear()
+		model.View(p.vb)
+		p.renderer.Write(p.vb.Render())
 	}
 
 	// Tear down.
@@ -518,10 +550,10 @@ func (p *Program[M]) Send(msg Msg) {
 	}
 }
 
-// Quit is a convenience function for quitting Bubble Tea programs. Use it
-// when you need to shut down a Bubble Tea program from the outside.
+// Quit is a convenience function for quitting Tea programs. Use it
+// when you need to shut down a Tea program from the outside.
 //
-// If you wish to quit from within a Bubble Tea program use the Quit command.
+// If you wish to quit from within a Tea program use the Quit command.
 //
 // If the program is not running this will be a no-op, so it's safe to call
 // if the program is unstarted or has already exited.

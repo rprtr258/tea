@@ -40,13 +40,13 @@ import (
 //	    return tickEvery()
 //	}
 //
-//	func (m *model) Update(msg Msg) (Model, Cmd) {
+//	func (m *model) Update(msg Msg) Cmd {
 //	    switch msg.(type) {
 //	    case MsgTick:
 //	        // Return your Every command again to loop.
-//	        return m, tickEvery()
+//	        return tickEvery()
 //	    }
-//	    return m, nil
+//	    return nil
 //	}
 //
 // Every is analogous to Tick in the Elm Architecture.
@@ -87,13 +87,13 @@ func Every(d time.Duration, fn func(time.Time) Msg) Cmd {
 //	    return doTick()
 //	}
 //
-//	func (m *model) Update(msg Msg) (Model, Cmd) {
+//	func (m *model) Update(msg Msg) Cmd {
 //	    switch msg.(type) {
 //	    case MsgTick:
 //	        // Return your Tick command again to loop.
-//	        return m, doTick()
+//	        return doTick()
 //	    }
-//	    return m, nil
+//	    return nil
 //	}
 func Tick(d time.Duration, fn func(time.Time) Msg) Cmd {
 	return func() Msg {

@@ -2,6 +2,7 @@ package tea
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"errors"
 	"flag"
@@ -9,14 +10,14 @@ import (
 	"io"
 	"math/rand"
 	"runtime"
-	"sort"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/samber/lo"
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
+	"github.com/rprtr258/fun"
 )
 
 func TestKeyString(t *testing.T) {
@@ -63,7 +64,7 @@ type seqTest struct {
 // detectSequence() function.
 func buildBaseSeqTests() []seqTest {
 	tests := []seqTest{}
-	for seq, key := range sequences {
+	for seq, key := range _sequences {
 		key := key
 		tests = append(tests, seqTest{[]byte(seq), MsgKey(key)})
 		if !key.Alt {
@@ -72,8 +73,8 @@ func buildBaseSeqTests() []seqTest {
 		}
 	}
 	// Add all the control characters.
-	for i := keyNUL + 1; i <= keyDEL; i++ {
-		if i == keyESC {
+	for i := _keyNUL + 1; i <= _keyDEL; i++ {
+		if i == _keyESC {
 			// Not handled in detectSequence(), so not part of the base test
 			// suite.
 			continue
@@ -82,8 +83,8 @@ func buildBaseSeqTests() []seqTest {
 			seqTest{[]byte{byte(i)}, MsgKey{Type: i}},
 			seqTest{[]byte{'\x1b', byte(i)}, MsgKey{Type: i, Alt: true}},
 		)
-		if i == keyUS {
-			i = keyDEL - 1
+		if i == _keyUS {
+			i = _keyDEL - 1
 		}
 	}
 
@@ -112,8 +113,8 @@ func TestDetectSequence(t *testing.T) {
 	for _, test := range buildBaseSeqTests() {
 		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
 			hasSeq, width, msg := detectSequence(test.seq)
-			assert.True(t, hasSeq, "no sequence found")
-			assert.Len(t, test.seq, width, "parser did not consume the entire input")
+			assert.Truef(t, hasSeq, "no sequence found")
+			assert.Equalf(t, len(test.seq), width, "parser did not consume the entire input")
 			assert.Equal(t, test.msg, msg)
 		})
 	}
@@ -137,11 +138,11 @@ func TestDetectOneMsg(t *testing.T) {
 		seqTest{[]byte("☃"), MsgKey{Type: KeyRunes, Runes: []rune("☃")}},
 		seqTest{[]byte("\x1b☃"), MsgKey{Type: KeyRunes, Runes: []rune("☃"), Alt: true}},
 		// Standalone control chacters.
-		seqTest{[]byte{'\x1b'}, MsgKey{Type: KeyEscape}},
+		seqTest{[]byte{'\x1b'}, MsgKey{Type: KeyEsc}},
 		seqTest{[]byte{byte(keySOH)}, MsgKey{Type: KeyCtrlA}},
 		seqTest{[]byte{'\x1b', byte(keySOH)}, MsgKey{Type: KeyCtrlA, Alt: true}},
-		seqTest{[]byte{byte(keyNUL)}, MsgKey{Type: KeyCtrlAt}},
-		seqTest{[]byte{'\x1b', byte(keyNUL)}, MsgKey{Type: KeyCtrlAt, Alt: true}},
+		seqTest{[]byte{byte(_keyNUL)}, MsgKey{Type: KeyCtrlAt}},
+		seqTest{[]byte{'\x1b', byte(_keyNUL)}, MsgKey{Type: KeyCtrlAt, Alt: true}},
 		// Invalid characters.
 		seqTest{[]byte{'\x80'}, msgUnknownInputByte(0x80)},
 	)
@@ -158,7 +159,7 @@ func TestDetectOneMsg(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
 			width, msg := detectOneMsg(test.seq)
-			assert.Len(t, test.seq, width)
+			assert.Equal(t, len(test.seq), width)
 			assert.Equal(t, test.msg, msg)
 		})
 	}
@@ -519,7 +520,7 @@ func genRandomData(logfn func(int64), length int) randTest {
 
 // genRandomDataWithSeed generates a randomized test with a fixed seed.
 func genRandomDataWithSeed(s int64, length int) randTest {
-	r := rand.New(rand.NewSource(s)) //nolint:gosec
+	r := rand.New(rand.NewSource(s))
 
 	// allseqs contains all the sequences, in sorted order. We sort
 	// to make the test deterministic (when the seed is also fixed).
@@ -527,11 +528,11 @@ func genRandomDataWithSeed(s int64, length int) randTest {
 		seq  string
 		name string
 	}
-	allseqs := lo.MapToSlice(sequences, func(seq string, key Key) seqpair {
+	allseqs := fun.MapToSlice(_sequences, func(seq string, key Key) seqpair {
 		return seqpair{seq, key.String()}
 	})
-	sort.Slice(allseqs, func(i, j int) bool {
-		return allseqs[i].seq < allseqs[j].seq
+	slices.SortFunc(allseqs, func(i, j seqpair) int {
+		return cmp.Compare(i.seq, j.seq)
 	})
 
 	// res contains the computed test.
@@ -599,11 +600,11 @@ func runTestDetectSequence(
 			// w is the length of the last sequence detected.
 			for tn, i, w := 0, 0, 0; i < len(td.data); tn, i = tn+1, i+w {
 				hasSequence, width, msg := detectSequence(td.data[i:])
-				assert.True(t, hasSequence, "at %d (ev %d): failed to find sequence", i, tn)
+				assert.Truef(t, hasSequence, "at %d (ev %d): failed to find sequence", i, tn)
 				assert.Equal(t, td.lengths[tn], width)
 				w = width
 
-				assert.Equal(t, td.names[tn], msg.(fmt.Stringer).String(), "at %d (ev %d)", i, tn)
+				assert.Equalf(t, td.names[tn], msg.(fmt.Stringer).String(), "at %d (ev %d)", i, tn)
 			}
 		})
 	}

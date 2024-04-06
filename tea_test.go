@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 type msgIncrement struct{}
@@ -28,9 +28,9 @@ func (m *testModel) Update(msg Msg, f func(...Cmd)) {
 	}
 }
 
-func (m *testModel) View(r Renderer) {
+func (m *testModel) View(vb Viewbox) {
 	m.viewCalled.Store(true)
-	r.Write("success\n")
+	vb.WriteLine("success")
 }
 
 func TestTeaModel(t *testing.T) {
@@ -40,7 +40,7 @@ func TestTeaModel(t *testing.T) {
 	_, err := NewProgram(context.Background(), &testModel{}).WithInput(in).WithOutput(&buf).Run()
 	assert.NoError(t, err)
 
-	assert.NotEmpty(t, buf.Bytes())
+	assert.True(t, len(buf.Bytes()) > 0)
 }
 
 func TestTeaQuit(t *testing.T) {
@@ -156,7 +156,7 @@ func TestMsgBatch(t *testing.T) {
 
 		for {
 			time.Sleep(time.Millisecond)
-			if m.counter.Load() >= 2 { //nolint:lostcancel
+			if m.counter.Load() >= 2 {
 				p.Quit()
 				return
 			}
@@ -190,5 +190,5 @@ func TestTeaNoRun(t *testing.T) {
 	var in bytes.Buffer
 
 	m := &testModel{}
-	assert.NotNil(t, NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf))
+	assert.NotZero(t, NewProgram(context.Background(), m).WithInput(&in).WithOutput(&buf))
 }

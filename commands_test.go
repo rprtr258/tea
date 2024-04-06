@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/rprtr258/assert"
 )
 
 type msgString string
@@ -14,7 +14,7 @@ func TestEvery(t *testing.T) {
 	msg := Every(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
-	assert.Equal(t, expected, msg)
+	assert.Equal(t, expected, msg.(msgString))
 }
 
 func TestTick(t *testing.T) {
@@ -22,5 +22,5 @@ func TestTick(t *testing.T) {
 	msg := Tick(time.Millisecond, func(t time.Time) Msg {
 		return expected
 	})()
-	assert.Equal(t, expected, msg)
+	assert.Equal(t, expected, msg.(msgString))
 }

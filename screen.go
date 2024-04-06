@@ -28,7 +28,7 @@ func ClearScreen() Msg {
 // EnterAltScreen.
 type msgEnterAltScreen struct{}
 
-// EnterAltScreen is a special command that tells the Bubble Tea program to
+// EnterAltScreen is a special command that tells the Tea program to
 // enter the alternate screen buffer.
 //
 // Because commands run asynchronously, this command should not be used in your
@@ -42,7 +42,7 @@ func EnterAltScreen() Msg {
 // alternate screen buffer. You can send a msgExitAltScreen with ExitAltScreen.
 type msgExitAltScreen struct{}
 
-// ExitAltScreen is a special command that tells the Bubble Tea program to exit
+// ExitAltScreen is a special command that tells the Tea program to exit
 // the alternate screen buffer. This command should be used to exit the
 // alternate screen buffer while the program is running.
 //
@@ -98,7 +98,7 @@ func DisableMouse() Msg {
 // this message with HideCursor.
 type msgHideCursor struct{}
 
-// HideCursor is a special command for manually instructing Bubble Tea to hide
+// HideCursor is a special command for manually instructing Tea to hide
 // the cursor. In some rare cases, certain operations will cause the terminal
 // to show the cursor, which is normally hidden for the duration of a Bubble
 // Tea program's lifetime. You will most likely not need to use this command.
@@ -110,7 +110,7 @@ func HideCursor() Msg {
 // this message with ShowCursor.
 type msgShowCursor struct{}
 
-// ShowCursor is a special command for manually instructing Bubble Tea to show
+// ShowCursor is a special command for manually instructing Tea to show
 // the cursor.
 func ShowCursor() Msg {
 	return msgShowCursor{}
