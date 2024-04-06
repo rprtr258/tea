@@ -49,7 +49,7 @@ your Tea application.
 
 The `exec` example shows how to execute a running command during the execution
 of a Tea application such as launching an `EDITOR`.
- 
+
 <a href="./exec/main.go">
   <img width="750" src="./exec/exec.gif" />
 </a>

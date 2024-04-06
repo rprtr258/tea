@@ -26,7 +26,7 @@ type DefaultItem interface {
 ```
 
 You can see a working example in our [Kancli][kancli] project built
-explicitly for a tutorial on lists and composite views in Tea. 
+explicitly for a tutorial on lists and composite views in Tea.
 
 [VIDEO](https://youtu.be/ZA93qgdLUzM)
 

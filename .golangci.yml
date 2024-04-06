@@ -173,7 +173,7 @@ linters-settings:
       - default # Default section: contains all imports that could not be matched to another section type.
       - prefix(github.com/rprtr258/tea) # Custom section: groups all imports with the specified Prefix.
     custom-order: true
-    
+
 linters:
   disable-all: true
   enable:

@@ -43,7 +43,7 @@ func (m *model) Init(f func(...tea.Cmd)) {
 func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	if key, ok := msg.(tea.MsgKey); ok {
 		switch key.Type {
-		case tea.KeyCtrlC, tea.KeyEscape, tea.KeyEnter:
+		case tea.KeyCtrlC, tea.KeyEsc, tea.KeyEnter:
 			f(tea.Quit)
 			return
 		}
