@@ -120,7 +120,9 @@ func (h *Hierachy[T]) GoPrevOrUp() {
 
 func (h *Hierachy[T]) GoNextOrUp() {
 	if h.sel().collapsed {
-		h.selected = h.sel().lastChildrenIdx + 1
+		if newSelected := h.sel().lastChildrenIdx + 1; newSelected < len(h.nodes) {
+			h.selected = newSelected
+		}
 	} else if h.selected < len(h.nodes)-1 {
 		h.selected++
 	}
