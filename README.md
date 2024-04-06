@@ -32,7 +32,7 @@ Be sure to check out [Bubbles][bubbles], a library of common UI components for T
 ## Tutorial
 Tea is based on the functional design paradigms of [The Elm Architecture][elm], which happens to work nicely with Go. It's a delightful way to build applications.
 
-This tutorial assumes you have a working knowledge of Go.
+This tutorial assumes you have working knowledge of Go.
 
 By the way, the non-annotated source code for this program is available [on GitHub][tut-source].
 
@@ -62,7 +62,7 @@ Tea programs are comprised of a **model** that describes the application state a
 * **View**, a function that renders the UI based on the data in the model.
 
 ### The Model
-So let's start by defining our model which will store our application's state.  It can be any type, but a `struct` usually makes the most sense.
+So let's start by defining our model, which will store our application's state.  It can be any type, but a `struct` usually makes the most sense.
 
 ```go
 type model struct {
@@ -205,7 +205,7 @@ There are also several [Tea examples][examples] available and, of course, there 
 [docs]: https://pkg.go.dev/github.com/rprtr258/tea?tab=doc
 
 ## Debugging
-### Debugging with Delve
+### Using Delve for debugging
 Since Tea apps assume control of stdin and stdout, you’ll need to run delve in headless mode and then connect to it:
 
 ```bash
