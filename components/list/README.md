@@ -1,11 +1,8 @@
 # Frequently Asked Questions
-
 These are some of the most commonly asked questions regarding the `list` bubble.
 
 ## Adding Custom Items
-
-There are a few things you need to do to create custom items. First off, they
-need to implement the `list.Item` and `list.DefaultItem` interfaces.
+There are a few things you need to do to create custom items. First off, they need to implement the `list.Item` and `list.DefaultItem` interfaces.
 
 ```go
 // Item is an item that appears in the list.
@@ -25,17 +22,14 @@ type DefaultItem interface {
 }
 ```
 
-You can see a working example in our [Kancli][kancli] project built
-explicitly for a tutorial on lists and composite views in Tea.
+You can see a working example in our [Kancli][kancli] project built explicitly for a tutorial on lists and composite views in Tea.
 
 [VIDEO](https://youtu.be/ZA93qgdLUzM)
 
-## Customizing Styles
+[kancli]: https://github.com/charmbracelet/kancli/blob/main/main.go#L45
 
-Rendering (and behavior) for list items is done via the
-[`ItemDelegate`][itemDelegate]
-interface. It can be a little confusing at first, but it allows the list to be
-very flexible and powerful.
+## Customizing Styles
+Rendering (and behavior) for list items is done via the [`ItemDelegate`][itemDelegate] interface. It can be a little confusing at first, but it allows the list to be very flexible and powerful.
 
 If you just want to alter the default style you could do something like:
 
@@ -58,14 +52,11 @@ l := list.New(listItems, d, width, height)
 l.SetDelegate(d)
 ```
 
-This code would replace [this line][replacedLine] in the [`list-default`
-example][listDefault].
+This code would replace [this line][replacedLine] in the [`list-default` example][listDefault].
 
-For full control over the way list items are rendered you can also define your
-own `ItemDelegate` too ([example][customDelegate]).
+For full control over the way list items are rendered you can also define your own `ItemDelegate` too ([example][customDelegate]).
 
 
-[kancli]: https://github.com/charmbracelet/kancli/blob/main/main.go#L45
 [itemDelegate]: https://pkg.go.dev/github.com/rprtr258/tea/bubbles@v0.10.2/list#ItemDelegate
 [replacedLine]: https://github.com/rprtr258/tea/blob/master/examples/list-default/main.go#L77
 [listDefault]: https://github.com/rprtr258/tea/tree/master/examples/list-default

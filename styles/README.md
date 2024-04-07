@@ -1,19 +1,16 @@
 Lip Gloss
 =========
+<img src="https://stuff.charm.sh/styles/styles-header-github.png" width="340" alt="Lip Gloss Title Treatment"><br>
 
-<p>
-    <img src="https://stuff.charm.sh/styles/styles-header-github.png" width="340" alt="Lip Gloss Title Treatment"><br>
-    <a href="https://github.com/rprtr258/tea/styles/releases"><img src="https://img.shields.io/github/release/rprtr258/tea/styles.svg" alt="Latest Release"></a>
-    <a href="https://pkg.go.dev/github.com/rprtr258/tea/styles?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
-    <a href="https://github.com/rprtr258/tea/styles/actions"><img src="https://github.com/rprtr258/tea/styles/workflows/build/badge.svg" alt="Build Status"></a>
-</p>
+<a href="https://github.com/rprtr258/tea/styles/releases"><img src="https://img.shields.io/github/release/rprtr258/tea/styles.svg" alt="Latest Release"></a>
+<a href="https://pkg.go.dev/github.com/rprtr258/tea/styles?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
+<a href="https://github.com/rprtr258/tea/styles/actions"><img src="https://github.com/rprtr258/tea/styles/workflows/build/badge.svg" alt="Build Status"></a>
 
 Style definitions for nice terminal layouts. Built with TUIs in mind.
 
 ![Lip Gloss example](https://stuff.charm.sh/styles/styles-example.png)
 
-Lip Gloss takes an expressive, declarative approach to terminal rendering.
-Users familiar with CSS will feel at home with Lip Gloss.
+Lip Gloss takes an expressive, declarative approach to terminal rendering.  Users familiar with CSS will feel at home with Lip Gloss.
 
 ```go
 
@@ -31,11 +28,9 @@ fmt.Println(style.Render("Hello, kitty"))
 ```
 
 ## Colors
-
 Lip Gloss supports the following color profiles:
 
 ### ANSI 16 colors (4-bit)
-
 ```go
 styles.Color("5")  // magenta
 styles.Color("9")  // red
@@ -43,7 +38,6 @@ styles.Color("12") // light blue
 ```
 
 ### ANSI 256 Colors (8-bit)
-
 ```go
 styles.Color("86")  // aqua
 styles.Color("201") // hot pink
@@ -51,7 +45,6 @@ styles.Color("202") // orange
 ```
 
 ### True Color (16,777,216 colors; 24-bit)
-
 ```go
 styles.Color("#0000FF") // good ol' 100% blue
 styles.Color("#04B575") // a green
@@ -60,38 +53,28 @@ styles.Color("#3C3C3C") // a dark gray
 
 ...as well as a 1-bit ASCII profile, which is black and white only.
 
-The terminal's color profile will be automatically detected, and colors outside
-the gamut of the current palette will be automatically coerced to their closest
-available value.
-
+The terminal's color profile will be automatically detected, and colors outside the gamut of the current palette will be automatically coerced to their closest available value.
 
 ### Adaptive Colors
-
 You can also specify color options for light and dark backgrounds:
 
 ```go
 styles.FgAdaptiveColor("236", "248")
 ```
 
-The terminal's background color will automatically be detected and the
-appropriate color will be chosen at runtime.
+The terminal's background color will automatically be detected and the appropriate color will be chosen at runtime.
 
 ### Complete Colors
-
-CompleteColor specifies exact values for truecolor, ANSI256, and ANSI color
-profiles.
+CompleteColor specifies exact values for truecolor, ANSI256, and ANSI color profiles.
 
 ```go
 styles.CompleteColor{True: "#0000FF", ANSI256: "86", ANSI: "5"}
 ```
 
-Automatic color degradation will not be performed in this case and it will be
-based on the color specified.
+Automatic color degradation will not be performed in this case and it will be based on the color specified.
 
 ### Complete Adaptive Colors
-
-You can use CompleteColor with AdaptiveColor to specify the exact values for
-light and dark backgrounds without automatic color degradation.
+You can use CompleteColor with AdaptiveColor to specify the exact values for light and dark backgrounds without automatic color degradation.
 
 ```go
 styles.CompleteAdaptiveColor{
@@ -101,7 +84,6 @@ styles.CompleteAdaptiveColor{
 ```
 
 ## Inline Formatting
-
 Lip Gloss supports the usual ANSI text formatting options:
 
 ```go
@@ -115,9 +97,7 @@ var style = styles.Style{}.
     Reverse(true)
 ```
 
-
 ## Block-Level Formatting
-
 Lip Gloss also supports rules for block-level formatting:
 
 ```go
@@ -136,8 +116,7 @@ var style = styles.Style{}.
     MarginLeft(4)
 ```
 
-There is also shorthand syntax for margins and padding, which follows the same
-format as CSS:
+There is also shorthand syntax for margins and padding, which follows the same format as CSS:
 
 ```go
 // 2 cells on all sides
@@ -156,7 +135,6 @@ styles.Style{}.Margin(2, 4, 3, 1)
 
 
 ## Aligning Text
-
 You can align paragraphs of text to the left, right, or center.
 
 ```go
@@ -167,9 +145,7 @@ var style = styles.Style{}.
     Align(styles.Center) // just kidding, align it in the center
 ```
 
-
 ## Width and Height
-
 Setting a minimum width and height is simple and straightforward.
 
 ```go
@@ -180,9 +156,7 @@ var style = styles.Style{}.
     Foreground(styles.Color("63"))
 ```
 
-
 ## Borders
-
 Adding borders is easy:
 
 ```go
@@ -212,8 +186,7 @@ var myCuteBorder = styles.Border{
 }
 ```
 
-There are also shorthand functions for defining borders, which follow a similar
-pattern to the margin and padding shorthand functions.
+There are also shorthand functions for defining borders, which follow a similar pattern to the margin and padding shorthand functions.
 
 ```go
 // Add a thick border to the top and bottom
@@ -228,26 +201,18 @@ styles.Style{}.
 
 For more on borders see [the docs][docs].
 
-
 ## Copying Styles
-
 Just use `Copy()`:
 
 ```go
 var style = styles.Style{}.Foreground(styles.Color("219"))
-
 var wildStyle = style.Copy().Blink(true)
 ```
 
-`Copy()` performs a copy on the underlying data structure ensuring that you get
-a true, dereferenced copy of a style. Without copying, it's possible to mutate
-styles.
-
+`Copy()` performs a copy on the underlying data structure ensuring that you get a true, dereferenced copy of a style. Without copying, it's possible to mutate styles.
 
 ## Inheritance
-
-Styles can inherit rules from other styles. When inheriting, only unset rules
-on the receiver are inherited.
+Styles can inherit rules from other styles. When inheriting, only unset rules on the receiver are inherited.
 
 ```go
 var styleA = styles.Style{}.
@@ -261,9 +226,7 @@ var styleB = styles.Style{}.
     Inherit(styleA)
 ```
 
-
 ## Unsetting Rules
-
 All rules can be unset:
 
 ```go
@@ -276,12 +239,8 @@ var style = styles.Style{}.
 
 When a rule is unset, it won't be inherited or copied.
 
-
 ## Enforcing Rules
-
-Sometimes, such as when developing a component, you want to make sure style
-definitions respect their intended purpose in the UI. This is where `Inline`
-and `MaxWidth`, and `MaxHeight` come in:
+Sometimes, such as when developing a component, you want to make sure style definitions respect their intended purpose in the UI. This is where `Inline` and `MaxWidth`, and `MaxHeight` come in:
 
 ```go
 // Force rendering onto a single line, ignoring margins, padding, and borders.
@@ -295,7 +254,6 @@ someStyle.MaxWidth(5).MaxHeight(5).Render("yadda yadda")
 ```
 
 ## Rendering
-
 Generally, you just call the `Render(string...)` method on a `styles.Style`:
 
 ```go
@@ -312,11 +270,7 @@ fmt.Println(style) // 你好，猫咪。
 ```
 
 ### Custom Renderers
-
-Custom renderers allow you to render to a specific outputs. This is
-particularly important when you want to render to different outputs and
-correctly detect the color profile and dark background status for each, such as
-in a server-client situation.
+Custom renderers allow you to render to a specific outputs. This is particularly important when you want to render to different outputs and correctly detect the color profile and dark background status for each, such as in a server-client situation.
 
 ```go
 func myLittleHandler(sess ssh.Session) {
@@ -331,17 +285,13 @@ func myLittleHandler(sess ssh.Session) {
 }
 ```
 
-For an example on using a custom renderer over SSH with [Wish][wish] see the
-[SSH example][ssh-example].
+For an example on using a custom renderer over SSH with [Wish][wish] see the [SSH example][ssh-example].
 
 ## Utilities
-
 In addition to pure styling, Lip Gloss also ships with some utilities to help
 assemble your layouts.
 
-
 ### Joining Paragraphs
-
 Horizontally and vertically joining paragraphs is a cinch.
 
 ```go
@@ -356,11 +306,8 @@ styles.JoinVertical(styles.Center, paragraphA, paragraphB)
 styles.JoinHorizontal(0.2, paragraphA, paragraphB, paragraphC)
 ```
 
-
 ### Measuring Width and Height
-
-Sometimes you’ll want to know the width and height of text blocks when building
-your layouts.
+Sometimes you’ll want to know the width and height of text blocks when building your layouts.
 
 ```go
 // Render a block of text.
@@ -377,9 +324,7 @@ height := styles.Height(block)
 w, h := styles.Size(block)
 ```
 
-
 ### Placing Text in Whitespace
-
 Sometimes you’ll simply want to place a block of text in whitespace.
 
 ```go
@@ -397,11 +342,9 @@ block := styles.Place(30, 80, styles.Right, styles.Bottom, fancyStyledParagraph)
 
 You can also style the whitespace. For details, see [the docs][docs].
 
-
 ***
 
 ## FAQ
-
 <details>
 <summary>
 Why are things misaligning? Why are borders at the wrong widths?
@@ -433,62 +376,26 @@ import (
 styles.SetColorProfile(termenv.TrueColor)
 ```
 
-*Note:* this option limits the flexibility of your application and can cause
-ANSI escape codes to be output in cases where that might not be desired. Take
-careful note of your use case and environment before choosing to force a color
-profile.
+*Note:* this option limits the flexibility of your application and can cause ANSI escape codes to be output in cases where that might not be desired. Take careful note of your use case and environment before choosing to force a color profile.
 </details>
 
 ## What about [Tea][tea]?
-
-Lip Gloss doesn’t replace Tea. Rather, it is an excellent Tea
-companion. It was designed to make assembling terminal user interface views as
-simple and fun as possible so that you can focus on building your application
-instead of concerning yourself with low-level layout details.
+Lip Gloss doesn’t replace Tea. Rather, it is an excellent Tea companion. It was designed to make assembling terminal user interface views as simple and fun as possible so that you can focus on building your application instead of concerning yourself with low-level layout details.
 
 In simple terms, you can use Lip Gloss to help build your Tea views.
 
 [tea]: https://github.com/charmbracelet/tea
 
-
 ## Under the Hood
-
-Lip Gloss is built on the excellent [Termenv][termenv] and [Reflow][reflow]
-libraries which deal with color and ANSI-aware text operations, respectively.
-For many use cases Termenv and Reflow will be sufficient for your needs.
+Lip Gloss is built on the excellent [Termenv][termenv] and [Reflow][reflow] libraries which deal with color and ANSI-aware text operations, respectively.  For many use cases Termenv and Reflow will be sufficient for your needs.
 
 [termenv]: https://github.com/rprtr258/scuf
 [reflow]: https://github.com/muesli/reflow
 
-
 ## Rendering Markdown
-
-For a more document-centric rendering solution with support for things like
-lists, tables, and syntax-highlighted code have a look at [Glamour][glamour],
-the stylesheet-based Markdown renderer.
+For a more document-centric rendering solution with support for things like lists, tables, and syntax-highlighted code have a look at [Glamour][glamour], the stylesheet-based Markdown renderer.
 
 [glamour]: https://github.com/rprtr258/tea/glamour
-
-
-## Feedback
-
-We’d love to hear your thoughts on this project. Feel free to drop us a note!
-
-* [Twitter](https://twitter.com/charmcli)
-* [The Fediverse](https://mastodon.social/@charmcli)
-* [Discord](https://charm.sh/chat)
-
-## License
-
-[MIT](https://github.com/rprtr258/tea/styles/raw/master/LICENSE)
-
-***
-
-Part of [Charm](https://charm.sh).
-
-<a href="https://charm.sh/"><img alt="The Charm logo" src="https://stuff.charm.sh/charm-badge.jpg" width="400"></a>
-
-Charm热爱开源 • Charm loves open source
 
 
 [docs]: https://pkg.go.dev/github.com/rprtr258/tea/styles?tab=doc

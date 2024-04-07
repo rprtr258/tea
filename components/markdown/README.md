@@ -1,5 +1,4 @@
 # Markdown
-
 <p>
     <img src="https://stuff.charm.sh/glamour/glamour-github-header.png" width="245" alt="Glamour Title Treatment"><br>
     <a href="https://github.com/rprtr258/tea/glamour/releases"><img src="https://img.shields.io/github/release/rprtr258/tea/glamour.svg" alt="Latest Release"></a>
@@ -13,13 +12,9 @@ Stylesheet-based markdown rendering for your CLI apps.
 
 ![Glamour dark style example](https://stuff.charm.sh/glamour/glamour-example.png)
 
-`markdown` lets you render [markdown](https://en.wikipedia.org/wiki/Markdown)
-documents & templates on [ANSI](https://en.wikipedia.org/wiki/ANSI_escape_code)
-compatible terminals. You can create your own stylesheet or simply use one of
-the stylish defaults.
+`markdown` lets you render [markdown](https://en.wikipedia.org/wiki/Markdown) documents & templates on [ANSI](https://en.wikipedia.org/wiki/ANSI_escape_code) compatible terminals. You can create your own stylesheet or simply use one of the stylish defaults.
 
 ## Usage
-
 ```go
 import "github.com/rprtr258/tea/components/markdown"
 
@@ -38,7 +33,6 @@ fmt.Print(out)
 <img src="https://github.com/rprtr258/tea/glamour/raw/master/examples/helloworld/helloworld.png" width="600" alt="Hello World example">
 
 ### Custom Renderer
-
 ```go
 import "github.com/rprtr258/tea/glamour"
 
@@ -54,9 +48,7 @@ fmt.Print(out)
 ```
 
 ## Styles
-
-You can find all available default styles in our [gallery](https://github.com/rprtr258/tea/glamour/tree/master/styles/gallery).
-Want to create your own style? [Learn how!](https://github.com/rprtr258/tea/glamour/tree/master/styles)
+You can find all available default styles in our [gallery](https://github.com/rprtr258/tea/glamour/tree/master/styles/gallery). Want to create your own style? [Learn how!](https://github.com/rprtr258/tea/glamour/tree/master/styles)
 
 There are a few options for using a custom style:
 1. Call `glamour.Render(inputText, "desiredStyle")`
@@ -64,7 +56,6 @@ There are a few options for using a custom style:
 1. Set the `GLAMOUR_STYLE` environment variable and pass `glamour.WithEnvironmentConfig()` to your custom renderer
 
 ## Glamourous Projects
-
 Check out these projects, which use `glamour`:
 - [Glow](https://github.com/charmbracelet/glow), a markdown renderer for
 the command-line.
@@ -72,23 +63,3 @@ the command-line.
 - [GitLab CLI](https://gitlab.com/gitlab-org/cli), GitLab's official command line tool.
 - [Gitea CLI](https://gitea.com/gitea/tea), Gitea's official command line tool.
 - [Meteor](https://github.com/odpf/meteor), an easy-to-use, plugin-driven metadata collection framework.
-
-## Feedback
-
-We’d love to hear your thoughts on this project. Feel free to drop us a note!
-
-* [Twitter](https://twitter.com/charmcli)
-* [The Fediverse](https://mastodon.social/@charmcli)
-* [Discord](https://charm.sh/chat)
-
-## License
-
-[MIT](https://github.com/rprtr258/tea/glamour/raw/master/LICENSE)
-
-***
-
-Part of [Charm](https://charm.sh).
-
-<a href="https://charm.sh/"><img alt="The Charm logo" src="https://stuff.charm.sh/charm-badge.jpg" width="400"></a>
-
-Charm热爱开源 • Charm loves open source

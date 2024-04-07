@@ -19,14 +19,6 @@ To get started, see the tutorial below, the [examples][examples], the
 
 [youtube]: https://charm.sh/yt
 
-## By the way
-Be sure to check out [Bubbles][bubbles], a library of common UI components for Tea.
-
-<p>
-    <a href="https://github.com/rprtr258/tea/bubbles"><img src="https://stuff.charm.sh/bubbles/bubbles-badge.png" width="174" alt="Bubbles Badge"></a>&nbsp;&nbsp;
-    <a href="https://github.com/rprtr258/tea/bubbles"><img src="https://stuff.charm.sh/bubbles-examples/textinput.gif" width="400" alt="Text Input Example from Bubbles"></a>
-</p>
-
 ***
 
 ## Tutorial
@@ -326,13 +318,3 @@ Tea is based on the paradigms of [The Elm Architecture][elm] by Evan Czaplicki e
 [gotea]: https://github.com/tj/go-tea
 [zb]: https://de.wikipedia.org/wiki/Zeichenorientierte_Benutzerschnittstelle
 
-## License
-[MIT](https://github.com/rprtr258/tea/raw/master/LICENSE)
-
-***
-
-Part of [Charm](https://charm.sh).
-
-<a href="https://charm.sh/"><img alt="The Charm logo" src="https://stuff.charm.sh/charm-badge.jpg" width="400"></a>
-
-Charm热爱开源 • Charm loves open source • نحنُ نحب المصادر المفتوحة

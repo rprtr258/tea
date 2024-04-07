@@ -9,7 +9,6 @@ You can find the non-annotated version of this program [on GitHub][source].
 [source]: https://github.com/rprtr258/tea/blob/master/tutorials/commands/main.go
 
 ## Let's Go!
-
 For this tutorial we're building a very simple program that makes an HTTP request to a server and reports the status code of the response.
 
 We'll import a few necessary packages and put the URL we're going to check in a `const`.
@@ -30,7 +29,6 @@ const url = "https://charm.sh/"
 ```
 
 ## The Model
-
 Next we'll define our model. The only things we need to store are the status code of the HTTP response and a possible error.
 
 ```go
@@ -41,7 +39,6 @@ type model struct {
 ```
 
 ## Commands and Messages
-
 `Cmd`s are functions that perform some I/O and then return a `Msg`. Checking the time, ticking a timer, reading from the disk, and network stuff are all I/O and should be run through commands. That might sound harsh, but it will keep your Tea program straightforward and simple.
 
 Anyway, let's write a `Cmd` that makes a request to a server and returns the result as a `Msg`.
@@ -72,7 +69,6 @@ type (
 And notice that we've defined two new `Msg` types. They can be any type, even an empty struct. We'll come back to them later in our update function.  First, let's write our initialization function.
 
 ## The Initialization Method
-
 The initialization method is very simple: we return the `Cmd` we made earlier.  Note that we don't call the function; the Tea runtime will do that when the time is right.
 
 ```go
@@ -82,7 +78,6 @@ func (m *model) Init() (tea.Cmd) {
 ```
 
 ## The Update Method
-
 Internally, `Cmd`s run asynchronously in a goroutine. The `Msg` they return is collected and sent to our update function for handling. Remember those message types we made earlier when we were making the `checkServer` command? We handle them here. This makes dealing with many asynchronous operations very easy.
 
 ```go
@@ -142,7 +137,6 @@ func (m *model) View(r tea.Renderer) {
 ```
 
 ## Run the program
-
 The only thing left to do is run the program, so let's do that! Our initial model doesn't need any data at all in this case, we just initialize it with as a `struct` with defaults.
 
 ```go
@@ -156,7 +150,6 @@ func main() {
 And that's that. There's one more thing that is helpful to know about `Cmd`s, though.
 
 ## One More Thing About Commands
-
 `Cmd`s are defined in Tea as `type Cmd func() Msg`. So they're just functions that don't take any arguments and return a `Msg`, which can be any type. If you need to pass arguments to a command, you just make a function that returns a command. For example:
 
 ```go
@@ -185,12 +178,11 @@ func checkSomeUrl(url string) tea.Cmd {
 Anyway, just make sure you do as much stuff as you can in the innermost function, because that's the one that runs asynchronously.
 
 ## Now What?
-
-After doing this tutorial and [the previous one][basics] you should be ready to build a Tea program of your own. We also recommend that you look at the Tea [example programs][examples] as well as [Bubbles][bubbles], a component library for Tea.
+After doing this tutorial and [the previous one][basics] you should be ready to build a Tea program of your own. We also recommend that you look at the Tea [example programs][examples] as well as [Components][components], a component library for Tea.
 
 And, of course, check out the [Go Docs][docs].
 
-[bubbles]: https://github.com/rprtr258/tea/bubbles
+[components]: https://github.com/rprtr258/tea/components
 [docs]: https://pkg.go.dev/github.com/rprtr258/tea?tab=doc
 [examples]: https://github.com/rprtr258/tea/tree/master/examples
 
@@ -198,19 +190,3 @@ And, of course, check out the [Go Docs][docs].
 
 * [Libraries we use with Tea](https://github.com/rprtr258/tea/#libraries-we-use-with-bubble-tea)
 * [Tea in the Wild](https://github.com/rprtr258/tea/#bubble-tea-in-the-wild)
-
-### Feedback
-
-We'd love to hear your thoughts on this tutorial. Feel free to drop us a note!
-
-* [Twitter](https://twitter.com/charmcli)
-* [The Fediverse](https://mastodon.social/@charmcli)
-* [Discord](https://charm.sh/chat)
-
-***
-
-Part of [Charm](https://charm.sh).
-
-<a href="https://charm.sh/"><img alt="The Charm logo" src="https://stuff.charm.sh/charm-badge.jpg" width="400"></a>
-
-Charm热爱开源 • Charm loves open source

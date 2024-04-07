@@ -2,9 +2,8 @@ package views
 
 // An example demonstrating an application with multiple views.
 //
-// Note that this example was produced before the Bubbles progress component
-// was available (github.com/rprtr258/tea/bubbles/progress) and thus, we're
-// implementing a progress bar from scratch here.
+// Note that this example was produced before the progress component
+// was available and thus, we're implementing a progress bar from scratch here.
 
 import (
 	"context"
@@ -16,8 +15,8 @@ import (
 
 	"github.com/fogleman/ease"
 	"github.com/lucasb-eyer/go-colorful"
-
 	"github.com/rprtr258/scuf"
+
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/styles"
 )
