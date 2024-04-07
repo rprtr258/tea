@@ -350,9 +350,9 @@ func (m *Model) View(vb tea.Viewbox) {
 		vb0 = vb0.PaddingLeft(_fileSizeWidth + 1)
 		vb0.
 			Styled(fun.Switch(true, m.Styles.File).
-				Case(f.IsDir(), m.Styles.Directory).
-				Case(isSymlink, m.Styles.Symlink).
-				Case(disabled, m.Styles.DisabledFile).
+				Case(m.Styles.Directory, f.IsDir()).
+				Case(m.Styles.Symlink, isSymlink).
+				Case(m.Styles.DisabledFile, disabled).
 				End()).
 			WriteLine(fileName)
 	}

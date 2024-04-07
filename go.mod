@@ -25,7 +25,7 @@ require (
 	github.com/muesli/termenv v0.15.2
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rprtr258/assert v0.0.0-20230831155552-b6a64f43e07f
-	github.com/rprtr258/fun v0.0.13
+	github.com/rprtr258/fun v0.0.16-0.20240407071119-ba32d9b883f9
 	github.com/rprtr258/scuf v0.0.6
 	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f
 	github.com/samber/lo v1.39.0

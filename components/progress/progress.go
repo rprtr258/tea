@@ -272,8 +272,8 @@ func (m *Model) barView(vb tea.Viewbox, percent float64, textWidth int) {
 				// this is up for debate: in a gradient of width=1, should the
 				// single character rendered be the first color, the last color
 				// or exactly 50% in between? I opted for 50%
-				Case(fw == 1, 0.5).
-				Case(m.scaleRamp, float64(i)/float64(fw-1)).
+				Case(0.5, fw == 1).
+				Case(float64(i)/float64(fw-1), m.scaleRamp).
 				End()
 
 			vb = vb.

@@ -136,7 +136,7 @@ type IterItem[T any] struct {
 	IsCollapsed bool
 }
 
-func (h *Hierachy[T]) Iter(yield func(IterItem[T]) bool) bool {
+func (h *Hierachy[T]) Iter(yield func(IterItem[T]) bool) {
 	for i := 0; i < len(h.nodes); i++ {
 		node := h.nodes[i]
 		if !yield(IterItem[T]{
@@ -146,13 +146,11 @@ func (h *Hierachy[T]) Iter(yield func(IterItem[T]) bool) bool {
 			HasChildren: node.lastChildrenIdx != i,
 			IsCollapsed: node.collapsed,
 		}) {
-			return false
+			return
 		}
 
 		if node.collapsed {
 			i = node.lastChildrenIdx
 		}
 	}
-
-	return true
 }

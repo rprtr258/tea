@@ -52,6 +52,10 @@ github.com/hexops/gotextdiff v1.0.3 h1:gitA9+qJrrTCsiCl7+kh75nPqQt1cx4ZkudSTLoUq
 github.com/hexops/gotextdiff v1.0.3/go.mod h1:pSWU5MAI3yDq+fZBTazCSJysOMbxWL1BSow5/V2vxeg=
 github.com/hugelgupf/vmtest v0.0.0-20240102225328-693afabdd27f h1:ov45/OzrJG8EKbGjn7jJZQJTN7Z1t73sFYNIRd64YlI=
 github.com/hugelgupf/vmtest v0.0.0-20240102225328-693afabdd27f/go.mod h1:JoDrYMZpDPYo6uH9/f6Peqms3zNNWT2XiGgioMOIGuI=
+github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
+github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
+github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
+github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=
@@ -83,8 +87,10 @@ github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJ
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.4 h1:8TfxU8dW6PdqD27gjM8MVNuicgxIjxpm4K7x4jp8sis=
 github.com/rivo/uniseg v0.4.4/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
-github.com/rprtr258/fun v0.0.13 h1:xNAHKdP4LIQEq3fohBwmZoJJ3du7OSlWvXvFMNf8WqI=
-github.com/rprtr258/fun v0.0.13/go.mod h1:styOCXbyVqY458UNFipnGuX7ddfLu9/VerFd3sNo1Mg=
+github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
+github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
+github.com/rprtr258/fun v0.0.16-0.20240407071119-ba32d9b883f9 h1:xK8by0agUShDc7UZRC09xOtDxt4Nwss3Xi8MC633AMQ=
+github.com/rprtr258/fun v0.0.16-0.20240407071119-ba32d9b883f9/go.mod h1:styOCXbyVqY458UNFipnGuX7ddfLu9/VerFd3sNo1Mg=
 github.com/rprtr258/scuf v0.0.6 h1:IHjqCCYNdyc0f/LKW2pW6jgnVEM2IhT3IOAiVK/BWc8=
 github.com/rprtr258/scuf v0.0.6/go.mod h1:7vElmY1mWY4HX8XXBZEa5opCpvXERQBjALk4HMnJ8PE=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
