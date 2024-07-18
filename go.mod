@@ -23,15 +23,18 @@ require (
 	github.com/muesli/cancelreader v0.2.2
 	github.com/muesli/reflow v0.3.0
 	github.com/muesli/termenv v0.15.2
+	github.com/nsf/termbox-go v1.1.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rprtr258/assert v0.0.0-20230831155552-b6a64f43e07f
 	github.com/rprtr258/fun v0.0.16-0.20240407071119-ba32d9b883f9
 	github.com/rprtr258/scuf v0.0.6
 	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f
 	github.com/samber/lo v1.39.0
+	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/yuin/goldmark v1.6.0
 	github.com/yuin/goldmark-emoji v1.0.2
+	golang.org/x/image v0.18.0
 	golang.org/x/term v0.16.0
 )
 
@@ -45,11 +48,12 @@ require (
 	github.com/charmbracelet/x/errors v0.0.0-20240118113134-7c8cecb18fdb // indirect
 	github.com/charmbracelet/x/exp/term v0.0.0-20240118113134-7c8cecb18fdb // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/u-root/u-root v0.12.0 // indirect
@@ -58,5 +62,6 @@ require (
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
