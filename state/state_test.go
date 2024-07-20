@@ -8,83 +8,50 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func compare4[A, B, C, D comparable](a, b Sum4[A, B, C, D]) (res bool) {
-	a(h4[A, B, C, D]{
-		A: func(a A) { b(h4[A, B, C, D]{A: func(b A) { res = true }}) },
-		B: func(a B) { b(h4[A, B, C, D]{B: func(b B) { res = true }}) },
-		C: func(a C) { b(h4[A, B, C, D]{C: func(b C) { res = true }}) },
-		D: func(a D) { b(h4[A, B, C, D]{D: func(b D) { res = true }}) },
-	})
-	return
-}
-
 func TestHandmadeFSM(t *testing.T) {
-	type stateStart struct{}
-	type stateA struct{}
-	type stateB struct{}
-	type stateC struct{}
-	// TODO: stateFail
-	type stateh = h4[stateStart, stateA, stateB, stateC]
-	type state = Sum4[stateStart, stateA, stateB, stateC]
-
-	var newState = New4[stateStart, stateA, stateB, stateC]()
-
 	type event rune
-
-	type cmd = struct{}
-
-	update := func(state state, ev event) (s state, _ []cmd) {
-		state(stateh{
-			A: func(state stateStart) {
-				if ev == 'a' {
-					s = newState.B(stateA{})
-				}
-			},
-			B: func(state stateA) {
-				if ev == 'b' {
-					s = newState.C(stateB{})
-				}
-			},
-			C: func(stateB) {
-				if ev == 'c' {
-					s = newState.D(stateC{})
-				}
-			},
-		})
-		return
-	}
-
-	initialState := newState.A(stateStart{})
-	hook := NewHook(initialState, update)
+	type cmd struct{}
+	type state = State[event, cmd]
+	var stateA, stateB, stateC, stateFail state
+	stateStart := func(ev event) (state, []cmd) {
+		if ev == 'a' {
+			return stateA, nil
+		}
+		return stateFail, nil
+	})
+	stateA = StateFunc[event,cmd](func(ev event) (state, []cmd) {
+		if ev == 'b' {
+			return stateA, nil
+		}
+		return stateFail, nil
+	})
+	stateB = StateFunc[event,cmd](func(ev event) (state, []cmd) {
+		if ev == 'c' {
+			return stateC, nil
+		}
+		return stateFail, nil
+	})
 
 	for name, test := range map[string]struct {
 		input         string
 		expectedState state
 	}{
-		"empty string": {"", newState.A(stateStart{})},
-		// "non matching string":     {"x", StatusFail},
-		"matching string":         {"abc", newState.D(stateC{})},
-		"partial matching string": {"ab", newState.C(stateB{})},
+		"empty string": {"", stateStart},
+		"non matching string":     {"x", StatusFail},
+		"matching string":         {"abc", stateC},
+		"partial matching string": {"ab", stateB},
 	} {
 		t.Run(name, func(t *testing.T) {
-			hook.Send([]event(test.input)...)
-			require.True(t, compare4(test.expectedState, hook.State()))
+			state := stateStart
+			for _, r := range test.input {
+				state, _ = state(event(r))
+			}
+			require.Equal(t, test.expectedState, state)
 		})
 	}
 }
 
 func TestLoadFSM(t *testing.T) {
-	type stateInitial struct{}
-	type stateLoading struct{ startedAt time.Time }
-	type stateLoaded struct {
-		stateLoading
-		loadedAt time.Time
-	}
-	type stateh = h3[stateInitial, stateLoading, stateLoaded]
-	type state = Sum3[stateInitial, stateLoading, stateLoaded]
-
-	var newState = New3[stateInitial, stateLoading, stateLoaded]()
-
 	type startedLoading struct{ At time.Time }
 	type finishedLoading struct{ At time.Time }
 	type eventh = h2[startedLoading, finishedLoading]
@@ -99,47 +66,56 @@ func TestLoadFSM(t *testing.T) {
 
 	var newCmd = New2[cmdStartLoadingAnimation, cmdDisplayPopup]()
 
-	update := func(state state, ev event) (s state, cmds []cmd) {
-		state(stateh{
-			A: func(state stateInitial) {
-				ev(eventh{
-					A: func(ev startedLoading) {
-						s = newState.B(stateLoading{startedAt: ev.At})
-						cmds = []cmd{newCmd.A(cmdStartLoadingAnimation{})}
-					},
-				})
+	type state = State[event, cmd]
+	var stateLoading func(startedAt time.Time) state
+	var stateLoaded func(startedAt time.Time, loadedAt time.Time) state
+
+	stateInitial := StateFunc[event, cmd](func(ev event) (s state, cmds []cmd) {
+		ev(eventh{
+			A: func(ev startedLoading) {
+				s = stateLoading(ev.At)
+				cmds = []cmd{newCmd.A(cmdStartLoadingAnimation{})}
 			},
-			B: func(state stateLoading) {
-				ev(eventh{
-					B: func(ev finishedLoading) {
-						s = newState.C(stateLoaded{state, ev.At})
-						cmds = []cmd{newCmd.B(cmdDisplayPopup{fmt.Sprintf(
-							`Loading finished in %d milliseconds!`,
-							ev.At.Sub(state.startedAt)/time.Millisecond,
-						)})}
-					},
-				})
-			},
-			C: func(stateLoaded) {},
 		})
 		return
+	})
+	stateLoading = func(startedAt time.Time) state {
+		return StateFunc[event, cmd](func(ev event) (s state, cmds []cmd) {
+			ev(eventh{
+				B: func(ev finishedLoading) {
+					s = stateLoaded(startedAt, ev.At)
+					cmds = []cmd{newCmd.B(cmdDisplayPopup{fmt.Sprintf(
+						`Loading finished in %d milliseconds!`,
+						ev.At.Sub(startedAt)/time.Millisecond,
+					)})}
+				},
+			})
+			return
+		})
+	}
+	stateLoaded = func(startedAt time.Time, loadedAt time.Time) state {
+		return StateFunc[event, cmd](func(ev event) (s state, cmds []cmd) {
+			return
+		})
 	}
 
-	initialState := newState.A(stateInitial{})
-	hook := NewHook(initialState, update)
-	fmt.Println(hook.State())
-	hook.Send(newEvent.A(startedLoading{time.Now()}))
-	fmt.Println(hook.State())
-	hook.Send(newEvent.B(finishedLoading{time.Now()}))
-	fmt.Println(hook.State())
-	for _, cmd := range hook.cmds { // handle commands
-		cmd(cmdh{
-			A: func(cmd cmdStartLoadingAnimation) {
-				fmt.Println(`loading animation started`)
-			},
-			B: func(cmd cmdDisplayPopup) {
-				fmt.Println(`displaying popup with text "${cmd.text}"`)
-			},
-		})
+	{
+		initialState := stateInitial
+		state := state(initialState)
+		fmt.Println(state)
+		state, cmds0 := state.Handle(newEvent.A(startedLoading{time.Now()}))
+		fmt.Println(state)
+		state, cmds1 := state.Handle(newEvent.B(finishedLoading{time.Now()}))
+		fmt.Println(state)
+		for _, cmd := range append(cmds0, cmds1...) { // handle commands
+			cmd(cmdh{
+				A: func(cmd cmdStartLoadingAnimation) {
+					fmt.Println(`loading animation started`)
+				},
+				B: func(cmd cmdDisplayPopup) {
+					fmt.Println(`displaying popup with text "${cmd.text}"`)
+				},
+			})
+		}
 	}
 }

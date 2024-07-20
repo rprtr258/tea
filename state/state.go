@@ -1,6 +1,16 @@
 // inspired by https://github.com/zlumer/tesm
 package state
 
+type State[Event, Cmd any] interface {
+	Handle(Event) (State[Event, Cmd], []Cmd)
+}
+
+type StateFunc[Event, Cmd any] func(Event) (State[Event, Cmd], []Cmd)
+
+func (f StateFunc[Event, Cmd]) Handle(ev Event) (State[Event, Cmd], []Cmd) {
+	return f(ev)
+}
+
 func call[T any](f func(T), t T) {
 	if f == nil {
 		return
@@ -74,27 +84,27 @@ func New4[A, B, C, D any]() new4[A, B, C, D] {
 	}
 }
 
-type Hook[State, Event, Cmd any] struct {
-	state  State
-	update func(State, Event) (State, []Cmd)
-	cmds   []Cmd
-}
+// type Hook[State, Event, Cmd any] struct {
+// 	state  State
+// 	update func(State, Event) (State, []Cmd)
+// 	cmds   []Cmd
+// }
 
-func NewHook[State, Event, Cmd any](
-	state State,
-	update func(State, Event) (State, []Cmd),
-) Hook[State, Event, Cmd] {
-	return Hook[State, Event, Cmd]{state, update, nil}
-}
+// func NewHook[State, Event, Cmd any](
+// 	state State,
+// 	update func(State, Event) (State, []Cmd),
+// ) Hook[State, Event, Cmd] {
+// 	return Hook[State, Event, Cmd]{state, update, nil}
+// }
 
-func (h *Hook[S, E, C]) Send(events ...E) {
-	for _, event := range events {
-		state, cmds := h.update(h.state, event)
-		h.state = state
-		h.cmds = append(h.cmds, cmds...)
-	}
-}
+// func (h *Hook[S, E, C]) Send(events ...E) {
+// 	for _, event := range events {
+// 		state, cmds := h.update(h.state, event)
+// 		h.state = state
+// 		h.cmds = append(h.cmds, cmds...)
+// 	}
+// }
 
-func (h *Hook[S, E, C]) State() S {
-	return h.state
-}
+// func (h *Hook[S, E, C]) State() S {
+// 	return h.state
+// }
