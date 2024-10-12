@@ -32,6 +32,8 @@ github.com/charmbracelet/x/exp/term v0.0.0-20240118113134-7c8cecb18fdb h1:TS3GqV
 github.com/charmbracelet/x/exp/term v0.0.0-20240118113134-7c8cecb18fdb/go.mod h1:kOOxxyxgAFQVcR5yQJWTuLjzt5dR2pcgwy3WaLEudjE=
 github.com/containerd/console v1.0.4-0.20230706203907-8f6c4e4faef5 h1:Ig+OPkE3XQrrl+SKsOqAjlkrBN/zrr+Qpw7rCuDjRCE=
 github.com/containerd/console v1.0.4-0.20230706203907-8f6c4e4faef5/go.mod h1:YynlIjWYF8myEu6sdkwKIvGQq+cOckRm6So2avqoYAk=
+github.com/containerd/console v1.0.4 h1:F2g4+oChYvBTsASRTz8NP6iIAi97J3TtSAsLbIFn4ro=
+github.com/containerd/console v1.0.4/go.mod h1:YynlIjWYF8myEu6sdkwKIvGQq+cOckRm6So2avqoYAk=
 github.com/cpuguy83/go-md2man/v2 v2.0.3 h1:qMCsGGgs+MAzDFyp9LpAe1Lqy/fY/qCovCm0qnXZOBM=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/creack/pty v1.1.21 h1:1/QdRyBaHHJP61QkWMXlOIBfsgdDeeKfK8SYVUWJKf0=

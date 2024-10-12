@@ -11,7 +11,7 @@ require (
 	github.com/charmbracelet/harmonica v0.2.0
 	github.com/charmbracelet/ssh v0.0.0-20240118173142-6d7cf11c8371
 	github.com/charmbracelet/wish v1.2.0
-	github.com/containerd/console v1.0.4-0.20230706203907-8f6c4e4faef5
+	github.com/containerd/console v1.0.4
 	github.com/creack/pty v1.1.21
 	github.com/dustin/go-humanize v1.0.1
 	github.com/fogleman/ease v0.0.0-20170301025033-8da417bf1776
