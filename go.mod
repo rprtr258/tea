@@ -5,7 +5,7 @@ go 1.21
 replace github.com/rprtr258/assert => ../assert
 
 require (
-	github.com/alecthomas/chroma/v2 v2.12.0
+	github.com/alecthomas/chroma/v2 v2.14.0
 	github.com/atotto/clipboard v0.1.4
 	github.com/aymanbagabas/go-udiff v0.2.0
 	github.com/charmbracelet/harmonica v0.2.0
@@ -49,7 +49,7 @@ require (
 	github.com/charmbracelet/x/exp/term v0.0.0-20240118113134-7c8cecb18fdb // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dlclark/regexp2 v1.10.0 // indirect
+	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
