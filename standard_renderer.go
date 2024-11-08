@@ -88,28 +88,17 @@ func (r *Renderer) start() {
 	go r.listen()
 }
 
-// stop permanently halts the renderer, rendering the final frame.
-func (r *Renderer) stop() {
+// stop permanently halts the renderer, rendering the final frame if flush.
+func (r *Renderer) stop(flush bool) {
 	// Stop the renderer before acquiring the mutex to avoid a deadlock.
 	r.once.Do(func() {
 		r.done <- struct{}{}
 	})
 
-	// flush locks the mutex
-	r.flush()
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.out.ClearLine()
-}
-
-// kill halts the renderer. The final frame will not be rendered.
-func (r *Renderer) kill() {
-	// Stop the renderer before acquiring the mutex to avoid a deadlock.
-	r.once.Do(func() {
-		r.done <- struct{}{}
-	})
+	if flush {
+		// flush locks the mutex
+		r.flush()
+	}
 
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -306,9 +295,8 @@ func (r *Renderer) setIgnoredLines(from, to int) {
 	}
 }
 
-// clearIgnoredLines returns control of any ignored lines to the standard
-// Tea renderer. That is, any lines previously set to be ignored can be
-// rendered to again.
+// clearIgnoredLines returns control of any ignored lines to the standard Tea renderer.
+// That is, any lines previously set to be ignored can be rendered to again.
 func (r *Renderer) clearIgnoredLines() {
 	r.ignoreLines = nil
 }

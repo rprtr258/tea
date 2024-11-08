@@ -132,9 +132,9 @@ type Program[M Model] struct {
 	ctx    context.Context //nolint:containedctx // TODO: remove
 	cancel context.CancelFunc
 
-	msgs     chan Msg
-	errs     chan error
-	finished chan struct{}
+	msgs chan Msg
+	errs chan error
+	done chan struct{}
 
 	// where to send output, this will usually be os.Stdout.
 	output        *termenv.Output
@@ -376,7 +376,7 @@ func (p *Program[M]) Run() (M, error) {
 	myHandlers := handlers{}
 	cmds := make(chan []Cmd)
 	p.errs = make(chan error)
-	p.finished = make(chan struct{}, 1)
+	p.done = make(chan struct{}, 1)
 
 	defer p.cancel()
 
@@ -560,36 +560,32 @@ func (p *Program[M]) Kill() {
 
 // Wait waits/blocks until the underlying Program finished shutting down.
 func (p *Program[M]) Wait() {
-	<-p.finished
+	<-p.done
 }
 
 // shutdown performs operations to free up resources and restore the terminal
 // to its original state.
 func (p *Program[M]) shutdown(kill bool) {
 	if p.renderer != nil {
-		if kill {
-			p.renderer.kill()
-		} else {
-			p.renderer.stop()
-		}
+		p.renderer.stop(!kill)
 	}
 
 	_ = p.restoreTerminalState()
 	if p.restoreOutput != nil {
 		_ = p.restoreOutput()
 	}
-	p.finished <- struct{}{}
+	p.done <- struct{}{}
 }
 
-// ReleaseTerminal restores the original terminal state and cancels the input
-// reader. You can return control to the Program with RestoreTerminal.
+// ReleaseTerminal restores the original terminal state and cancels the input reader.
+// You can return control to the Program with RestoreTerminal.
 func (p *Program[M]) ReleaseTerminal() error {
 	p.ignoreSignals = true
 	p.cancelReader.Cancel()
 	p.waitForReadLoop()
 
 	if p.renderer != nil {
-		p.renderer.stop()
+		p.renderer.stop(true)
 	}
 
 	p.altScreenWasActive = p.renderer.altScreen()
@@ -618,9 +614,8 @@ func (p *Program[M]) RestoreTerminal() error {
 	p.renderer.start()
 
 	// If the output is a terminal, it may have been resized while another
-	// process was at the foreground, in which case we may not have received
-	// SIGWINCH. Detect any size change now and propagate the new size as
-	// needed.
+	// process was at the foreground, in which case we may not have received SIGWINCH.
+	// Detect any size change now and propagate the new size as needed.
 	go p.checkResize()
 
 	return nil

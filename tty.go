@@ -114,7 +114,7 @@ func (p *Program[M]) readLoop() {
 	}
 }
 
-// waitForReadLoop waits for the cancelReader to finish its read loop.
+// waitForReadLoop waits for the cancelReader to finish its read loop
 func (p *Program[M]) waitForReadLoop() {
 	select {
 	case <-p.readLoopDone:
@@ -125,10 +125,9 @@ func (p *Program[M]) waitForReadLoop() {
 	}
 }
 
-// checkResize detects the current size of the output and informs the program
-// via a MsgWindowSize.
+// checkResize detects the current size of the output and informs the program via a MsgWindowSize.
 func (p *Program[M]) checkResize() {
-	f, ok := p.output.TTY().(*os.File)
+	f, ok := p.output.Writer().(*os.File)
 	if !ok || !isatty.IsTerminal(f.Fd()) {
 		// can't query window size
 		return
