@@ -70,11 +70,11 @@ func (k Key) String() string {
 
 	if k.Type == KeyRunes {
 		return prefix + string(k.Runes)
-	} else if s, ok := keyNames[k.Type]; ok {
-		return prefix + s
-	} else {
-		return ""
 	}
+	if s, ok := keyNames[k.Type]; ok {
+		return prefix + s
+	}
+	return ""
 }
 
 // KeyType indicates the key pressed, such as KeyEnter or KeyBreak or KeyCtrlC.
