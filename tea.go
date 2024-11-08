@@ -29,8 +29,8 @@ import (
 // ErrProgramKilled is returned by [Program.Run] when the program got killed.
 var ErrProgramKilled = errors.New("program was killed")
 
-// Msg contain data from the result of a IO operation. Msgs trigger the update
-// function and, henceforth, the UI.
+// Msg contain data from the result of a IO operation.
+// Msgs trigger the update function and, henceforth, the UI.
 type Msg any
 
 // Model contains the program's state as well as its core functions.
@@ -63,8 +63,8 @@ const (
 	customInput
 )
 
-// String implements the stringer interface for [inputType]. It is inteded to
-// be used in testing.
+// String implements the stringer interface for [inputType].
+// It is inteded to be used in testing.
 func (i inputType) String() string {
 	return [...]string{
 		"default input",
@@ -121,7 +121,7 @@ func (h handlers) shutdown() {
 
 // Program is a terminal user interface.
 type Program[M Model] struct {
-	initialModel M
+	model M
 
 	// Configuration options that will set as the program is initializing,
 	// treated as bits. These options can be set via various ProgramOptions.
@@ -152,19 +152,9 @@ type Program[M Model] struct {
 	altScreenWasActive bool
 	ignoreSignals      bool
 
-	// Stores the original reference to stdin for cases where input is not a
-	// TTY on windows and we've automatically opened CONIN$ to receive input.
-	// When the program exits this will be restored.
-	//
-	// Lint ignore note: the linter will find false positive on unix systems
-	// as this value only comes into play on Windows, hence the ignore comment
-	// below.
-	windowsStdin *os.File //nolint:golint,structcheck,unused // uuh
-
 	filter func(M, Msg) Msg
 
-	// fps is the frames per second we should set on the renderer, if
-	// applicable,
+	// fps is the frames per second we should set on the renderer, if applicable,
 	fps int
 }
 
@@ -189,7 +179,7 @@ func NewProgram[M Model](ctx context.Context, model M) *Program[M] {
 	restoreOutput, _ := termenv.EnableVirtualTerminalProcessing(output)
 
 	return &Program[M]{
-		initialModel:  model,
+		model:         model,
 		msgs:          make(chan Msg),
 		output:        output,
 		ctx:           ctx,
@@ -410,7 +400,7 @@ func (p *Program[M]) Run() (M, error) {
 
 		f, err := openInputTTY()
 		if err != nil {
-			return p.initialModel, err
+			return p.model, err
 		}
 		defer f.Close() //nolint:errcheck // uuh
 
@@ -419,7 +409,7 @@ func (p *Program[M]) Run() (M, error) {
 		// Open a new TTY, by request
 		f, err := openInputTTY()
 		if err != nil {
-			return p.initialModel, err
+			return p.model, err
 		}
 		defer f.Close() //nolint:errcheck // uuh
 
@@ -447,7 +437,7 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Check if output is a TTY before entering raw mode, hiding the cursor and so on.
 	if err := p.initTerminal(); err != nil {
-		return p.initialModel, err
+		return p.model, err
 	}
 
 	// Honor program startup options.
@@ -461,9 +451,8 @@ func (p *Program[M]) Run() (M, error) {
 	}
 
 	// Initialize the program.
-	model := p.initialModel
 	var initCmds []Cmd
-	model.Init(func(cmds ...Cmd) {
+	p.model.Init(func(cmds ...Cmd) {
 		initCmds = append(initCmds, cmds...)
 	})
 	if len(initCmds) > 0 {
@@ -486,13 +475,13 @@ func (p *Program[M]) Run() (M, error) {
 	// Render the initial view.
 	p.renderer.reset()
 	p.vb.clear()
-	model.View(p.vb)
+	p.model.View(p.vb)
 	p.renderer.Write(p.vb.Render())
 
 	// Subscribe to user input.
 	if p.input != nil {
 		if err := p.initCancelReader(); err != nil {
-			return model, err
+			return p.model, err
 		}
 	}
 
@@ -503,7 +492,8 @@ func (p *Program[M]) Run() (M, error) {
 	myHandlers.add(p.handleCommands(cmds))
 
 	// Run event loop, handle updates and draw.
-	model, err := p.eventLoop(model, cmds)
+	var err error
+	p.model, err = p.eventLoop(p.model, cmds)
 	killed := p.ctx.Err() != nil
 	if killed {
 		err = ErrProgramKilled
@@ -511,7 +501,7 @@ func (p *Program[M]) Run() (M, error) {
 		// Ensure we rendered the final state of the model.
 		p.renderer.reset()
 		p.vb.clear()
-		model.View(p.vb)
+		p.model.View(p.vb)
 		p.renderer.Write(p.vb.Render())
 	}
 
@@ -533,7 +523,7 @@ func (p *Program[M]) Run() (M, error) {
 	// Restore terminal state.
 	p.shutdown(killed)
 
-	return model, err
+	return p.model, err
 }
 
 // Send sends a message to the main update function, effectively allowing

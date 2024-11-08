@@ -28,6 +28,7 @@ func TestKeyString(t *testing.T) {
 		"alt+space": {key: Key{Type: KeySpace, Alt: true}, expected: "alt+ "},
 		"runes":     {key: Key{Type: KeyRunes, Runes: []rune{'a'}}, expected: "a"},
 		"invalid":   {key: Key{Type: KeyType(99999)}, expected: ""},
+		"enter":     {key: Key{Type: KeyEnter}, expected: "enter"},
 	} {
 		t.Run(name, func(t *testing.T) {
 			assert.Equal(t, test.expected, MsgKey(test.key).String())

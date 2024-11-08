@@ -56,12 +56,8 @@ type Key struct {
 	Alt   bool
 }
 
-// String returns a friendly string representation for a key. It's safe (and
-// encouraged) for use in key comparison.
-//
-//	k := Key{Type: KeyEnter}
-//	fmt.Println(k)
-//	// Output: enter
+// String returns a friendly string representation for a key.
+// It's safe (and encouraged) for use in key comparison.
 func (k Key) String() string {
 	prefix := ""
 	if k.Alt {
