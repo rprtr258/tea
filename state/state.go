@@ -1,13 +1,9 @@
 // inspired by https://github.com/zlumer/tesm
 package state
 
-type State[Event, Cmd any] interface {
-	Handle(Event) (State[Event, Cmd], []Cmd)
-}
+type State[Event, Cmd any] func(Event) (State[Event, Cmd], []Cmd)
 
-type StateFunc[Event, Cmd any] func(Event) (State[Event, Cmd], []Cmd)
-
-func (f StateFunc[Event, Cmd]) Handle(ev Event) (State[Event, Cmd], []Cmd) {
+func (f State[Event, Cmd]) Handle(ev Event) (State[Event, Cmd], []Cmd) {
 	return f(ev)
 }
 

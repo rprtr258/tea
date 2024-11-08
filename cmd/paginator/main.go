@@ -18,7 +18,7 @@ func newModel() *model {
 		iter.FromRange(0, 100, 1),
 		func(i int) string {
 			return fmt.Sprintf("Item %d", i)
-		}).ToSlice()
+		}).Slice()
 
 	p := paginator.New()
 	p.Type = paginator.Dots

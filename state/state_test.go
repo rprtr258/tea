@@ -13,19 +13,19 @@ func TestHandmadeFSM(t *testing.T) {
 	type cmd struct{}
 	type state = State[event, cmd]
 	var stateA, stateB, stateC, stateFail state
-	stateStart := func(ev event) (state, []cmd) {
+	stateStart := State[event, cmd](func(ev event) (state, []cmd) {
 		if ev == 'a' {
 			return stateA, nil
 		}
 		return stateFail, nil
 	})
-	stateA = StateFunc[event,cmd](func(ev event) (state, []cmd) {
+	stateA = State[event, cmd](func(ev event) (state, []cmd) {
 		if ev == 'b' {
 			return stateA, nil
 		}
 		return stateFail, nil
 	})
-	stateB = StateFunc[event,cmd](func(ev event) (state, []cmd) {
+	stateB = State[event, cmd](func(ev event) (state, []cmd) {
 		if ev == 'c' {
 			return stateC, nil
 		}
@@ -36,15 +36,15 @@ func TestHandmadeFSM(t *testing.T) {
 		input         string
 		expectedState state
 	}{
-		"empty string": {"", stateStart},
-		"non matching string":     {"x", StatusFail},
+		"empty string":            {"", stateStart},
+		"non matching string":     {"x", stateFail},
 		"matching string":         {"abc", stateC},
 		"partial matching string": {"ab", stateB},
 	} {
 		t.Run(name, func(t *testing.T) {
 			state := stateStart
 			for _, r := range test.input {
-				state, _ = state(event(r))
+				state, _ = state.Handle(event(r))
 			}
 			require.Equal(t, test.expectedState, state)
 		})
@@ -70,7 +70,7 @@ func TestLoadFSM(t *testing.T) {
 	var stateLoading func(startedAt time.Time) state
 	var stateLoaded func(startedAt time.Time, loadedAt time.Time) state
 
-	stateInitial := StateFunc[event, cmd](func(ev event) (s state, cmds []cmd) {
+	stateInitial := State[event, cmd](func(ev event) (s state, cmds []cmd) {
 		ev(eventh{
 			A: func(ev startedLoading) {
 				s = stateLoading(ev.At)
@@ -80,7 +80,7 @@ func TestLoadFSM(t *testing.T) {
 		return
 	})
 	stateLoading = func(startedAt time.Time) state {
-		return StateFunc[event, cmd](func(ev event) (s state, cmds []cmd) {
+		return State[event, cmd](func(ev event) (s state, cmds []cmd) {
 			ev(eventh{
 				B: func(ev finishedLoading) {
 					s = stateLoaded(startedAt, ev.At)
@@ -93,8 +93,8 @@ func TestLoadFSM(t *testing.T) {
 			return
 		})
 	}
-	stateLoaded = func(startedAt time.Time, loadedAt time.Time) state {
-		return StateFunc[event, cmd](func(ev event) (s state, cmds []cmd) {
+	stateLoaded = func(time.Time, time.Time) state {
+		return State[event, cmd](func(ev event) (s state, cmds []cmd) {
 			return
 		})
 	}
