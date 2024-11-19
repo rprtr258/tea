@@ -1,10 +1,24 @@
 // inspired by https://github.com/zlumer/tesm
 package state
 
+import "iter"
+
 type State[Event, T any] func(Event) (State[Event, T], T)
 
 func (f State[Event, T]) Handle(ev Event) (State[Event, T], T) {
 	return f(ev)
+}
+
+func Run[Event, T any](state State[Event, T], events iter.Seq[Event]) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for ev := range events {
+			var t T
+			state, t = state(ev)
+			if !yield(t) {
+				return
+			}
+		}
+	}
 }
 
 func call[T any](f func(T), t T) {
