@@ -18,15 +18,11 @@ var _renderer = &Renderer{
 	Output: termenv.DefaultOutput(),
 }
 
-// RendererOption is a function that can be used to configure a [Renderer].
-type RendererOption func(r *Renderer)
-
 // NewRenderer creates a new Renderer.
-//
 // w will be used to determine the terminal's color capabilities.
-func NewRenderer(w io.Writer, opts ...termenv.OutputOption) *Renderer {
+func NewRenderer(w io.Writer) *Renderer {
 	return &Renderer{
-		Output: termenv.NewOutput(w, opts...),
+		Output: termenv.NewOutput(w),
 	}
 }
 
