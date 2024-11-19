@@ -126,10 +126,6 @@ func (s Style) Render(strs ...string) string {
 		return str
 	}
 
-	// Enable support for ANSI on the legacy Windows cmd.exe console. This is a
-	// no-op on non-Windows systems and on Windows runs only once.
-	enableLegacyWindowsANSI()
-
 	te := []scuf.Modifier{}
 	if bold {
 		te = append(te, scuf.ModBold)
