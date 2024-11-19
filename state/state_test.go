@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/rprtr258/assert"
 )
 
 func TestHandmadeFSM(t *testing.T) {
@@ -31,23 +31,22 @@ func TestHandmadeFSM(t *testing.T) {
 		return stateFail, struct{}{}
 	})
 
-	for name, test := range map[string]struct {
+	type testcase struct {
 		input         string
 		expectedState state
-	}{
+	}
+	assert.Table(t, map[string]testcase{
 		"empty string":            {"", stateStart},
 		"non matching string":     {"x", stateFail},
 		"matching string":         {"abc", stateC},
 		"partial matching string": {"ab", stateB},
-	} {
-		t.Run(name, func(t *testing.T) {
-			state := stateStart
-			for _, r := range test.input {
-				state, _ = state.Handle(event(r))
-			}
-			require.Equal(t, test.expectedState, state)
-		})
-	}
+	}, func(t *testing.T, test testcase) {
+		state := stateStart
+		for _, r := range test.input {
+			state, _ = state.Handle(event(r))
+		}
+		assert.Equal(t, test.expectedState, state)
+	})
 }
 
 func TestLoadFSM(t *testing.T) {

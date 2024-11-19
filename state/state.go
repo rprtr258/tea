@@ -1,4 +1,3 @@
-// inspired by https://github.com/zlumer/tesm
 package state
 
 import "iter"
