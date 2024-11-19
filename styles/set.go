@@ -2,62 +2,75 @@ package styles
 
 import "github.com/rprtr258/scuf"
 
-// Set a value on the underlying rules map.
+// setInt a value on the underlying rules map.
+func (s *Style) setInt(key propKey, value int) Style {
+	if s.rules == nil {
+		s.rules = map[propKey]any{}
+	}
+	// We don't allow negative integers on any of our values, so just keep
+	// them at zero or above. We could use uints instead, but the
+	// conversions are a little tedious, so we're sticking with ints for
+	// sake of usability.
+	s.rules[key] = max(0, value)
+	return *s
+}
+
+// setBool a value on the underlying rules map.
+func (s *Style) setBool(key propKey, value bool) Style {
+	if s.rules == nil {
+		s.rules = map[propKey]any{}
+	}
+	s.rules[key] = value
+	return *s
+}
+
+// set a value on the underlying rules map.
 func (s *Style) set(key propKey, value any) Style {
 	if s.rules == nil {
 		s.rules = map[propKey]any{}
 	}
-	switch v := value.(type) {
-	case int:
-		// We don't allow negative integers on any of our values, so just keep
-		// them at zero or above. We could use uints instead, but the
-		// conversions are a little tedious, so we're sticking with ints for
-		// sake of usability.
-		s.rules[key] = max(0, v)
-	default:
-		s.rules[key] = v
-	}
+	s.rules[key] = value
 	return *s
 }
 
 // Bold sets a bold formatting rule.
 func (s Style) Bold(v bool) Style {
-	return s.set(_keyBold, v)
+	return s.setBool(_keyBold, v)
 }
 
 // Italic sets an italic formatting rule. In some terminal emulators this will
 // render with "reverse" coloring if not italic font variant is available.
 func (s Style) Italic() Style {
-	return s.set(_keyItalic, true)
+	return s.setBool(_keyItalic, true)
 }
 
 // Underline sets an underline rule. By default, underlines will not be drawn on
 // whitespace like margins and padding. To change this behavior set
 // UnderlineSpaces.
 func (s Style) Underline() Style {
-	return s.set(_keyUnderline, true)
+	return s.setBool(_keyUnderline, true)
 }
 
 // Strikethrough sets a strikethrough rule. By default, strikes will not be
 // drawn on whitespace like margins and padding. To change this behavior set
 // StrikethroughSpaces.
 func (s Style) Strikethrough(v bool) Style {
-	return s.set(_keyStrikethrough, v)
+	return s.setBool(_keyStrikethrough, v)
 }
 
 // Reverse sets a rule for inverting foreground and background colors.
 func (s Style) Reverse(v bool) Style {
-	return s.set(_keyReverse, v)
+	return s.setBool(_keyReverse, v)
 }
 
 // Blink sets a rule for blinking foreground text.
 func (s Style) Blink() Style {
-	return s.set(_keyBlink, true)
+	return s.setBool(_keyBlink, true)
 }
 
 // Faint sets a rule for rendering the foreground color in a dimmer shade.
 func (s Style) Faint() Style {
-	return s.set(_keyFaint, true)
+	return s.setBool(_keyFaint, true)
 }
 
 // Foreground sets a foreground color.
@@ -107,21 +120,21 @@ func (s Style) AlignVertical(p Alignment) Style {
 // desired and expected behavior, but it can be disabled for certain graphic
 // effects.
 func (s Style) ColorWhitespace(v bool) Style {
-	return s.set(_keyColorWhitespace, v)
+	return s.setBool(_keyColorWhitespace, v)
 }
 
 // UnderlineSpaces determines whether to underline spaces between words. By
 // default, this is true. Spaces can also be underlined without underlining the
 // text itself.
 func (s Style) UnderlineSpaces(v bool) Style {
-	return s.set(_keyUnderlineSpaces, v)
+	return s.setBool(_keyUnderlineSpaces, v)
 }
 
 // StrikethroughSpaces determines whether to apply strikethroughs to spaces
 // between words. By default, this is true. Spaces can also be struck without
 // underlining the text itself.
 func (s Style) StrikethroughSpaces(v bool) Style {
-	return s.set(_keyStrikethroughSpaces, v)
+	return s.setBool(_keyStrikethroughSpaces, v)
 }
 
 // whichSidesInt is a helper method for setting values on sides of a block based
