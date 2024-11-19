@@ -7,7 +7,7 @@ import (
 
 // GetBold returns the style's bold value. If no value is set false is returned.
 func (s Style) GetBold() bool {
-	return s.getAsBool(_keyBold, false)
+	return s.bold
 }
 
 // GetItalic returns the style's italic value. If no value is set false is

@@ -35,7 +35,8 @@ func (s *Style) set(key propKey, value any) Style {
 
 // Bold sets a bold formatting rule.
 func (s Style) Bold(v bool) Style {
-	return s.setBool(_keyBold, v)
+	s.bold = v
+	return s
 }
 
 // Italic sets an italic formatting rule. In some terminal emulators this will

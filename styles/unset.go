@@ -2,7 +2,7 @@ package styles
 
 // UnsetBold removes the bold style rule, if set.
 func (s Style) UnsetBold() Style {
-	delete(s.rules, _keyBold)
+	s.bold = false
 	return s
 }
 
