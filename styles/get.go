@@ -19,31 +19,31 @@ func (s Style) GetItalic() bool {
 // GetUnderline returns the style's underline value. If no value is set false is
 // returned.
 func (s Style) GetUnderline() bool {
-	return s.getAsBool(_keyUnderline, false)
+	return s.underline
 }
 
 // GetStrikethrough returns the style's strikethrough value. If no value is set false
 // is returned.
 func (s Style) GetStrikethrough() bool {
-	return s.getAsBool(_keyStrikethrough, false)
+	return s.strikethrough
 }
 
 // GetReverse returns the style's reverse value. If no value is set false is
 // returned.
 func (s Style) GetReverse() bool {
-	return s.getAsBool(_keyReverse, false)
+	return s.reverse
 }
 
 // GetBlink returns the style's blink value. If no value is set false is
 // returned.
 func (s Style) GetBlink() bool {
-	return s.getAsBool(_keyBlink, false)
+	return s.blink
 }
 
 // GetFaint returns the style's faint value. If no value is set false is
 // returned.
 func (s Style) GetFaint() bool {
-	return s.getAsBool(_keyFaint, false)
+	return s.faint
 }
 
 // GetForeground returns the style's foreground color. If no value is set

@@ -50,29 +50,34 @@ func (s Style) Italic() Style {
 // whitespace like margins and padding. To change this behavior set
 // UnderlineSpaces.
 func (s Style) Underline() Style {
-	return s.setBool(_keyUnderline, true)
+	s.underline = true
+	return s
 }
 
 // Strikethrough sets a strikethrough rule. By default, strikes will not be
 // drawn on whitespace like margins and padding. To change this behavior set
 // StrikethroughSpaces.
 func (s Style) Strikethrough(v bool) Style {
-	return s.setBool(_keyStrikethrough, v)
+	s.strikethrough = v
+	return s
 }
 
 // Reverse sets a rule for inverting foreground and background colors.
 func (s Style) Reverse(v bool) Style {
-	return s.setBool(_keyReverse, v)
+	s.reverse = v
+	return s
 }
 
 // Blink sets a rule for blinking foreground text.
 func (s Style) Blink() Style {
-	return s.setBool(_keyBlink, true)
+	s.blink = true
+	return s
 }
 
 // Faint sets a rule for rendering the foreground color in a dimmer shade.
 func (s Style) Faint() Style {
-	return s.setBool(_keyFaint, true)
+	s.faint = true
+	return s
 }
 
 // Foreground sets a foreground color.

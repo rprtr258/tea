@@ -14,31 +14,31 @@ func (s Style) UnsetItalic() Style {
 
 // UnsetUnderline removes the underline style rule, if set.
 func (s Style) UnsetUnderline() Style {
-	delete(s.rules, _keyUnderline)
+	s.underline = false
 	return s
 }
 
 // UnsetStrikethrough removes the strikethrough style rule, if set.
 func (s Style) UnsetStrikethrough() Style {
-	delete(s.rules, _keyStrikethrough)
+	s.strikethrough = false
 	return s
 }
 
 // UnsetReverse removes the reverse style rule, if set.
 func (s Style) UnsetReverse() Style {
-	delete(s.rules, _keyReverse)
+	s.reverse = false
 	return s
 }
 
 // UnsetBlink removes the blink style rule, if set.
 func (s Style) UnsetBlink() Style {
-	delete(s.rules, _keyBlink)
+	s.blink = false
 	return s
 }
 
 // UnsetFaint removes the faint style rule, if set.
 func (s Style) UnsetFaint() Style {
-	delete(s.rules, _keyFaint)
+	s.faint = false
 	return s
 }
 
