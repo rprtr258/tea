@@ -42,7 +42,8 @@ func (s Style) Bold(v bool) Style {
 // Italic sets an italic formatting rule. In some terminal emulators this will
 // render with "reverse" coloring if not italic font variant is available.
 func (s Style) Italic() Style {
-	return s.setBool(_keyItalic, true)
+	s.italic = true
+	return s
 }
 
 // Underline sets an underline rule. By default, underlines will not be drawn on

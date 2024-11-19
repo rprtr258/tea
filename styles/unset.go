@@ -8,7 +8,7 @@ func (s Style) UnsetBold() Style {
 
 // UnsetItalic removes the italic style rule, if set.
 func (s Style) UnsetItalic() Style {
-	delete(s.rules, _keyItalic)
+	s.italic = false
 	return s
 }
 

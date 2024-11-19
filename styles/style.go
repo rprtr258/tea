@@ -14,8 +14,7 @@ type propKey int
 
 // Available properties.
 const (
-	_keyItalic propKey = iota
-	_keyUnderline
+	_keyUnderline propKey = iota
 	_keyStrikethrough
 	_keyReverse
 	_keyBlink
@@ -33,9 +32,9 @@ const (
 
 // Style contains a set of rules that comprise a style as a whole.
 type Style struct {
-	value string
-	rules map[propKey]any
-	bold  bool
+	value        string
+	rules        map[propKey]any
+	bold, italic bool
 }
 
 // joinString joins a list of strings into a single string separated with a

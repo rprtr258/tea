@@ -13,7 +13,7 @@ func (s Style) GetBold() bool {
 // GetItalic returns the style's italic value. If no value is set false is
 // returned.
 func (s Style) GetItalic() bool {
-	return s.getAsBool(_keyItalic, false)
+	return s.italic
 }
 
 // GetUnderline returns the style's underline value. If no value is set false is
