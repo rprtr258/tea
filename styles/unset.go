@@ -44,13 +44,13 @@ func (s Style) UnsetFaint() Style {
 
 // UnsetForeground removes the foreground style rule, if set.
 func (s Style) UnsetForeground() Style {
-	delete(s.rules, _keyForeground)
+	s.foreground = nil
 	return s
 }
 
 // UnsetBackground removes the background style rule, if set.
 func (s Style) UnsetBackground() Style {
-	delete(s.rules, _keyBackground)
+	s.background = nil
 	return s
 }
 

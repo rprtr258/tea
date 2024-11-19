@@ -14,9 +14,7 @@ type propKey int
 
 // Available properties.
 const (
-	_keyForeground propKey = iota
-	_keyBackground
-	_keyAlighHorizontal
+	_keyAlighHorizontal propKey = iota
 	_keyAlignVertical
 
 	_keyColorWhitespace
@@ -27,8 +25,9 @@ const (
 
 // Style contains a set of rules that comprise a style as a whole.
 type Style struct {
-	value string
-	rules map[propKey]any
+	value                  string
+	rules                  map[propKey]any
+	foreground, background scuf.Modifier
 
 	bold, italic, underline, strikethrough, reverse, blink, faint bool
 }

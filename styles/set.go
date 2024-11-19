@@ -88,12 +88,14 @@ func (s Style) Faint() Style {
 //	// Removes the foreground color
 //	s.Foreground(styles.NoColor)
 func (s Style) Foreground(c scuf.Modifier) Style {
-	return s.set(_keyForeground, c)
+	s.foreground = c
+	return s
 }
 
 // Background sets a background color.
 func (s Style) Background(c scuf.Modifier) Style {
-	return s.set(_keyBackground, c)
+	s.background = c
+	return s
 }
 
 // Align is a shorthand method for setting horizontal and vertical alignment.

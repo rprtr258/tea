@@ -49,13 +49,13 @@ func (s Style) GetFaint() bool {
 // GetForeground returns the style's foreground color. If no value is set
 // NoColor{} is returned.
 func (s Style) GetForeground() scuf.Modifier {
-	return s.getAsColor(_keyForeground)
+	return s.foreground
 }
 
 // GetBackground returns the style's background color. If no value is set
 // NoColor{} is returned.
 func (s Style) GetBackground() scuf.Modifier {
-	return s.getAsColor(_keyBackground)
+	return s.background
 }
 
 // GetAlign returns the style's implicit horizontal alignment setting.
