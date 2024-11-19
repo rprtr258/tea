@@ -285,7 +285,7 @@ func RequireEqualOutput(tb testing.TB, out []byte) {
 	goldenBts := assert.UseFileContent(tb, golden)
 
 	diff := udiff.Unified("golden", "run", string(goldenBts), string(out))
-	assert.Equalf(tb, "", diff, "output does not match, diff:\n\n%s", diff)
+	assert.Equal(assert.Wrap(tb).Msgf("output does not match, diff:\n\n%s", diff), "", diff)
 }
 
 func safe(rw io.ReadWriter) io.ReadWriter {

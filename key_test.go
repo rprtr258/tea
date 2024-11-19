@@ -114,8 +114,8 @@ func TestDetectSequence(t *testing.T) {
 	for _, test := range buildBaseSeqTests() {
 		t.Run(fmt.Sprintf("%q", string(test.seq)), func(t *testing.T) {
 			hasSeq, width, msg := detectSequence(test.seq)
-			assert.Truef(t, hasSeq, "no sequence found")
-			assert.Equalf(t, len(test.seq), width, "parser did not consume the entire input")
+			assert.True(assert.Wrap(t).Msg("no sequence found"), hasSeq)
+			assert.Equal(assert.Wrap(t).Msg("parser did not consume the entire input"), len(test.seq), width)
 			assert.Equal(t, test.msg, msg)
 		})
 	}
@@ -601,11 +601,11 @@ func runTestDetectSequence(
 			// w is the length of the last sequence detected.
 			for tn, i, w := 0, 0, 0; i < len(td.data); tn, i = tn+1, i+w {
 				hasSequence, width, msg := detectSequence(td.data[i:])
-				assert.Truef(t, hasSequence, "at %d (ev %d): failed to find sequence", i, tn)
+				assert.True(assert.Wrap(t).Msgf("at %d (ev %d): failed to find sequence", i, tn), hasSequence)
 				assert.Equal(t, td.lengths[tn], width)
 				w = width
 
-				assert.Equalf(t, td.names[tn], msg.(fmt.Stringer).String(), "at %d (ev %d)", i, tn)
+				assert.Equal(assert.Wrap(t).Msgf("at %d (ev %d)", i, tn), td.names[tn], msg.(fmt.Stringer).String())
 			}
 		})
 	}

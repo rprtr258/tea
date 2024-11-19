@@ -27,7 +27,7 @@ require (
 	github.com/muesli/termenv v0.15.3-0.20240912151726-82936c5ea257
 	github.com/nsf/termbox-go v1.1.1
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/rprtr258/assert v0.0.8
+	github.com/rprtr258/assert v0.0.13
 	github.com/rprtr258/fun v0.0.21
 	github.com/rprtr258/scuf v0.0.6
 	github.com/sahilm/fuzzy v0.1.1
@@ -71,5 +71,6 @@ require (
 	golang.org/x/sync v0.9.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect
+	golang.org/x/tools v0.26.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -37,6 +37,6 @@ func TestSanitize(t *testing.T) {
 		s := NewSanitizer(ReplaceNewlines("XX"), ReplaceTabs(""))
 		result := s.Sanitize(runes)
 		rs := string(result)
-		assert.Equalf(t, test.output, rs, "input: %q, result: %v", test.input, result)
+		assert.Equal(assert.Wrap(t).Msgf("input: %q, result: %v", test.input, result), test.output, rs)
 	}
 }
