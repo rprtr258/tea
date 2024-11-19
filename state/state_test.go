@@ -10,26 +10,25 @@ import (
 
 func TestHandmadeFSM(t *testing.T) {
 	type event rune
-	type cmd struct{}
-	type state = State[event, cmd]
+	type state = State[event, struct{}]
 	var stateA, stateB, stateC, stateFail state
-	stateStart := State[event, cmd](func(ev event) (state, []cmd) {
+	stateStart := State[event, struct{}](func(ev event) (state, struct{}) {
 		if ev == 'a' {
-			return stateA, nil
+			return stateA, struct{}{}
 		}
-		return stateFail, nil
+		return stateFail, struct{}{}
 	})
-	stateA = State[event, cmd](func(ev event) (state, []cmd) {
+	stateA = State[event, struct{}](func(ev event) (state, struct{}) {
 		if ev == 'b' {
-			return stateA, nil
+			return stateA, struct{}{}
 		}
-		return stateFail, nil
+		return stateFail, struct{}{}
 	})
-	stateB = State[event, cmd](func(ev event) (state, []cmd) {
+	stateB = State[event, struct{}](func(ev event) (state, struct{}) {
 		if ev == 'c' {
-			return stateC, nil
+			return stateC, struct{}{}
 		}
-		return stateFail, nil
+		return stateFail, struct{}{}
 	})
 
 	for name, test := range map[string]struct {
@@ -62,7 +61,7 @@ func TestLoadFSM(t *testing.T) {
 	type cmdStartLoadingAnimation struct{}
 	type cmdDisplayPopup struct{ text string }
 	type cmdh = h2[cmdStartLoadingAnimation, cmdDisplayPopup]
-	type cmd = Sum2[cmdStartLoadingAnimation, cmdDisplayPopup]
+	type cmd = []Sum2[cmdStartLoadingAnimation, cmdDisplayPopup]
 
 	var newCmd = New2[cmdStartLoadingAnimation, cmdDisplayPopup]()
 
@@ -70,21 +69,21 @@ func TestLoadFSM(t *testing.T) {
 	var stateLoading func(startedAt time.Time) state
 	var stateLoaded func(startedAt time.Time, loadedAt time.Time) state
 
-	stateInitial := State[event, cmd](func(ev event) (s state, cmds []cmd) {
+	stateInitial := State[event, cmd](func(ev event) (s state, cmds cmd) {
 		ev(eventh{
 			A: func(ev startedLoading) {
 				s = stateLoading(ev.At)
-				cmds = []cmd{newCmd.A(cmdStartLoadingAnimation{})}
+				cmds = cmd{newCmd.A(cmdStartLoadingAnimation{})}
 			},
 		})
 		return
 	})
 	stateLoading = func(startedAt time.Time) state {
-		return State[event, cmd](func(ev event) (s state, cmds []cmd) {
+		return State[event, cmd](func(ev event) (s state, cmds cmd) {
 			ev(eventh{
 				B: func(ev finishedLoading) {
 					s = stateLoaded(startedAt, ev.At)
-					cmds = []cmd{newCmd.B(cmdDisplayPopup{fmt.Sprintf(
+					cmds = cmd{newCmd.B(cmdDisplayPopup{fmt.Sprintf(
 						`Loading finished in %d milliseconds!`,
 						ev.At.Sub(startedAt)/time.Millisecond,
 					)})}
@@ -94,7 +93,7 @@ func TestLoadFSM(t *testing.T) {
 		})
 	}
 	stateLoaded = func(time.Time, time.Time) state {
-		return State[event, cmd](func(ev event) (s state, cmds []cmd) {
+		return State[event, cmd](func(ev event) (s state, cmds cmd) {
 			return
 		})
 	}

@@ -6,8 +6,8 @@ import (
 )
 
 // StyleRunes apply a given style to runes at the given indices in the string.
-// Note that you must provide styling options for both matched and unmatched
-// runes. Indices out of bounds will be ignored.
+// Note that you must provide styling options for both matched and unmatched runes.
+// Indices out of bounds will be ignored.
 func StyleRunes(str string, indices []int, matched, unmatched Style) string {
 	// Convert slice of indices to a map for easier lookups
 	m := make(map[int]struct{})
@@ -24,7 +24,6 @@ func StyleRunes(str string, indices []int, matched, unmatched Style) string {
 
 		_, matches := m[i]
 		_, nextMatches := m[i+1]
-
 		if matches != nextMatches || i == runeCount-1 {
 			// Flush
 			style := unmatched

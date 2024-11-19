@@ -32,8 +32,7 @@ type Style struct {
 	bold, italic, underline, strikethrough, reverse, blink, faint bool
 }
 
-// joinString joins a list of strings into a single string separated with a
-// space.
+// joinString joins a list of strings into a single string separated with a space.
 func joinString(strs ...string) string {
 	return strings.Join(strs, " ")
 }
