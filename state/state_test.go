@@ -65,10 +65,10 @@ func TestLoadFSM(t *testing.T) {
 	var newCmd = New2[cmdStartLoadingAnimation, cmdDisplayPopup]()
 
 	type state = State[event, cmd]
+	var stateInitial state
 	var stateLoading func(startedAt time.Time) state
 	var stateLoaded func(startedAt time.Time, loadedAt time.Time) state
-
-	stateInitial := State[event, cmd](func(ev event) (s state, cmds cmd) {
+	stateInitial = State[event, cmd](func(ev event) (s state, cmds cmd) {
 		ev(eventh{
 			A: func(ev startedLoading) {
 				s = stateLoading(ev.At)
