@@ -174,23 +174,20 @@ func (m *Model) Init() tea.Cmd {
 // SetPercent to create the command you'll need to trigger the animation.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m *Model) Update(msg tea.Msg) []tea.Cmd {
+func (m *Model) Update(c tea.Context[*Model], msg tea.Msg) {
 	switch msg := msg.(type) {
 	case MsgFrame:
 		if msg.id != uintptr(unsafe.Pointer(m)) || msg.tag != m.tag {
-			return nil
+			return
 		}
 
 		// If we've more or less reached equilibrium, stop updating.
 		if !m.IsAnimating() {
-			return nil
+			return
 		}
 
 		m.percentShown, m.velocity = m.spring.Update(m.percentShown, m.velocity, m.targetPercent)
-		return []tea.Cmd{m.nextFrame()}
-
-	default:
-		return nil
+		m.nextFrame(c)
 	}
 }
 
@@ -214,26 +211,26 @@ func (m *Model) Percent() float64 {
 // necessary for animating the progress bar to this new percentage.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m *Model) SetPercent(p float64) tea.Cmd {
+func (m *Model) SetPercent(c tea.Context[*Model], p float64) {
 	m.targetPercent = max(0, min(1, p))
 	m.tag++
-	return m.nextFrame()
+	m.nextFrame(c)
 }
 
 // IncrPercent increments the percentage by a given amount, returning a command
 // necessary to animate the progress bar to the new percentage.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m *Model) IncrPercent(v float64) tea.Cmd {
-	return m.SetPercent(m.Percent() + v)
+func (m *Model) IncrPercent(c tea.Context[*Model], v float64) {
+	m.SetPercent(c, m.Percent()+v)
 }
 
 // DecrPercent decrements the percentage by a given amount, returning a command
 // necessary to animate the progress bar to the new percentage.
 //
 // If you're rendering with ViewAs you won't need this.
-func (m *Model) DecrPercent(v float64) tea.Cmd {
-	return m.SetPercent(m.Percent() - v)
+func (m *Model) DecrPercent(c tea.Context[*Model], v float64) {
+	m.SetPercent(c, m.Percent()-v)
 }
 
 // View renders an animated progress bar in its current state. To render
@@ -250,11 +247,17 @@ func (m *Model) ViewAs(vb tea.Viewbox, percent float64) {
 	vb.PaddingLeft(m.Width - textWidth).WriteLine(percentView)
 }
 
-func (m *Model) nextFrame() tea.Cmd {
-	return tea.Tick(time.Second/time.Duration(fps), func(time.Time) tea.Msg {
-		return MsgFrame{
-			id:  uintptr(unsafe.Pointer(m)),
-			tag: m.tag,
+func (m *Model) nextFrame(c tea.Context[*Model]) {
+	d := time.Second / time.Duration(fps)
+	// TODO: tea.Tick(time.Second/time.Duration(fps))
+	msg := MsgFrame{
+		id:  uintptr(unsafe.Pointer(m)),
+		tag: m.tag,
+	}
+	c.F(func() tea.Msg2[*Model] {
+		return func(m *Model) {
+			<-time.After(d)
+			m.Update(c, msg)
 		}
 	})
 }

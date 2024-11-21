@@ -2,7 +2,6 @@ package spinner
 
 import (
 	"time"
-	"unsafe"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/styles"
@@ -98,10 +97,7 @@ type Model struct {
 	tag   int
 }
 
-// ID returns the spinner's unique ID.
-func (m *Model) ID() uintptr {
-	return uintptr(unsafe.Pointer(m))
-}
+type Msg = tea.Msg2[*Model]
 
 // New returns a model with default values.
 func New(opts ...Option) Model {
@@ -120,19 +116,12 @@ func (*Model) Init(func(...tea.Cmd)) {}
 type MsgTick struct {
 	Time time.Time
 	tag  int
-	ID   uintptr
 }
 
 // Update is the Tea update function.
-func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *Model) Update(c tea.Context[*Model], msg tea.Msg) {
 	switch msg := msg.(type) { //nolint:gocritic
 	case MsgTick:
-		// If an ID is set, and the ID doesn't belong to this spinner, reject
-		// the message.
-		if msg.ID > 0 && msg.ID != m.ID() {
-			return
-		}
-
 		// If a tag is set, and it's not the one we expect, reject the message.
 		// This prevents the spinner from receiving too many messages and
 		// thus spinning too fast.
@@ -146,7 +135,7 @@ func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		}
 
 		m.tag++
-		f(m.tick(m.ID(), m.tag))
+		m.tick(c, m.tag)
 	}
 }
 
@@ -162,26 +151,34 @@ func (m *Model) View(vb tea.Viewbox) {
 
 // CmdTick is the command used to advance the spinner one frame. Use this command
 // to effectively start the spinner.
-func (m *Model) CmdTick() tea.Msg {
-	return MsgTick{
+func (m *Model) CmdTick(c tea.Context[*Model]) {
+	msg := MsgTick{
 		// The time at which the tick occurred.
 		Time: time.Now(),
 
 		// The ID of the spinner that this message belongs to. This can be
 		// helpful when routing messages, however bear in mind that spinners
 		// will ignore messages that don't contain ID by default.
-		ID: m.ID(),
 
 		tag: m.tag,
 	}
+	c.F(func() Msg {
+		return func(m *Model) {
+			m.Update(c, msg)
+		}
+	})
 }
 
-func (m *Model) tick(id uintptr, tag int) tea.Cmd {
-	return tea.Tick(m.Spinner.FPS, func(t time.Time) tea.Msg {
-		return MsgTick{
-			Time: t,
-			ID:   id,
-			tag:  tag,
+func (m *Model) tick(c tea.Context[*Model], tag int) {
+	msg := MsgTick{
+		// Time: t,
+		tag: tag,
+	}
+	// TODO: tea.Tick(m.Spinner.FPS)
+	c.F(func() Msg {
+		return func(m *Model) {
+			msg.Time = <-time.After(m.Spinner.FPS)
+			m.Update(c, msg)
 		}
 	})
 }

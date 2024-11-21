@@ -68,6 +68,8 @@ type model struct {
 	done     bool
 }
 
+type cmd = tea.Msg2[*model]
+
 var (
 	currentPkgNameStyle = styles.Style{}.
 				Foreground(styles.FgColor("211"))
@@ -94,43 +96,41 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init(yield func(...tea.Cmd)) {
-	yield(
-		downloadAndInstall(m.packages[m.index]),
-		m.spinner.CmdTick,
-	)
+func (m *model) Init(c tea.Context[*model]) {
+	downloadAndInstall(c, m.packages[m.index])
+	m.spinner.CmdTick(tea.Of(c, func(*model) *spinner.Model { return &m.spinner }))
 }
 
-func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxProgress := tea.Of(c, func(*model) *progress.Model { return &m.progress })
+	ctxSpinner := tea.Of(c, func(*model) *spinner.Model { return &m.spinner })
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.width, m.height = msg.Width, msg.Height
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
-			yield(tea.Quit)
+			c.Dispatch(tea.Quit)
+			return
 		}
 	case msgInstalledPkg:
 		if m.index >= len(m.packages)-1 {
 			// Everything's been installed. We're done!
 			m.done = true
-			yield(tea.Quit)
+			c.Dispatch(tea.Quit)
 			return
 		}
 
 		// Update progress bar
-		progressCmd := m.progress.SetPercent(float64(m.index) / float64(len(m.packages)-1))
+		m.progress.SetPercent(ctxProgress, float64(m.index)/float64(len(m.packages)-1))
 
 		m.index++
-		yield(
-			progressCmd,
-			tea.Printf("%s %s", checkMark, m.packages[m.index]), // print success message above our program
-			downloadAndInstall(m.packages[m.index]),             // download the next package
-		)
+		c.Dispatch(tea.Printf("%s %s", checkMark, m.packages[m.index])) // print success message above our program
+		downloadAndInstall(c, m.packages[m.index])                      // download the next package
 	case spinner.MsgTick:
-		m.spinner.Update(msg, yield)
+		m.spinner.Update(ctxSpinner, msg)
 	case progress.MsgFrame:
-		yield(m.progress.Update(msg)...)
+		m.progress.Update(ctxProgress, msg)
 	}
 }
 
@@ -164,16 +164,20 @@ func (m *model) View(vb tea.Viewbox) {
 
 type msgInstalledPkg string
 
-func downloadAndInstall(pkg string) tea.Cmd {
+func downloadAndInstall(c tea.Context[*model], pkg string) {
 	// This is where you'd do i/o stuff to download and install packages. In
 	// our case we're just pausing for a moment to simulate the process.
 	d := time.Millisecond * time.Duration(rand.Intn(500)) //nolint:gosec
-	return tea.Tick(d, func(t time.Time) tea.Msg {
-		return msgInstalledPkg(pkg)
+	// TODO: tea.Tick(d)
+	c.F(func() cmd {
+		return func(m *model) {
+			<-time.After(d)
+			m.Update(c, msgInstalledPkg(pkg))
+		}
 	})
 }
 
 func Main(ctx context.Context) error {
-	_, err := tea.NewProgram(ctx, newModel()).Run()
+	_, err := tea.NewProgram2(ctx, newModel()).Run()
 	return err
 }

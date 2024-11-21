@@ -36,39 +36,18 @@ import (
 
 // MsgStartStop is used to start and stop the timer.
 type MsgStartStop struct {
-	ID      int
 	running bool
 }
 
 // MsgTick is a message that is sent on every timer tick.
 type MsgTick struct {
-	// ID is the identifier of the timer that sends the message. This makes
-	// it possible to determine which timer a tick belongs to when there
-	// are multiple timers running.
-	//
-	// Note, however, that a timer will reject ticks from other timers, so
-	// it's safe to flow all MsgTick-s through all timers and have them still
-	// behave appropriately.
-	ID int
-
 	// Timeout returns whether or not this tick is a timeout tick. You can
 	// alternatively listen for MsgTimeout.
 	Timeout bool
 }
 
-// MsgTimeout is a message that is sent once when the timer times out.
-//
-// It's a convenience message sent alongside a MsgTick with the Timeout value set to true.
-type MsgTimeout struct {
-	ID int
-}
-
-var _id = 0
-
 // Model of the timer component.
 type Model struct {
-	id int
-
 	// How long until the timer expires.
 	Timeout time.Duration
 
@@ -78,11 +57,11 @@ type Model struct {
 	running bool
 }
 
+type Cmd = func(*Model)
+
 // NewWithInterval creates a new timer with the given timeout and tick interval.
 func NewWithInterval(timeout, interval time.Duration) Model {
-	_id++
 	return Model{
-		id:       _id,
 		Timeout:  timeout,
 		Interval: interval,
 		running:  true,
@@ -109,29 +88,12 @@ func (m *Model) Timedout() bool {
 }
 
 // Init starts the timer.
-func (m *Model) Init(f func(...tea.Cmd)) {
-	f(m.tick())
+func (m *Model) Init(c tea.Context[*Model]) {
+	m.tick(c)
 }
 
 // Update handles the timer tick.
-func (m *Model) Update(msg tea.Msg, f func(...tea.Cmd)) {
-	switch msg := msg.(type) {
-	case MsgStartStop:
-		if msg.ID != 0 && msg.ID != m.id {
-			return
-		}
-		m.running = msg.running
-		f(m.tick())
-	case MsgTick:
-		if !m.Running() || msg.ID != 0 && msg.ID != m.id {
-			break
-		}
-
-		m.Timeout -= m.Interval
-		f(m.timedout()...)
-		f(m.tick())
-	}
-}
+func (m *Model) Update(c tea.Context[*Model], msg tea.Msg) {}
 
 // View of the timer component.
 func (m *Model) View(vb tea.Viewbox) {
@@ -139,39 +101,59 @@ func (m *Model) View(vb tea.Viewbox) {
 }
 
 // CmdStart resumes the timer. Has no effect if the timer has timed out.
-func (m *Model) CmdStart() tea.Cmd {
-	return m.cmdStartStop(true)
+func (m *Model) CmdStart(c tea.Context[*Model]) {
+	m.cmdStartStop(c, true)
 }
 
 // CmdStop pauses the timer. Has no effect if the timer has timed out.
-func (m *Model) CmdStop() tea.Cmd {
-	return m.cmdStartStop(false)
+func (m *Model) CmdStop(c tea.Context[*Model]) {
+	m.cmdStartStop(c, false)
 }
 
 // CmdToggle stops the timer if it's running and starts it if it's stopped.
-func (m *Model) CmdToggle() tea.Cmd {
-	return m.cmdStartStop(!m.Running())
+func (m *Model) CmdToggle(c tea.Context[*Model]) {
+	m.cmdStartStop(c, !m.Running())
 }
 
-func (m *Model) tick() tea.Cmd {
-	id := m.id
-	return tea.Tick(m.Interval, func(_ time.Time) tea.Msg {
-		return MsgTick{ID: id, Timeout: m.Timedout()}
+func (m *Model) tick(c tea.Context[*Model]) {
+	// msg := MsgTick{Timeout: m.Timedout()}
+	// TODO: use tea.Tick(m.Interval)
+	c.F(func() tea.Msg2[*Model] {
+		return func(m *Model) {
+			<-time.After(m.Interval)
+			if !m.Running() {
+				return
+			}
+
+			m.Timeout -= m.Interval
+			m.timedout(c)
+			m.tick(c)
+		}
 	})
 }
 
-func (m *Model) timedout() []tea.Cmd {
+func (m *Model) timedout(c tea.Context[*Model]) {
 	if !m.Timedout() {
-		return nil
+		return
 	}
 
-	return []tea.Cmd{func() tea.Msg {
-		return MsgTimeout{ID: m.id}
-	}}
+	// MsgTimeout must be sent, but no reaction on it
+	// MsgTimeout is a message that is sent once when the timer times out.
+	//
+	// It's a convenience message sent alongside a MsgTick with the Timeout value set to true.
+	// type MsgTimeout struct{}
+	// msg := MsgTimeout{}
+	c.F(func() tea.Msg2[*Model] {
+		return func(m *Model) {}
+	})
 }
 
-func (m *Model) cmdStartStop(v bool) tea.Cmd {
-	return func() tea.Msg {
-		return MsgStartStop{ID: m.id, running: v}
-	}
+func (m *Model) cmdStartStop(c tea.Context[*Model], v bool) {
+	msg := MsgStartStop{running: v}
+	c.F(func() tea.Msg2[*Model] {
+		return func(m *Model) {
+			m.running = msg.running
+			m.tick(c)
+		}
+	})
 }

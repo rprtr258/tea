@@ -1,8 +1,10 @@
-package composable_views //nolint:revive,stylecheck
+// package composable_views //nolint:revive,stylecheck
+package main
 
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 	"unicode/utf8"
 
@@ -54,6 +56,8 @@ type mainModel struct {
 	index   int
 }
 
+type cmd = func(*mainModel)
+
 func newModel(timeout time.Duration) *mainModel {
 	return &mainModel{
 		state:   _timerView,
@@ -62,44 +66,46 @@ func newModel(timeout time.Duration) *mainModel {
 	}
 }
 
-func (m *mainModel) Init(f func(...tea.Cmd)) {
+func (m *mainModel) Init(c tea.Context[*mainModel]) {
 	// start the timer and spinner on program start
-	m.timer.Init(f)
-	f(m.spinner.CmdTick)
+	m.timer.Init(tea.Of(c, func(m *mainModel) *timer.Model { return &m.timer }))
+	m.spinner.CmdTick(tea.Of(c, func(m *mainModel) *spinner.Model { return &m.spinner }))
 }
 
-func (m *mainModel) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *mainModel) Update(c tea.Context[*mainModel], msg tea.Msg) {
+	timerCtx := tea.Of(c, func(m *mainModel) *timer.Model { return &m.timer })
+	spinnerCtx := tea.Of(c, func(m *mainModel) *spinner.Model { return &m.spinner })
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 			return
 		case "tab":
 			m.state = fun.IF(m.state == _timerView, _spinnerView, _timerView)
 		case "n":
 			if m.state == _timerView {
 				m.timer = timer.New(_defaultTime)
-				m.timer.Init(f)
+				m.timer.Init(timerCtx)
 			} else {
 				m.index = (m.index + 1) % len(spinners)
 				m.spinner = spinner.New()
 				m.spinner.Style = _styleSpinner
 				m.spinner.Spinner = spinners[m.index]
-				f(m.spinner.CmdTick)
+				m.spinner.CmdTick(spinnerCtx)
 			}
 		}
 		switch m.state {
 		// update whichever model is focused
 		case _spinnerView:
-			m.spinner.Update(msg, f)
+			m.spinner.Update(spinnerCtx, msg)
 		default:
-			m.timer.Update(msg, f)
+			m.timer.Update(timerCtx, msg)
 		}
 	case spinner.MsgTick:
-		m.spinner.Update(msg, f)
+		m.spinner.Update(spinnerCtx, msg)
 	case timer.MsgTick:
-		m.timer.Update(msg, f)
+		m.timer.Update(timerCtx, msg)
 	}
 }
 
@@ -142,6 +148,10 @@ func (m *mainModel) View(vb tea.Viewbox) {
 }
 
 func Main(ctx context.Context) error {
-	_, err := tea.NewProgram(ctx, newModel(_defaultTime)).Run()
+	_, err := tea.NewProgram2(ctx, newModel(_defaultTime)).Run()
 	return err
+}
+
+func main() {
+	log.Fatal(Main(context.Background()))
 }

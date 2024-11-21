@@ -55,6 +55,29 @@ type Model interface {
 // update function.
 type Cmd func() Msg
 
+type Msg2[M any] func(M)
+
+type Context[M any] struct {
+	Dispatch func(...Cmd)
+
+	F func(...func() Msg2[M])
+}
+
+func Of[M, N any](c Context[M], ff func(M) N) Context[N] {
+	return Context[N]{
+		Dispatch: c.Dispatch,
+		F: func(cmds ...func() Msg2[N]) {
+			for _, cmd := range cmds {
+				c.F(func() Msg2[M] {
+					return func(m M) {
+						cmd()(ff(m))
+					}
+				})
+			}
+		},
+	}
+}
+
 type inputType int
 
 const (
@@ -165,6 +188,51 @@ type MsgQuit struct{}
 // Quit is a special command that tells the Tea program to exit.
 func Quit() Msg {
 	return MsgQuit{}
+}
+
+type model2[M any] interface {
+	Init(Context[M])
+	Update(Context[M], Msg)
+	View(Viewbox)
+}
+
+type adapterModel[M model2[M]] struct {
+	m M
+}
+
+func (m *adapterModel[M]) Init(f func(...Cmd)) {
+	m.m.Init(Context[M]{
+		Dispatch: f,
+		F: func(fs ...func() Msg2[M]) {
+			for _, fn := range fs {
+				f(func() Msg {
+					fn()(m.m)
+					return nil // TODO: ???
+				})
+			}
+		},
+	})
+}
+func (m *adapterModel[M]) Update(msg Msg, f func(...Cmd)) {
+	ctx := Context[M]{
+		Dispatch: f,
+		F: func(fs ...func() Msg2[M]) {
+			for _, fn := range fs {
+				f(func() Msg {
+					fn()(m.m)
+					return nil // TODO: ???
+				})
+			}
+		},
+	}
+	m.m.Update(ctx, msg)
+}
+func (m *adapterModel[M]) View(vb Viewbox) {
+	m.m.View(vb)
+}
+
+func NewProgram2[M model2[M]](ctx context.Context, model M) *Program[*adapterModel[M]] {
+	return NewProgram[*adapterModel[M]](ctx, &adapterModel[M]{m: model})
 }
 
 // NewProgram creates a new Program.
