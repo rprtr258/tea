@@ -52,19 +52,21 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(m.spinner.CmdTick)
+func (m *model) Init(c tea.Context[*model]) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
+	m.spinner.CmdTick(ctxSpinner)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		f(tea.Quit)
+		c.Dispatch(tea.Quit)
 	case msgResult:
 		m.results = append(m.results[1:], msg)
 	case spinner.MsgTick:
-		m.spinner.Update(msg, f)
+		m.spinner.Update(ctxSpinner, msg)
 	}
 }
 
@@ -95,7 +97,7 @@ func randomFood() string {
 }
 
 func Main(ctx context.Context) error {
-	p := tea.NewProgram(ctx, newModel())
+	p := tea.NewProgram2(ctx, newModel())
 
 	// Simulate activity
 	go func() {

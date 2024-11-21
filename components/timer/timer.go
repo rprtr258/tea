@@ -132,6 +132,8 @@ func (m *Model) tick(c tea.Context[*Model]) {
 	})
 }
 
+type MsgTimeout struct{}
+
 func (m *Model) timedout(c tea.Context[*Model]) {
 	if !m.Timedout() {
 		return
@@ -141,9 +143,8 @@ func (m *Model) timedout(c tea.Context[*Model]) {
 	// MsgTimeout is a message that is sent once when the timer times out.
 	//
 	// It's a convenience message sent alongside a MsgTick with the Timeout value set to true.
-	// type MsgTimeout struct{}
-	// msg := MsgTimeout{}
 	c.F(func() tea.Msg2[*Model] {
+		// msg := MsgTimeout{}
 		return func(m *Model) {}
 	})
 }

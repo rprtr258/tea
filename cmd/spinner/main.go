@@ -23,19 +23,21 @@ func initialModel() *model {
 	}
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(m.spinner.CmdTick)
+func (m *model) Init(c tea.Context[*model]) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
+	m.spinner.CmdTick(ctxSpinner)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 		}
 	default:
-		m.spinner.Update(msg, f)
+		ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
+		m.spinner.Update(ctxSpinner, msg)
 	}
 }
 
@@ -51,6 +53,6 @@ func (m *model) View(vb tea.Viewbox) {
 }
 
 func Main(ctx context.Context) error {
-	_, err := tea.NewProgram(ctx, initialModel()).Run()
+	_, err := tea.NewProgram2(ctx, initialModel()).Run()
 	return err
 }

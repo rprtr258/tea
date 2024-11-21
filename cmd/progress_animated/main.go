@@ -23,22 +23,30 @@ const (
 
 type msgTick time.Time
 
-var _cmdTick = tea.Tick(time.Second*1, func(t time.Time) tea.Msg {
-	return msgTick(t)
-})
-
 type model struct {
 	progress progress.Model
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(_cmdTick)
+func (m *model) Init(c tea.Context[*model]) {
+	m._cmdTick(c)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) _cmdTick(c tea.Context[*model]) {
+	// TODO: tea.Tick(time.Second*1)
+	c.F(func() tea.Msg2[*model] {
+		return func(m *model) {
+			t := <-time.After(time.Second * 1)
+			msg := msgTick(t)
+			m.Update(c, msg)
+		}
+	})
+}
+
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxProgress := tea.Of(c, func(m *model) *progress.Model { return &m.progress })
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		f(tea.Quit)
+		c.Dispatch(tea.Quit)
 	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - _padding*2 - 4
 		if m.progress.Width > _maxWidth {
@@ -46,16 +54,16 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		}
 	case msgTick:
 		if m.progress.Percent() == 1.0 {
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 			return
 		}
 
-		// Note that you can also use progress.Model.SetPercent to set the
-		// percentage value explicitly, too.
-		f(_cmdTick, m.progress.IncrPercent(0.25))
+		// Note that you can also use progress.Model.SetPercent to set the percentage value explicitly, too.
+		m._cmdTick(c)
+		m.progress.IncrPercent(ctxProgress, 0.25)
 	// MsgFrame is sent when the progress bar wants to animate itself
 	case progress.MsgFrame:
-		f(m.progress.Update(msg)...)
+		m.progress.Update(ctxProgress, msg)
 	}
 }
 
@@ -72,6 +80,6 @@ func Main(ctx context.Context) error {
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
 
-	_, err := tea.NewProgram(ctx, m).Run()
+	_, err := tea.NewProgram2(ctx, m).Run()
 	return err
 }

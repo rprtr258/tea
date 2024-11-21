@@ -116,11 +116,12 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(tea.EnterAltScreen)
+func (m *model) Init(c tea.Context[*model]) {
+	c.Dispatch(tea.EnterAltScreen)
 }
 
-func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxList := tea.Of(c, func(m *model) *list.Model[item] { return &m.list })
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.list.SetSize(msg.Width-appPadding.Left-appPadding.Right, msg.Height-appPadding.Top-appPadding.Bottom)
@@ -132,7 +133,7 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 
 		switch {
 		case key.Matches(msg, m.keys.toggleSpinner):
-			yield(m.list.ToggleSpinner()...)
+			m.list.ToggleSpinner(ctxList)
 		case key.Matches(msg, m.keys.toggleTitleBar):
 			v := !m.list.ShowTitle()
 			m.list.SetShowTitle(v)
@@ -147,13 +148,13 @@ func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
 		case key.Matches(msg, m.keys.insertItem):
 			m.delegateKeys.remove.SetEnabled(true)
 			newItem := m.itemGenerator.next()
-			yield(m.list.InsertItem(0, newItem)...)
-			yield(m.list.CmdNewStatusMessage(statusMessageStyle("Added " + newItem.Title())))
+			c.Dispatch(m.list.InsertItem(0, newItem)...)
+			c.Dispatch(m.list.CmdNewStatusMessage(statusMessageStyle("Added " + newItem.Title())))
 		}
 	}
 
 	// This will also call our delegate's update function.
-	m.list.Update(msg, yield)
+	m.list.Update(ctxList, msg)
 }
 
 func (m *model) View(vb tea.Viewbox) {
@@ -163,6 +164,6 @@ func (m *model) View(vb tea.Viewbox) {
 func Main(ctx context.Context) error {
 	rand.Seed(time.Now().UnixNano())
 
-	_, err := tea.NewProgram(ctx, newModel()).Run()
+	_, err := tea.NewProgram2(ctx, newModel()).Run()
 	return err
 }

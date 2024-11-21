@@ -27,13 +27,13 @@ type model struct {
 	list list.Model[item]
 }
 
-func (m *model) Init(func(...tea.Cmd)) {}
+func (m *model) Init(tea.Context[*model]) {}
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if msg.String() == "ctrl+c" {
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 			return
 		}
 	case tea.MsgWindowSize:
@@ -43,7 +43,8 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		)
 	}
 
-	m.list.Update(msg, f)
+	ctxList := tea.Of(c, func(m *model) *list.Model[item] { return &m.list })
+	m.list.Update(ctxList, msg)
 }
 
 func (m *model) View(vb tea.Viewbox) {
@@ -88,7 +89,7 @@ func Main(ctx context.Context) error {
 	m.list.Title = "My Fave Things"
 
 	_, err := tea.
-		NewProgram(ctx, m).
+		NewProgram2(ctx, m).
 		WithAltScreen().
 		Run()
 	return err

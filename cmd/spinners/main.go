@@ -33,33 +33,35 @@ type model struct {
 	spinner spinner.Model
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(m.spinner.CmdTick)
+func (m *model) Init(c tea.Context[*model]) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
+	m.spinner.CmdTick(ctxSpinner)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		switch msg.String() {
 		case "ctrl+c", "q", "esc":
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 		case "h", "left":
 			m.index--
 			if m.index < 0 {
 				m.index = len(spinners) - 1
 			}
 			m.resetSpinner()
-			f(m.spinner.CmdTick)
+			m.spinner.CmdTick(ctxSpinner)
 		case "l", "right":
 			m.index++
 			if m.index >= len(spinners) {
 				m.index = 0
 			}
 			m.resetSpinner()
-			f(m.spinner.CmdTick)
+			m.spinner.CmdTick(ctxSpinner)
 		}
 	case spinner.MsgTick:
-		m.spinner.Update(msg, f)
+		m.spinner.Update(ctxSpinner, msg)
 	}
 }
 
@@ -81,6 +83,6 @@ func Main(ctx context.Context) error {
 	m := &model{}
 	m.resetSpinner()
 
-	_, err := tea.NewProgram(ctx, m).Run()
+	_, err := tea.NewProgram2(ctx, m).Run()
 	return err
 }

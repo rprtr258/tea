@@ -196,43 +196,43 @@ type model2[M any] interface {
 	View(Viewbox)
 }
 
-type adapterModel[M model2[M]] struct {
-	m M
+type AdapterModel[M model2[M]] struct {
+	M M
 }
 
-func (m *adapterModel[M]) Init(f func(...Cmd)) {
-	m.m.Init(Context[M]{
+func (m *AdapterModel[M]) Init(f func(...Cmd)) {
+	m.M.Init(Context[M]{
 		Dispatch: f,
 		F: func(fs ...func() Msg2[M]) {
 			for _, fn := range fs {
 				f(func() Msg {
-					fn()(m.m)
+					fn()(m.M)
 					return nil // TODO: ???
 				})
 			}
 		},
 	})
 }
-func (m *adapterModel[M]) Update(msg Msg, f func(...Cmd)) {
+func (m *AdapterModel[M]) Update(msg Msg, f func(...Cmd)) {
 	ctx := Context[M]{
 		Dispatch: f,
 		F: func(fs ...func() Msg2[M]) {
 			for _, fn := range fs {
 				f(func() Msg {
-					fn()(m.m)
+					fn()(m.M)
 					return nil // TODO: ???
 				})
 			}
 		},
 	}
-	m.m.Update(ctx, msg)
+	m.M.Update(ctx, msg)
 }
-func (m *adapterModel[M]) View(vb Viewbox) {
-	m.m.View(vb)
+func (m *AdapterModel[M]) View(vb Viewbox) {
+	m.M.View(vb)
 }
 
-func NewProgram2[M model2[M]](ctx context.Context, model M) *Program[*adapterModel[M]] {
-	return NewProgram[*adapterModel[M]](ctx, &adapterModel[M]{m: model})
+func NewProgram2[M model2[M]](ctx context.Context, model M) *Program[*AdapterModel[M]] {
+	return NewProgram[*AdapterModel[M]](ctx, &AdapterModel[M]{M: model})
 }
 
 // NewProgram creates a new Program.

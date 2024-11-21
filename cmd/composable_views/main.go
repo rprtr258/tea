@@ -1,10 +1,8 @@
-// package composable_views //nolint:revive,stylecheck
-package main
+package composable_views //nolint:revive,stylecheck
 
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 	"unicode/utf8"
 
@@ -150,8 +148,4 @@ func (m *mainModel) View(vb tea.Viewbox) {
 func Main(ctx context.Context) error {
 	_, err := tea.NewProgram2(ctx, newModel(_defaultTime)).Run()
 	return err
-}
-
-func main() {
-	log.Fatal(Main(context.Background()))
 }

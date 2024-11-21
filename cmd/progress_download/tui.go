@@ -20,24 +20,19 @@ type (
 	msgProgressErr struct{ err error }
 )
 
-func finalPause() tea.Cmd {
-	return tea.Tick(time.Millisecond*750, func(_ time.Time) tea.Msg {
-		return nil
-	})
-}
-
 type model struct {
 	pw       *progressWriter
 	progress progress.Model
 	err      error
 }
 
-func (m *model) Init(func(...tea.Cmd)) {}
+func (m *model) Init(tea.Context[*model]) {}
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxProgress := tea.Of(c, func(m *model) *progress.Model { return &m.progress })
 	switch msg := msg.(type) {
 	case tea.MsgKey:
-		f(tea.Quit)
+		c.Dispatch(tea.Quit)
 	case tea.MsgWindowSize:
 		m.progress.Width = msg.Width - padding*2 - 4
 		if m.progress.Width > maxWidth {
@@ -45,16 +40,23 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		}
 	case msgProgressErr:
 		m.err = msg.err
-		f(tea.Quit)
+		c.Dispatch(tea.Quit)
 	case msgProgress:
 		if msg >= 1.0 {
-			f(finalPause(), tea.Quit)
+			// TODO: tea.Tick(time.Millisecond*750)
+			c.F(func() tea.Msg2[*model] {
+				return func(m *model) {
+					<-time.After(time.Millisecond * 750)
+					// TODO: ???
+				}
+			})
+			c.Dispatch(tea.Quit)
 		}
 
-		f(m.progress.SetPercent(float64(msg)))
+		m.progress.SetPercent(ctxProgress, float64(msg))
 	// MsgFrame is sent when the progress bar wants to animate itself
 	case progress.MsgFrame:
-		f(m.progress.Update(msg)...)
+		m.progress.Update(ctxProgress, msg)
 	}
 }
 

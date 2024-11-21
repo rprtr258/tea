@@ -27,10 +27,15 @@ type result struct {
 type msgProcessFinished time.Duration
 
 // pretendProcess simulates a long-running process.
-func runPretendProcess() tea.Msg {
-	pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec // not needed
-	time.Sleep(pause)
-	return msgProcessFinished(pause)
+func runPretendProcess(c tea.Context[*model]) {
+	c.F(func() tea.Msg2[*model] {
+		pause := time.Duration(rand.Int63n(899)+100) * time.Millisecond // nolint:gosec // not needed
+		time.Sleep(pause)
+		msg := msgProcessFinished(pause)
+		return func(m *model) {
+			m.Update(c, msg)
+		}
+	})
 }
 
 type model struct {
@@ -49,26 +54,29 @@ func newModel() *model {
 	}
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(m.spinner.CmdTick, runPretendProcess)
+func (m *model) Init(c tea.Context[*model]) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
+	m.spinner.CmdTick(ctxSpinner)
+	runPretendProcess(c)
 }
 
 func randomEmoji() rune {
 	return _emojis[rand.Intn(len(_emojis))] //nolint:gosec // not needed
 }
 
-func (m *model) Update(msg tea.Msg, yield func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		m.quitting = true
-		yield(tea.Quit)
+		c.Dispatch(tea.Quit)
 	case spinner.MsgTick:
-		m.spinner.Update(msg, yield)
+		m.spinner.Update(ctxSpinner, msg)
 	case msgProcessFinished:
 		d := time.Duration(msg)
 		res := result{emoji: randomEmoji(), duration: d}
 		m.results = append(m.results[1:], res)
-		yield(runPretendProcess)
+		runPretendProcess(c)
 	}
 }
 
@@ -92,6 +100,6 @@ func (m *model) View(vb tea.Viewbox) {
 }
 
 func Main(ctx context.Context) error {
-	_, err := tea.NewProgram(ctx, newModel()).Run()
+	_, err := tea.NewProgram2(ctx, newModel()).Run()
 	return err
 }

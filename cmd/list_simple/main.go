@@ -45,9 +45,9 @@ type model struct {
 	quitting bool
 }
 
-func (m *model) Init(func(...tea.Cmd)) {}
+func (m *model) Init(tea.Context[*model]) {}
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.list.SetWidth(msg.Width)
@@ -56,19 +56,20 @@ func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			m.quitting = true
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 			return
 		case "enter":
 			i, ok := m.list.SelectedItem()
 			if ok {
 				m.choice = string(i)
 			}
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 			return
 		}
 	}
 
-	m.list.Update(msg, f)
+	ctxList := tea.Of(c, func(m *model) *list.Model[item] { return &m.list })
+	m.list.Update(ctxList, msg)
 }
 
 func (m *model) View(vb tea.Viewbox) {
@@ -116,6 +117,6 @@ func Main(ctx context.Context) error {
 	l.Styles.Title = titleStyle
 	l.Styles.PaginationStyle = paginationStyle
 
-	_, err := tea.NewProgram(ctx, &model{list: l}).Run()
+	_, err := tea.NewProgram2(ctx, &model{list: l}).Run()
 	return err
 }

@@ -28,30 +28,32 @@ type keymap struct {
 	quit  key.Binding
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	m.timer.Init(f)
+func (m *model) Init(c tea.Context[*model]) {
+	ctxTimer := tea.Of(c, func(m *model) *timer.Model { return &m.timer })
+	m.timer.Init(ctxTimer)
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
+	ctxTimer := tea.Of(c, func(m *model) *timer.Model { return &m.timer })
 	switch msg := msg.(type) {
 	case timer.MsgTick:
-		m.timer.Update(msg, f)
+		m.timer.Update(ctxTimer, msg)
 	case timer.MsgStartStop:
-		m.timer.Update(msg, f)
+		m.timer.Update(ctxTimer, msg)
 		m.keymap.stop.SetEnabled(m.timer.Running())
 		m.keymap.start.SetEnabled(!m.timer.Running())
 	case timer.MsgTimeout:
 		m.quitting = true
-		f(tea.Quit)
+		c.Dispatch(tea.Quit)
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
 			m.quitting = true
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 		case key.Matches(msg, m.keymap.reset):
 			m.timer.Timeout = timeout
 		case key.Matches(msg, m.keymap.start, m.keymap.stop):
-			f(m.timer.CmdToggle())
+			m.timer.CmdToggle(ctxTimer)
 		}
 	}
 }
@@ -108,6 +110,6 @@ func Main(ctx context.Context) error {
 		help: help.New(),
 	}
 
-	_, err := tea.NewProgram(ctx, m).Run()
+	_, err := tea.NewProgram2(ctx, m).Run()
 	return err
 }

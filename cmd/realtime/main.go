@@ -21,20 +21,23 @@ type msgResponse struct{}
 // In this case, we'll send events on the channel at a random interval between
 // 100 to 1000 milliseconds. As a command, Tea will run this
 // asynchronously.
-func cmdListenForActivity(sub chan struct{}) tea.Cmd {
-	return func() tea.Msg {
+func cmdListenForActivity(c tea.Context[*model], sub chan struct{}) {
+	c.F(func() tea.Msg2[*model] {
 		for {
 			time.Sleep(time.Millisecond * time.Duration(rand.Int63n(900)+100)) // nolint:gosec
 			sub <- struct{}{}
 		}
-	}
+	})
 }
 
 // A command that waits for the activity on a channel.
-func cmdWaitForActivity(sub chan struct{}) tea.Cmd {
-	return func() tea.Msg {
-		return msgResponse(<-sub)
-	}
+func cmdWaitForActivity(c tea.Context[*model], sub chan struct{}) {
+	c.F(func() tea.Msg2[*model] {
+		return func(m *model) {
+			msg := msgResponse(<-sub)
+			m.Update(c, msg)
+		}
+	})
 }
 
 type model struct {
@@ -43,23 +46,23 @@ type model struct {
 	spinner   spinner.Model
 }
 
-func (m *model) Init(f func(...tea.Cmd)) {
-	f(
-		m.spinner.CmdTick,
-		cmdWaitForActivity(m.sub),   // wait for activity
-		cmdListenForActivity(m.sub), // generate activity
-	)
+func (m *model) Init(c tea.Context[*model]) {
+	ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
+	m.spinner.CmdTick(ctxSpinner)
+	cmdWaitForActivity(c, m.sub)   // wait for activity
+	cmdListenForActivity(c, m.sub) // generate activity
 }
 
-func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 	switch msg.(type) {
 	case tea.MsgKey:
-		f(tea.Quit)
+		c.Dispatch(tea.Quit)
 	case msgResponse:
 		m.responses++                // record external activity
-		f(cmdWaitForActivity(m.sub)) // wait for next event
+		cmdWaitForActivity(c, m.sub) // wait for next event
 	case spinner.MsgTick:
-		m.spinner.Update(msg, f)
+		ctxSpinner := tea.Of(c, func(m *model) *spinner.Model { return &m.spinner })
+		m.spinner.Update(ctxSpinner, msg)
 	}
 }
 
@@ -70,7 +73,7 @@ func (m *model) View(vb tea.Viewbox) {
 }
 
 func Main(ctx context.Context) error {
-	_, err := tea.NewProgram(ctx, &model{
+	_, err := tea.NewProgram2(ctx, &model{
 		sub:     make(chan struct{}),
 		spinner: spinner.New(),
 	}).Run()

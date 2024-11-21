@@ -569,19 +569,20 @@ func (m *Model[I]) SetSpinner(spinner spinner.Spinner) {
 }
 
 // ToggleSpinner toggles the spinner. Note that this also returns a command.
-func (m *Model[I]) ToggleSpinner() []tea.Cmd {
+func (m *Model[I]) ToggleSpinner(c tea.Context[*Model[I]]) {
 	if !m.showSpinner {
-		return []tea.Cmd{m.StartSpinner()}
+		m.StartSpinner(c)
+		return
 	}
 
 	m.StopSpinner()
-	return nil
 }
 
 // StartSpinner starts the spinner. Note that this returns a command.
-func (m *Model[I]) StartSpinner() tea.Cmd {
+func (m *Model[I]) StartSpinner(c tea.Context[*Model[I]]) {
 	m.showSpinner = true
-	return m.spinner.CmdTick
+	ctxSpinner := tea.Of(c, func(m *Model[I]) *spinner.Model { return &m.spinner })
+	m.spinner.CmdTick(ctxSpinner)
 }
 
 // StopSpinner stops the spinner.
@@ -750,11 +751,11 @@ func (m *Model[I]) hideStatusMessage() {
 }
 
 // Update is the Tea update loop.
-func (m *Model[I]) Update(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *Model[I]) Update(c tea.Context[*Model[I]], msg tea.Msg) {
 	switch msg := msg.(type) {
 	case tea.MsgKey:
 		if key.Matches(msg, m.KeyMap.ForceQuit) {
-			f(tea.Quit)
+			c.Dispatch(tea.Quit)
 			return
 		}
 
@@ -763,7 +764,8 @@ func (m *Model[I]) Update(msg tea.Msg, f func(...tea.Cmd)) {
 		return
 
 	case spinner.MsgTick:
-		m.spinner.Update(msg, nil)
+		ctxSpinner := tea.Of(c, func(m *Model[I]) *spinner.Model { return &m.spinner })
+		m.spinner.Update(ctxSpinner, msg)
 		// if m.showSpinner {
 		// 	cmds = append(cmds, cmd...)
 		// }
@@ -773,15 +775,15 @@ func (m *Model[I]) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	}
 
 	if m.filterState == Filtering {
-		m.handleFiltering(msg, f)
+		m.handleFiltering(c, msg)
 		return
 	}
 
-	f(m.handleBrowsing(msg)...)
+	m.handleBrowsing(c, msg)
 }
 
 // Updates for when a user is browsing the list.
-func (m *Model[I]) handleBrowsing(msg tea.Msg) []tea.Cmd {
+func (m *Model[I]) handleBrowsing(c tea.Context[*Model[I]], msg tea.Msg) {
 	numItems := len(m.VisibleItems())
 
 	switch msg := msg.(type) { //nolint:gocritic
@@ -793,7 +795,8 @@ func (m *Model[I]) handleBrowsing(msg tea.Msg) []tea.Cmd {
 			m.resetFiltering()
 
 		case key.Matches(msg, m.KeyMap.Quit):
-			return []tea.Cmd{tea.Quit}
+			c.Dispatch(tea.Quit)
+			return
 
 		case key.Matches(msg, m.KeyMap.CursorUp):
 			m.CursorUp()
@@ -827,7 +830,8 @@ func (m *Model[I]) handleBrowsing(msg tea.Msg) []tea.Cmd {
 			m.FilterInput.CursorEnd()
 			m.FilterInput.Focus()
 			m.updateKeybindings()
-			return []tea.Cmd{textinput.Blink}
+			c.Dispatch(textinput.Blink)
+			return
 
 		case key.Matches(msg, m.KeyMap.ShowFullHelp) || key.Matches(msg, m.KeyMap.CloseFullHelp):
 			m.Help.ShowAll = !m.Help.ShowAll
@@ -843,11 +847,11 @@ func (m *Model[I]) handleBrowsing(msg tea.Msg) []tea.Cmd {
 		m.cursor = max(0, itemsOnPage-1)
 	}
 
-	return cmds
+	c.Dispatch(cmds...)
 }
 
 // Updates for when a user is in the filter editing interface.
-func (m *Model[I]) handleFiltering(msg tea.Msg, f func(...tea.Cmd)) {
+func (m *Model[I]) handleFiltering(c tea.Context[*Model[I]], msg tea.Msg) {
 	// Handle keys
 	if msg, ok := msg.(tea.MsgKey); ok {
 		switch {
@@ -883,12 +887,12 @@ func (m *Model[I]) handleFiltering(msg tea.Msg, f func(...tea.Cmd)) {
 
 	// Update the filter text input component
 	oldValue := m.FilterInput.Value()
-	m.FilterInput.Update(msg, f)
+	m.FilterInput.Update(msg, c.Dispatch)
 	filterChanged := oldValue != m.FilterInput.Value()
 
 	// If the filtering input has changed, request updated filtering
 	if filterChanged {
-		f(cmdFilterItems(*m))
+		c.Dispatch(cmdFilterItems(*m))
 		m.KeyMap.AcceptWhileFiltering.SetEnabled(m.FilterInput.Value() != "")
 	}
 

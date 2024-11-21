@@ -73,7 +73,7 @@ func Main(ctx context.Context) error {
 	}
 	defer file.Close() // nolint:errcheck
 
-	var p *tea.Program[*model]
+	var p *tea.Program[*tea.AdapterModel[*model]]
 
 	pw := &progressWriter{
 		total:  int(resp.ContentLength),
@@ -92,7 +92,7 @@ func Main(ctx context.Context) error {
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
 
-	p = tea.NewProgram(ctx, m)
+	p = tea.NewProgram2(ctx, m)
 
 	// Start the download
 	go pw.Start()

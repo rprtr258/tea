@@ -5,7 +5,6 @@ import (
 	"math"
 	"strings"
 	"time"
-	"unsafe"
 
 	"github.com/charmbracelet/harmonica"
 	"github.com/lucasb-eyer/go-colorful"
@@ -101,7 +100,6 @@ func WithSpringOptions(frequency, damping float64) Option {
 
 // MsgFrame indicates that an animation step should occur.
 type MsgFrame struct {
-	id  uintptr
 	tag int
 }
 
@@ -177,7 +175,7 @@ func (m *Model) Init() tea.Cmd {
 func (m *Model) Update(c tea.Context[*Model], msg tea.Msg) {
 	switch msg := msg.(type) {
 	case MsgFrame:
-		if msg.id != uintptr(unsafe.Pointer(m)) || msg.tag != m.tag {
+		if msg.tag != m.tag {
 			return
 		}
 
@@ -251,7 +249,6 @@ func (m *Model) nextFrame(c tea.Context[*Model]) {
 	d := time.Second / time.Duration(fps)
 	// TODO: tea.Tick(time.Second/time.Duration(fps))
 	msg := MsgFrame{
-		id:  uintptr(unsafe.Pointer(m)),
 		tag: m.tag,
 	}
 	c.F(func() tea.Msg2[*Model] {
