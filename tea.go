@@ -121,7 +121,7 @@ func (s startupOptions) has(option startupOptions) bool {
 
 // handlers manages series of channels returned by various processes. It allows
 // us to wait for those processes to terminate before exiting the program.
-type handlers []<-chan struct{}
+type handlers = []<-chan struct{}
 
 // handlersShutdown waits for all handlers to terminate.
 func handlersShutdown(h handlers) {
