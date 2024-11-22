@@ -123,8 +123,8 @@ func (s startupOptions) has(option startupOptions) bool {
 // us to wait for those processes to terminate before exiting the program.
 type handlers []<-chan struct{}
 
-// shutdown waits for all handlers to terminate.
-func (h handlers) shutdown() {
+// handlersShutdown waits for all handlers to terminate.
+func handlersShutdown(h handlers) {
 	var wg sync.WaitGroup
 	for _, ch := range h {
 		wg.Add(1)
@@ -571,7 +571,7 @@ func (p *Program[M]) Run() (M, error) {
 	}
 
 	// Wait for all handlers to finish.
-	myHandlers.shutdown()
+	handlersShutdown(myHandlers)
 
 	// Restore terminal state.
 	p.shutdown(killed)
