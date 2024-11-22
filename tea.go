@@ -123,12 +123,6 @@ func (s startupOptions) has(option startupOptions) bool {
 // us to wait for those processes to terminate before exiting the program.
 type handlers []<-chan struct{}
 
-// Adds a channel to the list of handlers. We wait for all handlers to terminate
-// gracefully on shutdown.
-func (h *handlers) add(ch <-chan struct{}) {
-	*h = append(*h, ch)
-}
-
 // shutdown waits for all handlers to terminate.
 func (h handlers) shutdown() {
 	var wg sync.WaitGroup
@@ -492,7 +486,7 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Handle signals.
 	if !p.startupOptions.has(withoutSignalHandler) {
-		myHandlers.add(p.handleSignals())
+		myHandlers = append(myHandlers, p.handleSignals())
 	}
 
 	// Recover from panics.
@@ -522,26 +516,12 @@ func (p *Program[M]) Run() (M, error) {
 	}
 
 	// Initialize the program.
-	var initCmds []Cmd
 	p.model.Init(func(cmdss ...Cmd) { // TODO: remove
 		// initCmds = append(initCmds, cmdss...)
 		go func() {
 			cmds <- cmdss
 		}()
 	})
-	if len(initCmds) > 0 {
-		ch := make(chan struct{})
-		myHandlers.add(ch)
-
-		go func() {
-			defer close(ch)
-
-			select {
-			case cmds <- initCmds:
-			case <-p.ctx.Done():
-			}
-		}()
-	}
 
 	// Start the renderer.
 	p.renderer.start()
@@ -559,11 +539,10 @@ func (p *Program[M]) Run() (M, error) {
 		}
 	}
 
-	// Handle resize events.
-	myHandlers.add(p.handleResize())
-
-	// Process commands.
-	myHandlers.add(p.handleCommands(cmds))
+	myHandlers = append(myHandlers,
+		p.handleResize(),       // Handle resize events.
+		p.handleCommands(cmds), // Process commands.
+	)
 
 	// Run event loop, handle updates and draw.
 	var err error
