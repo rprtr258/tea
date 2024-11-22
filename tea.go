@@ -201,20 +201,7 @@ type AdapterModel[M model2[M]] struct {
 }
 
 func (m *AdapterModel[M]) Init(f func(...Cmd)) {
-	m.M.Init(Context[M]{
-		Dispatch: f,
-		F: func(fs ...func() Msg2[M]) {
-			for _, fn := range fs {
-				f(func() Msg {
-					fn()(m.M)
-					return nil // TODO: ???
-				})
-			}
-		},
-	})
-}
-func (m *AdapterModel[M]) Update(msg Msg, f func(...Cmd)) {
-	ctx := Context[M]{
+	c := Context[M]{
 		Dispatch: f,
 		F: func(fs ...func() Msg2[M]) {
 			for _, fn := range fs {
@@ -225,14 +212,28 @@ func (m *AdapterModel[M]) Update(msg Msg, f func(...Cmd)) {
 			}
 		},
 	}
-	m.M.Update(ctx, msg)
+	m.M.Init(c)
+}
+func (m *AdapterModel[M]) Update(msg Msg, f func(...Cmd)) {
+	c := Context[M]{
+		Dispatch: f,
+		F: func(fs ...func() Msg2[M]) {
+			for _, fn := range fs {
+				f(func() Msg {
+					fn()(m.M)
+					return nil // TODO: ???
+				})
+			}
+		},
+	}
+	m.M.Update(c, msg)
 }
 func (m *AdapterModel[M]) View(vb Viewbox) {
 	m.M.View(vb)
 }
 
 func NewProgram2[M model2[M]](ctx context.Context, model M) *Program[*AdapterModel[M]] {
-	return NewProgram[*AdapterModel[M]](ctx, &AdapterModel[M]{M: model})
+	return NewProgram(ctx, &AdapterModel[M]{M: model})
 }
 
 // NewProgram creates a new Program.

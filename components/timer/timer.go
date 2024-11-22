@@ -93,7 +93,19 @@ func (m *Model) Init(c tea.Context[*Model]) {
 }
 
 // Update handles the timer tick.
-func (m *Model) Update(c tea.Context[*Model], msg tea.Msg) {}
+func (m *Model) Update(c tea.Context[*Model], msg tea.Msg) {
+	switch msg := msg.(type) {
+	case MsgTick:
+		_ = msg
+		if !m.Running() {
+			return
+		}
+
+		m.Timeout -= m.Interval
+		m.timedout(c)
+		m.tick(c)
+	}
+}
 
 // View of the timer component.
 func (m *Model) View(vb tea.Viewbox) {
@@ -116,18 +128,12 @@ func (m *Model) CmdToggle(c tea.Context[*Model]) {
 }
 
 func (m *Model) tick(c tea.Context[*Model]) {
-	// msg := MsgTick{Timeout: m.Timedout()}
 	// TODO: use tea.Tick(m.Interval)
 	c.F(func() tea.Msg2[*Model] {
 		return func(m *Model) {
 			<-time.After(m.Interval)
-			if !m.Running() {
-				return
-			}
-
-			m.Timeout -= m.Interval
-			m.timedout(c)
-			m.tick(c)
+			msg := MsgTick{Timeout: m.Timedout()}
+			m.Update(c, msg)
 		}
 	})
 }
