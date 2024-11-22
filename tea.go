@@ -356,9 +356,10 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 				for _, cmd := range cmds {
 					go func() {
 						msg := cmd()
-						// if ; msg != nil {
+						if msg == nil {
+							msg = msgRepaint{}
+						}
 						p.Send(msg) // this can be long.
-						// }
 					}()
 				}
 			}
