@@ -63,19 +63,27 @@ type Context[M any] struct {
 	F func(...func() Msg2[M])
 }
 
-func Of[M, N any](c Context[M], ff func(M) N) Context[N] {
+func OfRaw[M, N any](c Context[M], ff func(Msg2[N]) Msg2[M]) Context[N] {
 	return Context[N]{
 		Dispatch: c.Dispatch,
 		F: func(cmds ...func() Msg2[N]) {
 			for _, cmd := range cmds {
 				c.F(func() Msg2[M] {
 					return func(m M) {
-						cmd()(ff(m))
+						ff(cmd())(m)
 					}
 				})
 			}
 		},
 	}
+}
+
+func Of[M, N any](c Context[M], ff func(M) N) Context[N] {
+	return OfRaw(c, func(msg Msg2[N]) Msg2[M] {
+		return func(m M) {
+			msg(ff(m))
+		}
+	})
 }
 
 type inputType int

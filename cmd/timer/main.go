@@ -28,13 +28,29 @@ type keymap struct {
 	quit  key.Binding
 }
 
+func (m *model) ctxTimer(c tea.Context[*model]) tea.Context[*timer.Model] {
+	return tea.OfRaw(c, func(msg tea.Msg2[*timer.Model]) tea.Msg2[*model] {
+		return func(m *model) {
+			msg(&m.timer)
+			if m.timer.Timedout() {
+				c.F(func() tea.Msg2[*model] {
+					return func(m *model) {
+						// case timer.MsgTimeout:
+						m.quitting = true
+						c.Dispatch(tea.Quit)
+					}
+				})
+			}
+		}
+	})
+}
+
 func (m *model) Init(c tea.Context[*model]) {
-	ctxTimer := tea.Of(c, func(m *model) *timer.Model { return &m.timer })
-	m.timer.Init(ctxTimer)
+	m.timer.Init(m.ctxTimer(c))
 }
 
 func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
-	ctxTimer := tea.Of(c, func(m *model) *timer.Model { return &m.timer })
+	ctxTimer := m.ctxTimer(c)
 	switch msg := msg.(type) {
 	case timer.MsgTick:
 		m.timer.Update(ctxTimer, msg)
@@ -42,9 +58,6 @@ func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 		m.timer.Update(ctxTimer, msg)
 		m.keymap.stop.SetEnabled(m.timer.Running())
 		m.keymap.start.SetEnabled(!m.timer.Running())
-	case timer.MsgTimeout:
-		m.quitting = true
-		c.Dispatch(tea.Quit)
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keymap.quit):
