@@ -76,10 +76,7 @@ func New(timeout time.Duration) Model {
 // Running returns whether or not the timer is running. If the timer has timed
 // out this will always return false.
 func (m *Model) Running() bool {
-	if m.Timedout() || !m.running {
-		return false
-	}
-	return true
+	return !m.Timedout() && m.running
 }
 
 // Timedout returns whether or not the timer has timed out.
@@ -130,9 +127,10 @@ func (m *Model) CmdToggle(c tea.Context[*Model]) {
 func (m *Model) tick(c tea.Context[*Model]) {
 	// TODO: use tea.Tick(m.Interval)
 	c.F(func() tea.Msg2[*Model] {
+		t := <-time.After(m.Interval)
+		_ = t
+		msg := MsgTick{Timeout: m.Timedout()}
 		return func(m *Model) {
-			<-time.After(m.Interval)
-			msg := MsgTick{Timeout: m.Timedout()}
 			m.Update(c, msg)
 		}
 	})

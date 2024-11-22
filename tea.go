@@ -354,10 +354,11 @@ func (p *Program[M]) handleCommands(cmds chan []Cmd) chan struct{} {
 				// possible to cancel them so we'll have to leak the goroutine
 				// until Cmd returns.
 				for _, cmd := range cmds {
-					go func(cmd Cmd) {
-						msg := cmd()
-						p.Send(msg) // this can be long.
-					}(cmd)
+					go func() {
+						if msg := cmd(); msg != nil {
+							p.Send(msg) // this can be long.
+						}
+					}()
 				}
 			}
 		}
@@ -499,7 +500,6 @@ func (p *Program[M]) Run() (M, error) {
 				p.shutdown(true)
 				fmt.Printf("Caught panic:\n\n%s\n\nRestoring terminal...\n\n", r)
 				debug.PrintStack()
-				return
 			}
 		}()
 	}
@@ -521,8 +521,11 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Initialize the program.
 	var initCmds []Cmd
-	p.model.Init(func(cmds ...Cmd) {
-		initCmds = append(initCmds, cmds...)
+	p.model.Init(func(cmdss ...Cmd) { // TODO: remove
+		// initCmds = append(initCmds, cmdss...)
+		go func() {
+			cmds <- cmdss
+		}()
 	})
 	if len(initCmds) > 0 {
 		ch := make(chan struct{})

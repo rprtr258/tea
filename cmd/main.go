@@ -67,7 +67,7 @@ import (
 	"github.com/rprtr258/tea/styles"
 )
 
-type examples map[string]func(context.Context) error
+type examples = map[string]func(context.Context) error
 
 var (
 	teaExamples = examples{
@@ -248,7 +248,7 @@ func runExamplesList(ctx context.Context, title string, examples examples) error
 }
 
 func main() {
-	if err := (&cli.App{
+	app := &cli.App{
 		Name:  "tea examples",
 		Usage: "tea <example>",
 		Action: func(ctx *cli.Context) error {
@@ -277,7 +277,17 @@ func main() {
 				},
 			},
 		},
-	}).Run(os.Args); err != nil {
+	}
+	for name, f := range teaExamples {
+		app.Commands = append(app.Commands, &cli.Command{
+			Name:  name,
+			Usage: name,
+			Action: func(ctx *cli.Context) error {
+				return f(ctx.Context)
+			},
+		})
+	}
+	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(err.Error())
 	}
 }
