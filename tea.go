@@ -517,7 +517,6 @@ func (p *Program[M]) Run() (M, error) {
 
 	// Initialize the program.
 	p.model.Init(func(cmdss ...Cmd) { // TODO: remove
-		// initCmds = append(initCmds, cmdss...)
 		go func() {
 			cmds <- cmdss
 		}()
