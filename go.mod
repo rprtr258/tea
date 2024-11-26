@@ -32,7 +32,7 @@ require (
 	github.com/rprtr258/scuf v0.0.6
 	github.com/sahilm/fuzzy v0.1.1
 	github.com/samber/lo v1.47.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-emoji v1.0.4
