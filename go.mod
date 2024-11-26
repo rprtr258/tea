@@ -27,8 +27,8 @@ require (
 	github.com/muesli/termenv v0.15.3-0.20240912151726-82936c5ea257
 	github.com/nsf/termbox-go v1.1.1
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/rprtr258/assert v0.0.13
-	github.com/rprtr258/fun v0.0.21
+	github.com/rprtr258/assert v0.1.0
+	github.com/rprtr258/fun v0.0.29
 	github.com/rprtr258/scuf v0.0.6
 	github.com/sahilm/fuzzy v0.1.1
 	github.com/samber/lo v1.47.0
