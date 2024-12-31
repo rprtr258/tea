@@ -78,11 +78,6 @@ func (m *model) Init(func(...tea.Cmd)) {}
 
 func (m *model) Update(msg tea.Msg, f func(...tea.Cmd)) {
 	switch msg := msg.(type) {
-	case tea.MsgWindowSize:
-		// If we set a width on the help menu it can gracefully truncate
-		// its view as needed.
-		m.help.Width = msg.Width
-
 	case tea.MsgKey:
 		switch {
 		case key.Matches(msg, m.keys.Up):

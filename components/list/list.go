@@ -605,7 +605,6 @@ func (m *Model[I]) CmdNewStatusMessage(s string) tea.Cmd {
 func (m *Model[I]) SetWidth(width int) { // TODO: remove
 	promptWidth := styles.Width(m.Styles.Title.Render(m.FilterInput.Prompt))
 
-	m.Help.Width = width
 	m.FilterInput.Width = width - promptWidth - styles.Width(m.spinnerView())
 	m.updatePagination()
 }

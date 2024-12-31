@@ -45,7 +45,6 @@ type Styles struct {
 
 // Model contains the state of the help view.
 type Model struct {
-	Width   int
 	ShowAll bool // if true, render the "full" help menu
 
 	ShortSeparator string
