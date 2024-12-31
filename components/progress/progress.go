@@ -77,9 +77,9 @@ func WithoutPercentage() Option {
 	}
 }
 
-// WithWidth sets the initial width of the progress bar. Note that you can also
-// set the width via the Width property, which can come in handy if you're
-// waiting for a tea.MsgWindowSize.
+// WithWidth sets the initial width of the progress bar.
+// Note that you can also set the width via the Width property,
+// which can come in handy if you're waiting for a tea.MsgWindowSize.
 func WithWidth(w int) Option {
 	return func(m *Model) {
 		m.Width = w
@@ -87,10 +87,8 @@ func WithWidth(w int) Option {
 }
 
 // WithSpringOptions sets the initial frequency and damping options for the
-// progress bar's built-in spring-based animation. Frequency corresponds to
-// speed, and damping to bounciness. For details see:
-//
-// https://github.com/charmbracelet/harmonica
+// progress bar's built-in spring-based animation.
+// Frequency corresponds to speed, and damping to bounciness.
 func WithSpringOptions(frequency, damping float64) Option {
 	return func(m *Model) {
 		m.SetSpringOptions(frequency, damping)
@@ -190,9 +188,7 @@ func (m *Model) Update(c tea.Context[*Model], msg tea.Msg) {
 }
 
 // SetSpringOptions sets the frequency and damping for the current spring.
-// Frequency corresponds to speed, and damping to bounciness. For details see:
-//
-// https://github.com/charmbracelet/harmonica
+// Frequency corresponds to speed, and damping to bounciness.
 func (m *Model) SetSpringOptions(frequency, damping float64) {
 	m.spring = harmonica.NewSpring(harmonica.FPS(fps), frequency, damping)
 }
