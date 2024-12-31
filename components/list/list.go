@@ -328,7 +328,7 @@ func (m *Model[I]) Items() []I {
 func (m *Model[I]) SetItems(items []I) tea.Cmd {
 	m.items = items
 
-	var cmd tea.Cmd
+	cmd := func() tea.Msg { return nil }
 	if m.filterState != Unfiltered {
 		m.filteredItems = nil
 		cmd = cmdFilterItems(*m)
