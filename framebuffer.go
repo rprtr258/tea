@@ -304,7 +304,7 @@ func (vb Viewbox) Fill(c rune) {
 type Layout int
 
 func Auto() Layout { // TODO: implement
-	return 0
+	return Flex(1)
 }
 
 func Fixed(n int) Layout {
