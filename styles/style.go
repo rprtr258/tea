@@ -115,10 +115,6 @@ func (s Style) Render(strs ...string) string {
 
 	str := joinString(strs...)
 
-	if len(s.rules) == 0 {
-		return str
-	}
-
 	te := []scuf.Modifier{}
 	if bold {
 		te = append(te, scuf.ModBold)

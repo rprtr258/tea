@@ -682,7 +682,7 @@ func (m *Model[I]) updateKeybindings() {
 func (m *Model[I]) updatePagination() {
 	index := m.Index()
 
-	availHeight := 8 //m.height // TODO: get back/remove?
+	availHeight := 6 //m.height // TODO: get back/remove?
 	if m.showTitle || m.showFilter && m.filteringEnabled {
 		availHeight -= 2
 	}
@@ -1087,7 +1087,7 @@ func (m *Model[I]) populatedView(vb tea.Viewbox) {
 	docs := items[start:end]
 
 	for i, item := range docs {
-		m.delegate.Render(vb, m, i+start, item)
+		m.delegate.Render(vb.MaxHeight(m.delegate.Height), m, i+start, item)
 		if i < len(docs)-1 {
 			vb = vb.PaddingTop(m.delegate.Spacing + m.delegate.Height)
 		}

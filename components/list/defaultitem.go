@@ -95,13 +95,13 @@ func NewDefaultDelegate[I DefaultItem](
 		fullHelp:        FullHelp,
 	}
 	return ItemDelegate[I]{
-		Render: d.Render,
+		d.Render,
 		// Height returns the delegate's preferred height.
 		// This has effect only if ShowDescription is true,
 		// otherwise height is always 1.
-		Height:  fun.IF(d.ShowDescription, d.height, 1),
-		Spacing: d.spacing,
-		Update:  d.Update,
+		fun.IF(d.ShowDescription, d.height, 1),
+		d.spacing,
+		d.Update,
 	}
 }
 
