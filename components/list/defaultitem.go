@@ -73,19 +73,35 @@ type DefaultDelegate[I DefaultItem] struct {
 	ShowDescription bool
 	Styles          DefaultItemStyles
 	UpdateFunc      func(tea.Msg, *Model[I]) []tea.Cmd
-	ShortHelpFunc   func() []key.Binding
-	FullHelpFunc    func() [][]key.Binding
+	shortHelp       []key.Binding
+	fullHelp        [][]key.Binding
 	height          int
 	spacing         int
 }
 
 // NewDefaultDelegate creates a new delegate with default styles.
-func NewDefaultDelegate[I DefaultItem]() DefaultDelegate[I] {
-	return DefaultDelegate[I]{
+func NewDefaultDelegate[I DefaultItem](
+	UpdateFunc func(tea.Msg, *Model[I]) []tea.Cmd,
+	ShortHelp []key.Binding,
+	FullHelp [][]key.Binding,
+) ItemDelegate[I] {
+	d := &DefaultDelegate[I]{
 		ShowDescription: true,
 		Styles:          NewDefaultItemStyles,
 		height:          2,
 		spacing:         1,
+		UpdateFunc:      UpdateFunc,
+		shortHelp:       ShortHelp,
+		fullHelp:        FullHelp,
+	}
+	return ItemDelegate[I]{
+		Render: d.Render,
+		// Height returns the delegate's preferred height.
+		// This has effect only if ShowDescription is true,
+		// otherwise height is always 1.
+		Height:  fun.IF(d.ShowDescription, d.height, 1),
+		Spacing: d.spacing,
+		Update:  d.Update,
 	}
 }
 
@@ -94,21 +110,9 @@ func (d *DefaultDelegate[I]) SetHeight(i int) {
 	d.height = i
 }
 
-// Height returns the delegate's preferred height.
-// This has effect only if ShowDescription is true,
-// otherwise height is always 1.
-func (d DefaultDelegate[I]) Height() int {
-	return fun.IF(d.ShowDescription, d.height, 1)
-}
-
 // SetSpacing sets the delegate's spacing.
 func (d *DefaultDelegate[I]) SetSpacing(i int) {
 	d.spacing = i
-}
-
-// Spacing returns the delegate's spacing.
-func (d DefaultDelegate[I]) Spacing() int {
-	return d.spacing
 }
 
 // Update checks whether the delegate's UpdateFunc is set and calls it.
@@ -121,7 +125,7 @@ func (d DefaultDelegate[I]) Update(msg tea.Msg, m *Model[I]) []tea.Cmd {
 
 // Render prints an item.
 func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item I) {
-	if m.width <= 0 {
+	if vb.Width <= 0 { // TODO: remove?
 		// short-circuit
 		return
 	}
@@ -131,7 +135,7 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 
 	s := &d.Styles
 	// Prevent text from exceeding list width
-	textwidth := uint(m.width /*- s.NormalTitle.GetPaddingLeft() - s.NormalTitle.GetPaddingRight()*/)
+	textwidth := uint(vb.Width /*- s.NormalTitle.GetPaddingLeft() - s.NormalTitle.GetPaddingRight()*/)
 	title = truncate.StringWithTail(title, textwidth, ellipsis)
 	if d.ShowDescription {
 		var lines []string
@@ -203,16 +207,10 @@ func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item 
 
 // ShortHelp returns the delegate's short help.
 func (d DefaultDelegate[I]) ShortHelp() []key.Binding {
-	if d.ShortHelpFunc != nil {
-		return d.ShortHelpFunc()
-	}
-	return nil
+	return d.shortHelp
 }
 
 // FullHelp returns the delegate's full help.
 func (d DefaultDelegate[I]) FullHelp() [][]key.Binding {
-	if d.FullHelpFunc != nil {
-		return d.FullHelpFunc()
-	}
-	return nil
+	return d.fullHelp
 }

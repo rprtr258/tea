@@ -37,9 +37,8 @@ func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 			return
 		}
 	case tea.MsgWindowSize:
-		m.list.SetSize(
-			msg.Width-appPadding.Left-appPadding.Right,
-			msg.Height-appPadding.Top-appPadding.Bottom,
+		m.list.SetWidth(
+			msg.Width - appPadding.Left - appPadding.Right,
 		)
 	}
 
@@ -84,7 +83,7 @@ func Main(ctx context.Context) error {
 	})
 
 	m := &model{
-		list: list.New[item](items, list.NewDefaultDelegate[item](), 0, 0),
+		list: list.New[item](items, list.NewDefaultDelegate[item](nil, nil, nil)),
 	}
 	m.list.Title = "My Fave Things"
 

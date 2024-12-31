@@ -21,22 +21,22 @@ type item string
 
 func (i item) FilterValue() string { return "" }
 
-type itemDelegate struct{}
+var itemDelegate = list.ItemDelegate[item]{
+	func(vb tea.Viewbox, m *list.Model[item], index int, i item) {
+		str := fmt.Sprintf("%d. %s", index+1, i)
 
-func (d itemDelegate) Height() int                                     { return 1 }
-func (d itemDelegate) Spacing() int                                    { return 0 }
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return nil }
-func (d itemDelegate) Render(vb tea.Viewbox, m *list.Model[item], index int, i item) {
-	str := fmt.Sprintf("%d. %s", index+1, i)
-
-	var style styles.Style
-	if index == m.Index() {
-		style = selectedItemStyle
-		vb.Styled(selectedItemStyle).WriteLine("> ")
-	} else {
-		style = itemStyle
-	}
-	vb.PaddingLeft(2).Styled(style).WriteLine(str)
+		var style styles.Style
+		if index == m.Index() {
+			style = selectedItemStyle
+			vb.Styled(selectedItemStyle).WriteLine("> ")
+		} else {
+			style = itemStyle
+		}
+		vb.PaddingLeft(2).Styled(style).WriteLine(str)
+	},
+	1,
+	0,
+	func(tea.Msg, *list.Model[item]) []tea.Cmd { return nil },
 }
 
 type model struct {
@@ -105,12 +105,7 @@ func Main(ctx context.Context) error {
 		"Just Wine",
 	}
 
-	const (
-		listHeight   = 14
-		defaultWidth = 20
-	)
-
-	l := list.New[item](items, itemDelegate{}, defaultWidth, listHeight)
+	l := list.New[item](items, itemDelegate)
 	l.Title = "What do you want for dinner?"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)

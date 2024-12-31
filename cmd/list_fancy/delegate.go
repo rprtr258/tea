@@ -6,48 +6,39 @@ import (
 	"github.com/rprtr258/tea/components/list"
 )
 
-func newItemDelegate[I list.DefaultItem](keys *delegateKeyMap) list.DefaultDelegate[I] {
-	d := list.NewDefaultDelegate[I]()
-
-	d.UpdateFunc = func(msg tea.Msg, m *list.Model[I]) []tea.Cmd {
-		var title string
-
-		if i, ok := m.SelectedItem(); ok {
-			title = i.Title()
-		} else {
-			return nil
-		}
-
-		switch msg := msg.(type) { //nolint:gocritic
-		case tea.MsgKey:
-			switch {
-			case key.Matches(msg, keys.choose):
-				return []tea.Cmd{m.CmdNewStatusMessage(statusMessageStyle("You chose " + title))}
-
-			case key.Matches(msg, keys.remove):
-				index := m.Index()
-				m.RemoveItem(index)
-				if len(m.Items()) == 0 {
-					keys.remove.SetEnabled(false)
-				}
-				return []tea.Cmd{m.CmdNewStatusMessage(statusMessageStyle("Deleted " + title))}
-			}
-		}
-
-		return nil
-	}
-
+func newItemDelegate[I list.DefaultItem](keys *delegateKeyMap) list.ItemDelegate[I] {
 	help := []key.Binding{keys.choose, keys.remove}
+	return list.NewDefaultDelegate(
+		func(msg tea.Msg, m *list.Model[I]) []tea.Cmd {
+			var title string
 
-	d.ShortHelpFunc = func() []key.Binding {
-		return help
-	}
+			if i, ok := m.SelectedItem(); ok {
+				title = i.Title()
+			} else {
+				return nil
+			}
 
-	d.FullHelpFunc = func() [][]key.Binding {
-		return [][]key.Binding{help}
-	}
+			switch msg := msg.(type) { //nolint:gocritic
+			case tea.MsgKey:
+				switch {
+				case key.Matches(msg, keys.choose):
+					return []tea.Cmd{m.CmdNewStatusMessage(statusMessageStyle("You chose " + title))}
 
-	return d
+				case key.Matches(msg, keys.remove):
+					index := m.Index()
+					m.RemoveItem(index)
+					if len(m.Items()) == 0 {
+						keys.remove.SetEnabled(false)
+					}
+					return []tea.Cmd{m.CmdNewStatusMessage(statusMessageStyle("Deleted " + title))}
+				}
+			}
+
+			return nil
+		},
+		help,
+		[][]key.Binding{help},
+	)
 }
 
 type delegateKeyMap struct {

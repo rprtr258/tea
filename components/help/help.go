@@ -17,16 +17,16 @@ import (
 //
 // Note that if a key is disabled (via key.Binding.SetEnabled) it will not be
 // rendered in the help view, so in theory generated help should self-manage.
-type KeyMap interface {
+type KeyMap struct {
 	// ShortHelp returns a slice of bindings to be displayed in the short
 	// version of the help. The help bubble will render help in the order in
 	// which the help items are returned here.
-	ShortHelp() []key.Binding
+	ShortHelp []key.Binding
 
 	// FullHelp returns an extended group of help items, grouped by columns.
 	// The help bubble will render the help in the order in which the help
 	// items are returned here.
-	FullHelp() [][]key.Binding
+	FullHelp [][]key.Binding
 }
 
 // Styles is a set of available style definitions for the Help bubble.
@@ -84,9 +84,9 @@ func (m *Model) Update(_ tea.Msg) []tea.Cmd {
 // View renders the help view's current state.
 func (m *Model) View(vb tea.Viewbox, k KeyMap) {
 	if m.ShowAll {
-		m.FullHelpView(vb, k.FullHelp())
+		m.FullHelpView(vb, k.FullHelp)
 	} else {
-		m.ShortHelpView(vb, k.ShortHelp())
+		m.ShortHelpView(vb, k.ShortHelp)
 	}
 }
 

@@ -146,22 +146,22 @@ var (
 	_stylePagination   = list.DefaultStyle.PaginationStyle // .PaddingLeft(4)
 )
 
-type itemDelegate struct{}
-
-func (d itemDelegate) Height() int                                     { return 1 }
-func (d itemDelegate) Spacing() int                                    { return 0 }
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model[item]) []tea.Cmd { return nil }
-func (d itemDelegate) Render(vb tea.Viewbox, m *list.Model[item], index int, i item) {
-	vb = vb.PaddingLeft(2)
-	var style styles.Style
-	if index == m.Index() {
-		style = _styleItemSelected
-		vb.Styled(_styleItemSelected).WriteLine("> ")
-	} else {
-		style = _styleItem
-	}
-	vb = vb.PaddingLeft(2)
-	vb.Styled(style).WriteLine(i.name)
+var itemDelegate = list.ItemDelegate[item]{
+	func(vb tea.Viewbox, m *list.Model[item], index int, i item) {
+		vb = vb.PaddingLeft(2)
+		var style styles.Style
+		if index == m.Index() {
+			style = _styleItemSelected
+			vb.Styled(_styleItemSelected).WriteLine("> ")
+		} else {
+			style = _styleItem
+		}
+		vb = vb.PaddingLeft(2)
+		vb.Styled(style).WriteLine(i.name)
+	},
+	1,
+	0,
+	func(tea.Msg, *list.Model[item]) []tea.Cmd { return nil },
 }
 
 type model struct {
@@ -223,12 +223,7 @@ func runExamplesList(ctx context.Context, title string, examples examples) error
 		return cmp.Compare(i.name, j.name)
 	})
 
-	const (
-		listHeight   = 30
-		defaultWidth = 20
-	)
-
-	l := list.New(items, itemDelegate{}, defaultWidth, min(listHeight, len(items)+8))
+	l := list.New(items, itemDelegate)
 	l.Title = title
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)

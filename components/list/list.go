@@ -35,21 +35,21 @@ type Item interface {
 //
 // Note that if the delegate also implements help.KeyMap delegate-related
 // help items will be added to the help view.
-type ItemDelegate[I Item] interface {
+type ItemDelegate[I Item] struct {
 	// Render renders the item's view.
-	Render(vb tea.Viewbox, m *Model[I], index int, item I)
+	Render func(vb tea.Viewbox, m *Model[I], index int, item I)
 
 	// Height is the height of the list item.
-	Height() int
+	Height int
 
 	// Spacing is the size of the horizontal gap between list items in cells.
-	Spacing() int
+	Spacing int
 
 	// Update is the update loop for items. All messages in the list's update
 	// loop will pass through here except when the user is setting a filter.
 	// Use this method to perform item-level updates appropriate to this
 	// delegate.
-	Update(msg tea.Msg, m *Model[I]) []tea.Cmd
+	Update func(msg tea.Msg, m *Model[I]) []tea.Cmd
 }
 
 type filteredItem[I Item] struct {
@@ -156,8 +156,6 @@ type Model[I Item] struct {
 
 	spinner     spinner.Model
 	showSpinner bool
-	width       int
-	height      int
 	Paginator   paginator.Model
 	cursor      int
 	Help        help.Model
@@ -183,7 +181,7 @@ type Model[I Item] struct {
 }
 
 // New returns a new model with sensible defaults.
-func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I] {
+func New[I Item](items []I, delegate ItemDelegate[I]) Model[I] {
 	filterInput := textinput.New()
 	filterInput.Prompt = "Filter: "
 	filterInput.PromptStyle = DefaultStyle.FilterPrompt
@@ -213,8 +211,6 @@ func New[I Item](items []I, delegate ItemDelegate[I], width, height int) Model[I
 		FilterInput:           filterInput,
 		StatusMessageLifetime: time.Second,
 
-		width:     width,
-		height:    height,
 		delegate:  delegate,
 		items:     items,
 		Paginator: p,
@@ -553,16 +549,6 @@ func (m *Model[I]) IsFiltered() bool {
 	return m.filterState == FilterApplied
 }
 
-// Width returns the current width setting.
-func (m *Model[I]) Width() int {
-	return m.width
-}
-
-// Height returns the current height setting.
-func (m *Model[I]) Height() int {
-	return m.height
-}
-
 // SetSpinner allows to set the spinner style.
 func (m *Model[I]) SetSpinner(spinner spinner.Spinner) {
 	m.spinner.Spinner = spinner
@@ -616,25 +602,9 @@ func (m *Model[I]) CmdNewStatusMessage(s string) tea.Cmd {
 }
 
 // SetSize sets the width and height of this component.
-func (m *Model[I]) SetSize(width, height int) {
-	m.setSize(width, height)
-}
-
-// SetWidth sets the width of this component.
-func (m *Model[I]) SetWidth(v int) {
-	m.setSize(v, m.height)
-}
-
-// SetHeight sets the height of this component.
-func (m *Model[I]) SetHeight(v int) {
-	m.setSize(m.width, v)
-}
-
-func (m *Model[I]) setSize(width, height int) {
+func (m *Model[I]) SetWidth(width int) { // TODO: remove
 	promptWidth := styles.Width(m.Styles.Title.Render(m.FilterInput.Prompt))
 
-	m.width = width
-	m.height = height
 	m.Help.Width = width
 	m.FilterInput.Width = width - promptWidth - styles.Width(m.spinnerView())
 	m.updatePagination()
@@ -712,8 +682,8 @@ func (m *Model[I]) updateKeybindings() {
 // Update pagination according to the amount of items for the current state.
 func (m *Model[I]) updatePagination() {
 	index := m.Index()
-	availHeight := m.height
 
+	availHeight := 8 //m.height // TODO: get back/remove?
 	if m.showTitle || m.showFilter && m.filteringEnabled {
 		availHeight -= 2
 	}
@@ -727,7 +697,7 @@ func (m *Model[I]) updatePagination() {
 		availHeight -= 2
 	}
 
-	m.Paginator.PerPage = max(1, availHeight/(m.delegate.Height()+m.delegate.Spacing()))
+	m.Paginator.PerPage = max(1, availHeight/(m.delegate.Height+m.delegate.Spacing))
 
 	if pages := len(m.VisibleItems()); pages < 1 {
 		m.Paginator.SetTotalPages(1)
@@ -915,9 +885,10 @@ func (m *Model[I]) ShortHelp() []key.Binding {
 	// If the delegate implements the help.KeyMap interface add the short help
 	// items to the short help after the cursor movement keys.
 	if !filtering {
-		if b, ok := m.delegate.(help.KeyMap); ok {
-			kb = append(kb, b.ShortHelp()...)
-		}
+		// TODO: get back/remove?
+		// if b, ok := m.delegate.(help.KeyMap); ok {
+		// 	kb = append(kb, b.ShortHelp()...)
+		// }
 	}
 
 	kb = append(kb,
@@ -954,9 +925,10 @@ func (m *Model[I]) FullHelp() [][]key.Binding {
 	// If the delegate implements the help.KeyMap interface add full help
 	// keybindings to a special section of the full help.
 	if !filtering {
-		if b, ok := m.delegate.(help.KeyMap); ok {
-			kb = append(kb, b.FullHelp()...)
-		}
+		// TODO: get back/remove?
+		// if b, ok := m.delegate.(help.KeyMap); ok {
+		// 	kb = append(kb, b.FullHelp()...)
+		// }
 	}
 
 	listLevelBindings := []key.Binding{
@@ -1118,13 +1090,14 @@ func (m *Model[I]) populatedView(vb tea.Viewbox) {
 	for i, item := range docs {
 		m.delegate.Render(vb, m, i+start, item)
 		if i < len(docs)-1 {
-			vb = vb.PaddingTop(m.delegate.Spacing() + m.delegate.Height())
+			vb = vb.PaddingTop(m.delegate.Spacing + m.delegate.Height)
 		}
 	}
 }
 
 func (m *Model[I]) helpView(vb tea.Viewbox) {
-	m.Help.View(vb, m)
+	// TODO: get back/remove?
+	// m.Help.View(vb, m)
 }
 
 func (m *Model[I]) spinnerView() string {

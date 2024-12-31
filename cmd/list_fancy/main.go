@@ -94,7 +94,7 @@ func newModel() *model {
 	listKeys := newListKeyMap()
 	// Setup list
 	delegate := newItemDelegate[item](delegateKeys)
-	groceryList := list.New[item](items, delegate, 0, 0)
+	groceryList := list.New[item](items, delegate)
 	groceryList.Title = "Groceries"
 	groceryList.Styles.Title = titleStyle
 	groceryList.AdditionalFullHelpKeys = func() []key.Binding {
@@ -124,7 +124,7 @@ func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 	ctxList := tea.Of(c, func(m *model) *list.Model[item] { return &m.list })
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
-		m.list.SetSize(msg.Width-appPadding.Left-appPadding.Right, msg.Height-appPadding.Top-appPadding.Bottom)
+		m.list.SetWidth(msg.Width - appPadding.Left - appPadding.Right)
 	case tea.MsgKey:
 		// Don't match any of the keys below if we're actively filtering.
 		if m.list.FilterState() == list.Filtering {
