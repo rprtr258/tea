@@ -3,6 +3,8 @@ package list_fancy //nolint:revive,stylecheck
 import (
 	"math/rand"
 	"sync"
+
+	"github.com/rprtr258/tea/components/list"
 )
 
 type randomItemGenerator struct {
@@ -137,7 +139,7 @@ func (r *randomItemGenerator) reset() {
 	})
 }
 
-func (r *randomItemGenerator) next() item {
+func (r *randomItemGenerator) next() list.DefaultItem[item] {
 	if r.mu == nil {
 		r.reset()
 	}
@@ -145,9 +147,9 @@ func (r *randomItemGenerator) next() item {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	i := item{
-		title:       r.titles[r.titleIndex],
-		description: r.descs[r.descIndex],
+	i := list.DefaultItem[item]{
+		Title:       r.titles[r.titleIndex],
+		Description: r.descs[r.descIndex],
 	}
 
 	r.titleIndex++

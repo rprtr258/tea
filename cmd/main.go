@@ -137,8 +137,6 @@ type item struct {
 	main func(context.Context) error
 }
 
-func (i item) FilterValue() string { return i.name }
-
 var (
 	_styleTitle        = styles.Style{} // .MarginLeft(2)
 	_styleItem         = styles.Style{}
@@ -223,7 +221,7 @@ func runExamplesList(ctx context.Context, title string, examples examples) error
 		return cmp.Compare(i.name, j.name)
 	})
 
-	l := list.New(items, itemDelegate)
+	l := list.New(items, itemDelegate, func(i item) string { return i.name })
 	l.Title = title
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)

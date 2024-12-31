@@ -6,14 +6,14 @@ import (
 	"github.com/rprtr258/tea/components/list"
 )
 
-func newItemDelegate[I list.DefaultItem](keys *delegateKeyMap) list.ItemDelegate[I] {
+func newItemDelegate[I any](keys *delegateKeyMap) list.ItemDelegate[list.DefaultItem[I]] {
 	help := []key.Binding{keys.choose, keys.remove}
 	return list.NewDefaultDelegate(
-		func(msg tea.Msg, m *list.Model[I]) []tea.Cmd {
+		func(msg tea.Msg, m *list.Model[list.DefaultItem[I]]) []tea.Cmd {
 			var title string
 
 			if i, ok := m.SelectedItem(); ok {
-				title = i.Title()
+				title = i.Title
 			} else {
 				return nil
 			}

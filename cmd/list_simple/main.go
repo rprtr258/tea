@@ -17,12 +17,8 @@ var (
 	quitTextStyle     = styles.Style{}                    // .Margin(1, 0, 2, 4)
 )
 
-type item string
-
-func (i item) FilterValue() string { return "" }
-
-var itemDelegate = list.ItemDelegate[item]{
-	func(vb tea.Viewbox, m *list.Model[item], index int, i item) {
+var itemDelegate = list.ItemDelegate[string]{
+	func(vb tea.Viewbox, m *list.Model[string], index int, i string) {
 		str := fmt.Sprintf("%d. %s", index+1, i)
 
 		var style styles.Style
@@ -36,11 +32,11 @@ var itemDelegate = list.ItemDelegate[item]{
 	},
 	1,
 	0,
-	func(tea.Msg, *list.Model[item]) []tea.Cmd { return nil },
+	func(tea.Msg, *list.Model[string]) []tea.Cmd { return nil },
 }
 
 type model struct {
-	list     list.Model[item]
+	list     list.Model[string]
 	choice   string
 	quitting bool
 }
@@ -68,7 +64,7 @@ func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 		}
 	}
 
-	ctxList := tea.Of(c, func(m *model) *list.Model[item] { return &m.list })
+	ctxList := tea.Of(c, func(m *model) *list.Model[string] { return &m.list })
 	m.list.Update(ctxList, msg)
 }
 
@@ -92,7 +88,7 @@ func (m *model) View(vb tea.Viewbox) {
 }
 
 func Main(ctx context.Context) error {
-	items := []item{
+	items := []string{
 		"Ramen",
 		"Tomato Soup",
 		"Hamburgers",
@@ -105,7 +101,7 @@ func Main(ctx context.Context) error {
 		"Just Wine",
 	}
 
-	l := list.New[item](items, itemDelegate)
+	l := list.New(items, itemDelegate, nil)
 	l.Title = "What do you want for dinner?"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)

@@ -22,20 +22,13 @@ import (
 	"github.com/rprtr258/tea/styles"
 )
 
-// Item is an item that appears in the list.
-type Item interface {
-	// FilterValue is the value we use when filtering against this item when
-	// we're filtering the list.
-	FilterValue() string
-}
-
 // ItemDelegate encapsulates the general functionality for all list items. The
 // benefit to separating this logic from the item itself is that you can change
 // the functionality of items without changing the actual items themselves.
 //
 // Note that if the delegate also implements help.KeyMap delegate-related
 // help items will be added to the help view.
-type ItemDelegate[I Item] struct {
+type ItemDelegate[I any] struct {
 	// Render renders the item's view.
 	Render func(vb tea.Viewbox, m *Model[I], index int, item I)
 
@@ -52,12 +45,12 @@ type ItemDelegate[I Item] struct {
 	Update func(msg tea.Msg, m *Model[I]) []tea.Cmd
 }
 
-type filteredItem[I Item] struct {
+type filteredItem[I any] struct {
 	item    I     // item matched
 	matches []int // rune indices of matched items
 }
 
-type filteredItems[I Item] []filteredItem[I]
+type filteredItems[I any] []filteredItem[I]
 
 func (f filteredItems[I]) items() []I {
 	return fun.Map[I](
@@ -69,7 +62,7 @@ func (f filteredItems[I]) items() []I {
 
 // MsgFilterMatches contains data about items matched during filtering. The
 // message should be routed to Update for processing.
-type MsgFilterMatches[I Item] []filteredItem[I]
+type MsgFilterMatches[I any] []filteredItem[I]
 
 // FilterFunc takes a term and a list of strings to search through
 // (defined by Item#FilterValue).
@@ -123,7 +116,7 @@ func (f FilterState) String() string {
 }
 
 // Model contains the state of this component.
-type Model[I Item] struct {
+type Model[I any] struct {
 	showTitle        bool
 	showFilter       bool
 	showStatusBar    bool
@@ -141,7 +134,11 @@ type Model[I Item] struct {
 	// Key mappings for navigating the list.
 	KeyMap KeyMap
 
-	// Filter is used to filter the list.
+	// ItemFilterValue is used to filter the list.
+	// FilterValue is the value we use when filtering against this item when
+	// we're filtering the list.
+	ItemFilterValue func(I) string
+
 	Filter FilterFunc
 
 	disableQuitKeybindings bool
@@ -181,7 +178,11 @@ type Model[I Item] struct {
 }
 
 // New returns a new model with sensible defaults.
-func New[I Item](items []I, delegate ItemDelegate[I]) Model[I] {
+func New[I any](items []I, delegate ItemDelegate[I], filter func(I) string) Model[I] {
+	if filter == nil {
+		filter = func(I) string { return "" }
+	}
+
 	filterInput := textinput.New()
 	filterInput.Prompt = "Filter: "
 	filterInput.PromptStyle = DefaultStyle.FilterPrompt
@@ -1104,7 +1105,7 @@ func (m *Model[I]) spinnerView() string {
 	return ""
 }
 
-func cmdFilterItems[I Item](m Model[I]) tea.Cmd {
+func cmdFilterItems[I any](m Model[I]) tea.Cmd {
 	return func() tea.Msg {
 		if m.FilterInput.Value() == "" || m.filterState == Unfiltered {
 			return MsgFilterMatches[I](m.itemsAsFilterItems()) // return nothing
@@ -1114,7 +1115,7 @@ func cmdFilterItems[I Item](m Model[I]) tea.Cmd {
 		items := m.items
 
 		for _, t := range items {
-			targets = append(targets, t.FilterValue())
+			targets = append(targets, m.ItemFilterValue(t))
 		}
 
 		filterMatches := []filteredItem[I]{}
@@ -1129,7 +1130,7 @@ func cmdFilterItems[I Item](m Model[I]) tea.Cmd {
 	}
 }
 
-func insertItemIntoSlice[I Item](items []I, item I, index int) []I {
+func insertItemIntoSlice[I any](items []I, item I, index int) []I {
 	if items == nil {
 		return []I{item}
 	}

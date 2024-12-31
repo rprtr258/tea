@@ -28,14 +28,7 @@ var (
 				Render
 )
 
-type item struct {
-	title       string
-	description string
-}
-
-func (i item) Title() string       { return i.title }
-func (i item) Description() string { return i.description }
-func (i item) FilterValue() string { return i.title }
+type item struct{}
 
 type listKeyMap struct {
 	toggleSpinner    key.Binding
@@ -76,7 +69,7 @@ func newListKeyMap() *listKeyMap {
 }
 
 type model struct {
-	list          list.Model[item]
+	list          list.Model[list.DefaultItem[item]]
 	itemGenerator *randomItemGenerator
 	keys          *listKeyMap
 	delegateKeys  *delegateKeyMap
@@ -86,7 +79,7 @@ func newModel() *model {
 	var itemGenerator randomItemGenerator
 	// Make initial list of items
 	const numItems = 24
-	items := make([]item, numItems)
+	items := make([]list.DefaultItem[item], numItems)
 	for i := range items {
 		items[i] = itemGenerator.next()
 	}
@@ -94,7 +87,9 @@ func newModel() *model {
 	listKeys := newListKeyMap()
 	// Setup list
 	delegate := newItemDelegate[item](delegateKeys)
-	groceryList := list.New[item](items, delegate)
+	groceryList := list.New[list.DefaultItem[item]](items, delegate, func(di list.DefaultItem[item]) string {
+		return di.Title
+	})
 	groceryList.Title = "Groceries"
 	groceryList.Styles.Title = titleStyle
 	groceryList.AdditionalFullHelpKeys = func() []key.Binding {
@@ -121,7 +116,7 @@ func (m *model) Init(c tea.Context[*model]) {
 }
 
 func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
-	ctxList := tea.Of(c, func(m *model) *list.Model[item] { return &m.list })
+	ctxList := tea.Of(c, func(m *model) *list.Model[list.DefaultItem[item]] { return &m.list })
 	switch msg := msg.(type) {
 	case tea.MsgWindowSize:
 		m.list.SetWidth(msg.Width - appPadding.Left - appPadding.Right)
@@ -149,7 +144,7 @@ func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 			m.delegateKeys.remove.SetEnabled(true)
 			newItem := m.itemGenerator.next()
 			c.Dispatch(m.list.InsertItem(0, newItem)...)
-			c.Dispatch(m.list.CmdNewStatusMessage(statusMessageStyle("Added " + newItem.Title())))
+			c.Dispatch(m.list.CmdNewStatusMessage(statusMessageStyle("Added " + newItem.Title)))
 		}
 	}
 

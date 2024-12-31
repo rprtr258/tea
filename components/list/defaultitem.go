@@ -50,10 +50,10 @@ var NewDefaultItemStyles = func() DefaultItemStyles {
 }()
 
 // DefaultItem describes an items designed to work with DefaultDelegate.
-type DefaultItem interface {
-	Item
-	Title() string
-	Description() string
+type DefaultItem[I any] struct {
+	Item        I
+	Title       string
+	Description string
 }
 
 // DefaultDelegate is a standard delegate designed to work in lists. It's
@@ -69,10 +69,10 @@ type DefaultItem interface {
 //
 // Settings ShortHelpFunc and FullHelpFunc is optional. They can be set to
 // include items in the list's default short and full help menus.
-type DefaultDelegate[I DefaultItem] struct {
+type DefaultDelegate[I any] struct {
 	ShowDescription bool
 	Styles          DefaultItemStyles
-	UpdateFunc      func(tea.Msg, *Model[I]) []tea.Cmd
+	UpdateFunc      func(tea.Msg, *Model[DefaultItem[I]]) []tea.Cmd
 	shortHelp       []key.Binding
 	fullHelp        [][]key.Binding
 	height          int
@@ -80,11 +80,11 @@ type DefaultDelegate[I DefaultItem] struct {
 }
 
 // NewDefaultDelegate creates a new delegate with default styles.
-func NewDefaultDelegate[I DefaultItem](
-	UpdateFunc func(tea.Msg, *Model[I]) []tea.Cmd,
+func NewDefaultDelegate[I any](
+	UpdateFunc func(tea.Msg, *Model[DefaultItem[I]]) []tea.Cmd,
 	ShortHelp []key.Binding,
 	FullHelp [][]key.Binding,
-) ItemDelegate[I] {
+) ItemDelegate[DefaultItem[I]] {
 	d := &DefaultDelegate[I]{
 		ShowDescription: true,
 		Styles:          NewDefaultItemStyles,
@@ -94,7 +94,7 @@ func NewDefaultDelegate[I DefaultItem](
 		shortHelp:       ShortHelp,
 		fullHelp:        FullHelp,
 	}
-	return ItemDelegate[I]{
+	return ItemDelegate[DefaultItem[I]]{
 		d.Render,
 		// Height returns the delegate's preferred height.
 		// This has effect only if ShowDescription is true,
@@ -116,7 +116,7 @@ func (d *DefaultDelegate[I]) SetSpacing(i int) {
 }
 
 // Update checks whether the delegate's UpdateFunc is set and calls it.
-func (d DefaultDelegate[I]) Update(msg tea.Msg, m *Model[I]) []tea.Cmd {
+func (d DefaultDelegate[I]) Update(msg tea.Msg, m *Model[DefaultItem[I]]) []tea.Cmd {
 	if d.UpdateFunc == nil {
 		return nil
 	}
@@ -124,14 +124,14 @@ func (d DefaultDelegate[I]) Update(msg tea.Msg, m *Model[I]) []tea.Cmd {
 }
 
 // Render prints an item.
-func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[I], index int, item I) {
+func (d DefaultDelegate[I]) Render(vb tea.Viewbox, m *Model[DefaultItem[I]], index int, item DefaultItem[I]) {
 	if vb.Width <= 0 { // TODO: remove?
 		// short-circuit
 		return
 	}
 
-	title := item.Title()
-	desc := item.Description()
+	title := item.Title
+	desc := item.Description
 
 	s := &d.Styles
 	// Prevent text from exceeding list width

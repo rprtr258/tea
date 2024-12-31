@@ -15,16 +15,10 @@ var appPadding = tea.PaddingOptions{
 	Bottom: 1,
 }
 
-type item struct {
-	title, desc string
-}
-
-func (i item) Title() string       { return i.title }
-func (i item) Description() string { return i.desc }
-func (i item) FilterValue() string { return i.title }
+type item struct{}
 
 type model struct {
-	list list.Model[item]
+	list list.Model[list.DefaultItem[item]]
 }
 
 func (m *model) Init(tea.Context[*model]) {}
@@ -42,7 +36,7 @@ func (m *model) Update(c tea.Context[*model], msg tea.Msg) {
 		)
 	}
 
-	ctxList := tea.Of(c, func(m *model) *list.Model[item] { return &m.list })
+	ctxList := tea.Of(c, func(m *model) *list.Model[list.DefaultItem[item]] { return &m.list })
 	m.list.Update(ctxList, msg)
 }
 
@@ -75,15 +69,17 @@ func Main(ctx context.Context) error {
 		"The vernal equinox":   "The autumnal equinox is pretty good too",
 		"Gaffer’s tape":        "Basically sticky fabric",
 		"Terrycloth":           "In other words, towel fabric",
-	}, func(title, desc string) item {
-		return item{
-			title: title,
-			desc:  desc,
+	}, func(title, description string) list.DefaultItem[item] {
+		return list.DefaultItem[item]{
+			Title:       title,
+			Description: description,
 		}
 	})
 
 	m := &model{
-		list: list.New[item](items, list.NewDefaultDelegate[item](nil, nil, nil)),
+		list: list.New(items, list.NewDefaultDelegate[item](nil, nil, nil), func(di list.DefaultItem[item]) string {
+			return di.Title
+		}),
 	}
 	m.list.Title = "My Fave Things"
 
