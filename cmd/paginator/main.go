@@ -9,7 +9,7 @@ import (
 	"github.com/rprtr258/fun/iter"
 
 	"github.com/rprtr258/tea"
-	"github.com/rprtr258/tea/components/paginator"
+	"github.com/rprtr258/tea/components/pager"
 	"github.com/rprtr258/tea/styles"
 )
 
@@ -20,9 +20,9 @@ func newModel() *model {
 			return fmt.Sprintf("Item %d", i)
 		}).Slice()
 
-	p := paginator.New()
-	p.Type = paginator.Dots
-	p.PerPage = 10
+	p := pager.New()
+	p.Type = pager.Dots
+	p.Pager.PerPageSet(10)
 	p.ActiveDotStyle = styles.Style{}.Foreground(styles.FgAdaptiveColor("235", "252"))
 	p.InactiveDotStyle = styles.Style{}.Foreground(styles.FgAdaptiveColor("250", "238"))
 	p.InactiveDot = '•'
@@ -36,7 +36,7 @@ func newModel() *model {
 
 type model struct {
 	items     []string
-	paginator paginator.Model
+	paginator pager.Model
 }
 
 func (m *model) Init(func(...tea.Cmd)) {}

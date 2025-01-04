@@ -16,7 +16,7 @@ import (
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/help"
 	"github.com/rprtr258/tea/components/key"
-	"github.com/rprtr258/tea/components/paginator"
+	"github.com/rprtr258/tea/components/pager"
 	"github.com/rprtr258/tea/components/spinner"
 	"github.com/rprtr258/tea/components/textinput"
 	"github.com/rprtr258/tea/styles"
@@ -40,24 +40,13 @@ type ItemDelegate[I any] struct {
 
 	// Update is the update loop for items. All messages in the list's update
 	// loop will pass through here except when the user is setting a filter.
-	// Use this method to perform item-level updates appropriate to this
-	// delegate.
+	// Use this method to perform item-level updates appropriate to this delegate.
 	Update func(msg tea.Msg, m *Model[I]) []tea.Cmd
 }
 
 type filteredItem[I any] struct {
 	item    I     // item matched
 	matches []int // rune indices of matched items
-}
-
-type filteredItems[I any] []filteredItem[I]
-
-func (f filteredItems[I]) items() []I {
-	return fun.Map[I](
-		func(v filteredItem[I]) I {
-			return v.item
-		},
-		f...)
 }
 
 // MsgFilterMatches contains data about items matched during filtering. The
@@ -67,26 +56,16 @@ type MsgFilterMatches[I any] []filteredItem[I]
 // FilterFunc takes a term and a list of strings to search through
 // (defined by Item#FilterValue).
 // It should return a sorted list of ranks.
-type FilterFunc func(string, []string) []Rank
-
-// Rank defines a rank for a given item.
-type Rank struct {
-	// The index of the item in the original input.
-	Index int
-	// Indices of the actual word that were matched against the filter term.
-	MatchedIndexes []int
-}
+type FilterFunc = func(string, []string) []fuzzy.Match
 
 // DefaultFilter uses the sahilm/fuzzy to filter through the list.
 // This is set by default.
-func DefaultFilter(term string, targets []string) []Rank {
+func DefaultFilter(term string, targets []string) []fuzzy.Match {
 	ranks := fuzzy.Find(term, targets)
 	slices.SortStableFunc(ranks, func(i, j fuzzy.Match) int {
 		return j.Score - i.Score
 	})
-	return fun.Map[Rank](func(r fuzzy.Match) Rank {
-		return Rank{r.Index, r.MatchedIndexes}
-	}, ranks...)
+	return ranks
 }
 
 type msgStatusMessageTimeout struct{}
@@ -112,12 +91,11 @@ func (f FilterState) String() string {
 
 // Model contains the state of this component.
 type Model[I any] struct {
-	showTitle        bool
-	showFilter       bool
-	showStatusBar    bool
-	showPagination   bool
-	showHelp         bool
-	filteringEnabled bool
+	showTitle      bool
+	showFilter     bool
+	showStatusBar  bool
+	showPagination bool
+	showHelp       bool
 
 	itemNameSingular string
 	itemNamePlural   string
@@ -132,9 +110,9 @@ type Model[I any] struct {
 	// ItemFilterValue is used to filter the list.
 	// FilterValue is the value we use when filtering against this item when
 	// we're filtering the list.
-	ItemFilterValue func(I) string
-
-	Filter FilterFunc
+	ItemFilterValue  func(I) string
+	Filter           FilterFunc
+	filteringEnabled bool
 
 	disableQuitKeybindings bool
 
@@ -148,14 +126,12 @@ type Model[I any] struct {
 
 	spinner     spinner.Model
 	showSpinner bool
-	Paginator   paginator.Model
-	cursor      int
+	Paginator   pager.Model
 	Help        help.Model
 	FilterInput textinput.Model
 	filterState FilterState
 
-	// How long status messages should stay visible. By default this is
-	// 1 second.
+	// How long status messages should stay visible. By default this is 1 second.
 	StatusMessageLifetime time.Duration
 
 	statusMessage      string
@@ -167,9 +143,9 @@ type Model[I any] struct {
 	// Filtered items we're currently displaying. Filtering, toggles and so on
 	// will alter this slice so we can show what is relevant. For that reason,
 	// this field should be considered ephemeral.
-	filteredItems filteredItems[I]
+	filteredItems []filteredItem[I]
 
-	delegate ItemDelegate[I]
+	ItemDelegate[I]
 }
 
 // New returns a new model with sensible defaults.
@@ -185,8 +161,8 @@ func New[I any](items []I, delegate ItemDelegate[I], filter func(I) string) Mode
 	filterInput.CharLimit = 64
 	filterInput.Focus()
 
-	p := paginator.New()
-	p.Type = paginator.Dots
+	p := pager.New()
+	p.Type = pager.Dots
 	p.ActiveDotStyle = DefaultStyle.ActivePaginationDot
 	p.InactiveDotStyle = DefaultStyle.InactivePaginationDot
 	p.InactiveDot = bullet
@@ -207,9 +183,9 @@ func New[I any](items []I, delegate ItemDelegate[I], filter func(I) string) Mode
 		FilterInput:           filterInput,
 		StatusMessageLifetime: time.Second,
 
-		delegate:  delegate,
-		items:     items,
-		Paginator: p,
+		ItemDelegate: delegate,
+		items:        items,
+		Paginator:    p,
 		spinner: spinner.New(
 			spinner.WithSpinner(spinner.Line),
 			spinner.WithStyle(DefaultStyle.Spinner),
@@ -336,8 +312,7 @@ func (m *Model[I]) SetItems(items []I) tea.Cmd {
 
 // Select selects the given index of the list and goes to its respective page.
 func (m *Model[I]) Select(index int) {
-	m.Paginator.Page = index / m.Paginator.PerPage
-	m.cursor = index % m.Paginator.PerPage
+	m.Paginator.Pager.Select(index)
 }
 
 // ResetSelected resets the selected item to the first item in the first page of the list.
@@ -366,7 +341,7 @@ func (m *Model[I]) SetItem(index int, item I) []tea.Cmd {
 // InsertItem inserts an item at the given index. If the index is out of the upper bound,
 // the item will be appended. This returns a command.
 func (m *Model[I]) InsertItem(index int, item I) []tea.Cmd {
-	m.items = insertItemIntoSlice(m.items, item, index)
+	m.items = slices.Insert(m.items, index, item)
 
 	var cmd []tea.Cmd
 	if m.filterState != Unfiltered {
@@ -382,9 +357,10 @@ func (m *Model[I]) InsertItem(index int, item I) []tea.Cmd {
 // this will be a no-op. O(n) complexity, which probably won't matter in the
 // case of a TUI.
 func (m *Model[I]) RemoveItem(index int) {
-	m.items = removeItemFromSlice(m.items, index)
+	m.items = slices.Replace(m.items, index, index+1)
+
 	if m.filterState != Unfiltered {
-		m.filteredItems = removeItemFromSlice(m.filteredItems, index)
+		m.filteredItems = slices.Replace(m.filteredItems, index, index+1)
 		if len(m.filteredItems) == 0 {
 			m.resetFiltering()
 		}
@@ -394,14 +370,16 @@ func (m *Model[I]) RemoveItem(index int) {
 
 // SetDelegate sets the item delegate.
 func (m *Model[I]) SetDelegate(d ItemDelegate[I]) {
-	m.delegate = d
+	m.ItemDelegate = d
 	m.updatePagination()
 }
 
 // VisibleItems returns the total items available to be shown.
 func (m *Model[I]) VisibleItems() []I {
 	if m.filterState != Unfiltered {
-		return m.filteredItems.items()
+		return fun.Map[I](func(v filteredItem[I]) I {
+			return v.item
+		}, m.filteredItems...)
 	}
 	return m.items
 }
@@ -434,76 +412,33 @@ func (m *Model[I]) MatchesForItem(index int) []int {
 // Index returns the index of the currently selected item as it appears in the
 // entire slice of items.
 func (m *Model[I]) Index() int {
-	return m.Paginator.Page*m.Paginator.PerPage + m.cursor
+	return m.Paginator.Pager.SelectedValue()
 }
 
 // Cursor returns the index of the cursor on the current page.
 func (m *Model[I]) Cursor() int {
-	return m.cursor
+	return m.Paginator.Pager.SelectedInPage()
 }
 
-// CursorUp moves the cursor up. This can also move the state to the previous
-// page.
+// CursorUp moves the cursor up. This can also move the state to the previous page.
 func (m *Model[I]) CursorUp() {
-	m.cursor--
-
-	// If we're at the start, stop
-	if m.cursor < 0 && m.Paginator.Page == 0 {
-		// if infinite scrolling is enabled, go to the last item
-		if m.InfiniteScrolling {
-			m.Paginator.Page = m.Paginator.TotalPages - 1
-			m.cursor = m.Paginator.ItemsOnPage(len(m.VisibleItems())) - 1
-			return
-		}
-
-		m.cursor = 0
+	if m.InfiniteScrolling && m.Paginator.Pager.SelectedValue() == 0 {
+		m.Paginator.Pager.SelectLast()
 		return
 	}
 
-	// Move the cursor as normal
-	if m.cursor >= 0 {
-		return
-	}
-
-	// Go to the previous page
-	m.Paginator.PrevPage()
-	m.cursor = m.Paginator.ItemsOnPage(len(m.VisibleItems())) - 1
+	m.Paginator.Pager.SelectPrev()
 }
 
 // CursorDown moves the cursor down. This can also advance the state to the
 // next page.
 func (m *Model[I]) CursorDown() {
-	itemsOnPage := m.Paginator.ItemsOnPage(len(m.VisibleItems()))
-
-	m.cursor++
-
-	// If we're at the end, stop
-	if m.cursor < itemsOnPage {
+	if m.InfiniteScrolling && m.Paginator.Pager.SelectedValue() == m.Paginator.Pager.Total()-1 {
+		m.Paginator.Pager.SelectFirst()
 		return
 	}
 
-	// Go to the next page
-	if !m.Paginator.OnLastPage() {
-		m.Paginator.NextPage()
-		m.cursor = 0
-		return
-	}
-
-	// During filtering the cursor position can exceed the number of
-	// itemsOnPage. It's more intuitive to start the cursor at the
-	// topmost position when moving it down in this scenario.
-	if m.cursor > itemsOnPage {
-		m.cursor = 0
-		return
-	}
-
-	m.cursor = itemsOnPage - 1
-
-	// if infinite scrolling is enabled, go to the first item
-	if m.InfiniteScrolling {
-		m.Paginator.Page = 0
-		m.cursor = 0
-	}
+	m.Paginator.Pager.SelectNext()
 }
 
 // PrevPage moves to the previous page, if available.
@@ -580,8 +515,8 @@ func (m *Model[I]) DisableQuitKeybindings() {
 	m.KeyMap.ForceQuit.SetEnabled(false)
 }
 
-// NewStatusMessage sets a new status message, which will show for a limited
-// amount of time. Note that this also returns a command.
+// NewStatusMessage sets a new status message, which will show for a limited amount of time.
+// Note that this also returns a command.
 func (m *Model[I]) CmdNewStatusMessage(s string) tea.Cmd {
 	m.statusMessage = s
 	if m.statusMessageTimer != nil {
@@ -601,7 +536,7 @@ func (m *Model[I]) CmdNewStatusMessage(s string) tea.Cmd {
 func (m *Model[I]) SetWidth(width int) { // TODO: remove
 	promptWidth := styles.Width(m.Styles.Title.Render(m.FilterInput.Prompt))
 
-	m.FilterInput.Width = width - promptWidth - styles.Width(m.spinnerView())
+	m.FilterInput.Width = width - promptWidth //- styles.Width(m.spinnerView())
 	m.updatePagination()
 }
 
@@ -617,7 +552,7 @@ func (m *Model[I]) resetFiltering() {
 	m.updateKeybindings()
 }
 
-func (m *Model[I]) itemsAsFilterItems() filteredItems[I] {
+func (m *Model[I]) itemsAsFilterItems() []filteredItem[I] {
 	fi := make([]filteredItem[I], len(m.items))
 	for i, item := range m.items {
 		fi[i] = filteredItem[I]{
@@ -650,7 +585,7 @@ func (m *Model[I]) updateKeybindings() {
 		m.KeyMap.CursorUp.SetEnabled(hasItems)
 		m.KeyMap.CursorDown.SetEnabled(hasItems)
 
-		hasPages := m.Paginator.TotalPages > 1
+		hasPages := m.Paginator.Pager.Total() > 1
 		m.KeyMap.NextPage.SetEnabled(hasPages)
 		m.KeyMap.PrevPage.SetEnabled(hasPages)
 
@@ -692,7 +627,7 @@ func (m *Model[I]) updatePagination() {
 		availHeight -= 2
 	}
 
-	m.Paginator.PerPage = max(1, availHeight/(m.delegate.Height+m.delegate.Spacing))
+	m.Paginator.Pager.PerPageSet(max(1, availHeight/(m.Height+m.Spacing)))
 
 	if pages := len(m.VisibleItems()); pages < 1 {
 		m.Paginator.SetTotalPages(1)
@@ -701,11 +636,7 @@ func (m *Model[I]) updatePagination() {
 	}
 
 	// Restore index
-	m.Paginator.Page = index / m.Paginator.PerPage
-	m.cursor = index % m.Paginator.PerPage
-
-	// Make sure the page stays in bounds
-	m.Paginator.Page = min(m.Paginator.Page, m.Paginator.TotalPages-1)
+	m.Paginator.Pager.Select(index)
 }
 
 func (m *Model[I]) hideStatusMessage() {
@@ -725,7 +656,7 @@ func (m *Model[I]) Update(c tea.Context[*Model[I]], msg tea.Msg) {
 		}
 
 	case MsgFilterMatches[I]:
-		m.filteredItems = filteredItems[I](msg)
+		m.filteredItems = []filteredItem[I](msg)
 		return
 
 	case spinner.MsgTick:
@@ -749,8 +680,6 @@ func (m *Model[I]) Update(c tea.Context[*Model[I]], msg tea.Msg) {
 
 // Updates for when a user is browsing the list.
 func (m *Model[I]) handleBrowsing(c tea.Context[*Model[I]], msg tea.Msg) {
-	numItems := len(m.VisibleItems())
-
 	switch msg := msg.(type) { //nolint:gocritic
 	case tea.MsgKey:
 		switch {
@@ -765,23 +694,18 @@ func (m *Model[I]) handleBrowsing(c tea.Context[*Model[I]], msg tea.Msg) {
 
 		case key.Matches(msg, m.KeyMap.CursorUp):
 			m.CursorUp()
-
 		case key.Matches(msg, m.KeyMap.CursorDown):
 			m.CursorDown()
 
 		case key.Matches(msg, m.KeyMap.PrevPage):
 			m.Paginator.PrevPage()
-
 		case key.Matches(msg, m.KeyMap.NextPage):
 			m.Paginator.NextPage()
 
 		case key.Matches(msg, m.KeyMap.GoToStart):
-			m.Paginator.Page = 0
-			m.cursor = 0
-
+			m.Paginator.Pager.SelectFirst()
 		case key.Matches(msg, m.KeyMap.GoToEnd):
-			m.Paginator.Page = m.Paginator.TotalPages - 1
-			m.cursor = m.Paginator.ItemsOnPage(numItems) - 1
+			m.Paginator.Pager.SelectLast()
 
 		case key.Matches(msg, m.KeyMap.Filter):
 			m.hideStatusMessage()
@@ -789,8 +713,7 @@ func (m *Model[I]) handleBrowsing(c tea.Context[*Model[I]], msg tea.Msg) {
 				// Populate filter with all items only if the filter is empty.
 				m.filteredItems = m.itemsAsFilterItems()
 			}
-			m.Paginator.Page = 0
-			m.cursor = 0
+			m.Paginator.Pager.SelectFirst()
 			m.filterState = Filtering
 			m.FilterInput.CursorEnd()
 			m.FilterInput.Focus()
@@ -804,13 +727,7 @@ func (m *Model[I]) handleBrowsing(c tea.Context[*Model[I]], msg tea.Msg) {
 		}
 	}
 
-	cmds := m.delegate.Update(msg, m)
-
-	// Keep the index in bounds when paginating
-	itemsOnPage := m.Paginator.ItemsOnPage(len(m.VisibleItems()))
-	if m.cursor > itemsOnPage-1 {
-		m.cursor = max(0, itemsOnPage-1)
-	}
+	cmds := m.ItemDelegate.Update(msg, m)
 
 	c.Dispatch(cmds...)
 }
@@ -1052,15 +969,15 @@ func (m *Model[I]) statusView(vb tea.Viewbox) {
 }
 
 func (m *Model[I]) paginationView(vb tea.Viewbox) {
-	if m.Paginator.TotalPages < 2 { //nolint:gomnd
+	if m.Paginator.Pager.Pages() < 2 { //nolint:gomnd
 		return
 	}
 
 	style := m.Styles.PaginationStyle
 	// If the dot pagination is wider than the width of the window
 	// use the arabic paginator.
-	if vb.Width > 0 && m.Paginator.TotalPages > vb.Width {
-		m.Paginator.Type = paginator.Arabic
+	if vb.Width > 0 && m.Paginator.Pager.Pages() > vb.Width {
+		m.Paginator.Type = pager.Arabic
 		style = m.Styles.ArabicPagination
 	}
 
@@ -1083,21 +1000,49 @@ func (m *Model[I]) populatedView(vb tea.Viewbox) {
 	docs := items[start:end]
 
 	for i, item := range docs {
-		m.delegate.Render(vb.MaxHeight(m.delegate.Height), m, i+start, item)
+		m.ItemDelegate.Render(vb.MaxHeight(m.Height), m, i+start, item)
 		if i < len(docs)-1 {
-			vb = vb.PaddingTop(m.delegate.Spacing + m.delegate.Height)
+			vb = vb.PaddingTop(m.Spacing + m.Height)
 		}
 	}
 }
 
 func (m *Model[I]) helpView(vb tea.Viewbox) {
-	// TODO: get back/remove?
-	// m.Help.View(vb, m)
+	fullHelp := [][]key.Binding{
+		{
+			m.KeyMap.CursorUp,
+			m.KeyMap.CursorDown,
+			m.KeyMap.NextPage,
+			m.KeyMap.PrevPage,
+			m.KeyMap.GoToStart,
+			m.KeyMap.GoToEnd,
+			m.KeyMap.Filter,
+			m.KeyMap.ClearFilter,
+		},
+		{
+			m.KeyMap.CancelWhileFiltering,
+			m.KeyMap.AcceptWhileFiltering,
+		},
+		{
+			m.KeyMap.ShowFullHelp,
+			m.KeyMap.CloseFullHelp,
+		},
+		{
+			m.KeyMap.Quit,
+		},
+		{
+			m.KeyMap.ForceQuit,
+		},
+	}
+
+	m.Help.View(vb, help.KeyMap{
+		ShortHelp: fun.ConcatMap(func(kb []key.Binding) []key.Binding { return kb }, fullHelp...),
+		FullHelp:  fullHelp,
+	})
 }
 
-func (m *Model[I]) spinnerView() string {
-	m.spinner.View(tea.Viewbox{})
-	return ""
+func (m *Model[I]) spinnerView(vb tea.Viewbox) {
+	m.spinner.View(vb)
 }
 
 func cmdFilterItems[I any](m Model[I]) tea.Cmd {
@@ -1107,50 +1052,20 @@ func cmdFilterItems[I any](m Model[I]) tea.Cmd {
 		}
 
 		targets := []string{}
-		items := m.items
-
-		for _, t := range items {
+		for _, t := range m.items {
 			targets = append(targets, m.ItemFilterValue(t))
 		}
 
 		filterMatches := []filteredItem[I]{}
 		for _, r := range m.Filter(m.FilterInput.Value(), targets) {
 			filterMatches = append(filterMatches, filteredItem[I]{
-				item:    items[r.Index],
+				item:    m.items[r.Index],
 				matches: r.MatchedIndexes,
 			})
 		}
 
 		return MsgFilterMatches[I](filterMatches)
 	}
-}
-
-func insertItemIntoSlice[I any](items []I, item I, index int) []I {
-	if items == nil {
-		return []I{item}
-	}
-
-	if index >= len(items) {
-		return append(items, item)
-	}
-
-	index = max(0, index)
-
-	items = append(items, item)
-	for i := len(items) - 1; i > index; i-- {
-		items[i], items[i-1] = items[i-1], items[i]
-	}
-	return items
-}
-
-// Remove an item from a slice of items at the given index. This runs in O(n).
-func removeItemFromSlice[I any](i []I, index int) []I {
-	if index >= len(i) {
-		return i // noop
-	}
-
-	copy(i[index:], i[index+1:])
-	return i[:len(i)-1]
 }
 
 func countEnabledBindings(groups [][]key.Binding) int {

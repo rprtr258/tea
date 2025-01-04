@@ -44,14 +44,10 @@ func (p *Pager) PageNext()  { p.PageSet(p.Page() + 1) }
 func (p *Pager) PageFirst() { p.PageSet(0) }
 func (p *Pager) PageLast()  { p.PageSet(p.Pages() - 1) }
 
-func (p *Pager) SelectValue() int { return p.selected }
-func (p *Pager) SelectNext() {
-	if p.selected < p.total {
-		p.selected++
-	}
-}
-func (p *Pager) SelectPrev() {
-	if p.selected > 0 {
-		p.selected--
-	}
-}
+func (p *Pager) SelectedValue() int  { return p.selected }
+func (p *Pager) SelectedInPage() int { return p.SelectedValue() % p.PerPage() }
+func (p *Pager) Select(index int)    { p.selected = min(max(0, index), p.total-1) }
+func (p *Pager) SelectNext()         { p.Select(p.SelectedValue() + 1) }
+func (p *Pager) SelectPrev()         { p.Select(p.SelectedValue() - 1) }
+func (p *Pager) SelectFirst()        { p.Select(0) }
+func (p *Pager) SelectLast()         { p.Select(p.total - 1) }

@@ -2,23 +2,24 @@
 // and rendering pagination info. Note that this package does not render actual
 // pages: it's purely for handling keystrokes related to pagination, and
 // rendering pagination status.
-package paginator
+package pager
 
 import (
 	"fmt"
 
 	"github.com/rprtr258/tea"
+	"github.com/rprtr258/tea/components/headless/pager"
 	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/styles"
 )
 
 // Type specifies the way we render pagination.
-type Type int
+type Type func(m *Model, vb tea.Viewbox)
 
 // Pagination rendering options.
-const (
-	Arabic Type = iota
-	Dots
+var (
+	Arabic = (*Model).arabicView
+	Dots   = (*Model).dotsView
 )
 
 // KeyMap is the key bindings for different actions within the paginator.
@@ -36,9 +37,7 @@ var DefaultKeyMap = KeyMap{
 
 // Model is the Tea model for this user interface.
 type Model struct {
-	Page       int // Page is the current page number.
-	PerPage    int // PerPage is the number of items per page.
-	TotalPages int // TotalPages is the total number of pages.
+	Pager *pager.Pager
 
 	Type             Type // Type configures how the pagination is rendered (Arabic, Dots).
 	ActiveDot        rune // ActiveDot is used to mark the current page under the Dots display type.
@@ -56,12 +55,8 @@ type Model struct {
 // used for other things beyond navigating sets. Note that it both returns the
 // number of total pages and alters the model.
 func (m *Model) SetTotalPages(items int) int {
-	if items < 1 {
-		return m.TotalPages
-	}
-	n := (items + m.PerPage - 1) / m.PerPage
-	m.TotalPages = n
-	return n
+	m.Pager.TotalSet(items)
+	return m.Pager.Pages()
 }
 
 // ItemsOnPage is a helper function for returning the number of items on the
@@ -82,39 +77,33 @@ func (m *Model) ItemsOnPage(totalItems int) int {
 //	start, end := model.GetSliceBounds(len(bunchOfStuff))
 //	sliceToRender := bunchOfStuff[start:end]
 func (m *Model) GetSliceBounds(length int) (int, int) {
-	start := m.Page * m.PerPage
-	end := min(start+m.PerPage, length)
+	start := m.Pager.Page() * m.Pager.PerPage()
+	end := min(start+m.Pager.PerPage(), length)
 	return start, end
 }
 
 // PrevPage is a helper function for navigating one page backward. It will not
 // page beyond the first page (i.e. page 0).
 func (m *Model) PrevPage() {
-	if m.Page > 0 {
-		m.Page--
-	}
+	m.Pager.PagePrev()
 }
 
 // NextPage is a helper function for navigating one page forward. It will not
 // page beyond the last page (i.e. totalPages - 1).
 func (m *Model) NextPage() {
-	if !m.OnLastPage() {
-		m.Page++
-	}
+	m.NextPage()
 }
 
 // OnLastPage returns whether or not we're on the last page.
 func (m *Model) OnLastPage() bool {
-	return m.Page == m.TotalPages-1
+	return m.Pager.Page() == m.Pager.Pages()-1
 }
 
 // New creates a new model with defaults.
 func New() Model {
 	return Model{
 		Type:         Arabic,
-		Page:         0,
-		PerPage:      1,
-		TotalPages:   1,
+		Pager:        pager.New(0, 1),
 		KeyMap:       DefaultKeyMap,
 		ActiveDot:    '•',
 		InactiveDot:  '○',
@@ -137,23 +126,18 @@ func (m *Model) Update(msg tea.Msg) []tea.Cmd {
 	return nil
 }
 
-// View renders the pagination.
-func (m *Model) View(vb tea.Viewbox) {
-	switch m.Type {
-	case Dots:
-		m.dotsView(vb)
-	default:
-		m.arabicView(vb)
-	}
-}
-
 func (m *Model) dotsView(vb tea.Viewbox) {
-	for i := 0; i < m.TotalPages; i++ {
+	for i := 0; i < m.Pager.Total(); i++ {
 		vb.Styled(m.InactiveDotStyle).Set(0, i, m.InactiveDot)
 	}
-	vb.Styled(m.ActiveDotStyle).Set(0, m.Page, m.ActiveDot)
+	vb.Styled(m.ActiveDotStyle).Set(0, m.Pager.Page(), m.ActiveDot)
 }
 
 func (m *Model) arabicView(vb tea.Viewbox) {
-	vb.WriteLine(fmt.Sprintf(m.ArabicFormat, m.Page+1, m.TotalPages))
+	vb.WriteLine(fmt.Sprintf(m.ArabicFormat, m.Pager.Page()+1, m.Pager.Total()))
+}
+
+// View renders the pagination.
+func (m *Model) View(vb tea.Viewbox) {
+	m.Type(m, vb)
 }
