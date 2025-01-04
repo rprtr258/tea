@@ -36,9 +36,7 @@
 // to render help text for keystrokes in your views.
 package key
 
-import (
-	"github.com/rprtr258/tea"
-)
+import "github.com/rprtr258/tea"
 
 // Help is help information for a given keybinding.
 type Help [2]string // Key, Desc

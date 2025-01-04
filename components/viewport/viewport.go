@@ -10,23 +10,20 @@ import (
 // programmatically with methods like Model.LineDown(1). See the GoDocs for
 // details.
 type KeyMap struct {
-	PageDown     key.Binding
-	PageUp       key.Binding
-	HalfPageUp   key.Binding
-	HalfPageDown key.Binding
-	Down         key.Binding
-	Up           key.Binding
+	PageUp, PageDown         key.Binding
+	HalfPageUp, HalfPageDown key.Binding
+	Down, Up                 key.Binding
 }
 
 // DefaultKeyMap returns a set of pager-like default keybindings.
 var DefaultKeyMap = KeyMap{
-	PageDown: key.Binding{
-		Keys: []string{"pgdown", " ", "f"},
-		Help: key.Help{"f/pgdn", "page down"},
-	},
 	PageUp: key.Binding{
 		Keys: []string{"pgup", "b"},
 		Help: key.Help{"b/pgup", "page up"},
+	},
+	PageDown: key.Binding{
+		Keys: []string{"pgdown", " ", "f"},
+		Help: key.Help{"f/pgdn", "page down"},
 	},
 	HalfPageUp: key.Binding{
 		Keys: []string{"u", "ctrl+u"},
@@ -74,10 +71,6 @@ func New(width, height int) Model {
 		MouseWheelDelta:   3,
 		YOffset:           0,
 	}
-}
-
-func (m *Model) Init() tea.Cmd {
-	return nil
 }
 
 // AtTop returns whether or not the viewport is at the very top position.

@@ -45,11 +45,12 @@ func Main(ctx context.Context) error {
 		Background(styles.BgColor("57")).
 		Bold(false)
 
+	widths := []int{4, 10, 10, 10}
 	columns := []table.Column{
-		{Title: "Rank", Width: 4},
-		{Title: "City", Width: 10},
-		{Title: "Country", Width: 10},
-		{Title: "Population", Width: 10},
+		{Title: "Rank"},
+		{Title: "City"},
+		{Title: "Country"},
+		{Title: "Population"},
 	}
 	rows := [][]string{
 		{"1", "Tokyo", "Japan", "37,274,000"},
@@ -154,10 +155,13 @@ func Main(ctx context.Context) error {
 		{"100", "Montreal", "Canada", "4,276,526"},
 	}
 	t := table.New(
-		table.WithColumns(columns),
-		table.WithRows(rows...),
-		table.WithHeight(7),
-		table.WithStyles(s),
+		columns,
+		widths,
+		rows,
+		7,
+		0,
+		s,
+		table.DefaultKeyMap,
 	)
 
 	_, err := tea.NewProgram(ctx, &model{t}).Run()

@@ -161,11 +161,6 @@ func New(opts ...Option) Model {
 	return m
 }
 
-// Init exists to satisfy the tea.Model interface.
-func (m *Model) Init() tea.Cmd {
-	return nil
-}
-
 // Update is used to animate the progress bar during transitions. Use
 // SetPercent to create the command you'll need to trigger the animation.
 //

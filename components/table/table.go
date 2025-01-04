@@ -2,31 +2,26 @@ package table
 
 import (
 	"github.com/mattn/go-runewidth"
-	"github.com/rprtr258/fun"
 
 	"github.com/rprtr258/tea"
 	"github.com/rprtr258/tea/components/box"
+	"github.com/rprtr258/tea/components/headless/table"
 	"github.com/rprtr258/tea/components/key"
 	"github.com/rprtr258/tea/components/viewport"
 	"github.com/rprtr258/tea/styles"
 )
 
+// Column defines the table structure
+type Column = table.Column[[]string]
+
 // Model defines a state for the table widget
 type Model struct {
-	KeyMap KeyMap
+	Table  *table.Table[[]string]
+	widths []int
 
-	cols   []Column
-	rows   [][]string
-	cursor int
-	styles Styles
-
+	styles   Styles
+	KeyMap   KeyMap
 	viewport viewport.Model
-}
-
-// Column defines the table structure
-type Column struct {
-	Title string
-	Width int
 }
 
 // KeyMap defines keybindings.
@@ -92,62 +87,28 @@ var DefaultStyles = Styles{
 // Option is used to set options in New. For example:
 //
 //	table := New(WithColumns([]Column{{Title: "ID", Width: 10}}))
-type Option func(*Model)
-
-// WithColumns sets the table columns (headers)
-func WithColumns(cols []Column) Option {
-	return func(m *Model) {
-		m.cols = cols
-	}
-}
-
-// WithRows sets the table rows (data)
-func WithRows(rows ...[]string) Option {
-	return func(m *Model) {
-		m.rows = rows
-	}
-}
-
-// WithHeight sets the height of the table
-func WithHeight(h int) Option {
-	return func(m *Model) {
-		m.viewport.Height = h
-	}
-}
-
-// WithWidth sets the width of the table
-func WithWidth(w int) Option {
-	return func(m *Model) {
-		m.viewport.Width = w
-	}
-}
-
-// WithStyles sets the table styles
-func WithStyles(s Styles) Option {
-	return func(m *Model) {
-		m.styles = s
-	}
-}
-
-// WithKeyMap sets the key map
-func WithKeyMap(km KeyMap) Option {
-	return func(m *Model) {
-		m.KeyMap = km
-	}
-}
+type Option = func(*Model)
 
 // New creates a new model for the table widget
-func New(opts ...Option) Model {
+func New(
+	cols []Column,
+	widths []int,
+	rows [][]string,
+	height, width int,
+	styles Styles,
+	keyMap KeyMap,
+) Model {
 	m := Model{
-		cursor:   0,
+		Table:    table.New(cols, rows),
+		widths:   widths,
 		viewport: viewport.New(0, 20),
 
-		KeyMap: DefaultKeyMap,
-		styles: DefaultStyles,
+		KeyMap: keyMap, // DefaultKeyMap,
+		styles: styles, // DefaultStyles,
 	}
-	for _, opt := range opts {
-		opt(&m)
-	}
+	m.Table.MoveTo(0)
+	m.viewport.Height = height
+	m.viewport.Width = width
 	return m
 }
 
@@ -183,95 +144,53 @@ func (m *Model) Update(msg tea.Msg) {
 // SelectedRow returns the selected row.
 // You can cast it to your own implementation.
 func (m *Model) SelectedRow() []string {
-	if m.cursor < 0 || m.cursor >= len(m.rows) {
+	if m.Table.Cursor() == -1 {
 		return nil
 	}
 
-	return m.rows[m.cursor]
+	return m.Table.Selected()
 }
 
-// Rows returns the current rows
-func (m *Model) Rows() [][]string {
-	return m.rows
-}
+func (m *Model) Height() int     { return m.viewport.Height } // Height returns the viewport height of the table
+func (m *Model) SetHeight(h int) { m.viewport.Height = h }    // SetHeight sets the height of the viewport of the table
 
-// SetRows sets a new rows state
-func (m *Model) SetRows(r ...[]string) {
-	m.rows = r
-}
+func (m *Model) Width() int     { return m.viewport.Width } // Width returns the viewport width of the table
+func (m *Model) SetWidth(w int) { m.viewport.Width = w }    // SetWidth sets the width of the viewport of the table
 
-// SetColumns sets a new columns state
-func (m *Model) SetColumns(c []Column) {
-	m.cols = c
-}
-
-// SetWidth sets the width of the viewport of the table
-func (m *Model) SetWidth(w int) {
-	m.viewport.Width = w
-}
-
-// SetHeight sets the height of the viewport of the table
-func (m *Model) SetHeight(h int) {
-	m.viewport.Height = h
-}
-
-// Height returns the viewport height of the table
-func (m *Model) Height() int {
-	return m.viewport.Height
-}
-
-// Width returns the viewport width of the table
-func (m *Model) Width() int {
-	return m.viewport.Width
-}
-
-// Cursor returns the index of the selected row
-func (m *Model) Cursor() int {
-	return m.cursor
-}
-
-// SetCursor sets the cursor position in the table
-func (m *Model) SetCursor(n int) {
-	m.cursor = fun.Clamp(n, 0, len(m.rows)-1)
-}
+func (m *Model) Cursor() int     { return m.Table.Cursor() } // Cursor returns the index of the selected row
+func (m *Model) SetCursor(n int) { m.Table.MoveTo(n) }       // SetCursor sets the cursor position in the table
 
 // MoveUp moves the selection up by any number of rows.
 // It can not go above the first row.
 func (m *Model) MoveUp(n int) {
-	newCursor := max(m.cursor-n, 0)
-	if newCursor < m.viewport.YOffset || m.cursor-newCursor >= m.viewport.Height {
-		m.viewport.SetYOffset(newCursor)
-	}
-	m.cursor = newCursor
+	m.Table.MoveUp(n)
+	m.viewport.SetYOffset(m.Table.Cursor())
 }
 
 // MoveDown moves the selection down by any number of rows.
 // It can not go below the last row.
 func (m *Model) MoveDown(n int) {
-	newCursor := min(m.cursor+n, len(m.rows)-1)
-	if newCursor-m.viewport.Height >= m.viewport.YOffset || newCursor-m.cursor >= m.viewport.Height {
-		m.viewport.SetYOffset(newCursor - m.viewport.Height + 1)
-	}
-	m.cursor = newCursor
+	m.Table.MoveDown(n)
+	m.viewport.SetYOffset(m.Table.Cursor())
 }
 
 // GotoTop moves the selection to the first row
 func (m *Model) GotoTop() {
-	m.MoveUp(m.cursor)
+	m.MoveUp(m.Table.Cursor())
 }
 
 // GotoBottom moves the selection to the last row
 func (m *Model) GotoBottom() {
-	m.MoveDown(len(m.rows))
+	m.MoveDown(m.Table.RowsCount())
 }
 
 // View renders the component
 func (m *Model) View(vb tea.Viewbox) {
 	const _gap = 2
 	// 2 for borders, 2 for margin
-	totalWidth := 2 + 2 + _gap*(len(m.cols)-1)
-	for _, col := range m.cols {
-		totalWidth += col.Width
+	totalWidth := 2 + 2 + _gap*(len(m.widths)-1)
+	for _, width := range m.widths {
+		totalWidth += width
 	}
 
 	vb = vb.
@@ -283,9 +202,9 @@ func (m *Model) View(vb tea.Viewbox) {
 		func(vb tea.Viewbox) {
 			// header
 			vbh := vb.Styled(m.styles.Header).PaddingLeft(1)
-			for _, col := range m.cols {
-				vbh.WriteLine(runewidth.Truncate(col.Title, col.Width, "…"))
-				vbh = vbh.PaddingLeft(col.Width).PaddingLeft(_gap)
+			for i, col := range m.Table.Columns() {
+				vbh.WriteLine(runewidth.Truncate(col.Title, m.widths[i], "…"))
+				vbh = vbh.PaddingLeft(m.widths[i]).PaddingLeft(_gap)
 			}
 
 			// split line
@@ -293,14 +212,14 @@ func (m *Model) View(vb tea.Viewbox) {
 
 			// rows
 			m.viewport.View(vb.PaddingTop(2), func(vbRow tea.Viewbox, i int) {
-				if i == m.cursor {
+				if i == m.Table.Cursor() {
 					vbRow = vbRow.Styled(m.styles.Selected)
 				}
 
 				vbRow = vbRow.PaddingLeft(1)
-				for i, value := range m.rows[i] {
-					vbRow.WriteLine(m.styles.Cell.Render(runewidth.Truncate(value, m.cols[i].Width, "…")))
-					vbRow = vbRow.PaddingLeft(m.cols[i].Width).PaddingLeft(_gap)
+				for i, value := range m.Table.Rows()[i] {
+					vbRow.WriteLine(m.styles.Cell.Render(runewidth.Truncate(value, m.widths[i], "…")))
+					vbRow = vbRow.PaddingLeft(m.widths[i]).PaddingLeft(_gap)
 				}
 			})
 		},
