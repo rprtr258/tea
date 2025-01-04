@@ -84,14 +84,9 @@ func DefaultFilter(term string, targets []string) []Rank {
 	slices.SortStableFunc(ranks, func(i, j fuzzy.Match) int {
 		return j.Score - i.Score
 	})
-	return fun.Map[Rank](
-		func(r fuzzy.Match) Rank {
-			return Rank{
-				Index:          r.Index,
-				MatchedIndexes: r.MatchedIndexes,
-			}
-		},
-		ranks...)
+	return fun.Map[Rank](func(r fuzzy.Match) Rank {
+		return Rank{r.Index, r.MatchedIndexes}
+	}, ranks...)
 }
 
 type msgStatusMessageTimeout struct{}

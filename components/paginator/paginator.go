@@ -36,10 +36,11 @@ var DefaultKeyMap = KeyMap{
 
 // Model is the Tea model for this user interface.
 type Model struct {
+	Page       int // Page is the current page number.
+	PerPage    int // PerPage is the number of items per page.
+	TotalPages int // TotalPages is the total number of pages.
+
 	Type             Type // Type configures how the pagination is rendered (Arabic, Dots).
-	Page             int  // Page is the current page number.
-	PerPage          int  // PerPage is the number of items per page.
-	TotalPages       int  // TotalPages is the total number of pages.
 	ActiveDot        rune // ActiveDot is used to mark the current page under the Dots display type.
 	ActiveDotStyle   styles.Style
 	InactiveDot      rune // InactiveDot is used to mark inactive pages under the Dots display type.
