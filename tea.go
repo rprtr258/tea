@@ -129,12 +129,12 @@ func (s startupOptions) has(option startupOptions) bool {
 
 // handlers manages series of channels returned by various processes. It allows
 // us to wait for those processes to terminate before exiting the program.
-type handlers = []<-chan struct{}
+type handler = <-chan struct{}
 
 // handlersShutdown waits for all handlers to terminate.
-func handlersShutdown(h handlers) {
+func handlersShutdown(handlers []handler) {
 	var wg sync.WaitGroup
-	for _, ch := range h {
+	for _, ch := range handlers {
 		wg.Add(1)
 		go func(ch <-chan struct{}) {
 			<-ch
@@ -447,7 +447,7 @@ func (p *Program[M]) eventLoop(model M, cmds chan []Cmd) (M, error) {
 // terminated by either [Program.Quit], [Program.Kill], or its signal handler.
 // Returns the final model.
 func (p *Program[M]) Run() (M, error) {
-	myHandlers := handlers{}
+	myHandlers := []handler{}
 	cmds := make(chan []Cmd)
 	p.errs = make(chan error)
 	p.done = make(chan struct{}, 1)
@@ -465,20 +465,11 @@ func (p *Program[M]) Run() (M, error) {
 		//
 		// To disable input entirely pass nil to the [WithInput] program option.
 		f, isFile := p.input.(*os.File)
-		if !isFile {
-			break
-		}
-		if isatty.IsTerminal(f.Fd()) {
+		if !isFile || isatty.IsTerminal(f.Fd()) {
 			break
 		}
 
-		f, err := openInputTTY()
-		if err != nil {
-			return p.model, err
-		}
-		defer f.Close() //nolint:errcheck // uuh
-
-		p.input = f
+		fallthrough
 	case ttyInput:
 		// Open a new TTY, by request
 		f, err := openInputTTY()
@@ -488,8 +479,6 @@ func (p *Program[M]) Run() (M, error) {
 		defer f.Close() //nolint:errcheck // uuh
 
 		p.input = f
-	case customInput:
-		// (There is nothing extra to do.)
 	}
 
 	// Handle signals.
