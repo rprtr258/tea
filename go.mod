@@ -3,7 +3,7 @@ module github.com/rprtr258/tea
 go 1.23.3
 
 require (
-	github.com/alecthomas/chroma/v2 v2.14.0
+	github.com/alecthomas/chroma/v2 v2.15.0
 	github.com/atotto/clipboard v0.1.4
 	github.com/aymanbagabas/go-udiff v0.2.0
 	github.com/charmbracelet/harmonica v0.2.0
