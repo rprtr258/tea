@@ -27,7 +27,7 @@ require (
 	github.com/rprtr258/fun v0.0.29
 	github.com/rprtr258/scuf v0.0.6
 	github.com/sahilm/fuzzy v0.1.1
-	github.com/samber/lo v1.47.0
+	github.com/samber/lo v1.49.0
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/yuin/goldmark v1.7.8
