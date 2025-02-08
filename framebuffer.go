@@ -59,6 +59,13 @@ func NewViewbox(height, width int) Viewbox {
 	}
 }
 
+func (vb Viewbox) String() string {
+	return fmt.Sprintf(
+		"Viewbox{Height: %d, Width: %d, Y: %d, X: %d}",
+		vb.Height, vb.Width, vb.Y, vb.X,
+	)
+}
+
 func (vb *Viewbox) clear() {
 	for i := range vb.fb.B {
 		vb.fb.B[i] = ' '
@@ -348,7 +355,7 @@ func EvalLayout(x int, ls ...Layout) []int {
 func (vb Viewbox) SplitY(ls ...Layout) []Viewbox {
 	heights := EvalLayout(vb.Height, ls...)
 	res := make([]Viewbox, len(heights))
-	y := 0
+	y := vb.Y
 	for i, h := range heights {
 		res[i] = Viewbox{
 			fb:     vb.fb,
@@ -386,7 +393,7 @@ func (vb Viewbox) SplitY5(l1, l2, l3, l4, l5 Layout) (_, _, _, _, _ Viewbox) {
 func (vb Viewbox) SplitX(ls ...Layout) []Viewbox {
 	widths := EvalLayout(vb.Width, ls...)
 	res := make([]Viewbox, len(widths))
-	x := 0
+	x := vb.X
 	for i, w := range widths {
 		res[i] = Viewbox{
 			fb:     vb.fb,

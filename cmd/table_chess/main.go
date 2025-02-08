@@ -35,27 +35,29 @@ func (m *model) View(vb tea.Viewbox) {
 		labelsX.Set(0, i*4+2, []rune("ABCDEFGH")[i])
 	}
 
-	tablebox.Box(
-		vbBoard,
-		[]tea.Layout{tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1), tea.Fixed(1)},
-		[]tea.Layout{tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3), tea.Fixed(3)}, // TODO: all flex(1)
-		func(vb tea.Viewbox, y, x int) {
-			board := [8][8]rune{
-				{'♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'},
-				{'♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'},
-				{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-				{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-				{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-				{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-				{'♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'},
-				{'♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'},
-			}
+	board := [8][8]rune{
+		{'♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'},
+		{'♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+		{'♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'},
+		{'♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'},
+	}
 
-			vb.Set(0, vb.Width/2, board[y][x])
-		},
+	for i, vb := range tablebox.Box(
+		vbBoard,
 		tablebox.NormalBorder,
 		styles.Style{},
-	)
+		tablebox.Grid(
+			[]tea.Layout{tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto()},
+			[]tea.Layout{tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto(), tea.Auto()},
+		)...,
+	) {
+		y, x := i/8, i%8
+		vb.Set(0, vb.Width/2, board[y][x])
+	}
 }
 
 func Main(ctx context.Context) error {
