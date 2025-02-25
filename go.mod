@@ -31,7 +31,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/yuin/goldmark v1.7.8
-	github.com/yuin/goldmark-emoji v1.0.4
+	github.com/yuin/goldmark-emoji v1.0.5
 	golang.org/x/image v0.24.0
 	golang.org/x/term v0.29.0
 )
